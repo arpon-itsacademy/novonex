@@ -149,11 +149,10 @@ export const AdminShurjopayPage: React.FC = () => {
                                 <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                                     {isBn ? 'shurjoPay গেটওয়ে ইন্টিগ্রেশন' : 'shurjoPay Gateway Integration'}
                                 </h1>
-                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
-                                    settings.enabled
-                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
-                                }`}>
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${settings.enabled
+                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                    : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                                    }`}>
                                     {settings.enabled ? (isBn ? 'সক্রিয়' : 'Active') : (isBn ? 'নিষ্ক্রিয়' : 'Disabled')}
                                 </span>
                                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300">
@@ -161,7 +160,7 @@ export const AdminShurjopayPage: React.FC = () => {
                                 </span>
                             </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                {isBn 
+                                {isBn
                                     ? 'বিকাশ, নগদ, রকেট, কার্ড এবং ইন্টারনেট ব্যাংকিংয়ের মাধ্যমে স্বয়ংক্রিয় পেমেন্ট ও এনরোলমেন্ট কনফিগার করুন।'
                                     : 'Configure dynamic shurjoPay online checkout with automatic payment verification and course enrollment.'}
                             </p>
@@ -207,11 +206,10 @@ export const AdminShurjopayPage: React.FC = () => {
 
             {/* Test Result Banner */}
             {testResult && (
-                <div className={`p-4 rounded-2xl border text-xs flex items-start gap-3 animate-fadeIn ${
-                    testResult.success
-                        ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200'
-                        : 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200'
-                }`}>
+                <div className={`p-4 rounded-2xl border text-xs flex items-start gap-3 animate-fadeIn ${testResult.success
+                    ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200'
+                    : 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200'
+                    }`}>
                     {testResult.success ? (
                         <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                     ) : (

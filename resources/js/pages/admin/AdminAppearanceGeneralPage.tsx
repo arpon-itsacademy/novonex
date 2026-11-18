@@ -58,8 +58,8 @@ export const AdminAppearanceGeneralPage: React.FC = () => {
             setFaviconUrl(settings.favicon_url || '');
             setSiteName(settings.site_name || 'NovoNex');
             setSiteTagline(settings.site_tagline || 'Premier Online Learning & EdTech Platform');
-            setPrimaryColor(settings.primary_color || '#0ea5e9');
-            setSecondaryColor(settings.secondary_color || '#0f172a');
+            setPrimaryColor(settings.primary_color || '#CC1200');
+            setSecondaryColor(settings.secondary_color || '#25a2ee');
         }
     }, [settings]);
 
@@ -168,8 +168,8 @@ export const AdminAppearanceGeneralPage: React.FC = () => {
             setFaviconUrl('');
             setSiteName('NovoNex');
             setSiteTagline("Premier Online Learning Platform");
-            setPrimaryColor('#0ea5e9');
-            setSecondaryColor('#0f172a');
+            setPrimaryColor('#CC1200');
+            setSecondaryColor('#25a2ee');
         }
     };
 

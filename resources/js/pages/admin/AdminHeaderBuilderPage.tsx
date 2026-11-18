@@ -45,7 +45,7 @@ const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
     announcement_text: '🎉 নতুন ব্যাচে ভর্তি চলছে! ২০% ছাড়ে এখনই এনরোল করুন।',
     announcement_text_en: '🎉 New batch admission open! Enroll now with 20% discount.',
     announcement_link: '/courses',
-    announcement_bg: '#0284c7',
+    announcement_bg: '#CC1200',
     cta_button_enabled: false,
     cta_button_text: 'ফ্রি ক্লাস',
     cta_button_text_en: 'Free Classes',

@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
 
             if (\Illuminate\Support\Facades\Schema::hasTable('website_settings')) {
                 $setting = \App\Models\WebsiteSetting::first();
-                if ($setting && ($setting->site_name !== 'NovoNex' || str_contains(json_encode($setting->header_settings), 'Monologue'))) {
+                if ($setting && ($setting->site_name !== 'NovoNex' || $setting->primary_color !== '#CC1200' || $setting->secondary_color !== '#25a2ee' || str_contains(json_encode($setting->header_settings), 'Monologue'))) {
                     $header = $setting->header_settings ?? [];
                     $header['brand_title'] = 'NovoNex';
                     $header['brand_subtitle'] = '';
@@ -57,6 +57,8 @@ class AppServiceProvider extends ServiceProvider
                         'site_tagline' => 'Premier Online Learning & EdTech Platform',
                         'contact_email' => 'support@nexcourses.com',
                         'copyright_text' => '© 2026 NovoNex. All rights reserved.',
+                        'primary_color' => '#CC1200',
+                        'secondary_color' => '#25a2ee',
                         'header_settings' => $header,
                         'footer_settings' => $footer,
                     ]);

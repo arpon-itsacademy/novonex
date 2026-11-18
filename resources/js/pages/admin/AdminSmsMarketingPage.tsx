@@ -174,7 +174,7 @@ export const AdminSmsMarketingPage: React.FC = () => {
 
     return (
         <div className="max-w-5xl mx-auto space-y-6 pb-16">
-            
+
             {/* Top Navigation Tabs: Configuration vs Marketing */}
             <div className="bg-white p-2 rounded-2xl border border-slate-200/90 shadow-2xs flex items-center gap-2">
                 <Link
@@ -264,10 +264,10 @@ export const AdminSmsMarketingPage: React.FC = () => {
 
             {/* Main Form Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
+
                 {/* Left 2 Cols: Form Inputs */}
                 <div className="lg:col-span-2 space-y-6">
-                    
+
                     {/* Step 1: Target Audience Selection */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4">
                         <div className="flex items-center justify-between">
@@ -298,15 +298,13 @@ export const AdminSmsMarketingPage: React.FC = () => {
                                         type="button"
                                         key={opt.id}
                                         onClick={() => setTargetType(opt.id as any)}
-                                        className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between ${
-                                            isSelected
-                                                ? 'bg-sky-50/70 border-sky-500 ring-2 ring-sky-500/20 shadow-xs'
-                                                : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                                        }`}
+                                        className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between ${isSelected
+                                            ? 'bg-sky-50/70 border-sky-500 ring-2 ring-sky-500/20 shadow-xs'
+                                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                            }`}
                                     >
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2 ${
-                                            isSelected ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-600'
-                                        }`}>
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2 ${isSelected ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-600'
+                                            }`}>
                                             <Icon className="w-4 h-4" />
                                         </div>
                                         <div>
@@ -425,9 +423,8 @@ export const AdminSmsMarketingPage: React.FC = () => {
                         {/* Character and SMS calculation indicator */}
                         <div className="flex flex-wrap items-center justify-between text-xs bg-slate-50 p-3 rounded-xl border border-slate-100 gap-2">
                             <div className="flex items-center gap-3">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                    isUnicode ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-700'
-                                }`}>
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${isUnicode ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-700'
+                                    }`}>
                                     {isUnicode ? 'Unicode' : 'GSM / ASCII'}
                                 </span>
                                 <span className="text-slate-600 font-medium">
@@ -470,7 +467,7 @@ export const AdminSmsMarketingPage: React.FC = () => {
 
                 {/* Right 1 Col: Summary & Audience Preview */}
                 <div className="space-y-6">
-                    
+
                     {/* Live Audience Card */}
                     <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4">
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3">

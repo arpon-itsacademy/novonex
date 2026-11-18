@@ -297,24 +297,24 @@ export const Navbar: React.FC = () => {
                     />
                     <path
                         d="M0 0 H40 C60 18, 50 38, 90 60 H0 Z"
-                        fill="#0284c7"
+                        fill="#25a2ee"
                         opacity="0.45"
                     />
                     <path
                         d="M0 10 C30 5, 45 40, 75 60 H0 Z"
-                        fill="#0369a1"
+                        fill="#1269a7"
                         opacity="0.3"
                     />
                     <defs>
                         <linearGradient id="bpLeftBlueGradient" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stopColor="#0284c7" />
-                            <stop offset="50%" stopColor="#38bdf8" />
-                            <stop offset="100%" stopColor="#7dd3fc" stopOpacity="0.85" />
+                            <stop offset="0%" stopColor="#1784ce" />
+                            <stop offset="50%" stopColor="#25a2ee" />
+                            <stop offset="100%" stopColor="#7bcbf4" stopOpacity="0.85" />
                         </linearGradient>
                     </defs>
                 </svg>
 
-                {/* Right Side Organic Wavy Orange/Amber Gradient Accent */}
+                {/* Right Side Organic Wavy Red Gradient Accent */}
                 <svg
                     className="absolute right-0 top-0 bottom-0 h-full w-24 sm:w-40 pointer-events-none select-none -z-0 rounded-r-full overflow-hidden"
                     viewBox="0 0 150 60"
@@ -323,19 +323,19 @@ export const Navbar: React.FC = () => {
                 >
                     <path
                         d="M150 0 H80 C50 15, 70 45, 25 60 H150 Z"
-                        fill="url(#bpRightOrangeGradient)"
+                        fill="url(#bpRightRedGradient)"
                         opacity="0.95"
                     />
                     <path
                         d="M150 0 H95 C75 18, 85 38, 45 60 H150 Z"
-                        fill="#f59e0b"
+                        fill="#CC1200"
                         opacity="0.4"
                     />
                     <defs>
-                        <linearGradient id="bpRightOrangeGradient" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stopColor="#f59e0b" />
-                            <stop offset="55%" stopColor="#fb923c" />
-                            <stop offset="100%" stopColor="#ea580c" />
+                        <linearGradient id="bpRightRedGradient" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor="#CC1200" />
+                            <stop offset="55%" stopColor="#e04337" />
+                            <stop offset="100%" stopColor="#ee736a" />
                         </linearGradient>
                     </defs>
                 </svg>
@@ -355,16 +355,18 @@ export const Navbar: React.FC = () => {
                             <div style={{ height: `${logoHeight}px`, width: '120px' }} className="shrink-0" />
                         ) : (
                             <div className="flex items-center gap-2">
-                                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white text-sky-700 shadow-md flex items-center justify-center font-black group-hover:rotate-6 transition-transform">
-                                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-sky-600" />
+                                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white text-[#25a2ee] shadow-md flex items-center justify-center font-black group-hover:rotate-6 transition-transform">
+                                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-[#25a2ee]" />
                                 </div>
                                 <div className="flex flex-col leading-none">
                                     <span className="text-base sm:text-xl font-black tracking-tight text-white drop-shadow-xs">
                                         {brandTitle}
                                     </span>
-                                    <span className="text-[10px] sm:text-xs font-black tracking-widest text-amber-300 drop-shadow-xs">
-                                        {brandSubtitle}
-                                    </span>
+                                    {brandSubtitle && (
+                                        <span className="text-[10px] sm:text-xs font-black tracking-widest text-[#CC1200] drop-shadow-xs">
+                                            {brandSubtitle}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -599,7 +601,7 @@ export const Navbar: React.FC = () => {
                                 className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/90 dark:bg-slate-800/90 text-slate-800 dark:text-white border border-slate-200/90 dark:border-slate-700 shadow-xs hover:border-sky-400 hover:text-sky-600 transition-all cursor-pointer group"
                                 title={user.role === 'admin' ? 'অ্যাডমিন প্যানেলে যান' : 'ড্যাশবোর্ডে যান'}
                             >
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-amber-500 text-white font-bold text-xs flex items-center justify-center">
+                                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#25a2ee] to-[#CC1200] text-white font-bold text-xs flex items-center justify-center">
                                     {user.name.charAt(0).toUpperCase()}
                                 </div>
                                 <span className="font-extrabold text-xs sm:text-sm hidden sm:inline max-w-[100px] truncate">
@@ -611,7 +613,7 @@ export const Navbar: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={logout}
-                                className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-full transition-colors cursor-pointer"
+                                className="p-2 text-slate-400 hover:text-[#CC1200] hover:bg-red-50 dark:hover:bg-red-950/40 rounded-full transition-colors cursor-pointer"
                                 title="লগআউট"
                             >
                                 <LogOut className="w-4 h-4" />
@@ -622,15 +624,15 @@ export const Navbar: React.FC = () => {
                             {/* লগইন (Login) Pill Button */}
                             <Link
                                 to="/login"
-                                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-extrabold text-white bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 shadow-md shadow-sky-500/25 transition-all transform active:scale-95 cursor-pointer"
+                                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-extrabold text-white bg-[#25a2ee] hover:bg-[#1784ce] shadow-md shadow-[#25a2ee]/25 transition-all transform active:scale-95 cursor-pointer"
                             >
                                 লগইন
                             </Link>
 
-                            {/* এখনই শুরু করুন (Get Started) Orange/Amber Pill Button */}
+                            {/* এখনই শুরু করুন (Get Started) Red Pill Button */}
                             <Link
                                 to="/courses"
-                                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-extrabold text-white bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 hover:from-orange-600 hover:to-amber-600 shadow-md shadow-orange-500/25 transition-all transform active:scale-95 cursor-pointer whitespace-nowrap hidden sm:inline-flex"
+                                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-extrabold text-white bg-[#CC1200] hover:bg-[#a80e00] shadow-md shadow-[#CC1200]/25 transition-all transform active:scale-95 cursor-pointer whitespace-nowrap hidden sm:inline-flex"
                             >
                                 এখনই শুরু করুন
                             </Link>

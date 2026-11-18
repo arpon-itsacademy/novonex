@@ -237,33 +237,33 @@ export const HomePage: React.FC = () => {
 
     return (
         <div className="space-y-16 sm:space-y-24 pb-20 overflow-hidden font-sans">
-            {/* Top Live Campaign Ribbon (Bondi Pathshala Style) */}
-            <div className="bg-gradient-to-r from-sky-700 via-sky-600 to-amber-500 text-white text-xs sm:text-sm py-2.5 px-4 font-semibold text-center flex items-center justify-center gap-2 shadow-inner">
+            {/* Top Live Campaign Ribbon */}
+            <div className="bg-gradient-to-r from-[#25a2ee] via-[#25a2ee] to-[#CC1200] text-white text-xs sm:text-sm py-2.5 px-4 font-semibold text-center flex items-center justify-center gap-2 shadow-inner">
                 <span className="flex h-2 w-2 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                 </span>
                 <span>🔥 HSC একাডেমিক সাইকেল ও অ্যাডমিশন মাস্টার ব্যাচে স্পেশাল ছাড়ে ভর্তি চলছে!</span>
-                <Link to="/courses" className="underline font-bold text-amber-200 hover:text-white transition-colors ml-1 hidden sm:inline">
+                <Link to="/courses" className="underline font-extrabold text-white hover:text-red-100 transition-colors ml-1 hidden sm:inline">
                     সকল কোর্স দেখুন →
                 </Link>
             </div>
 
-            {/* 1. HERO SECTION (Bondi Pathshala Inspired Dynamic Layout) */}
+            {/* 1. HERO SECTION */}
             <section className="relative overflow-hidden bg-gradient-to-b from-sky-50/70 via-white to-slate-50/50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 pt-8 sm:pt-14 pb-16 sm:pb-24 border-b border-slate-100 dark:border-slate-800 transition-colors">
                 {/* Decorative background blurs */}
-                <div className="absolute top-0 right-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
-                <div className="absolute bottom-0 left-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+                <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#25a2ee]/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+                <div className="absolute bottom-0 left-10 w-96 h-96 bg-[#CC1200]/10 rounded-full blur-3xl -z-10 pointer-events-none" />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
                         {/* Left Content Column */}
                         <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
                             {/* Trust Badge */}
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-sky-50 to-amber-50 dark:from-slate-800 dark:to-slate-800 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-slate-700 text-xs sm:text-sm font-extrabold tracking-wide shadow-2xs">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#25a2ee]/10 to-[#CC1200]/10 text-[#25a2ee] border border-[#25a2ee]/30 text-xs sm:text-sm font-extrabold tracking-wide shadow-2xs">
                                 <span className="flex h-2.5 w-2.5 relative">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-600"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#CC1200] opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#CC1200]"></span>
                                 </span>
                                 <span>বাংলাদেশের আধুনিকতম অনলাইন লার্নিং প্ল্যাটফর্ম</span>
                             </div>
@@ -271,7 +271,7 @@ export const HomePage: React.FC = () => {
                             {/* Headline */}
                             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-[1.2] tracking-tight">
                                 স্বপ্ন যেখানে বাস্তব হয়, <br />
-                                <span className="bg-gradient-to-r from-sky-600 via-sky-500 to-amber-500 bg-clip-text text-transparent">
+                                <span className="bg-gradient-to-r from-[#25a2ee] via-[#25a2ee] to-[#CC1200] bg-clip-text text-transparent">
                                     কনসেপ্ট ক্লিয়ারিং থেকে
                                 </span> <br />
                                 অ্যাডমিশন জয়!
@@ -279,14 +279,14 @@ export const HomePage: React.FC = () => {
 
                             {/* Subtitle */}
                             <p className="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                                অভিজ্ঞ মেন্টরদের লাইভ ও ফুল HD রেকর্ডেড ক্লাস, অধ্যায়ভিত্তিক লেকচার শিট, <strong className="text-sky-600 dark:text-sky-400 font-bold">24/7 NexPilot AI ডাউট সলভিং</strong> এবং রিয়েল টাইম মডেল টেস্টের মাধ্যমে প্রস্তুতি নাও ১০০% আত্মবিশ্বাসে।
+                                অভিজ্ঞ মেন্টরদের লাইভ ও ফুল HD রেকর্ডেড ক্লাস, অধ্যায়ভিত্তিক লেকচার শিট, <strong className="text-[#25a2ee] font-bold">24/7 NexPilot AI ডাউট সলভিং</strong> এবং রিয়েল টাইম মডেল টেস্টের মাধ্যমে প্রস্তুতি নাও ১০০% আত্মবিশ্বাসে।
                             </p>
 
                             {/* Dual CTAs */}
                             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
                                 <Link
                                     to="/courses"
-                                    className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-sky-600/30 hover:shadow-xl hover:shadow-sky-600/40 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                                    className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#CC1200] hover:bg-[#a80e00] text-white font-extrabold text-sm sm:text-base shadow-lg shadow-[#CC1200]/30 hover:shadow-xl hover:shadow-[#CC1200]/40 transition-all flex items-center justify-center gap-2 group cursor-pointer"
                                 >
                                     <span>কোর্সগুলো ঘুরে দেখুন</span>
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
@@ -294,9 +294,9 @@ export const HomePage: React.FC = () => {
 
                                 <Link
                                     to="/student/exams"
-                                    className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-extrabold text-sm sm:text-base hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-sky-300 dark:hover:border-sky-600 hover:text-sky-600 transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                                    className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-slate-900 border-2 border-[#25a2ee] text-[#25a2ee] font-extrabold text-sm sm:text-base hover:bg-[#25a2ee] hover:text-white transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                                 >
-                                    <ClipboardList className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                                    <ClipboardList className="w-5 h-5 text-current" />
                                     <span>অনলাইন এক্সাম দিন</span>
                                 </Link>
                             </div>
@@ -304,40 +304,40 @@ export const HomePage: React.FC = () => {
                             {/* Metrics Counter Bar */}
                             <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-slate-200/80 dark:border-slate-800 text-left">
                                 <div className="space-y-0.5">
-                                    <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400">৫০,০০০+</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-[#25a2ee]">৫০,০০০+</div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">সক্রিয় শিক্ষার্থী</div>
                                 </div>
                                 <div className="space-y-0.5">
-                                    <div className="text-2xl sm:text-3xl font-black text-amber-500 dark:text-amber-400">১০০+</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-[#CC1200]">১০০+</div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">ফ্ল্যাগশিপ কোর্স</div>
                                 </div>
                                 <div className="space-y-0.5">
-                                    <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">৯৮%</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-[#25a2ee]">৯৮%</div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">পরীক্ষায় সাফল্য</div>
                                 </div>
                                 <div className="space-y-0.5">
-                                    <div className="text-2xl sm:text-3xl font-black text-sky-500 dark:text-sky-400">২৪/৭</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-[#CC1200]">২৪/৭</div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">এআই ডাউট সলভার</div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Bondi Pathshala Style Interactive Visual Card */}
+                        {/* Right Interactive Visual Card */}
                         <div className="lg:col-span-5 relative">
-                            <div className="relative mx-auto max-w-md lg:max-w-none bg-gradient-to-tr from-sky-500 via-sky-600 to-amber-500 p-1 rounded-3xl shadow-2xl shadow-sky-500/25">
+                            <div className="relative mx-auto max-w-md lg:max-w-none bg-gradient-to-tr from-[#25a2ee] to-[#CC1200] p-1 rounded-3xl shadow-2xl shadow-[#25a2ee]/25">
                                 <div className="bg-slate-900 rounded-[22px] p-6 text-white space-y-5">
                                     {/* Card Header */}
                                     <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                                         <div className="flex items-center gap-2">
                                             <span className="flex h-2.5 w-2.5 relative">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#CC1200] opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#CC1200]"></span>
                                             </span>
-                                            <span className="text-xs font-bold text-amber-400 uppercase tracking-wide">
+                                            <span className="text-xs font-bold text-[#CC1200] uppercase tracking-wide">
                                                 লাইভ ফ্ল্যাগশিপ প্রোগ্রাম
                                             </span>
                                         </div>
-                                        <span className="text-[11px] font-bold px-2 py-0.5 bg-sky-500/30 text-sky-200 rounded-md">
+                                        <span className="text-[11px] font-bold px-2 py-0.5 bg-[#25a2ee]/20 text-[#25a2ee] rounded-md">
                                             Academic Cycle 2026-27
                                         </span>
                                     </div>
@@ -355,7 +355,7 @@ export const HomePage: React.FC = () => {
                                     {/* Highlights list with icons */}
                                     <div className="space-y-2.5">
                                         <div className="bg-slate-800/90 p-3 rounded-xl border border-slate-700/60 flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+                                            <div className="w-9 h-9 rounded-lg bg-[#25a2ee]/20 text-[#25a2ee] flex items-center justify-center shrink-0">
                                                 <Video className="w-5 h-5" />
                                             </div>
                                             <div>
@@ -365,7 +365,7 @@ export const HomePage: React.FC = () => {
                                         </div>
 
                                         <div className="bg-slate-800/90 p-3 rounded-xl border border-slate-700/60 flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                                            <div className="w-9 h-9 rounded-lg bg-[#25a2ee]/20 text-[#25a2ee] flex items-center justify-center shrink-0">
                                                 <Bot className="w-5 h-5" />
                                             </div>
                                             <div>
@@ -375,7 +375,7 @@ export const HomePage: React.FC = () => {
                                         </div>
 
                                         <div className="bg-slate-800/90 p-3 rounded-xl border border-slate-700/60 flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                                            <div className="w-9 h-9 rounded-lg bg-[#CC1200]/20 text-[#CC1200] flex items-center justify-center shrink-0">
                                                 <ClipboardList className="w-5 h-5" />
                                             </div>
                                             <div>
@@ -389,7 +389,7 @@ export const HomePage: React.FC = () => {
                                     <div className="pt-2">
                                         <Link
                                             to="/courses"
-                                            className="block w-full py-3.5 bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-extrabold rounded-xl text-center text-sm shadow-md shadow-sky-500/25 transition-all cursor-pointer"
+                                            className="block w-full py-3.5 bg-gradient-to-r from-[#25a2ee] to-[#CC1200] hover:opacity-95 text-white font-extrabold rounded-xl text-center text-sm shadow-md shadow-[#25a2ee]/25 transition-all cursor-pointer"
                                         >
                                             এখনই ব্যাচে ভর্তি হোন
                                         </Link>

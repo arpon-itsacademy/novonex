@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../api/client';
-import { 
-    Bot, 
-    Sparkles, 
-    Cpu, 
-    Key, 
-    Check, 
-    CheckCircle2, 
-    AlertCircle, 
-    Eye, 
-    EyeOff, 
-    Save, 
-    RefreshCw, 
-    ShieldCheck, 
-    Zap, 
+import {
+    Bot,
+    Sparkles,
+    Cpu,
+    Key,
+    Check,
+    CheckCircle2,
+    AlertCircle,
+    Eye,
+    EyeOff,
+    Save,
+    RefreshCw,
+    ShieldCheck,
+    Zap,
     ExternalLink,
     HelpCircle,
     Info,
@@ -216,11 +216,10 @@ export const AdminNexPilotAiConfigPage: React.FC = () => {
 
             {/* Test Result Message */}
             {testResult && (
-                <div className={`p-4 rounded-2xl border text-xs font-medium flex items-start gap-3 animate-in fade-in duration-200 ${
-                    testResult.success 
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200' 
-                        : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
-                }`}>
+                <div className={`p-4 rounded-2xl border text-xs font-medium flex items-start gap-3 animate-in fade-in duration-200 ${testResult.success
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                    : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                    }`}>
                     {testResult.success ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                     ) : (
@@ -308,11 +307,10 @@ export const AdminNexPilotAiConfigPage: React.FC = () => {
                         {/* Option 1: gpt-4o-mini */}
                         <div
                             onClick={() => setDefaultModel('gpt-4o-mini')}
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                defaultModel === 'gpt-4o-mini'
-                                    ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 shadow-xs'
-                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${defaultModel === 'gpt-4o-mini'
+                                ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 shadow-xs'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
+                                }`}
                         >
                             <div className="flex items-center justify-between mb-1.5">
                                 <span className="font-black text-sm text-slate-900 dark:text-white font-mono">
@@ -330,11 +328,10 @@ export const AdminNexPilotAiConfigPage: React.FC = () => {
                         {/* Option 2: gpt-4o */}
                         <div
                             onClick={() => setDefaultModel('gpt-4o')}
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                defaultModel === 'gpt-4o'
-                                    ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/30 shadow-xs'
-                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${defaultModel === 'gpt-4o'
+                                ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/30 shadow-xs'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
+                                }`}
                         >
                             <div className="flex items-center justify-between mb-1.5">
                                 <span className="font-black text-sm text-slate-900 dark:text-white font-mono">
@@ -352,11 +349,10 @@ export const AdminNexPilotAiConfigPage: React.FC = () => {
                         {/* Option 3: gpt-4-turbo */}
                         <div
                             onClick={() => setDefaultModel('gpt-4-turbo')}
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                defaultModel === 'gpt-4-turbo'
-                                    ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-950/30 shadow-xs'
-                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${defaultModel === 'gpt-4-turbo'
+                                ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-950/30 shadow-xs'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
+                                }`}
                         >
                             <span className="font-black text-sm text-slate-900 dark:text-white font-mono block mb-1">
                                 gpt-4-turbo
@@ -369,11 +365,10 @@ export const AdminNexPilotAiConfigPage: React.FC = () => {
                         {/* Option 4: gpt-3.5-turbo */}
                         <div
                             onClick={() => setDefaultModel('gpt-3.5-turbo')}
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                defaultModel === 'gpt-3.5-turbo'
-                                    ? 'border-slate-700 bg-slate-100 dark:bg-slate-800 shadow-xs'
-                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${defaultModel === 'gpt-3.5-turbo'
+                                ? 'border-slate-700 bg-slate-100 dark:bg-slate-800 shadow-xs'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
+                                }`}
                         >
                             <span className="font-black text-sm text-slate-900 dark:text-white font-mono block mb-1">
                                 gpt-3.5-turbo
@@ -386,11 +381,10 @@ export const AdminNexPilotAiConfigPage: React.FC = () => {
                         {/* Option 5: o1-mini */}
                         <div
                             onClick={() => setDefaultModel('o1-mini')}
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                defaultModel === 'o1-mini'
-                                    ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-950/30 shadow-xs'
-                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${defaultModel === 'o1-mini'
+                                ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-950/30 shadow-xs'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
+                                }`}
                         >
                             <div className="flex items-center justify-between mb-1.5">
                                 <span className="font-black text-sm text-slate-900 dark:text-white font-mono">
@@ -408,11 +402,10 @@ export const AdminNexPilotAiConfigPage: React.FC = () => {
                         {/* Option 6: o1-preview */}
                         <div
                             onClick={() => setDefaultModel('o1-preview')}
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                defaultModel === 'o1-preview'
-                                    ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 shadow-xs'
-                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${defaultModel === 'o1-preview'
+                                ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 shadow-xs'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/40'
+                                }`}
                         >
                             <div className="flex items-center justify-between mb-1.5">
                                 <span className="font-black text-sm text-slate-900 dark:text-white font-mono">

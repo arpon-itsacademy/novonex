@@ -84,11 +84,11 @@ export const Footer: React.FC = () => {
                                 </Link>
                             ) : (
                                 <>
-                                    <div className="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+                                    <div className="w-10 h-10 rounded-xl bg-[#25a2ee] flex items-center justify-center text-white shadow-md shadow-[#25a2ee]/20">
                                         <BookOpen className="w-6 h-6" />
                                     </div>
                                     <span className="text-2xl font-black text-white tracking-tight">
-                                        {brandTitle} <span className="text-sky-400">{brandSubtitle}</span>
+                                        {brandTitle} <span className="text-[#CC1200]">{brandSubtitle}</span>
                                     </span>
                                 </>
                             )}
@@ -97,7 +97,7 @@ export const Footer: React.FC = () => {
                             {description}
                         </p>
                         {showBadge && (
-                            <div className="flex items-center gap-2 text-xs text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-800/60 px-3 py-1.5 rounded-lg w-fit">
+                            <div className="flex items-center gap-2 text-xs text-[#25a2ee] font-semibold bg-[#25a2ee]/10 border border-[#25a2ee]/30 px-3 py-1.5 rounded-lg w-fit">
                                 <ShieldCheck className="w-4 h-4" />
                                 <span>{badgeText}</span>
                             </div>
@@ -183,7 +183,7 @@ export const Footer: React.FC = () => {
                                             href={soc.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-sky-600 text-slate-300 hover:text-white text-xs font-semibold capitalize transition"
+                                            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-[#CC1200] text-slate-300 hover:text-white text-xs font-semibold capitalize transition"
                                         >
                                             {soc.platform}
                                         </a>

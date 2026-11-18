@@ -39,6 +39,8 @@ return new class extends Migration
                     'site_tagline' => 'Premier Online Learning & EdTech Platform',
                     'contact_email' => 'support@nexcourses.com',
                     'copyright_text' => '© 2026 NovoNex. All rights reserved.',
+                    'primary_color' => '#CC1200',
+                    'secondary_color' => '#25a2ee',
                     'header_settings' => json_encode($header),
                     'footer_settings' => json_encode($footer),
                 ]);
