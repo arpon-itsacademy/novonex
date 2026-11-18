@@ -109,27 +109,19 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $normalizedPhone = User::normalizePhone($validated['phone']);
-
-        if (! $normalizedPhone) {
-            return response()->json([
-                'message' => 'সঠিক বাংলাদেশি মোবাইল নম্বর প্রদান করুন (যেমন: 017xxxxxxxx)।',
-                'errors' => ['phone' => ['সঠিক বাংলাদেশি মোবাইল নম্বর দিন।']],
-            ], 422);
-        }
+        $loginInput = trim($validated['phone']);
+        $normalizedPhone = User::normalizePhone($loginInput);
 
         $user = null;
-        if (! $normalizedPhone) {
-            if (filter_var($validated['phone'], FILTER_VALIDATE_EMAIL)) {
-                $user = User::where('email', strtolower(trim($validated['phone'])))->first();
-            } else {
-                return response()->json([
-                    'message' => 'সঠিক বাংলাদেশি মোবাইল নম্বর প্রদান করুন (যেমন: 017xxxxxxxx)।',
-                    'errors' => ['phone' => ['সঠিক বাংলাদেশি মোবাইল নম্বর দিন।']],
-                ], 422);
-            }
-        } else {
+        if ($normalizedPhone) {
             $user = User::where('phone', $normalizedPhone)->first();
+        } elseif (filter_var($loginInput, FILTER_VALIDATE_EMAIL)) {
+            $user = User::where('email', strtolower($loginInput))->first();
+        } else {
+            return response()->json([
+                'message' => 'সঠিক বাংলাদেশি মোবাইল নম্বর অথবা ইমেইল প্রদান করুন।',
+                'errors' => ['phone' => ['সঠিক বাংলাদেশি মোবাইল নম্বর অথবা ইমেইল দিন।']],
+            ], 422);
         }
 
         if (! $user) {

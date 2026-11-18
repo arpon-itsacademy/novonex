@@ -78,7 +78,7 @@ class User extends Authenticatable
     public static function generateUniqueRegistrationNumber(): string
     {
         $year = date('Y');
-        $prefix = "ME-{$year}-";
+        $prefix = "NN-{$year}-";
 
         // Find the latest user with this prefix
         $latest = static::where('registration_number', 'like', "{$prefix}%")
@@ -185,7 +185,7 @@ class User extends Authenticatable
         }
 
         if (strlen($digits) === 10 && str_starts_with($digits, '1')) {
-            return '+88'.$digits;
+            return '+880'.$digits;
         }
 
         return null;

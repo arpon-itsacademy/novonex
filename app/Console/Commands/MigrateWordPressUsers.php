@@ -89,12 +89,24 @@ class MigrateWordPressUsers extends Command
                 u.display_name,
                 u.user_registered,
                 m_phone.meta_value AS digits_phone,
+                m_phone2.meta_value AS digits_phone_alt,
+                m_pnum.meta_value AS phone_number,
                 m_country.meta_value AS digits_countrycode,
-                m_billing.meta_value AS billing_phone
+                m_billing.meta_value AS billing_phone,
+                m_shipping.meta_value AS shipping_phone,
+                m_fname.meta_value AS first_name,
+                m_lname.meta_value AS last_name,
+                m_caps.meta_value AS wp_capabilities
             FROM `{$prefix}users` u
             LEFT JOIN `{$prefix}usermeta` m_phone ON u.ID = m_phone.user_id AND m_phone.meta_key = 'digits_phone_no'
+            LEFT JOIN `{$prefix}usermeta` m_phone2 ON u.ID = m_phone2.user_id AND m_phone2.meta_key = 'digits_phone'
+            LEFT JOIN `{$prefix}usermeta` m_pnum ON u.ID = m_pnum.user_id AND m_pnum.meta_key = 'phone_number'
             LEFT JOIN `{$prefix}usermeta` m_country ON u.ID = m_country.user_id AND m_country.meta_key = 'digt_countrycode'
             LEFT JOIN `{$prefix}usermeta` m_billing ON u.ID = m_billing.user_id AND m_billing.meta_key = 'billing_phone'
+            LEFT JOIN `{$prefix}usermeta` m_shipping ON u.ID = m_shipping.user_id AND m_shipping.meta_key = 'shipping_phone'
+            LEFT JOIN `{$prefix}usermeta` m_fname ON u.ID = m_fname.user_id AND m_fname.meta_key = 'first_name'
+            LEFT JOIN `{$prefix}usermeta` m_lname ON u.ID = m_lname.user_id AND m_lname.meta_key = 'last_name'
+            LEFT JOIN `{$prefix}usermeta` m_caps ON u.ID = m_caps.user_id AND m_caps.meta_key = 'wp_capabilities'
             ORDER BY u.ID ASC
         ";
 
@@ -144,8 +156,11 @@ class MigrateWordPressUsers extends Command
 
         foreach ($users as $row) {
             $rawPhone = $row['digits_phone'] 
+                ?? $row['digits_phone_alt'] 
+                ?? $row['phone_number'] 
                 ?? $row['phone'] 
                 ?? $row['billing_phone'] 
+                ?? $row['shipping_phone'] 
                 ?? $row['user_login'] 
                 ?? null;
 
@@ -163,7 +178,7 @@ class MigrateWordPressUsers extends Command
             }
 
             // Check if phone or email already exists in Laravel
-            $email = ! empty($row['user_email']) ? trim($row['user_email']) : null;
+            $email = ! empty($row['user_email']) ? strtolower(trim($row['user_email'])) : null;
 
             $exists = DB::table('users')
                 ->where('phone', $normalizedPhone)
@@ -180,18 +195,32 @@ class MigrateWordPressUsers extends Command
                 continue;
             }
 
-            $name = ! empty($row['display_name']) ? trim($row['display_name']) : 'Student';
+            $fullName = trim(($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? ''));
+            if (empty($fullName)) {
+                $fullName = ! empty($row['display_name']) ? trim($row['display_name']) : (! empty($row['user_login']) ? $row['user_login'] : 'Student');
+            }
+
+            $caps = ! empty($row['wp_capabilities']) ? @unserialize($row['wp_capabilities']) : [];
+            $role = User::ROLE_STUDENT;
+            if (is_array($caps)) {
+                if (isset($caps['administrator'])) {
+                    $role = User::ROLE_ADMIN;
+                } elseif (isset($caps['tutor_instructor'])) {
+                    $role = User::ROLE_TEACHER;
+                }
+            }
+
             $passwordHash = $row['user_pass'] ?? $row['password'] ?? '';
             $createdAt = ! empty($row['user_registered']) ? $row['user_registered'] : now();
 
             // Insert directly via DB facade to avoid double-hashing password cast
             DB::table('users')->insert([
-                'name' => $name,
+                'name' => $fullName,
                 'phone' => $normalizedPhone,
                 'registration_number' => User::generateUniqueRegistrationNumber(),
-                'email' => $email ?: ($normalizedPhone . '@temporary.novonex.com'),
+                'email' => $email ?: ($normalizedPhone . '@user.novonex.tech'),
                 'password' => $passwordHash,
-                'role' => User::ROLE_STUDENT,
+                'role' => $role,
                 'status' => User::STATUS_ACTIVE,
                 'created_at' => $createdAt,
                 'updated_at' => now(),
