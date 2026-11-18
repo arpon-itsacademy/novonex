@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../api/client';
 import { SmsSetting } from '../../types';
-import { 
-    MessageSquareText, 
-    Save, 
-    Send, 
-    CheckCircle2, 
+import {
+    MessageSquareText,
+    Save,
+    Send,
+    CheckCircle2,
     RefreshCw
 } from 'lucide-react';
 
@@ -284,13 +284,12 @@ export const AdminSmsPage: React.FC = () => {
                                         <td className="py-3 px-4 font-mono font-bold text-slate-900">{log.phone}</td>
                                         <td className="py-3 px-4 max-w-xs truncate">{log.message}</td>
                                         <td className="py-3 px-4">
-                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                                                log.status === 'sent' 
-                                                    ? 'bg-emerald-100 text-emerald-800' 
-                                                    : log.status === 'simulated'
+                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${log.status === 'sent'
+                                                ? 'bg-emerald-100 text-emerald-800'
+                                                : log.status === 'simulated'
                                                     ? 'bg-sky-100 text-sky-800'
                                                     : 'bg-rose-100 text-rose-800'
-                                            }`}>
+                                                }`}>
                                                 {log.status}
                                             </span>
                                         </td>

@@ -280,138 +280,320 @@ export const Navbar: React.FC = () => {
                 </div>
             )}
 
-            <header className="py-2 sm:py-3.5 px-3 sm:px-6 lg:px-8 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md transition-all">
-                {/* Bondi Pathshala Style Floating Capsule Navbar */}
-                <div className="max-w-7xl mx-auto bg-white dark:bg-slate-900 rounded-full border border-slate-200/80 dark:border-slate-800 shadow-md shadow-sky-500/5 relative overflow-hidden flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2">
-                {/* Left Side Organic Wavy Blue Gradient Accent */}
-                <svg
-                    className="absolute left-0 top-0 bottom-0 h-full w-24 sm:w-36 pointer-events-none select-none -z-0 rounded-l-full overflow-hidden"
-                    viewBox="0 0 140 60"
-                    preserveAspectRatio="none"
-                    fill="none"
-                >
-                    <path
-                        d="M0 0 H55 C80 15, 65 45, 115 60 H0 Z"
-                        fill="url(#bpLeftBlueGradient)"
-                        opacity="0.95"
-                    />
-                    <path
-                        d="M0 0 H40 C60 18, 50 38, 90 60 H0 Z"
-                        fill="#25a2ee"
-                        opacity="0.45"
-                    />
-                    <path
-                        d="M0 10 C30 5, 45 40, 75 60 H0 Z"
-                        fill="#1269a7"
-                        opacity="0.3"
-                    />
-                    <defs>
-                        <linearGradient id="bpLeftBlueGradient" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stopColor="#1784ce" />
-                            <stop offset="50%" stopColor="#25a2ee" />
-                            <stop offset="100%" stopColor="#7bcbf4" stopOpacity="0.85" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-
-                {/* Right Side Organic Wavy Red Gradient Accent */}
-                <svg
-                    className="absolute right-0 top-0 bottom-0 h-full w-24 sm:w-40 pointer-events-none select-none -z-0 rounded-r-full overflow-hidden"
-                    viewBox="0 0 150 60"
-                    preserveAspectRatio="none"
-                    fill="none"
-                >
-                    <path
-                        d="M150 0 H80 C50 15, 70 45, 25 60 H150 Z"
-                        fill="url(#bpRightRedGradient)"
-                        opacity="0.95"
-                    />
-                    <path
-                        d="M150 0 H95 C75 18, 85 38, 45 60 H150 Z"
-                        fill="#CC1200"
-                        opacity="0.4"
-                    />
-                    <defs>
-                        <linearGradient id="bpRightRedGradient" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stopColor="#CC1200" />
-                            <stop offset="55%" stopColor="#e04337" />
-                            <stop offset="100%" stopColor="#ee736a" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-
-                {/* Brand Logo (Left) */}
-                <div className="relative z-10 pl-2 sm:pl-3 flex items-center shrink-0">
-                    <Link to="/" className="flex items-center gap-2 sm:gap-2.5 group">
-                        {logoUrl && !logoError ? (
-                            <img
-                                src={logoUrl}
-                                alt={settings?.site_name || 'NovoNex'}
-                                onError={() => setLogoError(true)}
-                                style={{ height: `${logoHeight}px` }}
-                                className="w-auto max-w-[140px] sm:max-w-[190px] object-contain group-hover:scale-105 transition-transform drop-shadow-xs"
-                            />
-                        ) : loading ? (
-                            <div style={{ height: `${logoHeight}px`, width: '120px' }} className="shrink-0" />
-                        ) : (
-                            <div className="flex items-center gap-2">
-                                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white text-[#25a2ee] shadow-md flex items-center justify-center font-black group-hover:rotate-6 transition-transform">
-                                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-[#25a2ee]" />
-                                </div>
-                                <div className="flex flex-col leading-none">
-                                    <span className="text-base sm:text-xl font-black tracking-tight text-white drop-shadow-xs">
-                                        {brandTitle}
-                                    </span>
-                                    {brandSubtitle && (
-                                        <span className="text-[10px] sm:text-xs font-black tracking-widest text-[#CC1200] drop-shadow-xs">
-                                            {brandSubtitle}
+            <header className="w-full bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 transition-colors">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+                    {/* Brand Logo (Left) */}
+                    <div className="flex items-center shrink-0">
+                        <Link to="/" className="flex items-center gap-2.5 group">
+                            {logoUrl && !logoError ? (
+                                <img
+                                    src={logoUrl}
+                                    alt={settings?.site_name || 'NovoNex'}
+                                    onError={() => setLogoError(true)}
+                                    style={{ height: `${logoHeight || 38}px` }}
+                                    className="w-auto max-w-[150px] sm:max-w-[200px] object-contain group-hover:opacity-95 transition-opacity"
+                                />
+                            ) : loading ? (
+                                <div style={{ height: `${logoHeight || 38}px`, width: '120px' }} className="shrink-0" />
+                            ) : (
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#25a2ee] text-white flex items-center justify-center font-black shadow-sm group-hover:scale-105 transition-transform">
+                                        <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                                    </div>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-sans">
+                                            {brandTitle || 'NovoNex'}
                                         </span>
-                                    )}
+                                        {brandSubtitle && (
+                                            <span className="text-xs font-bold text-[#CC1200] uppercase">
+                                                {brandSubtitle}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </Link>
-                </div>
+                            )}
+                        </Link>
+                    </div>
 
-                {/* Center Dynamic Navigation Menu Items (Bondi Pathshala Style) */}
-                <nav className="hidden lg:flex items-center gap-1 sm:gap-1.5 relative z-10 px-2">
-                    {menuItems.map((item) => {
-                        const hasChildren = Boolean(item.children && item.children.length > 0);
-                        const isCurrentActive = location.pathname === item.url && !hasChildren;
-                        const isOpen = openDropdownId === item.id;
-                        const itemLabel = getLocalizedText(item.label, item.label_en, language) || item.label;
+                    {/* Right Side Navigation + Actions Group (Phitron Layout) */}
+                    <div className="flex items-center gap-4 lg:gap-6">
+                        {/* Desktop Navigation Links */}
+                        <nav className="hidden lg:flex items-center gap-5 xl:gap-6">
+                            {menuItems.map((item) => {
+                                const hasChildren = Boolean(item.children && item.children.length > 0);
+                                const isCurrentActive = location.pathname === item.url && !hasChildren;
+                                const isOpen = openDropdownId === item.id;
+                                const itemLabel = getLocalizedText(item.label, item.label_en, language) || item.label;
 
-                        if (hasChildren) {
-                            return (
-                                <div
-                                    key={item.id}
-                                    className="relative"
-                                    onMouseEnter={() => setOpenDropdownId(item.id)}
-                                    onMouseLeave={() => setOpenDropdownId(null)}
-                                >
+                                // Phitron-style outline pill for highlighted / special item (like [ AI ML ])
+                                if (item.highlight) {
+                                    return (
+                                        <Link
+                                            key={item.id}
+                                            to={item.url}
+                                            className="px-3.5 py-1 rounded-full border border-[#25a2ee] text-[#25a2ee] hover:bg-[#25a2ee]/10 font-bold text-xs sm:text-sm transition-colors whitespace-nowrap"
+                                        >
+                                            {itemLabel}
+                                        </Link>
+                                    );
+                                }
+
+                                if (hasChildren) {
+                                    return (
+                                        <div
+                                            key={item.id}
+                                            className="relative"
+                                            onMouseEnter={() => setOpenDropdownId(item.id)}
+                                            onMouseLeave={() => setOpenDropdownId(null)}
+                                        >
+                                            <Link
+                                                to={item.url}
+                                                className={`flex items-center gap-1 text-xs sm:text-sm font-semibold transition-colors py-1 ${
+                                                    isOpen || (location.pathname.startsWith(item.url) && item.url !== '/')
+                                                        ? 'text-[#25a2ee]'
+                                                        : 'text-slate-800 dark:text-slate-200 hover:text-[#25a2ee]'
+                                                }`}
+                                            >
+                                                <span>{itemLabel}</span>
+                                                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#25a2ee]' : ''}`} />
+                                            </Link>
+
+                                            {/* Dropdown Menu */}
+                                            {isOpen && (
+                                                <div className="absolute left-0 mt-2 min-w-[220px] w-max max-w-xs bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                                                    {item.children!.map((sub) => {
+                                                        const subLabel = getLocalizedText(sub.label, sub.label_en, language) || sub.label;
+                                                        return sub.is_external || sub.url.startsWith('http') ? (
+                                                            <a
+                                                                key={sub.id}
+                                                                href={sub.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center justify-between gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-[#25a2ee] transition-colors"
+                                                            >
+                                                                <span>{subLabel}</span>
+                                                                <ExternalLink className="w-3 h-3 text-slate-400" />
+                                                            </a>
+                                                        ) : (
+                                                            <Link
+                                                                key={sub.id}
+                                                                to={sub.url}
+                                                                className="block px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-[#25a2ee] transition-colors"
+                                                            >
+                                                                {subLabel}
+                                                            </Link>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                }
+
+                                if (item.is_external || item.url.startsWith('http')) {
+                                    return (
+                                        <a
+                                            key={item.id}
+                                            href={item.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-[#25a2ee] transition-colors flex items-center gap-1"
+                                        >
+                                            <span>{itemLabel}</span>
+                                            <ExternalLink className="w-3 h-3 text-slate-400" />
+                                        </a>
+                                    );
+                                }
+
+                                return (
                                     <Link
+                                        key={item.id}
                                         to={item.url}
-                                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs sm:text-sm transition-colors ${
-                                            isOpen || (location.pathname.startsWith(item.url) && item.url !== '/')
-                                                ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-slate-800'
-                                                : 'text-slate-700 dark:text-slate-200 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                        className={`text-xs sm:text-sm font-semibold transition-colors ${
+                                            isCurrentActive
+                                                ? 'text-[#25a2ee] font-bold'
+                                                : 'text-slate-800 dark:text-slate-200 hover:text-[#25a2ee]'
                                         }`}
                                     >
-                                        {item.url.includes('course') ? (
-                                            <GraduationCap className="w-4 h-4 text-sky-500" />
-                                        ) : item.label.includes('বই') || item.label.toLowerCase().includes('book') ? (
-                                            <BookOpen className="w-4 h-4 text-amber-500" />
-                                        ) : (
-                                            <Sparkles className="w-4 h-4 text-sky-500" />
-                                        )}
-                                        <span>{itemLabel}</span>
-                                        {item.highlight && <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />}
-                                        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                        {itemLabel}
                                     </Link>
+                                );
+                            })}
+                        </nav>
 
-                                    {/* Dropdown Menu */}
-                                    {isOpen && (
-                                        <div className="absolute left-0 mt-1 min-w-[220px] w-max max-w-xs bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 py-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                        {/* Search Icon */}
+                        <button
+                            type="button"
+                            onClick={() => setSearchModalOpen(true)}
+                            className="p-2 text-slate-600 dark:text-slate-300 hover:text-[#25a2ee] dark:hover:text-[#25a2ee] hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                            title="কোর্স খুঁজুন"
+                        >
+                            <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+
+                        {/* Theme switcher */}
+                        {headerSettings?.show_theme_toggle !== false && (
+                            <div className="hidden sm:block">
+                                <ThemeSwitcher variant="compact" />
+                            </div>
+                        )}
+
+                        {/* Auth Buttons (Phitron Signature Style) */}
+                        {user ? (
+                            <div className="flex items-center gap-2">
+                                {/* Notification Bell */}
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
+                                        className="p-2 text-slate-700 dark:text-slate-200 hover:text-[#25a2ee] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer relative"
+                                        title="নোটিফিকেশনসমূহ"
+                                    >
+                                        <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                                        {unreadCount > 0 && (
+                                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#CC1200] rounded-full ring-2 ring-white animate-pulse" />
+                                        )}
+                                    </button>
+
+                                    {notifDropdownOpen && (
+                                        <div 
+                                            className="absolute right-0 mt-2 w-72 sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                                            onMouseLeave={() => setNotifDropdownOpen(false)}
+                                        >
+                                            <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                                <span className="text-xs font-bold text-slate-800 dark:text-slate-100">নোটিফিকেশনসমূহ</span>
+                                                {unreadCount > 0 && (
+                                                    <button
+                                                        onClick={markAllRead}
+                                                        className="text-[10px] font-bold text-[#25a2ee] hover:underline flex items-center gap-1 cursor-pointer"
+                                                    >
+                                                        <CheckCheck className="w-3 h-3" />
+                                                        <span>পড়েছি চিহ্নিত করুন</span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <div className="max-h-60 overflow-y-auto divide-y divide-slate-50 dark:divide-slate-800">
+                                                {notifications.length === 0 ? (
+                                                    <div className="p-4 text-center text-xs text-slate-400">
+                                                        কোনো নতুন নোটিফিকেশন নেই
+                                                    </div>
+                                                ) : (
+                                                    notifications.slice(0, 8).map((n) => (
+                                                        <div 
+                                                            key={n.id} 
+                                                            onClick={() => handleNotificationClick(n)}
+                                                            className={`p-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer ${
+                                                                !n.read_at ? 'bg-sky-50/50 dark:bg-sky-950/40' : ''
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-center justify-between gap-1">
+                                                                <p className="text-xs font-bold text-slate-800 dark:text-slate-100 line-clamp-1">
+                                                                    {n.data?.title || n.title || 'বিজ্ঞপ্তি'}
+                                                                </p>
+                                                                {!n.read_at && (
+                                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#25a2ee] shrink-0" />
+                                                                )}
+                                                            </div>
+                                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">
+                                                                {n.data?.message || n.message}
+                                                            </p>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* User Dashboard Pill */}
+                                <Link
+                                    to={getDashboardPath()}
+                                    className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-[#25a2ee] text-slate-800 dark:text-white transition-all group"
+                                >
+                                    <div className="w-7 h-7 rounded-lg bg-[#25a2ee] text-white font-bold text-xs flex items-center justify-center">
+                                        {user.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <span className="font-bold text-xs sm:text-sm hidden sm:inline max-w-[100px] truncate">
+                                        {user.name.split(' ')[0]}
+                                    </span>
+                                </Link>
+
+                                <button
+                                    type="button"
+                                    onClick={logout}
+                                    className="p-2 text-slate-400 hover:text-[#CC1200] hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
+                                    title="লগআউট"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 sm:gap-2.5">
+                                {/* লগইন (Login) Outline Pill Button */}
+                                <Link
+                                    to="/login"
+                                    className="px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:border-[#25a2ee] hover:text-[#25a2ee] dark:hover:border-[#25a2ee] dark:hover:text-[#25a2ee] transition-all cursor-pointer"
+                                >
+                                    লগইন
+                                </Link>
+
+                                {/* রেজিস্ট্রেশন (Registration) Solid Pill Button in #CC1200 */}
+                                <Link
+                                    to="/register"
+                                    className="px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-white bg-[#CC1200] hover:bg-[#a80e00] shadow-sm shadow-[#CC1200]/25 transition-all cursor-pointer whitespace-nowrap"
+                                >
+                                    রেজিস্ট্রেশন
+                                </Link>
+                            </div>
+                        )}
+
+                        {/* Mobile Hamburger Button */}
+                        <button
+                            type="button"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            className="lg:hidden p-2 text-slate-700 dark:text-slate-200 hover:text-[#25a2ee] rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                        >
+                            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Drawer (Phitron Clean Full-Width Style) */}
+                {mobileMenuOpen && (
+                    <div className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                        {menuItems.map((item) => {
+                            const itemLabel = getLocalizedText(item.label, item.label_en, language) || item.label;
+                            const hasChildren = Boolean(item.children && item.children.length > 0);
+
+                            return (
+                                <div key={item.id} className="space-y-1">
+                                    {item.is_external || item.url.startsWith('http') ? (
+                                        <a
+                                            href={item.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-[#25a2ee]"
+                                        >
+                                            <span>{itemLabel}</span>
+                                            <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                                        </a>
+                                    ) : (
+                                        <Link
+                                            to={item.url}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-[#25a2ee]"
+                                        >
+                                            <span>{itemLabel}</span>
+                                            {item.highlight && (
+                                                <span className="text-[10px] border border-[#25a2ee] text-[#25a2ee] px-2 py-0.5 rounded-full font-bold">PRO</span>
+                                            )}
+                                        </Link>
+                                    )}
+
+                                    {/* Sub-items if any */}
+                                    {hasChildren && (
+                                        <div className="pl-4 space-y-1 border-l-2 border-slate-100 dark:border-slate-800 ml-3 my-1">
                                             {item.children!.map((sub) => {
                                                 const subLabel = getLocalizedText(sub.label, sub.label_en, language) || sub.label;
                                                 return sub.is_external || sub.url.startsWith('http') ? (
@@ -420,22 +602,20 @@ export const Navbar: React.FC = () => {
                                                         href={sub.url}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="flex items-center justify-between gap-2.5 px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 transition-colors"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-[#25a2ee]"
                                                     >
-                                                        <div className="flex items-center gap-2">
-                                                            <Sparkles className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                                                            <span>{subLabel}</span>
-                                                        </div>
+                                                        <span>• {subLabel}</span>
                                                         <ExternalLink className="w-3 h-3 text-slate-400" />
                                                     </a>
                                                 ) : (
                                                     <Link
                                                         key={sub.id}
                                                         to={sub.url}
-                                                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 transition-colors"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="block px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-[#25a2ee]"
                                                     >
-                                                        <Sparkles className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                                                        <span>{subLabel}</span>
+                                                        • {subLabel}
                                                     </Link>
                                                 );
                                             })}
@@ -443,338 +623,53 @@ export const Navbar: React.FC = () => {
                                     )}
                                 </div>
                             );
-                        }
+                        })}
 
-                        if (item.is_external || item.url.startsWith('http')) {
-                            return (
-                                <a
-                                    key={item.id}
-                                    href={item.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
-                                        item.highlight ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 font-extrabold' : ''
-                                    }`}
-                                >
-                                    <span>{itemLabel}</span>
-                                    {item.highlight && <Sparkles className="w-3 h-3 text-amber-500" />}
-                                    <ExternalLink className="w-3 h-3 text-slate-400" />
-                                </a>
-                            );
-                        }
-
-                        return (
-                            <Link
-                                key={item.id}
-                                to={item.url}
-                                className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-xs sm:text-sm transition-all ${
-                                    isCurrentActive
-                                        ? 'bg-sky-100/90 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 shadow-2xs font-extrabold'
-                                        : item.highlight
-                                            ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 font-bold'
-                                            : 'text-slate-700 dark:text-slate-200 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                                }`}
-                            >
-                                {item.url === '/' && <Home className={`w-4 h-4 ${isCurrentActive ? 'text-sky-600 fill-sky-600' : 'text-slate-400'}`} />}
-                                {item.url.includes('contact') && <Users className="w-4 h-4 text-purple-500" />}
-                                {item.url.includes('free') && <FileText className="w-4 h-4 text-emerald-500" />}
-                                {item.url.includes('exam') && <ClipboardList className="w-4 h-4 text-sky-500" />}
-                                <span>{itemLabel}</span>
-                                {item.highlight && <Sparkles className="w-3 h-3 text-amber-500" />}
-                            </Link>
-                        );
-                    })}
-                </nav>
-
-                {/* Right Side Actions (Search, Login & Enroll CTA Buttons) */}
-                <div className="relative z-10 flex items-center gap-2 sm:gap-3 pr-1 sm:pr-2 shrink-0">
-                    {/* Search Icon Button */}
-                    <button
-                        type="button"
-                        onClick={() => setSearchModalOpen(true)}
-                        className="p-2 sm:p-2.5 text-slate-700 dark:text-slate-200 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors cursor-pointer"
-                        title="কোর্স খুঁজুন"
-                    >
-                        <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </button>
-
-                    {/* Theme switcher */}
-                    {headerSettings?.show_theme_toggle !== false && (
-                        <div className="hidden sm:block">
-                            <ThemeSwitcher variant="compact" />
-                        </div>
-                    )}
-
-                    {/* Optional Custom Header CTA Button */}
-                    {headerSettings?.cta_button_enabled && ctaButtonText && (
-                        headerSettings.cta_button_link?.startsWith('http') ? (
-                            <a
-                                href={headerSettings.cta_button_link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900 border border-sky-200 dark:border-sky-800 transition-colors shadow-2xs hidden md:inline-flex items-center gap-1"
-                            >
-                                <Sparkles className="w-3.5 h-3.5 text-sky-500" />
-                                <span>{ctaButtonText}</span>
-                            </a>
-                        ) : (
-                            <Link
-                                to={headerSettings.cta_button_link || '/courses'}
-                                className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900 border border-sky-200 dark:border-sky-800 transition-colors shadow-2xs hidden md:inline-flex items-center gap-1"
-                            >
-                                <Sparkles className="w-3.5 h-3.5 text-sky-500" />
-                                <span>{ctaButtonText}</span>
-                            </Link>
-                        )
-                    )}
-
-                    {/* Authentication and CTA Buttons */}
-                    {user ? (
-                        <div className="flex items-center gap-1 sm:gap-1.5">
-                            {/* Notification Bell */}
-                            <div className="relative">
-                                <button
-                                    type="button"
-                                    onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
-                                    className="p-2 sm:p-2.5 text-slate-700 dark:text-slate-200 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors cursor-pointer relative"
-                                    title="নোটিফিকেশনসমূহ"
-                                >
-                                    <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                                    {unreadCount > 0 && (
-                                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white animate-pulse" />
-                                    )}
-                                </button>
-
-                                {notifDropdownOpen && (
-                                    <div 
-                                        className="absolute right-0 mt-2 w-72 sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
-                                        onMouseLeave={() => setNotifDropdownOpen(false)}
-                                    >
-                                        <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                            <span className="text-xs font-bold text-slate-800 dark:text-slate-100">নোটিফিকেশনসমূহ</span>
-                                            {unreadCount > 0 && (
-                                                <button
-                                                    onClick={markAllRead}
-                                                    className="text-[10px] font-bold text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1 cursor-pointer"
-                                                >
-                                                    <CheckCheck className="w-3 h-3" />
-                                                    <span>পড়েছি চিহ্নিত করুন</span>
-                                                </button>
-                                            )}
-                                        </div>
-                                        <div className="max-h-60 overflow-y-auto divide-y divide-slate-50 dark:divide-slate-800">
-                                            {notifications.length === 0 ? (
-                                                <div className="p-4 text-center text-xs text-slate-400">
-                                                    কোনো নতুন নোটিফিকেশন নেই
-                                                </div>
-                                            ) : (
-                                                notifications.slice(0, 8).map((n) => (
-                                                    <div 
-                                                        key={n.id} 
-                                                        onClick={() => handleNotificationClick(n)}
-                                                        className={`p-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer ${
-                                                            !n.read_at ? 'bg-sky-50/50 dark:bg-sky-950/40' : ''
-                                                        }`}
-                                                    >
-                                                        <div className="flex items-center justify-between gap-1">
-                                                            <p className="text-xs font-bold text-slate-800 dark:text-slate-100 line-clamp-1">
-                                                                {n.data?.title || n.title || 'বিজ্ঞপ্তি'}
-                                                            </p>
-                                                            {!n.read_at && (
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
-                                                            )}
-                                                        </div>
-                                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">
-                                                            {n.data?.message || n.message}
-                                                        </p>
-                                                    </div>
-                                                ))
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Click on User / Admin directly goes to Admin Panel / Dashboard */}
-                            <Link
-                                to={getDashboardPath()}
-                                className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/90 dark:bg-slate-800/90 text-slate-800 dark:text-white border border-slate-200/90 dark:border-slate-700 shadow-xs hover:border-sky-400 hover:text-sky-600 transition-all cursor-pointer group"
-                                title={user.role === 'admin' ? 'অ্যাডমিন প্যানেলে যান' : 'ড্যাশবোর্ডে যান'}
-                            >
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#25a2ee] to-[#CC1200] text-white font-bold text-xs flex items-center justify-center">
-                                    {user.name.charAt(0).toUpperCase()}
-                                </div>
-                                <span className="font-extrabold text-xs sm:text-sm hidden sm:inline max-w-[100px] truncate">
-                                    {user.name.split(' ')[0]}
-                                </span>
-                            </Link>
-
-                            {/* Quick Logout Button */}
-                            <button
-                                type="button"
-                                onClick={logout}
-                                className="p-2 text-slate-400 hover:text-[#CC1200] hover:bg-red-50 dark:hover:bg-red-950/40 rounded-full transition-colors cursor-pointer"
-                                title="লগআউট"
-                            >
-                                <LogOut className="w-4 h-4" />
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                            {/* লগইন (Login) Pill Button */}
-                            <Link
-                                to="/login"
-                                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-extrabold text-white bg-[#25a2ee] hover:bg-[#1784ce] shadow-md shadow-[#25a2ee]/25 transition-all transform active:scale-95 cursor-pointer"
-                            >
-                                লগইন
-                            </Link>
-
-                            {/* এখনই শুরু করুন (Get Started) Red Pill Button */}
-                            <Link
-                                to="/courses"
-                                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-extrabold text-white bg-[#CC1200] hover:bg-[#a80e00] shadow-md shadow-[#CC1200]/25 transition-all transform active:scale-95 cursor-pointer whitespace-nowrap hidden sm:inline-flex"
-                            >
-                                এখনই শুরু করুন
-                            </Link>
-                        </div>
-                    )}
-
-                    {/* Mobile Hamburger Button */}
-                    <button
-                        type="button"
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="p-2 text-slate-700 dark:text-slate-200 hover:text-sky-600 lg:hidden rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                    >
-                        {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                    </button>
-                </div>
-            </div>
-
-            {/* Mobile Drawer (Bondi Pathshala Style) */}
-            {mobileMenuOpen && (
-                <div className="lg:hidden mt-2 max-w-7xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 shadow-xl space-y-2 animate-in slide-in-from-top-2 duration-200">
-                    {menuItems.map((item) => {
-                        const itemLabel = getLocalizedText(item.label, item.label_en, language) || item.label;
-                        const hasChildren = Boolean(item.children && item.children.length > 0);
-
-                        return (
-                            <div key={item.id} className="space-y-1">
-                                {item.is_external || item.url.startsWith('http') ? (
-                                    <a
-                                        href={item.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <Sparkles className="w-4 h-4 text-sky-600" />
-                                            <span>{itemLabel}</span>
-                                        </div>
-                                        <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                                    </a>
-                                ) : (
+                        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                            {user ? (
+                                <div className="flex items-center gap-2 w-full">
                                     <Link
-                                        to={item.url}
+                                        to={getDashboardPath()}
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600"
+                                        className="flex-1 py-2 text-center font-bold text-white bg-[#25a2ee] hover:bg-[#1784ce] rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            {item.url === '/' ? (
-                                                <Home className="w-4 h-4 text-sky-600" />
-                                            ) : item.url.includes('course') ? (
-                                                <GraduationCap className="w-4 h-4 text-sky-500" />
-                                            ) : item.url.includes('contact') ? (
-                                                <Users className="w-4 h-4 text-amber-500" />
-                                            ) : (
-                                                <Sparkles className="w-4 h-4 text-sky-600" />
-                                            )}
-                                            <span>{itemLabel}</span>
-                                        </div>
-                                        {item.highlight && (
-                                            <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-extrabold">NEW</span>
-                                        )}
+                                        <Shield className="w-4 h-4" />
+                                        <span>{user.role === 'admin' ? 'অ্যাডমিন প্যানেল' : `ড্যাশবোর্ড (${user.name.split(' ')[0]})`}</span>
                                     </Link>
-                                )}
-
-                                {/* Sub-items if any */}
-                                {hasChildren && (
-                                    <div className="pl-6 space-y-1 border-l-2 border-sky-100 dark:border-slate-800 ml-4 my-1">
-                                        {item.children!.map((sub) => {
-                                            const subLabel = getLocalizedText(sub.label, sub.label_en, language) || sub.label;
-                                            return sub.is_external || sub.url.startsWith('http') ? (
-                                                <a
-                                                    key={sub.id}
-                                                    href={sub.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    onClick={() => setMobileMenuOpen(false)}
-                                                    className="flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-sky-600"
-                                                >
-                                                    <span>• {subLabel}</span>
-                                                    <ExternalLink className="w-3 h-3 text-slate-400" />
-                                                </a>
-                                            ) : (
-                                                <Link
-                                                    key={sub.id}
-                                                    to={sub.url}
-                                                    onClick={() => setMobileMenuOpen(false)}
-                                                    className="block px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-sky-600"
-                                                >
-                                                    • {subLabel}
-                                                </Link>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
-                        {user ? (
-                            <div className="flex items-center gap-2 w-full">
-                                <Link
-                                    to={getDashboardPath()}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="flex-1 py-2.5 text-center font-bold text-white bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 rounded-full text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-1.5 transition-colors"
-                                >
-                                    <Shield className="w-4 h-4" />
-                                    <span>{user.role === 'admin' ? 'অ্যাডমিন প্যানেল' : `ড্যাশবোর্ড (${user.name.split(' ')[0]})`}</span>
-                                </Link>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setMobileMenuOpen(false);
-                                        logout();
-                                    }}
-                                    className="p-2.5 text-rose-500 hover:text-rose-600 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 rounded-full transition-colors cursor-pointer"
-                                    title="লগআউট"
-                                >
-                                    <LogOut className="w-4 h-4" />
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-2 gap-2 w-full">
-                                <Link
-                                    to="/login"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="py-2.5 text-center font-bold text-white bg-sky-600 rounded-full text-xs shadow-sm"
-                                >
-                                    লগইন
-                                </Link>
-                                <Link
-                                    to="/courses"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="py-2.5 text-center font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 rounded-full text-xs shadow-sm"
-                                >
-                                    এখনই শুরু করুন
-                                </Link>
-                            </div>
-                        )}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setMobileMenuOpen(false);
+                                            logout();
+                                        }}
+                                        className="p-2 text-[#CC1200] hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl transition-colors cursor-pointer"
+                                        title="লগআউট"
+                                    >
+                                        <LogOut className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 gap-2 w-full">
+                                    <Link
+                                        to="/login"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="py-2 text-center font-bold text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl text-xs hover:border-[#25a2ee] hover:text-[#25a2ee] transition-all"
+                                    >
+                                        লগইন
+                                    </Link>
+                                    <Link
+                                        to="/register"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="py-2 text-center font-extrabold text-white bg-[#CC1200] hover:bg-[#a80e00] rounded-xl text-xs shadow-sm transition-all"
+                                    >
+                                        রেজিস্ট্রেশন
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </header>
 
             {/* Quick Search Modal */}
             {searchModalOpen && (
@@ -817,9 +712,8 @@ export const Navbar: React.FC = () => {
                     </div>
                 </div>
             )}
-        </header>
 
-        {/* 10 MINUTE SCHOOL STYLE SUB-HEADER BANNER */}
+            {/* 10 MINUTE SCHOOL STYLE SUB-HEADER BANNER */}
         {shouldShowBanner && (
             <div
                 style={{

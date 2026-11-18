@@ -442,14 +442,14 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                 />
                             ) : (
                                 <div className="flex items-center gap-2">
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-sm">
-                                        M
+                                    <div className="w-10 h-10 rounded-xl bg-[#25a2ee] flex items-center justify-center text-white font-black text-sm shadow-sm">
+                                        N
                                     </div>
                                     <div>
                                         <span className="text-lg font-black text-slate-900 tracking-tight block">
                                             {previewBrandTitle}
                                         </span>
-                                        <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider block -mt-1">
+                                        <span className="text-[10px] font-bold text-[#CC1200] uppercase tracking-wider block -mt-1">
                                             {previewBrandSubtitle}
                                         </span>
                                     </div>
@@ -485,9 +485,14 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                 </span>
                             )}
                             {headerSettings.show_auth_buttons && (
-                                <span className="hidden sm:inline px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 rounded-xl">
-                                    Login
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className="hidden sm:inline px-3.5 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-xl">
+                                        লগইন
+                                    </span>
+                                    <span className="hidden sm:inline px-3.5 py-1.5 text-xs font-bold text-white bg-[#CC1200] rounded-xl shadow-xs">
+                                        রেজিস্ট্রেশন
+                                    </span>
+                                </div>
                             )}
                         </div>
                     </div>
