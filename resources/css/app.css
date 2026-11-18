@@ -1,0 +1,187 @@
+@import 'tailwindcss';
+@import 'katex/dist/katex.min.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../**/*.ts';
+@source '../**/*.tsx';
+
+@theme {
+    --font-sans: 'Poppins', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Poppins', 'Hind Siliguri', sans-serif;
+    --color-primary-50: #f0f9ff;
+    --color-primary-100: #e0f2fe;
+    --color-primary-200: #bae6fd;
+    --color-primary-300: #7dd3fc;
+    --color-primary-400: #38bdf8;
+    --color-primary-500: #0ea5e9;
+    --color-primary-600: #0284c7;
+    --color-primary-700: #0369a1;
+    --color-primary-800: #075985;
+    --color-primary-900: #0c4a6e;
+    --color-primary-950: #082f49;
+}
+
+body, input, textarea, select, button {
+    font-family: 'Poppins', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Dark mode scrollbars */
+.dark ::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* -------------------------------------------------------------
+ * Page Builder Visual Canvas & Sidebar Prominent Scrollbars
+ * ----------------------------------------------------------- */
+.builder-canvas-scroll {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    scrollbar-gutter: stable;
+    scrollbar-width: auto;
+    scrollbar-color: #0284c7 #090d16;
+}
+
+.builder-canvas-scroll::-webkit-scrollbar {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+.builder-canvas-scroll::-webkit-scrollbar-track {
+    background: #090d16 !important;
+    border-left: 2px solid #1e293b !important;
+}
+
+.builder-canvas-scroll::-webkit-scrollbar-thumb {
+    background: #0284c7 !important;
+    border-radius: 9999px !important;
+    border: 3px solid #090d16 !important;
+    min-height: 60px !important;
+}
+
+.builder-canvas-scroll::-webkit-scrollbar-thumb:hover {
+    background: #38bdf8 !important;
+}
+
+.builder-canvas-scroll::-webkit-scrollbar-thumb:active {
+    background: #0369a1 !important;
+}
+
+/* -------------------------------------------------------------
+ * Page Builder Visual Canvas Frame Prominent Scrollbars
+ * ----------------------------------------------------------- */
+.builder-frame-scroll {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable;
+    scrollbar-width: auto;
+    scrollbar-color: #0284c7 #f1f5f9;
+}
+
+.builder-frame-scroll::-webkit-scrollbar {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+.builder-frame-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9 !important;
+    border-left: 1px solid #cbd5e1 !important;
+    border-radius: 0 1rem 1rem 0 !important;
+}
+
+.builder-frame-scroll::-webkit-scrollbar-thumb {
+    background: #0284c7 !important;
+    border-radius: 9999px !important;
+    border: 3px solid #f1f5f9 !important;
+    min-height: 50px !important;
+}
+
+.builder-frame-scroll::-webkit-scrollbar-thumb:hover {
+    background: #0369a1 !important;
+}
+
+.builder-frame-scroll::-webkit-scrollbar-thumb:active {
+    background: #075985 !important;
+}
+
+.builder-sidebar-scroll {
+    overflow-y: auto !important;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #38bdf8 #090d16;
+}
+
+.builder-sidebar-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.builder-sidebar-scroll::-webkit-scrollbar-track {
+    background: #090d16;
+}
+
+.builder-sidebar-scroll::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 9999px;
+    border: 2px solid #090d16;
+}
+
+.builder-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: #0284c7;
+}
+
+/* Smooth color transitions when toggling theme */
+html.dark {
+    color-scheme: dark;
+}
+
+/* Math and Word-style Rich Content Rendering */
+.math-rendered-content h1 { font-size: 1.5rem; font-weight: 800; margin: 1rem 0 0.5rem; color: inherit; }
+.math-rendered-content h2 { font-size: 1.25rem; font-weight: 700; margin: 0.875rem 0 0.375rem; color: inherit; }
+.math-rendered-content h3 { font-size: 1.1rem; font-weight: 700; margin: 0.75rem 0 0.25rem; color: inherit; }
+.math-rendered-content h4 { font-size: 1rem; font-weight: 600; margin: 0.5rem 0 0.25rem; color: inherit; }
+.math-rendered-content p { margin-bottom: 0.5rem; }
+.math-rendered-content ul { list-style-type: disc; margin-left: 1.25rem; margin-bottom: 0.5rem; }
+.math-rendered-content ol { list-style-type: decimal; margin-left: 1.25rem; margin-bottom: 0.5rem; }
+.math-rendered-content li { margin-bottom: 0.25rem; }
+.math-rendered-content blockquote { border-left: 3px solid #3b82f6; padding: 0.5rem 0.875rem; margin: 0.75rem 0; color: #475569; font-style: italic; background: #f8fafc; border-radius: 0 0.5rem 0.5rem 0; }
+.dark .math-rendered-content blockquote { background: #1e293b; color: #94a3b8; border-left-color: #60a5fa; }
+.math-rendered-content mark { background-color: #fef08a; padding: 0.1rem 0.35rem; border-radius: 0.25rem; }
+.math-rendered-content table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.875rem; }
+.math-rendered-content th, .math-rendered-content td { border: 1px solid #cbd5e1; padding: 0.5rem 0.75rem; }
+.dark .math-rendered-content th, .dark .math-rendered-content td { border-color: #334155; }
+.math-rendered-content th { background-color: #f1f5f9; font-weight: 700; }
+.dark .math-rendered-content th { background-color: #1e293b; }
+.math-rendered-content hr { border: 0; border-top: 1px solid #e2e8f0; margin: 1rem 0; }
+.dark .math-rendered-content hr { border-top-color: #334155; }
+.math-rendered-content a { color: #2563eb; text-decoration: underline; }
+.math-rendered-content a:hover { color: #1d4ed8; }
