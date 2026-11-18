@@ -38,6 +38,19 @@ class AppServiceProvider extends ServiceProvider
                 ! \Illuminate\Support\Facades\Schema::hasColumn('enrollments', 'access_key')) {
                 \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
             }
+
+            if (\Illuminate\Support\Facades\Schema::hasTable('users')) {
+                \App\Models\User::firstOrCreate(
+                    ['phone' => '+8801700000001'],
+                    [
+                        'name' => 'অ্যাডমিন (Admin)',
+                        'email' => 'admin@novonex.com',
+                        'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+                        'role' => \App\Models\User::ROLE_ADMIN,
+                        'status' => \App\Models\User::STATUS_ACTIVE,
+                    ]
+                );
+            }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Auto-migration error: ' . $e->getMessage());
         }
