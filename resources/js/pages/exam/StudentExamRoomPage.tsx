@@ -315,7 +315,7 @@ export const StudentExamRoomPage: React.FC = () => {
                     <div className="hidden print:block mb-6 border-b-2 border-slate-900 pb-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-black tracking-tight text-slate-900">MONOLOGUE EDU</h1>
+                                <h1 className="text-2xl font-black tracking-tight text-slate-900">NOVONEX</h1>
                                 <p className="text-xs uppercase tracking-widest text-slate-600 font-bold">Online Examination Result & Evaluation Sheet</p>
                             </div>
                             <div className="text-right text-xs text-slate-700">
@@ -452,44 +452,40 @@ export const StudentExamRoomPage: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => setReviewFilter('all')}
-                                    className={`px-3 py-1.5 rounded-lg transition-all ${
-                                        reviewFilter === 'all'
-                                            ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                                    }`}
+                                    className={`px-3 py-1.5 rounded-lg transition-all ${reviewFilter === 'all'
+                                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                                        }`}
                                 >
                                     সব ({reviewAnswers.length})
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setReviewFilter('correct')}
-                                    className={`px-3 py-1.5 rounded-lg transition-all ${
-                                        reviewFilter === 'correct'
-                                            ? 'bg-emerald-600 text-white shadow-xs'
-                                            : 'text-emerald-600 hover:text-emerald-700'
-                                    }`}
+                                    className={`px-3 py-1.5 rounded-lg transition-all ${reviewFilter === 'correct'
+                                        ? 'bg-emerald-600 text-white shadow-xs'
+                                        : 'text-emerald-600 hover:text-emerald-700'
+                                        }`}
                                 >
                                     সঠিক ({resultData.total_correct || 0})
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setReviewFilter('wrong')}
-                                    className={`px-3 py-1.5 rounded-lg transition-all ${
-                                        reviewFilter === 'wrong'
-                                            ? 'bg-rose-600 text-white shadow-xs'
-                                            : 'text-rose-600 hover:text-rose-700'
-                                    }`}
+                                    className={`px-3 py-1.5 rounded-lg transition-all ${reviewFilter === 'wrong'
+                                        ? 'bg-rose-600 text-white shadow-xs'
+                                        : 'text-rose-600 hover:text-rose-700'
+                                        }`}
                                 >
                                     ভুল ({resultData.total_wrong || 0})
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setReviewFilter('skipped')}
-                                    className={`px-3 py-1.5 rounded-lg transition-all ${
-                                        reviewFilter === 'skipped'
-                                            ? 'bg-slate-700 text-white shadow-xs'
-                                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                                    }`}
+                                    className={`px-3 py-1.5 rounded-lg transition-all ${reviewFilter === 'skipped'
+                                        ? 'bg-slate-700 text-white shadow-xs'
+                                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                                        }`}
                                 >
                                     ছেড়ে দেওয়া ({resultData.total_skipped || 0})
                                 </button>
@@ -505,7 +501,7 @@ export const StudentExamRoomPage: React.FC = () => {
                                 const studentAnswers: string[] = Array.isArray(ans.student_answer)
                                     ? ans.student_answer.map(String)
                                     : (ans.student_answer ? [String(ans.student_answer)] : []);
-                                
+
                                 const isSkipped = studentAnswers.length === 0 && (!ans.attachments || ans.attachments.length === 0);
                                 const isCorrect = ans.is_correct === true;
                                 const isWrong = !isSkipped && ans.is_correct === false;
@@ -659,11 +655,10 @@ export const StudentExamRoomPage: React.FC = () => {
                     </div>
 
                     {/* Timer Badge */}
-                    <div className={`px-4 py-1.5 rounded-2xl font-mono text-sm sm:text-base font-bold flex items-center gap-2 border shadow-sm ${
-                        timeLeftSeconds < 300
-                            ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/60 dark:border-rose-900 animate-pulse'
-                            : 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-950/60 dark:border-sky-900'
-                    }`}>
+                    <div className={`px-4 py-1.5 rounded-2xl font-mono text-sm sm:text-base font-bold flex items-center gap-2 border shadow-sm ${timeLeftSeconds < 300
+                        ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/60 dark:border-rose-900 animate-pulse'
+                        : 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-950/60 dark:border-sky-900'
+                        }`}>
                         <Clock className="w-4 h-4 shrink-0" />
                         <span>{formatTime(timeLeftSeconds)}</span>
                     </div>
@@ -743,15 +738,13 @@ export const StudentExamRoomPage: React.FC = () => {
                                                 key={opt.id}
                                                 type="button"
                                                 onClick={() => handleSelectOption(q.id, opt.id, isMultiple)}
-                                                className={`w-full flex items-center gap-3 p-3.5 rounded-2xl border text-left text-sm font-medium transition-all ${
-                                                    isChecked
-                                                        ? 'bg-sky-50 dark:bg-sky-950/50 border-sky-500 text-sky-950 dark:text-sky-200 ring-2 ring-sky-500/20'
-                                                        : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
-                                                }`}
+                                                className={`w-full flex items-center gap-3 p-3.5 rounded-2xl border text-left text-sm font-medium transition-all ${isChecked
+                                                    ? 'bg-sky-50 dark:bg-sky-950/50 border-sky-500 text-sky-950 dark:text-sky-200 ring-2 ring-sky-500/20'
+                                                    : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
+                                                    }`}
                                             >
-                                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${
-                                                    isChecked ? 'bg-sky-600 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                                                }`}>
+                                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${isChecked ? 'bg-sky-600 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                                                    }`}>
                                                     {String.fromCharCode(65 + oIdx)}
                                                 </span>
                                                 <MathView content={opt.text} inline className="flex-1" />

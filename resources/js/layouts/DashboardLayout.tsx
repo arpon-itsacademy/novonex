@@ -340,7 +340,7 @@ export const DashboardLayout: React.FC = () => {
                         {logoUrl && !logoError ? (
                             <img
                                 src={logoUrl}
-                                alt={settings?.site_name || 'Monologue Edu'}
+                                alt={settings?.site_name || 'NovoNex'}
                                 className="h-10 w-auto max-w-[190px] object-contain"
                                 onError={() => setLogoError(true)}
                             />
@@ -351,7 +351,7 @@ export const DashboardLayout: React.FC = () => {
                                 </div>
                                 <div>
                                     <span className="text-xl font-black text-white tracking-tight">
-                                        {settings?.site_name ? settings.site_name.split(' ')[0] : 'Monologue'}
+                                        {settings?.site_name ? settings.site_name.split(' ')[0] : 'NovoNex'}
                                     </span>
                                     <span className="block text-[10px] font-bold text-sky-400 uppercase tracking-widest -mt-1">
                                         {user.custom_role ? user.custom_role.name : user.role === 'admin' ? t.nav.adminPanel : user.role === 'teacher' ? t.nav.instructorPortal : t.nav.studentHub}
@@ -631,12 +631,12 @@ export const DashboardLayout: React.FC = () => {
                                 {logoUrl && !logoError ? (
                                     <img
                                         src={logoUrl}
-                                        alt={settings?.site_name || 'Monologue Edu'}
+                                        alt={settings?.site_name || 'NovoNex'}
                                         className="h-9 w-auto max-w-[150px] object-contain"
                                         onError={() => setLogoError(true)}
                                     />
                                 ) : (
-                                    <span className="text-xl font-black text-white">{settings?.site_name || 'Monologue Edu'}</span>
+                                    <span className="text-xl font-black text-white">{settings?.site_name || 'NovoNex'}</span>
                                 )}
                             </Link>
                             <div className="flex items-center gap-2">

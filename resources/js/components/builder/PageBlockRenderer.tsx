@@ -731,7 +731,7 @@ const CtaBannerBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ b
     const s = block.settings || {};
 
     const badge = getLocalizedText(s.badge, s.badge_en, language);
-    const title = getLocalizedText(s.title, s.title_en, language) || 'Join Monologue Edu Today';
+    const title = getLocalizedText(s.title, s.title_en, language) || 'Join NovoNex Today';
     const subtitle = getLocalizedText(s.subtitle, s.subtitle_en, language);
     const buttonText = getLocalizedText(s.buttonText, s.buttonText_en, language) || 'Browse Courses';
 
@@ -1250,7 +1250,7 @@ const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }>
                                 {t.designation || 'শিক্ষক ও মেন্টর'}
                             </p>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
-                                {t.institution || 'Monologue Edu'}
+                                {t.institution || 'NovoNex'}
                             </p>
                             <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
                                 <Link
@@ -1430,7 +1430,7 @@ const FaqAccordionBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = (
     const defaultFaqs = [
         {
             id: '1',
-            q: 'মনোলগ এডু (Monologue Edu)-তে কোর্স কীভাবে কিনব বা ভর্তি হব?',
+            q: 'নভয়নেক্স (NovoNex)-এ কোর্স কীভাবে কিনব বা ভর্তি হব?',
             a: 'যেকোনো কোর্সের কার্ডে থাকা "কোর্সটি কিনুন" বাটনে ক্লিক করুন। এরপর বিকাশ, নগদ বা রকেটের মাধ্যমে পেমেন্ট করে TrxID সাবমিট করলেই খুব দ্রুত আপনার কোর্স এনরোলমেন্ট সক্রিয় হয়ে যাবে।'
         },
         {

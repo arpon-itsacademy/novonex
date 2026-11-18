@@ -115,7 +115,7 @@ interface WidgetDef {
     type: BlockType;
     name: string;
     description: string;
-    category: 'Basic' | 'Pro & Marketing' | 'Monologue LMS';
+    category: 'Basic' | 'Pro & Marketing' | 'NovoNex LMS';
     icon: React.ComponentType<{ className?: string }>;
     iconBg: string;
     iconColor: string;
@@ -259,12 +259,12 @@ const WIDGET_CATALOG: WidgetDef[] = [
         iconBg: 'bg-emerald-500/20',
         iconColor: 'text-emerald-400',
     },
-    // --- MONOLOGUE LMS ---
+    // --- NOVONEX LMS ---
     {
         type: 'course_tabs',
         name: 'Course Tabs & Grid',
         description: 'Category filter tabs & live course cards',
-        category: 'Monologue LMS',
+        category: 'NovoNex LMS',
         icon: BookOpen,
         iconBg: 'bg-sky-500/20',
         iconColor: 'text-sky-400',
@@ -273,7 +273,7 @@ const WIDGET_CATALOG: WidgetDef[] = [
         type: 'bundle_showcase',
         name: 'Course Bundles',
         description: 'Combo package showcase grid',
-        category: 'Monologue LMS',
+        category: 'NovoNex LMS',
         icon: Boxes,
         iconBg: 'bg-indigo-500/20',
         iconColor: 'text-indigo-400',
@@ -282,7 +282,7 @@ const WIDGET_CATALOG: WidgetDef[] = [
         type: 'teachers_showcase',
         name: 'Faculty Mentors',
         description: 'Teacher profiles & university tags',
-        category: 'Monologue LMS',
+        category: 'NovoNex LMS',
         icon: GraduationCap,
         iconBg: 'bg-orange-500/20',
         iconColor: 'text-orange-400',
@@ -291,7 +291,7 @@ const WIDGET_CATALOG: WidgetDef[] = [
         type: 'html_widget',
         name: 'Custom HTML/CSS',
         description: 'Embed arbitrary code & styles',
-        category: 'Monologue LMS',
+        category: 'NovoNex LMS',
         icon: Code,
         iconBg: 'bg-amber-500/20',
         iconColor: 'text-amber-400',
@@ -549,7 +549,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                     title: 'Why Choose Us',
                     settings: {
                         sectionTag: 'Our Highlights',
-                        sectionTitle: 'Why Choose Monologue Edu?',
+                        sectionTitle: 'Why Choose NovoNex?',
                         sectionSub: 'We don\'t just deliver videos; we build conceptual mastery.',
                         items: [
                             { id: '1', icon: 'Award', title: 'Expert Faculty', desc: 'Lectures prepared under direct supervision of top university professors.' },
@@ -594,7 +594,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                     title: 'Video Embed',
                     settings: {
                         title: 'Introduction to Our Platform',
-                        subtitle: 'See how Monologue Edu helps students excel',
+                        subtitle: 'See how NovoNex helps students excel',
                         videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                     }
                 };
@@ -780,7 +780,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                         sectionTitle: 'সাধারণ কিছু প্রশ্নের উত্তর',
                         sectionSub: 'কোর্স ভর্তি, ক্লাস ও পরীক্ষা সংক্রান্ত প্রয়োজনীয় তথ্য।',
                         items: [
-                            { id: '1', q: 'মনোলগ এডু (Monologue Edu)-তে কোর্স কীভাবে কিনব বা ভর্তি হব?', a: 'যেকোনো কোর্সের কার্ডে থাকা "কোর্সটি কিনুন" বাটনে ক্লিক করুন। এরপর বিকাশ, নগদ বা রকেটের মাধ্যমে পেমেন্ট করে TrxID সাবমিট করলেই কোর্স সক্রিয় হবে।' },
+                            { id: '1', q: 'নভয়নেক্স (NovoNex)-এ কোর্স কীভাবে কিনব বা ভর্তি হব?', a: 'যেকোনো কোর্সের কার্ডে থাকা "কোর্সটি কিনুন" বাটনে ক্লিক করুন। এরপর বিকাশ, নগদ বা রকেটের মাধ্যমে পেমেন্ট করে TrxID সাবমিট করলেই কোর্স সক্রিয় হবে।' },
                             { id: '2', q: 'লাইভ ক্লাস ছাড়াও কি রেকর্ডেড ক্লাস ও লেকচার শিট পাওয়া যাবে?', a: 'হ্যাঁ, প্রতিটি লাইভ ক্লাসের পর তা স্বয়ংক্রিয়ভাবে ফুল HD রেকর্ডেড আর্কাইভে জমা হয় যা পরীক্ষার শেষ দিন পর্যন্ত যতবার ইচ্ছা রিভিশন দেওয়া যায়।' },
                             { id: '3', q: 'NexPilot AI ডাউট সলভার কীভাবে পড়ালেখায় সাহায্য করে?', a: 'NexPilot হলো সম্পূর্ণ কারিকুলাম-সংযুক্ত ২৪/৭ এআই টিউটর। ক্লাসের পড়ালেখা বা সূত্রে আটকে গেলে সেকেন্ডের মধ্যে সমাধান পাওয়া যায়।' },
                         ]
@@ -1160,7 +1160,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    (['Basic', 'Pro & Marketing', 'Monologue LMS'] as const).map(category => {
+                                    (['Basic', 'Pro & Marketing', 'NovoNex LMS'] as const).map(category => {
                                         const categoryWidgets = WIDGET_CATALOG.filter(w => w.category === category);
                                         return (
                                             <div key={category} className="space-y-2 pt-1">

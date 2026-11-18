@@ -231,7 +231,7 @@ class Page extends Model
                     'items' => [
                         [
                             'id' => 'faq_1',
-                            'q' => 'মনোলগ এডু (Monologue Edu)-তে কোর্স কীভাবে কিনব বা ভর্তি হব?',
+                            'q' => 'নভয়নেক্স (NovoNex)-এ কোর্স কীভাবে কিনব বা ভর্তি হব?',
                             'a' => 'যেকোনো কোর্সের কার্ডে থাকা "কোর্সটি কিনুন" বাটনে ক্লিক করুন। এরপর বিকাশ, নগদ বা রকেটের মাধ্যমে পেমেন্ট করে TrxID সাবমিট করলেই খুব দ্রুত আপনার কোর্স এনরোলমেন্ট সক্রিয় হয়ে যাবে।'
                         ],
                         [
@@ -392,7 +392,7 @@ class Page extends Model
                     'status' => 'published',
                     'layout_type' => 'category',
                     'is_system' => false,
-                    'meta_title' => $category->name . ' - Monologue Edu',
+                    'meta_title' => $category->name . ' - NovoNex',
                     'meta_description' => $category->description ?? ($category->name . ' courses and materials.'),
                     'blocks' => static::defaultCategoryBlocks($category),
                 ]
@@ -409,7 +409,7 @@ class Page extends Model
                 'status' => 'published',
                 'layout_type' => 'builder',
                 'is_system' => true,
-                'meta_title' => 'All Courses - Monologue Edu',
+                'meta_title' => 'All Courses - NovoNex',
                 'meta_description' => 'Browse all subject-based preparation courses.',
                 'blocks' => static::defaultCoursesBlocks(),
             ]

@@ -7,8 +7,8 @@ define('LARAVEL_START', microtime(true));
 
 // Auto-generate or update .env on production server
 $envFile = __DIR__ . '/../.env';
-if (!file_exists($envFile) || strpos(@file_get_contents($envFile), 'u991362382_nexcourses') === false) {
-    $prodEnv = "APP_NAME=\"Novonex Academy\"\n"
+if (!file_exists($envFile) || strpos(@file_get_contents($envFile), 'u991362382_nexcourses') === false || strpos(@file_get_contents($envFile), 'APP_NAME="NovoNex"') === false) {
+    $prodEnv = "APP_NAME=\"NovoNex\"\n"
         . "APP_ENV=production\n"
         . "APP_KEY=\"base64:ajmsflCfT24fHNskELz7tcw5FTJZVzXl2RvU+yb+gZQ=\"\n"
         . "APP_DEBUG=false\n"

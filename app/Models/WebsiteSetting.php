@@ -51,8 +51,8 @@ class WebsiteSetting extends Model
             'show_auth_buttons' => true,
             'logo_url' => null,
             'logo_height' => 44,
-            'brand_title' => 'Monologue',
-            'brand_subtitle' => 'Edu',
+            'brand_title' => 'NovoNex',
+            'brand_subtitle' => '',
             'announcement_enabled' => false,
             'announcement_text' => '🎉 নতুন ব্যাচে ভর্তি চলছে! ২০% ছাড়ে এখনই এনরোল করুন।',
             'announcement_link' => '/courses',
@@ -144,8 +144,8 @@ class WebsiteSetting extends Model
     {
         return [
             'bg_color' => '#0f172a',
-            'brand_title' => 'Monologue',
-            'brand_subtitle' => 'Edu',
+            'brand_title' => 'NovoNex',
+            'brand_subtitle' => '',
             'description' => 'Bangladesh’s leading online learning platform. Prepare for exams with the best mentors.',
             'badge_text' => '100% Trusted & Quality Online Education',
             'show_badge' => true,
@@ -166,13 +166,13 @@ class WebsiteSetting extends Model
             'column_4_title' => 'Contact Us',
             'phone' => '+880 1700 000000',
             'phone_hours' => '10 AM - 10 PM (Sat - Thu)',
-            'email' => 'support@monologueedu.com',
+            'email' => 'support@novonex.com',
             'address' => 'Dhaka, Bangladesh',
             'social_links' => [
                 ['id' => '1', 'platform' => 'facebook', 'url' => 'https://facebook.com'],
                 ['id' => '2', 'platform' => 'youtube', 'url' => 'https://youtube.com'],
             ],
-            'copyright_text' => '© 2026 Monologue Edu. All rights reserved.',
+            'copyright_text' => '© 2026 NovoNex. All rights reserved.',
             'bottom_credit' => 'Crafted with ❤️ for passionate learners',
         ];
     }
@@ -250,16 +250,16 @@ class WebsiteSetting extends Model
         $setting = static::first();
         if (! $setting) {
             $setting = static::create([
-                'site_name' => 'Monologue Edu',
+                'site_name' => 'NovoNex',
                 'site_tagline' => 'Premier Online Learning & EdTech Platform',
                 'default_language' => 'en',
                 'logo_url' => null,
                 'favicon_url' => null,
-                'contact_email' => 'support@monologueedu.com',
+                'contact_email' => 'support@novonex.com',
                 'contact_phone' => '+880 1700 000000',
                 'primary_color' => '#0ea5e9',
                 'secondary_color' => '#0f172a',
-                'copyright_text' => '© 2026 Monologue Edu. All rights reserved.',
+                'copyright_text' => '© 2026 NovoNex. All rights reserved.',
                 'header_settings' => static::defaultHeaderSettings(),
                 'footer_settings' => static::defaultFooterSettings(),
                 'manual_payment_settings' => static::defaultManualPaymentSettings(),
@@ -268,26 +268,23 @@ class WebsiteSetting extends Model
             ]);
         }
 
-        // Ensure defaults if existing record was created prior to columns
-        if ($setting->site_name === 'Novonex Academy') {
+        // Ensure legacy brand names are updated to NovoNex
+        if ($setting->site_name === 'Monologue Edu' || (isset($setting->header_settings['brand_title']) && $setting->header_settings['brand_title'] === 'Monologue')) {
             $header = $setting->header_settings ?? [];
-            if (isset($header['brand_title']) && $header['brand_title'] === 'Novonex') {
-                $header['brand_title'] = 'Monologue';
-                $header['brand_subtitle'] = 'Edu';
-            }
+            $header['brand_title'] = 'NovoNex';
+            $header['brand_subtitle'] = '';
+            
             $footer = $setting->footer_settings ?? [];
-            if (isset($footer['brand_title']) && $footer['brand_title'] === 'Novonex') {
-                $footer['brand_title'] = 'Monologue';
-                $footer['brand_subtitle'] = 'Edu';
-                $footer['email'] = 'support@monologueedu.com';
-                $footer['copyright_text'] = '© 2026 Monologue Edu. All rights reserved.';
-            }
+            $footer['brand_title'] = 'NovoNex';
+            $footer['brand_subtitle'] = '';
+            $footer['email'] = 'support@novonex.com';
+            $footer['copyright_text'] = '© 2026 NovoNex. All rights reserved.';
 
             $setting->update([
-                'site_name' => 'Monologue Edu',
+                'site_name' => 'NovoNex',
                 'site_tagline' => 'Premier Online Learning & EdTech Platform',
-                'contact_email' => 'support@monologueedu.com',
-                'copyright_text' => '© 2026 Monologue Edu. All rights reserved.',
+                'contact_email' => 'support@novonex.com',
+                'copyright_text' => '© 2026 NovoNex. All rights reserved.',
                 'header_settings' => $header,
                 'footer_settings' => $footer,
             ]);

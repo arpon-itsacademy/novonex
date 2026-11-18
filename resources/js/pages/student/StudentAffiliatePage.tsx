@@ -197,7 +197,7 @@ export const StudentAffiliatePage: React.FC = () => {
                     Affiliate Partner Program
                 </h1>
                 <p className="text-sm text-gray-600 mt-1">
-                    Share Monologue Edu courses with your friends and earn attractive commissions on every successful enrollment!
+                    Share NovoNex courses with your friends and earn attractive commissions on every successful enrollment!
                 </p>
             </div>
 
@@ -233,7 +233,7 @@ export const StudentAffiliatePage: React.FC = () => {
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Unlock Affiliate Program</h2>
                         <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-                            To maintain the high quality of Monologue Edu, only our enrolled students are eligible to become affiliate partners.
+                            To maintain the high quality of NovoNex, only our enrolled students are eligible to become affiliate partners.
                             As soon as you purchase or enroll in any course, this program will be automatically activated.
                         </p>
                     </div>
@@ -272,7 +272,7 @@ export const StudentAffiliatePage: React.FC = () => {
                             You are eligible!
                         </div>
                         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-                            Join Monologue Edu Affiliate Program
+                            Join NovoNex Affiliate Program
                         </h2>
                         <p className="text-indigo-100 text-sm sm:text-base leading-relaxed">
                             You are already an enrolled student with us. Now you can refer courses to your friends and earn money right from home.
@@ -435,7 +435,7 @@ export const StudentAffiliatePage: React.FC = () => {
                                 Facebook
                             </a>
                             <a
-                                href={`https://api.whatsapp.com/send?text=${encodeURIComponent('Enroll in Monologue Edu courses with my referral link: ' + baseReferralLink)}`}
+                                href={`https://api.whatsapp.com/send?text=${encodeURIComponent('Enroll in NovoNex courses with my referral link: ' + baseReferralLink)}`}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="px-3 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold transition-colors"

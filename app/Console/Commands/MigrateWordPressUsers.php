@@ -189,7 +189,7 @@ class MigrateWordPressUsers extends Command
                 'name' => $name,
                 'phone' => $normalizedPhone,
                 'registration_number' => User::generateUniqueRegistrationNumber(),
-                'email' => $email ?: ($normalizedPhone . '@temporary.monologueedu.com'),
+                'email' => $email ?: ($normalizedPhone . '@temporary.novonex.com'),
                 'password' => $passwordHash,
                 'role' => User::ROLE_STUDENT,
                 'status' => User::STATUS_ACTIVE,

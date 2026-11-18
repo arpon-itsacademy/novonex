@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
     {
         if ($this->app->environment('production') || 
             request()->server('HTTP_X_FORWARDED_PROTO') === 'https' ||
-            str_contains(request()->getHost(), 'monologueedu.com')) {
+            str_contains(request()->getHost(), 'nexcourses.com')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 
@@ -37,6 +37,30 @@ class AppServiceProvider extends ServiceProvider
                 ! \Illuminate\Support\Facades\Schema::hasColumn('exam_questions', 'negative_marks') ||
                 ! \Illuminate\Support\Facades\Schema::hasColumn('enrollments', 'access_key')) {
                 \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            }
+
+            if (\Illuminate\Support\Facades\Schema::hasTable('website_settings')) {
+                $setting = \App\Models\WebsiteSetting::first();
+                if ($setting && ($setting->site_name !== 'NovoNex' || str_contains(json_encode($setting->header_settings), 'Monologue'))) {
+                    $header = $setting->header_settings ?? [];
+                    $header['brand_title'] = 'NovoNex';
+                    $header['brand_subtitle'] = '';
+                    $footer = $setting->footer_settings ?? [];
+                    $footer['brand_title'] = 'NovoNex';
+                    $footer['brand_subtitle'] = '';
+                    $footer['description'] = 'Bangladesh’s premier online learning platform. Prepare for exams with the best mentors.';
+                    $footer['email'] = 'support@nexcourses.com';
+                    $footer['copyright_text'] = '© 2026 NovoNex. All rights reserved.';
+
+                    $setting->update([
+                        'site_name' => 'NovoNex',
+                        'site_tagline' => 'Premier Online Learning & EdTech Platform',
+                        'contact_email' => 'support@nexcourses.com',
+                        'copyright_text' => '© 2026 NovoNex. All rights reserved.',
+                        'header_settings' => $header,
+                        'footer_settings' => $footer,
+                    ]);
+                }
             }
 
             if (\Illuminate\Support\Facades\Schema::hasTable('users')) {

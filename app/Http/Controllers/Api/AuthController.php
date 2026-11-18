@@ -231,7 +231,7 @@ class AuthController extends Controller
                 ]
             );
 
-            $smsMessage = "Monologue Edu-তে আপনার OTP কোড হল: {$otpCode}। এটি {$smsSettings->otp_expiration_minutes} মিনিট কার্যকর থাকবে।";
+            $smsMessage = "NovoNex-এ আপনার OTP কোড হল: {$otpCode}। এটি {$smsSettings->otp_expiration_minutes} মিনিট কার্যকর থাকবে।";
             $smsService->sendSms($normalizedPhone, $smsMessage);
 
             return response()->json([
@@ -346,7 +346,7 @@ class AuthController extends Controller
             ],
         ]);
 
-        $smsMessage = "Monologue Edu-তে আপনার পাসওয়ার্ড রিসেট OTP কোড হল: {$otpCode}। এটি ১০ মিনিট কার্যকর থাকবে।";
+        $smsMessage = "NovoNex-এ আপনার পাসওয়ার্ড রিসেট OTP কোড হল: {$otpCode}। এটি ১০ মিনিট কার্যকর থাকবে।";
         $smsService->sendSms($normalizedPhone, $smsMessage);
 
         return response()->json([

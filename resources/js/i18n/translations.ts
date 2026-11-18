@@ -2,7 +2,7 @@ export type Language = 'en' | 'bn';
 
 const enTranslations = {
     common: {
-        siteName: 'Monologue Edu',
+        siteName: 'NovoNex',
         loading: 'Loading...',
         save: 'Save',
         saving: 'Saving...',
@@ -91,7 +91,7 @@ const enTranslations = {
     },
     features: {
         sectionTag: 'Why Choose Us',
-        sectionTitle: 'Why is Monologue Edu the Best?',
+        sectionTitle: 'Why is NovoNex the Best?',
         sectionSub: 'We do not just provide video lessons; we ensure in-depth concept clarity for every student.',
         feature1Title: 'Expert Faculty',
         feature1Desc: 'Every lecture is prepared under the guidance of top university professors and subject-matter experts.',
@@ -121,7 +121,7 @@ const enTranslations = {
         loginTitle: 'Welcome Back',
         loginSub: 'Sign in to your account with your mobile number',
         registerTitle: 'Create an Account',
-        registerSub: 'Join Monologue Edu today and start learning',
+        registerSub: 'Join NovoNex today and start learning',
         phoneLabel: 'Mobile Number',
         phonePlaceholder: 'e.g. 01700000000',
         passwordLabel: 'Password',

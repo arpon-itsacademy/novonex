@@ -73,7 +73,7 @@ class CoursePurchaseSmsService
         $orderNumber = $order->order_number ?? '#' . $order->id;
         $amount = '৳' . number_format((float) $order->final_amount, 2);
         $loginUrl = url('/login');
-        $siteName = 'Monologue Edu';
+        $siteName = 'NovoNex';
 
         $rendered = str_replace(
             ['{student_name}', '{course_title}', '{bundle_title}', '{order_id}', '{amount}', '{site_name}', '{login_url}'],

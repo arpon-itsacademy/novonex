@@ -118,7 +118,7 @@ export const Navbar: React.FC = () => {
         headerSettings?.brand_title,
         headerSettings?.brand_title_en,
         language
-    ) || (settings?.site_name ? settings.site_name.split(' ')[0] : 'MONOLOGUE');
+    ) || (settings?.site_name ? settings.site_name.split(' ')[0] : 'NOVONEX');
 
     const brandSubtitle = getLocalizedText(
         headerSettings?.brand_subtitle,
@@ -217,7 +217,7 @@ export const Navbar: React.FC = () => {
     const bannerKey = `${headerSettings?.banner_image_url || ''}_${headerSettings?.banner_title || ''}_${headerSettings?.banner_bg_color || ''}`;
     const [bannerDismissed, setBannerDismissed] = useState<boolean>(() => {
         try {
-            return sessionStorage.getItem(`monologue_header_banner_dismissed_${bannerKey}`) === 'true';
+            return sessionStorage.getItem(`novonex_header_banner_dismissed_${bannerKey}`) === 'true';
         } catch {
             return false;
         }
@@ -225,7 +225,7 @@ export const Navbar: React.FC = () => {
 
     useEffect(() => {
         try {
-            const isDismissed = sessionStorage.getItem(`monologue_header_banner_dismissed_${bannerKey}`) === 'true';
+            const isDismissed = sessionStorage.getItem(`novonex_header_banner_dismissed_${bannerKey}`) === 'true';
             setBannerDismissed(isDismissed);
         } catch {
             setBannerDismissed(false);
@@ -235,7 +235,7 @@ export const Navbar: React.FC = () => {
     const handleDismissBanner = () => {
         setBannerDismissed(true);
         try {
-            sessionStorage.setItem(`monologue_header_banner_dismissed_${bannerKey}`, 'true');
+            sessionStorage.setItem(`novonex_header_banner_dismissed_${bannerKey}`, 'true');
         } catch {}
     };
 
@@ -346,7 +346,7 @@ export const Navbar: React.FC = () => {
                         {logoUrl && !logoError ? (
                             <img
                                 src={logoUrl}
-                                alt={settings?.site_name || 'Monologue Edu'}
+                                alt={settings?.site_name || 'NovoNex'}
                                 onError={() => setLogoError(true)}
                                 style={{ height: `${logoHeight}px` }}
                                 className="w-auto max-w-[140px] sm:max-w-[190px] object-contain group-hover:scale-105 transition-transform drop-shadow-xs"

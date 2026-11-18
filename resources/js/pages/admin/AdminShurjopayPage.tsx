@@ -343,7 +343,7 @@ export const AdminShurjopayPage: React.FC = () => {
                             type="text"
                             value={settings.live_prefix}
                             onChange={(e) => setSettings({ ...settings, live_prefix: e.target.value })}
-                            placeholder="MLE"
+                            placeholder="NVX"
                             className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono uppercase text-slate-800 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                         />
                     </div>
@@ -356,7 +356,7 @@ export const AdminShurjopayPage: React.FC = () => {
                             type="text"
                             value={settings.live_username}
                             onChange={(e) => setSettings({ ...settings, live_username: e.target.value })}
-                            placeholder="Monologue Edu"
+                            placeholder="NovoNex"
                             className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-800 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                         />
                     </div>

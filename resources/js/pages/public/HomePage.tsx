@@ -145,7 +145,7 @@ export const HomePage: React.FC = () => {
         return {
             ...t,
             designation: t.designation || 'শিক্ষক মেন্টর',
-            institution: t.institution || 'Monologue Edu',
+            institution: t.institution || 'NovoNex',
             experience: t.bio ? (t.bio.length > 50 ? t.bio.substring(0, 50) + '...' : t.bio) : 'ফ্যাকাল্টি মেম্বার',
             tags,
             category: cat
@@ -203,7 +203,7 @@ export const HomePage: React.FC = () => {
 
     const faqs = [
         {
-            q: 'মনোলগ এডু (Monologue Edu)-তে কোর্স কীভাবে কিনব বা ভর্তি হব?',
+            q: 'নভয়নেক্স (NovoNex)-এ কোর্স কীভাবে কিনব বা ভর্তি হব?',
             a: 'যেকোনো কোর্সের কার্ডে থাকা "কোর্সটি কিনুন" বাটনে ক্লিক করুন। এরপর বিকাশ (bKash), নগদ (Nagad) বা রকেটের মাধ্যমে সরাসরি পেমেন্ট করে ট্রানজেকশন আইডি (TrxID) দিয়ে সাবমিট করলেই খুব দ্রুত আপনার কোর্স এনরোলমেন্ট সক্রিয় হয়ে যাবে।',
         },
         {
@@ -1049,12 +1049,12 @@ export const HomePage: React.FC = () => {
                 </div>
             </section>
 
-            {/* 7. WHY CHOOSE MONOLOGUE EDU (Platform Pillars) */}
+            {/* 7. WHY CHOOSE NOVONEX (Platform Pillars) */}
             <section className="bg-slate-900 text-white py-16 sm:py-20 relative overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
                         <span className="text-xs font-bold uppercase tracking-widest text-sky-400 bg-sky-950 px-3 py-1 rounded-full border border-sky-800">
-                            কেন মনোলগ এডু সেরা?
+                            কেন নভয়নেক্স সেরা?
                         </span>
                         <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
                             সঠিক দিকনির্দেশনা ও সর্বোচ্চ প্রস্তুতি

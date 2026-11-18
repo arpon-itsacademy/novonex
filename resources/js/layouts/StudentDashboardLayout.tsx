@@ -87,7 +87,7 @@ export const StudentDashboardLayout: React.FC = () => {
             await apiClient.post('/notifications/read-all');
             setUnreadCount(0);
             setNotifications(prev => prev.map(n => ({ ...n, read_at: new Date().toISOString() })));
-        } catch {}
+        } catch { }
     };
 
     const handleNotificationClick = async (n: any) => {
@@ -97,7 +97,7 @@ export const StudentDashboardLayout: React.FC = () => {
                 setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, read_at: new Date().toISOString() } : item));
                 setUnreadCount(prev => Math.max(0, prev - 1));
             }
-        } catch {}
+        } catch { }
         setNotifDropdownOpen(false);
         const targetLink = n.data?.link || n.link;
         if (targetLink) {
@@ -237,9 +237,8 @@ export const StudentDashboardLayout: React.FC = () => {
 
             {/* Floating Left Sidebar */}
             <aside
-                className={`fixed lg:sticky top-0 h-screen z-50 transition-all duration-300 ease-in-out p-3 sm:p-4 shrink-0 ${
-                    sidebarOpen ? 'left-0' : '-left-80 lg:left-0'
-                }`}
+                className={`fixed lg:sticky top-0 h-screen z-50 transition-all duration-300 ease-in-out p-3 sm:p-4 shrink-0 ${sidebarOpen ? 'left-0' : '-left-80 lg:left-0'
+                    }`}
             >
                 <div className="w-64 h-[calc(100vh-1.5rem)] sm:h-[calc(100vh-2rem)] bg-white rounded-3xl shadow-sm border border-slate-200/80 flex flex-col justify-between p-4 sm:p-5 overflow-y-auto">
                     {/* Top: Logo & Nav items */}
@@ -250,7 +249,7 @@ export const StudentDashboardLayout: React.FC = () => {
                                 {logoUrl && !logoError ? (
                                     <img
                                         src={logoUrl}
-                                        alt={settings?.site_name || 'Monologue Edu'}
+                                        alt={settings?.site_name || 'NovoNex'}
                                         onError={() => setLogoError(true)}
                                         className="h-9 w-auto max-w-[140px] object-contain group-hover:scale-105 transition-transform"
                                     />
@@ -260,7 +259,7 @@ export const StudentDashboardLayout: React.FC = () => {
                                             <GraduationCap className="w-5 h-5" />
                                         </div>
                                         <span className="font-extrabold text-base tracking-tight text-slate-900">
-                                            {settings?.site_name || 'Monologue'}
+                                            {settings?.site_name || 'NovoNex'}
                                         </span>
                                     </div>
                                 )}
@@ -287,11 +286,10 @@ export const StudentDashboardLayout: React.FC = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => toggleSubmenu(item.title)}
-                                                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all text-left cursor-pointer ${
-                                                    active
-                                                        ? 'bg-sky-50 text-sky-700 font-extrabold'
-                                                        : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/80'
-                                                }`}
+                                                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all text-left cursor-pointer ${active
+                                                    ? 'bg-sky-50 text-sky-700 font-extrabold'
+                                                    : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/80'
+                                                    }`}
                                             >
                                                 <div className="flex items-center gap-3">
                                                     <Icon className={`w-4 h-4 ${active ? 'text-sky-600' : 'text-slate-400'}`} />
@@ -306,9 +304,8 @@ export const StudentDashboardLayout: React.FC = () => {
                                                     title={isSubmenuOpen ? 'সংকোচন করুন' : 'প্রসারিত করুন'}
                                                 >
                                                     <ChevronDown
-                                                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                                                            isSubmenuOpen ? 'rotate-180 text-sky-600' : 'text-slate-400'
-                                                        }`}
+                                                        className={`w-3.5 h-3.5 transition-transform duration-200 ${isSubmenuOpen ? 'rotate-180 text-sky-600' : 'text-slate-400'
+                                                            }`}
                                                     />
                                                 </div>
                                             </button>
@@ -320,18 +317,17 @@ export const StudentDashboardLayout: React.FC = () => {
                                                         const isChildActive = location.pathname === child.path || (
                                                             child.path === '/student/settings/profile' && location.pathname === '/student/profile'
                                                         ) || (
-                                                            child.path === '/student/settings/devices' && location.pathname === '/student/settings'
-                                                        );
+                                                                child.path === '/student/settings/devices' && location.pathname === '/student/settings'
+                                                            );
                                                         return (
                                                             <Link
                                                                 key={child.path}
                                                                 to={child.path}
                                                                 onClick={() => setSidebarOpen(false)}
-                                                                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-all ${
-                                                                    isChildActive
-                                                                        ? 'bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 text-white shadow-xs'
-                                                                        : 'text-slate-500 hover:text-sky-600 hover:bg-sky-50/70'
-                                                                }`}
+                                                                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-all ${isChildActive
+                                                                    ? 'bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 text-white shadow-xs'
+                                                                    : 'text-slate-500 hover:text-sky-600 hover:bg-sky-50/70'
+                                                                    }`}
                                                             >
                                                                 {ChildIcon && (
                                                                     <ChildIcon className={`w-3.5 h-3.5 ${isChildActive ? 'text-white' : 'text-slate-400'}`} />
@@ -355,11 +351,10 @@ export const StudentDashboardLayout: React.FC = () => {
                                                 setSidebarOpen(false);
                                                 item.action();
                                             }}
-                                            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all text-left cursor-pointer ${
-                                                active
-                                                    ? 'bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/25'
-                                                    : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/80'
-                                            }`}
+                                            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all text-left cursor-pointer ${active
+                                                ? 'bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/25'
+                                                : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/80'
+                                                }`}
                                         >
                                             <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-slate-400'}`} />
                                             <span>{item.title}</span>
@@ -371,11 +366,10 @@ export const StudentDashboardLayout: React.FC = () => {
                                     <Link
                                         key={item.title}
                                         to={item.path}
-                                        className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all ${
-                                            active
-                                                ? 'bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/25'
-                                                : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/80'
-                                        }`}
+                                        className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all ${active
+                                            ? 'bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/25'
+                                            : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/80'
+                                            }`}
                                     >
                                         <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-slate-400'}`} />
                                         <span>{item.title}</span>
@@ -506,12 +500,11 @@ export const StudentDashboardLayout: React.FC = () => {
                                             </div>
                                         ) : (
                                             notifications.slice(0, 8).map((n) => (
-                                                <div 
-                                                    key={n.id} 
+                                                <div
+                                                    key={n.id}
                                                     onClick={() => handleNotificationClick(n)}
-                                                    className={`p-3 hover:bg-slate-50 transition-colors cursor-pointer ${
-                                                        !n.read_at ? 'bg-sky-50/50' : ''
-                                                    }`}
+                                                    className={`p-3 hover:bg-slate-50 transition-colors cursor-pointer ${!n.read_at ? 'bg-sky-50/50' : ''
+                                                        }`}
                                                 >
                                                     <div className="flex items-center justify-between gap-1">
                                                         <p className="text-xs font-bold text-slate-800 line-clamp-1">

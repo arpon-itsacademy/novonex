@@ -37,10 +37,10 @@ const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
     show_auth_buttons: true,
     logo_url: null,
     logo_height: 44,
-    brand_title: 'Monologue',
-    brand_title_en: 'Monologue',
-    brand_subtitle: 'Edu',
-    brand_subtitle_en: 'Edu',
+    brand_title: 'NovoNex',
+    brand_title_en: 'NovoNex',
+    brand_subtitle: '',
+    brand_subtitle_en: '',
     announcement_enabled: false,
     announcement_text: '🎉 নতুন ব্যাচে ভর্তি চলছে! ২০% ছাড়ে এখনই এনরোল করুন।',
     announcement_text_en: '🎉 New batch admission open! Enroll now with 20% discount.',
@@ -331,8 +331,8 @@ export const AdminHeaderBuilderPage: React.FC = () => {
     };
 
     // Localized values for Live Preview based on previewLang toggle
-    const previewBrandTitle = getLocalizedText(headerSettings.brand_title, headerSettings.brand_title_en, previewLang) || 'Monologue';
-    const previewBrandSubtitle = getLocalizedText(headerSettings.brand_subtitle, headerSettings.brand_subtitle_en, previewLang) || 'Edu';
+    const previewBrandTitle = getLocalizedText(headerSettings.brand_title, headerSettings.brand_title_en, previewLang) || 'NovoNex';
+    const previewBrandSubtitle = getLocalizedText(headerSettings.brand_subtitle, headerSettings.brand_subtitle_en, previewLang) || '';
     const previewAnnouncementText = getLocalizedText(headerSettings.announcement_text, headerSettings.announcement_text_en, previewLang);
     const previewCtaText = getLocalizedText(headerSettings.cta_button_text, headerSettings.cta_button_text_en, previewLang) || 'Free Classes';
 
@@ -392,9 +392,8 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setPreviewMode('desktop')}
-                                className={`p-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                                    previewMode === 'desktop' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
-                                }`}
+                                className={`p-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${previewMode === 'desktop' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                                    }`}
                             >
                                 <Monitor className="w-3.5 h-3.5" />
                                 <span className="hidden sm:inline">Desktop</span>
@@ -402,9 +401,8 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setPreviewMode('mobile')}
-                                className={`p-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                                    previewMode === 'mobile' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
-                                }`}
+                                className={`p-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${previewMode === 'mobile' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                                    }`}
                             >
                                 <Smartphone className="w-3.5 h-3.5" />
                                 <span className="hidden sm:inline">Mobile</span>
@@ -414,9 +412,8 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                 </div>
 
                 {/* Preview Frame */}
-                <div className={`mx-auto bg-white text-slate-900 rounded-2xl overflow-hidden shadow-2xs border border-slate-200 transition-all duration-200 ${
-                    previewMode === 'mobile' ? 'max-w-sm' : 'w-full'
-                }`}>
+                <div className={`mx-auto bg-white text-slate-900 rounded-2xl overflow-hidden shadow-2xs border border-slate-200 transition-all duration-200 ${previewMode === 'mobile' ? 'max-w-sm' : 'w-full'
+                    }`}>
                     {/* Announcement Bar Preview */}
                     {headerSettings.announcement_enabled && (
                         <div
@@ -568,11 +565,10 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('branding')}
-                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${
-                            activeTab === 'branding'
-                                ? 'border-sky-600 text-sky-600 bg-white'
-                                : 'border-transparent text-slate-600 hover:text-slate-900'
-                        }`}
+                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${activeTab === 'branding'
+                            ? 'border-sky-600 text-sky-600 bg-white'
+                            : 'border-transparent text-slate-600 hover:text-slate-900'
+                            }`}
                     >
                         <ImageIcon className="w-4 h-4" />
                         <span>Logo & Branding</span>
@@ -580,11 +576,10 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('menu')}
-                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${
-                            activeTab === 'menu'
-                                ? 'border-sky-600 text-sky-600 bg-white'
-                                : 'border-transparent text-slate-600 hover:text-slate-900'
-                        }`}
+                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${activeTab === 'menu'
+                            ? 'border-sky-600 text-sky-600 bg-white'
+                            : 'border-transparent text-slate-600 hover:text-slate-900'
+                            }`}
                     >
                         <Layers className="w-4 h-4" />
                         <span>Navigation Menu ({headerSettings.menu_items?.length || 0})</span>
@@ -592,11 +587,10 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('banner')}
-                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${
-                            activeTab === 'banner'
-                                ? 'border-sky-600 text-sky-600 bg-white'
-                                : 'border-transparent text-slate-600 hover:text-slate-900'
-                        }`}
+                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${activeTab === 'banner'
+                            ? 'border-sky-600 text-sky-600 bg-white'
+                            : 'border-transparent text-slate-600 hover:text-slate-900'
+                            }`}
                     >
                         <Sparkles className="w-4 h-4 text-amber-500" />
                         <span>Header Banner (10MS Style)</span>
@@ -607,11 +601,10 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('announcement')}
-                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${
-                            activeTab === 'announcement'
-                                ? 'border-sky-600 text-sky-600 bg-white'
-                                : 'border-transparent text-slate-600 hover:text-slate-900'
-                        }`}
+                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${activeTab === 'announcement'
+                            ? 'border-sky-600 text-sky-600 bg-white'
+                            : 'border-transparent text-slate-600 hover:text-slate-900'
+                            }`}
                     >
                         <Bell className="w-4 h-4" />
                         <span>Announcement Bar</span>
@@ -619,11 +612,10 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('options')}
-                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${
-                            activeTab === 'options'
-                                ? 'border-sky-600 text-sky-600 bg-white'
-                                : 'border-transparent text-slate-600 hover:text-slate-900'
-                        }`}
+                        className={`px-6 py-4 text-xs font-bold transition flex items-center gap-2 border-b-2 whitespace-nowrap cursor-pointer ${activeTab === 'options'
+                            ? 'border-sky-600 text-sky-600 bg-white'
+                            : 'border-transparent text-slate-600 hover:text-slate-900'
+                            }`}
                     >
                         <Sliders className="w-4 h-4" />
                         <span>Buttons & Options</span>
@@ -743,7 +735,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                 value={headerSettings.brand_title || ''}
                                                 onChange={(e) => handleUpdate('brand_title', e.target.value)}
                                                 className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium"
-                                                placeholder="e.g. Monologue"
+                                                placeholder="e.g. NovoNex"
                                             />
                                         </div>
                                         <div>
@@ -755,7 +747,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                 value={headerSettings.brand_title_en || ''}
                                                 onChange={(e) => handleUpdate('brand_title_en', e.target.value)}
                                                 className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium"
-                                                placeholder="e.g. Monologue"
+                                                placeholder="e.g. NovoNex"
                                             />
                                         </div>
                                     </div>
@@ -1008,20 +1000,18 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                             {/* Option A: Image Banner */}
                                             <div
                                                 onClick={() => handleUpdate('banner_mode', 'image')}
-                                                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                                    headerSettings.banner_mode !== 'text'
-                                                        ? 'border-sky-600 bg-sky-50/50 shadow-xs'
-                                                        : 'border-slate-200 hover:border-slate-300 bg-white'
-                                                }`}
+                                                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${headerSettings.banner_mode !== 'text'
+                                                    ? 'border-sky-600 bg-sky-50/50 shadow-xs'
+                                                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                                                    }`}
                                             >
                                                 <div className="flex items-center justify-between mb-1.5">
                                                     <div className="flex items-center gap-2">
                                                         <ImageIcon className="w-4 h-4 text-sky-600" />
                                                         <span className="text-sm font-bold text-slate-900">ছবি / ব্যানার গ্রাফিক্স (Image Banner)</span>
                                                     </div>
-                                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                                                        headerSettings.banner_mode !== 'text' ? 'border-sky-600 bg-sky-600' : 'border-slate-300'
-                                                    }`}>
+                                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${headerSettings.banner_mode !== 'text' ? 'border-sky-600 bg-sky-600' : 'border-slate-300'
+                                                        }`}>
                                                         {headerSettings.banner_mode !== 'text' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                                                     </div>
                                                 </div>
@@ -1033,20 +1023,18 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                             {/* Option B: Custom Text & Background Color */}
                                             <div
                                                 onClick={() => handleUpdate('banner_mode', 'text')}
-                                                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                                    headerSettings.banner_mode === 'text'
-                                                        ? 'border-sky-600 bg-sky-50/50 shadow-xs'
-                                                        : 'border-slate-200 hover:border-slate-300 bg-white'
-                                                }`}
+                                                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${headerSettings.banner_mode === 'text'
+                                                    ? 'border-sky-600 bg-sky-50/50 shadow-xs'
+                                                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                                                    }`}
                                             >
                                                 <div className="flex items-center justify-between mb-1.5">
                                                     <div className="flex items-center gap-2">
                                                         <Palette className="w-4 h-4 text-emerald-600" />
                                                         <span className="text-sm font-bold text-slate-900">ব্যাকগ্রাউন্ড কালার ও টেক্সট (Color & Text)</span>
                                                     </div>
-                                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                                                        headerSettings.banner_mode === 'text' ? 'border-sky-600 bg-sky-600' : 'border-slate-300'
-                                                    }`}>
+                                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${headerSettings.banner_mode === 'text' ? 'border-sky-600 bg-sky-600' : 'border-slate-300'
+                                                        }`}>
                                                         {headerSettings.banner_mode === 'text' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                                                     </div>
                                                 </div>
@@ -1223,11 +1211,10 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                             type="button"
                                                             onClick={() => handleUpdate('banner_bg_color', preset.color)}
                                                             style={{ backgroundColor: preset.color }}
-                                                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold text-white flex items-center gap-1.5 shadow-xs border transition-all cursor-pointer ${
-                                                                headerSettings.banner_bg_color === preset.color
-                                                                    ? 'ring-2 ring-offset-2 ring-sky-500 border-white'
-                                                                    : 'border-transparent opacity-90 hover:opacity-100'
-                                                            }`}
+                                                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold text-white flex items-center gap-1.5 shadow-xs border transition-all cursor-pointer ${headerSettings.banner_bg_color === preset.color
+                                                                ? 'ring-2 ring-offset-2 ring-sky-500 border-white'
+                                                                : 'border-transparent opacity-90 hover:opacity-100'
+                                                                }`}
                                                         >
                                                             {headerSettings.banner_bg_color === preset.color && <Check className="w-3 h-3" />}
                                                             <span>{preset.label}</span>
