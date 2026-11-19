@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { apiClient } from '../../api/client';
+import { apiClient, getImageUrl } from '../../api/client';
 import { User, UserRole, Role } from '../../types';
 import {
     Users,
@@ -31,7 +31,10 @@ import {
     ClipboardList,
     ShoppingCart,
     Share2,
-    Award
+    Award,
+    Edit,
+    Camera,
+    Upload
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Modal } from '../../components/ui/Modal';
@@ -101,6 +104,27 @@ export const AdminUsersPage: React.FC = () => {
         photo_url: '',
         bio: '',
         is_featured: true,
+    });
+
+    // Edit User Modal state
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [savingUser, setSavingUser] = useState(false);
+    const [editError, setEditError] = useState<string | null>(null);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const [editForm, setEditForm] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        password: '',
+        role: 'student' as UserRole,
+        custom_role_id: '' as string | number,
+        status: 'active' as 'active' | 'inactive',
+        registration_number: '',
+        photo_url: '',
+        designation: '',
+        institution: '',
+        bio: '',
     });
 
     // Keep state in sync with URL searchParams (e.g. when navigating from dashboard or back/forward)
@@ -358,6 +382,93 @@ export const AdminUsersPage: React.FC = () => {
         }
     };
 
+    const handleOpenEditUser = (u: User) => {
+        setEditingUser(u);
+        setEditError(null);
+        const teacherProf = (u as any).teacher_profile || (u as any).teacherProfile;
+        setEditForm({
+            name: u.name || '',
+            phone: u.phone || '',
+            email: u.email || '',
+            password: '',
+            role: u.role || 'student',
+            custom_role_id: u.custom_role_id || '',
+            status: u.status || 'active',
+            registration_number: u.registration_number || '',
+            photo_url: u.photo_url || teacherProf?.photo_url || '',
+            designation: teacherProf?.designation || '',
+            institution: teacherProf?.institution || '',
+            bio: teacherProf?.bio || '',
+        });
+        setEditModalOpen(true);
+    };
+
+    const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !editingUser) return;
+        setUploadingAvatar(true);
+        try {
+            const formData = new FormData();
+            formData.append('photo', file);
+            const { data } = await apiClient.post(`/admin/users/${editingUser.id}/avatar`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            const newPhoto = data.photo_url || '';
+            setEditForm(prev => ({ ...prev, photo_url: newPhoto }));
+            setEditingUser(prev => prev ? { ...prev, photo_url: newPhoto } : null);
+            setUsers(prev => prev.map(item => item.id === editingUser.id ? { ...item, photo_url: newPhoto } : item));
+            if (userDetails && userDetails.id === editingUser.id) {
+                setUserDetails((prev: any) => ({ ...prev, photo_url: newPhoto }));
+            }
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Failed to upload profile picture.');
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
+
+    const handleSaveEditUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingUser) return;
+        setSavingUser(true);
+        setEditError(null);
+        try {
+            const payload: any = {
+                name: editForm.name,
+                email: editForm.email,
+                phone: editForm.phone,
+                role: editForm.role,
+                custom_role_id: editForm.role === 'custom' || editForm.custom_role_id ? editForm.custom_role_id : null,
+                status: editForm.status,
+                registration_number: editForm.registration_number || null,
+                photo_url: editForm.photo_url || null,
+            };
+            if (editForm.password && editForm.password.trim()) {
+                payload.password = editForm.password.trim();
+            }
+            if (editForm.role === 'teacher' || editForm.designation || editForm.institution) {
+                payload.designation = editForm.designation;
+                payload.institution = editForm.institution;
+                payload.bio = editForm.bio;
+            }
+
+            const { data } = await apiClient.put(`/admin/users/${editingUser.id}`, payload);
+            const updated = data.user;
+
+            setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, ...updated } : u));
+            if (userDetails && userDetails.id === editingUser.id) {
+                setUserDetails((prev: any) => ({ ...prev, ...updated }));
+            }
+            setEditModalOpen(false);
+            setEditingUser(null);
+            alert(data.message || 'User information and profile picture updated successfully.');
+        } catch (err: any) {
+            setEditError(err.response?.data?.message || 'Failed to update user.');
+        } finally {
+            setSavingUser(false);
+        }
+    };
+
     const activeRoleTab = searchParams.get('role') || '';
 
     return (
@@ -567,6 +678,7 @@ export const AdminUsersPage: React.FC = () => {
                             ) : (
                                 users.map((u) => {
                                     const initial = (u.name || 'U').charAt(0).toUpperCase();
+                                    const avatarUrl = u.photo_url || (u as any).teacher_profile?.photo_url || (u as any).teacherProfile?.photo_url;
                                     return (
                                         <tr key={u.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
                                             <td className="py-4 px-6">
@@ -576,8 +688,16 @@ export const AdminUsersPage: React.FC = () => {
                                                     className="flex items-center gap-3 text-left group cursor-pointer focus:outline-hidden"
                                                     title="Click to view details and enrollments"
                                                 >
-                                                    <div className="w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 font-bold flex items-center justify-center text-sm shrink-0 border border-sky-200/50 dark:border-sky-800/50 group-hover:scale-105 group-hover:border-sky-400 transition-all">
-                                                        {initial}
+                                                    <div className="w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 font-bold flex items-center justify-center text-sm shrink-0 border border-sky-200/50 dark:border-sky-800/50 group-hover:scale-105 group-hover:border-sky-400 transition-all overflow-hidden">
+                                                        {avatarUrl ? (
+                                                            <img
+                                                                src={getImageUrl(avatarUrl)}
+                                                                alt={u.name}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            initial
+                                                        )}
                                                     </div>
                                                     <div>
                                                         <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors flex items-center gap-1.5">
@@ -658,10 +778,19 @@ export const AdminUsersPage: React.FC = () => {
                                             <td className="py-4 px-6 text-right">
                                                 <div className="inline-flex items-center gap-1.5">
                                                     <button
+                                                        type="button"
+                                                        onClick={() => handleOpenEditUser(u)}
+                                                        className="px-2.5 py-1.5 bg-[#25a2ee]/10 hover:bg-[#25a2ee]/20 text-[#25a2ee] font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1"
+                                                        title="Edit User Info & Profile Picture"
+                                                    >
+                                                        <Edit className="w-3.5 h-3.5" />
+                                                        <span>Edit</span>
+                                                    </button>
+                                                    <button
                                                         onClick={() => openRoleModal(u)}
                                                         className="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-lg text-xs transition-colors cursor-pointer"
                                                     >
-                                                        Change Role
+                                                        Role
                                                     </button>
                                                     <button
                                                         onClick={() => handleToggleStatus(u)}
@@ -1040,8 +1169,16 @@ export const AdminUsersPage: React.FC = () => {
                         <div className="p-4 sm:p-5 bg-gradient-to-br from-slate-50 via-sky-50/30 to-indigo-50/20 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-850 rounded-2xl border border-slate-200/80 dark:border-slate-700 space-y-4">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex items-center gap-3.5">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white font-extrabold flex items-center justify-center text-xl shadow-md shrink-0">
-                                        {(userDetails.name || 'U').charAt(0).toUpperCase()}
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white font-extrabold flex items-center justify-center text-xl shadow-md shrink-0 overflow-hidden">
+                                        {userDetails.photo_url || userDetails.teacher_profile?.photo_url ? (
+                                            <img
+                                                src={getImageUrl(userDetails.photo_url || userDetails.teacher_profile?.photo_url)}
+                                                alt={userDetails.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            (userDetails.name || 'U').charAt(0).toUpperCase()
+                                        )}
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2 flex-wrap">
@@ -1089,7 +1226,18 @@ export const AdminUsersPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 self-start sm:self-center">
+                                <div className="flex items-center gap-2 self-start sm:self-center flex-wrap">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setDetailsModalOpen(false);
+                                            handleOpenEditUser(userDetails);
+                                        }}
+                                        className="px-3 py-1.5 bg-[#25a2ee] hover:bg-[#1a8ed2] text-white rounded-xl text-xs font-bold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                                    >
+                                        <Edit className="w-3.5 h-3.5" />
+                                        <span>Edit Info</span>
+                                    </button>
                                     <button
                                         onClick={() => {
                                             openRoleModal(userDetails);
@@ -1588,6 +1736,308 @@ export const AdminUsersPage: React.FC = () => {
                             </form>
                         )}
                     </div>
+                )}
+            </Modal>
+
+            {/* Edit User Information & Profile Picture Modal */}
+            <Modal
+                isOpen={editModalOpen}
+                onClose={() => {
+                    if (!savingUser) {
+                        setEditModalOpen(false);
+                        setEditingUser(null);
+                        setEditError(null);
+                    }
+                }}
+                title={editingUser ? `Edit User: ${editingUser.name}` : 'Edit User Profile'}
+                maxWidth="lg"
+            >
+                {editingUser && (
+                    <form onSubmit={handleSaveEditUser} className="space-y-5">
+                        {editError && (
+                            <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
+                                <AlertCircle className="w-4 h-4 shrink-0" />
+                                <span>{editError}</span>
+                            </div>
+                        )}
+
+                        {/* Profile Picture Upload Section */}
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700 space-y-3">
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                                Profile Picture
+                            </label>
+                            <div className="flex flex-col sm:flex-row items-center gap-4">
+                                {/* Preview Circle */}
+                                <div className="relative group shrink-0">
+                                    <div className="w-20 h-20 rounded-2xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-black text-2xl flex items-center justify-center border-2 border-white dark:border-slate-600 shadow-md overflow-hidden">
+                                        {editForm.photo_url ? (
+                                            <img
+                                                src={getImageUrl(editForm.photo_url)}
+                                                alt="Avatar"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            (editForm.name || 'U').charAt(0).toUpperCase()
+                                        )}
+                                    </div>
+                                    {uploadingAvatar && (
+                                        <div className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center text-white">
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="space-y-2 flex-1 w-full text-center sm:text-left">
+                                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                        {/* File Upload Button */}
+                                        <label className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#25a2ee] hover:bg-[#1a8ed2] text-white text-xs font-bold rounded-xl cursor-pointer shadow-xs transition-colors">
+                                            <Upload className="w-3.5 h-3.5" />
+                                            <span>Upload New Photo</span>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                disabled={uploadingAvatar || savingUser}
+                                                onChange={handleAvatarFileChange}
+                                            />
+                                        </label>
+
+                                        {editForm.photo_url && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setEditForm({ ...editForm, photo_url: '' })}
+                                                className="px-3 py-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 border border-rose-200 dark:border-rose-800 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                                            >
+                                                Remove Photo
+                                            </button>
+                                        )}
+                                    </div>
+                                    <p className="text-[11px] text-slate-400">
+                                        Accepts JPG, PNG, WEBP (up to 10MB). Image is optimized & stored securely.
+                                    </p>
+                                    <div className="pt-1">
+                                        <input
+                                            type="text"
+                                            value={editForm.photo_url}
+                                            onChange={(e) => setEditForm({ ...editForm, photo_url: e.target.value })}
+                                            placeholder="Or enter direct photo URL (optional)"
+                                            className="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#25a2ee] focus:outline-hidden"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Name & Phone */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    Full Name <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={editForm.name}
+                                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#25a2ee] focus:outline-hidden"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    Mobile Phone Number <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={editForm.phone}
+                                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                                    placeholder="01XXXXXXXXX"
+                                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#25a2ee] focus:outline-hidden"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Email & Registration Number */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    Email Address <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={editForm.email}
+                                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#25a2ee] focus:outline-hidden"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    Student ID / Registration No.
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editForm.registration_number}
+                                    onChange={(e) => setEditForm({ ...editForm, registration_number: e.target.value })}
+                                    placeholder="e.g. NN-2026-0042"
+                                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#25a2ee] focus:outline-hidden"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Role, Custom Role & Status */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    Role
+                                </label>
+                                <select
+                                    value={editForm.role}
+                                    onChange={(e) => setEditForm({ ...editForm, role: e.target.value as UserRole })}
+                                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#25a2ee] focus:outline-hidden cursor-pointer"
+                                >
+                                    <option value="student">Student</option>
+                                    <option value="teacher">Instructor / Teacher</option>
+                                    <option value="admin">Administrator</option>
+                                    {customRoles.length > 0 && <option value="custom">Custom Role</option>}
+                                </select>
+                            </div>
+
+                            {editForm.role === 'custom' && (
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        Custom Role
+                                    </label>
+                                    <select
+                                        value={editForm.custom_role_id}
+                                        onChange={(e) => setEditForm({ ...editForm, custom_role_id: e.target.value })}
+                                        className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#25a2ee] focus:outline-hidden cursor-pointer"
+                                    >
+                                        <option value="">Select Role...</option>
+                                        {customRoles.map((r) => (
+                                            <option key={r.id} value={r.id}>
+                                                {r.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    Account Status
+                                </label>
+                                <select
+                                    value={editForm.status}
+                                    onChange={(e) => setEditForm({ ...editForm, status: e.target.value as 'active' | 'inactive' })}
+                                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#25a2ee] focus:outline-hidden cursor-pointer"
+                                >
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Reset Password Field */}
+                        <div className="p-3.5 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 rounded-xl space-y-1.5">
+                            <label className="block text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
+                                <Lock className="w-3.5 h-3.5 text-amber-600" />
+                                <span>Reset Password (Optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={editForm.password}
+                                onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
+                                placeholder="Leave blank to keep existing password"
+                                className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#25a2ee] focus:outline-hidden"
+                            />
+                            <p className="text-[11px] text-amber-700/80 dark:text-amber-300/80">
+                                Enter 6+ characters only if you want to set a new password for this user.
+                            </p>
+                        </div>
+
+                        {/* Teacher Fields (if instructor) */}
+                        {editForm.role === 'teacher' && (
+                            <div className="p-4 bg-indigo-50/40 dark:bg-indigo-950/20 rounded-2xl border border-indigo-200/60 dark:border-indigo-800/40 space-y-3">
+                                <span className="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wider block">
+                                    Instructor Profile Details
+                                </span>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                            Designation
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={editForm.designation}
+                                            onChange={(e) => setEditForm({ ...editForm, designation: e.target.value })}
+                                            placeholder="e.g. Senior Mentor"
+                                            className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                            Institution
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={editForm.institution}
+                                            onChange={(e) => setEditForm({ ...editForm, institution: e.target.value })}
+                                            placeholder="e.g. BUET / DU"
+                                            className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Biography / Bio
+                                    </label>
+                                    <textarea
+                                        rows={2}
+                                        value={editForm.bio}
+                                        onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                                        placeholder="Short teacher introduction..."
+                                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Modal Action Buttons */}
+                        <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100 dark:border-slate-800">
+                            <button
+                                type="button"
+                                disabled={savingUser}
+                                onClick={() => {
+                                    setEditModalOpen(false);
+                                    setEditingUser(null);
+                                    setEditError(null);
+                                }}
+                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={savingUser || uploadingAvatar}
+                                className="px-5 py-2 bg-[#25a2ee] hover:bg-[#1a8ed2] text-white rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                            >
+                                {savingUser ? (
+                                    <>
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                        <span>Saving Changes...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        <span>Save Changes</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </form>
                 )}
             </Modal>
         </div>

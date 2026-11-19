@@ -296,6 +296,198 @@ class AdminUserController extends Controller
     }
 
     /**
+     * Update user information, roles, and profile picture (Admin)
+     */
+    public function update(Request $request, User $user): JsonResponse
+    {
+        $normalizedPhone = $request->filled('phone')
+            ? User::normalizePhone($request->input('phone'))
+            : $user->phone;
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'phone' => ['required', 'string'],
+            'registration_number' => ['nullable', 'string', 'max:50', 'unique:users,registration_number,' . $user->id],
+            'role' => ['nullable', 'string'],
+            'custom_role_id' => ['nullable'],
+            'status' => ['nullable', 'in:active,inactive'],
+            'password' => ['nullable', 'string', 'min:6'],
+            'photo_url' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'max:10240'],
+            'avatar' => ['nullable', 'image', 'max:10240'],
+            'designation' => ['nullable', 'string', 'max:255'],
+            'institution' => ['nullable', 'string', 'max:255'],
+            'bio' => ['nullable', 'string'],
+        ], [
+            'name.required' => 'Full name is required.',
+            'email.required' => 'Email address is required.',
+            'email.unique' => 'This email address is already in use by another user.',
+            'phone.required' => 'Phone number is required.',
+            'registration_number.unique' => 'This registration number is already in use.',
+            'password.min' => 'Password must be at least 6 characters.',
+        ]);
+
+        if (! $normalizedPhone || ! User::isValidPhoneNumber($normalizedPhone)) {
+            return response()->json([
+                'message' => 'Please provide a valid 11-digit Bangladeshi mobile number.',
+                'errors' => ['phone' => ['Please provide a valid Bangladeshi mobile number.']],
+            ], 422);
+        }
+
+        $phoneExists = User::where('phone', $normalizedPhone)->where('id', '!=', $user->id)->exists();
+        if ($phoneExists) {
+            return response()->json([
+                'message' => 'This mobile number is already in use by another account.',
+                'errors' => ['phone' => ['This mobile number is already in use.']],
+            ], 422);
+        }
+
+        $oldData = $user->only(['name', 'email', 'phone', 'role', 'status', 'photo_url']);
+
+        $photoUrl = $user->photo_url;
+        if ($request->has('photo_url')) {
+            $photoUrl = $request->input('photo_url') ?: null;
+        }
+
+        // Handle uploaded image file if provided
+        $imageFile = $request->file('photo') ?? $request->file('avatar');
+        if ($imageFile && $imageFile->isValid()) {
+            $path = $imageFile->store('avatars', 'public');
+            $photoUrl = asset('storage/' . $path);
+
+            try {
+                $destPath = public_path('storage/' . $path);
+                $destDir = dirname($destPath);
+                if (! file_exists($destDir)) {
+                    @mkdir($destDir, 0755, true);
+                }
+                @copy(storage_path('app/public/' . $path), $destPath);
+            } catch (\Throwable $e) {}
+        }
+
+        $updateData = [
+            'name' => trim($validated['name']),
+            'email' => strtolower(trim($validated['email'])),
+            'phone' => $normalizedPhone,
+            'photo_url' => $photoUrl,
+        ];
+
+        if ($request->has('registration_number')) {
+            $updateData['registration_number'] = $request->input('registration_number') ? trim($request->input('registration_number')) : null;
+        }
+
+        if ($request->filled('status')) {
+            $newStatus = $request->input('status');
+            if ($user->isAdmin() && $newStatus === User::STATUS_INACTIVE) {
+                $otherActiveAdmins = User::where('role', User::ROLE_ADMIN)
+                    ->where('status', User::STATUS_ACTIVE)
+                    ->where('id', '!=', $user->id)
+                    ->count();
+
+                if ($otherActiveAdmins === 0) {
+                    return response()->json([
+                        'message' => 'The only active admin account cannot be deactivated.',
+                    ], 422);
+                }
+            }
+            $updateData['status'] = $newStatus;
+        }
+
+        if ($request->filled('password')) {
+            $updateData['password'] = Hash::make($request->input('password'));
+        }
+
+        if ($request->filled('role')) {
+            $newRole = $request->input('role');
+            if ($user->role === User::ROLE_ADMIN && $newRole !== User::ROLE_ADMIN) {
+                $activeAdminCount = User::where('role', User::ROLE_ADMIN)
+                    ->where('status', User::STATUS_ACTIVE)
+                    ->where('id', '!=', $user->id)
+                    ->count();
+
+                if ($activeAdminCount === 0) {
+                    return response()->json([
+                        'message' => 'At least one active admin is required. This admin cannot be demoted.',
+                    ], 422);
+                }
+            }
+            $updateData['role'] = $newRole;
+            $updateData['custom_role_id'] = ($newRole === 'custom' || !empty($request->input('custom_role_id')))
+                ? $request->input('custom_role_id')
+                : null;
+        }
+
+        $user->update($updateData);
+
+        // Keep TeacherProfile synced if teacher or profile info provided
+        if ($user->role === User::ROLE_TEACHER || $request->filled('designation') || $request->filled('institution')) {
+            TeacherProfile::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'designation' => $request->input('designation') ?: ($user->teacherProfile?->designation ?: 'Instructor'),
+                    'institution' => $request->input('institution') ?: ($user->teacherProfile?->institution ?: 'NovoNex Faculty'),
+                    'photo_url' => $photoUrl,
+                    'bio' => $request->input('bio') ?: $user->teacherProfile?->bio,
+                    'is_featured' => true,
+                ]
+            );
+        } elseif ($user->teacherProfile && $photoUrl !== null) {
+            $user->teacherProfile->update(['photo_url' => $photoUrl]);
+        }
+
+        AuditLog::log('user_updated_by_admin', 'User', $user->id, $oldData, $updateData);
+
+        return response()->json([
+            'message' => 'User information and profile picture updated successfully.',
+            'user' => $user->fresh(['teacherProfile', 'customRole'])->loadCount(['enrollments', 'instructedCourses']),
+        ]);
+    }
+
+    /**
+     * Upload avatar image for any user (Admin)
+     */
+    public function updateAvatar(Request $request, User $user): JsonResponse
+    {
+        $request->validate([
+            'photo' => ['nullable', 'image', 'max:10240'],
+            'avatar' => ['nullable', 'image', 'max:10240'],
+            'photo_url' => ['nullable', 'string'],
+        ]);
+
+        $photoUrl = $request->input('photo_url');
+
+        $imageFile = $request->file('photo') ?? $request->file('avatar');
+        if ($imageFile && $imageFile->isValid()) {
+            $path = $imageFile->store('avatars', 'public');
+            $photoUrl = asset('storage/' . $path);
+
+            try {
+                $destPath = public_path('storage/' . $path);
+                $destDir = dirname($destPath);
+                if (! file_exists($destDir)) {
+                    @mkdir($destDir, 0755, true);
+                }
+                @copy(storage_path('app/public/' . $path), $destPath);
+            } catch (\Throwable $e) {}
+        }
+
+        if (! empty($photoUrl)) {
+            $user->update(['photo_url' => $photoUrl]);
+
+            if ($user->teacherProfile) {
+                $user->teacherProfile->update(['photo_url' => $photoUrl]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Profile picture updated successfully.',
+            'photo_url' => $photoUrl,
+            'user' => $user->fresh(['teacherProfile', 'customRole']),
+        ]);
+    }
+
+    /**
      * Update teacher profile details
      */
     public function updateTeacherProfile(Request $request, User $user): JsonResponse

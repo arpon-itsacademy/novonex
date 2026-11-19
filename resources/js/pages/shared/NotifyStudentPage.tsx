@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../api/client';
-import { 
-    Send, 
-    Bell, 
-    BookOpen, 
-    Package, 
-    Users, 
-    CheckCircle2, 
-    AlertCircle, 
-    Loader2, 
-    Info, 
+import {
+    Send,
+    Bell,
+    BookOpen,
+    Package,
+    Users,
+    CheckCircle2,
+    AlertCircle,
+    Loader2,
+    Info,
     ExternalLink,
     Clock,
     Megaphone,
@@ -238,11 +238,10 @@ export const NotifyStudentPage: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => setTargetType('course')}
-                                    className={`p-3 rounded-2xl border text-left font-bold text-xs flex items-center gap-2.5 transition-all cursor-pointer ${
-                                        targetType === 'course'
-                                            ? 'bg-sky-50 dark:bg-sky-950/50 border-sky-500 text-sky-700 dark:text-sky-300 ring-2 ring-sky-500/20'
-                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
-                                    }`}
+                                    className={`p-3 rounded-2xl border text-left font-bold text-xs flex items-center gap-2.5 transition-all cursor-pointer ${targetType === 'course'
+                                        ? 'bg-sky-50 dark:bg-sky-950/50 border-sky-500 text-sky-700 dark:text-sky-300 ring-2 ring-sky-500/20'
+                                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
+                                        }`}
                                 >
                                     <BookOpen className="w-4 h-4 text-sky-500" />
                                     <span>Course</span>
@@ -251,11 +250,10 @@ export const NotifyStudentPage: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => setTargetType('bundle')}
-                                    className={`p-3 rounded-2xl border text-left font-bold text-xs flex items-center gap-2.5 transition-all cursor-pointer ${
-                                        targetType === 'bundle'
-                                            ? 'bg-sky-50 dark:bg-sky-950/50 border-sky-500 text-sky-700 dark:text-sky-300 ring-2 ring-sky-500/20'
-                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
-                                    }`}
+                                    className={`p-3 rounded-2xl border text-left font-bold text-xs flex items-center gap-2.5 transition-all cursor-pointer ${targetType === 'bundle'
+                                        ? 'bg-sky-50 dark:bg-sky-950/50 border-sky-500 text-sky-700 dark:text-sky-300 ring-2 ring-sky-500/20'
+                                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
+                                        }`}
                                 >
                                     <Package className="w-4 h-4 text-indigo-500" />
                                     <span>Bundle</span>
@@ -265,11 +263,10 @@ export const NotifyStudentPage: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setTargetType('all')}
-                                        className={`p-3 rounded-2xl border text-left font-bold text-xs flex items-center gap-2.5 transition-all cursor-pointer ${
-                                            targetType === 'all'
-                                                ? 'bg-sky-50 dark:bg-sky-950/50 border-sky-500 text-sky-700 dark:text-sky-300 ring-2 ring-sky-500/20'
+                                        className={`p-3 rounded-2xl border text-left font-bold text-xs flex items-center gap-2.5 transition-all cursor-pointer ${targetType === 'all'
+                                            ? 'bg-sky-50 dark:bg-sky-950/50 border-sky-500 text-sky-700 dark:text-sky-300 ring-2 ring-sky-500/20'
                                             : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
-                                        }`}
+                                            }`}
                                     >
                                         <Users className="w-4 h-4 text-emerald-500" />
                                         <span>All Students</span>
@@ -442,10 +439,10 @@ export const NotifyStudentPage: React.FC = () => {
                         <div className="p-4 rounded-2xl bg-[#f8fafc] dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 space-y-1.5 shadow-2xs">
                             <div className="flex items-center justify-between">
                                 <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 text-[10px] font-bold">
-                                    {targetType === 'course' 
-                                        ? selectedCourse?.title || 'Course' 
-                                        : targetType === 'bundle' 
-                                            ? selectedBundle?.title || 'Bundle' 
+                                    {targetType === 'course'
+                                        ? selectedCourse?.title || 'Course'
+                                        : targetType === 'bundle'
+                                            ? selectedBundle?.title || 'Bundle'
                                             : 'All Students'}
                                 </span>
                                 <span className="text-[10px] text-slate-400">Just now</span>

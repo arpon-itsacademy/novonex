@@ -33,6 +33,7 @@ class User extends Authenticatable
         'role',
         'custom_role_id',
         'status',
+        'photo_url',
     ];
 
     protected $hidden = [
@@ -61,6 +62,11 @@ class User extends Authenticatable
                 if (! Schema::hasColumn('users', 'registration_number')) {
                     Schema::table('users', function (Blueprint $table) {
                         $table->string('registration_number', 50)->nullable()->unique()->after('phone');
+                    });
+                }
+                if (! Schema::hasColumn('users', 'photo_url')) {
+                    Schema::table('users', function (Blueprint $table) {
+                        $table->string('photo_url', 1000)->nullable()->after('email');
                     });
                 }
             } catch (\Throwable $e) {
@@ -260,8 +266,12 @@ class User extends Authenticatable
         return $this->hasOne(TeacherProfile::class);
     }
 
-    public function getPhotoUrlAttribute(): ?string
+    public function getPhotoUrlAttribute($value = null): ?string
     {
+        if (! empty($value)) {
+            return $value;
+        }
+
         return $this->teacherProfile?->photo_url;
     }
 
