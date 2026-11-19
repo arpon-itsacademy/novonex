@@ -294,7 +294,7 @@ export const LessonPlayerPage: React.FC = () => {
                             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                                 <h3 className="text-base font-bold text-white flex items-center gap-2">
                                     <Paperclip className="w-4 h-4 text-sky-400" />
-                                    <span>স্টাডি ম্যাটেরিয়াল ও রিসোর্স ({lesson.attachments.length})</span>
+                                    <span>Study Materials & Resources ({lesson.attachments.length})</span>
                                 </h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {lesson.attachments.map((att) => {
@@ -321,9 +321,9 @@ export const LessonPlayerPage: React.FC = () => {
                                                     </div>
                                                     <span className="text-[10px] text-slate-400 font-mono mt-0.5 flex items-center gap-1">
                                                         {isDrive ? (
-                                                            <span className="text-amber-400 font-semibold">Google Drive লিংক</span>
+                                                            <span className="text-amber-400 font-semibold">Google Drive Link</span>
                                                         ) : isLink ? (
-                                                            <span className="text-sky-400 font-semibold">ওয়েব লিংক</span>
+                                                            <span className="text-sky-400 font-semibold">Web Link</span>
                                                         ) : (
                                                             <span>{att.file_type.toUpperCase()} • {att.formatted_size || `${Math.round(att.file_size / 1024)} KB`}</span>
                                                         )}

@@ -77,7 +77,7 @@ class RoutineController extends Controller
                 $events[] = [
                     'id' => $class->id,
                     'type' => 'live_class',
-                    'type_label' => 'লাইভ ক্লাস',
+                    'type_label' => 'Live Class',
                     'title' => $class->title,
                     'description' => $class->description,
                     'start_time' => $start ? $start->toISOString() : null,
@@ -89,13 +89,13 @@ class RoutineController extends Controller
                     'subject' => $subjectInfo['name'],
                     'subject_theme' => $subjectInfo['theme'],
                     'course_id' => $class->course_id,
-                    'course_title' => $class->course?->title ?? 'কোর্স',
-                    'instructor_name' => $class->course?->instructor?->name ?? 'শিক্ষক',
+                    'course_title' => $class->course?->title ?? 'Course',
+                    'instructor_name' => $class->course?->instructor?->name ?? 'Instructor',
                     'is_live' => $isLive,
                     'is_upcoming' => $isUpcoming,
                     'is_completed' => $isCompleted,
                     'action_url' => "/student/live-classes/{$class->id}/room",
-                    'action_text' => $isLive ? 'ক্লাসে যুক্ত হন' : 'রিমাইন্ডার',
+                    'action_text' => $isLive ? 'Join Live Class' : 'Reminder',
                     'status' => $class->status,
                 ];
             }
@@ -128,7 +128,7 @@ class RoutineController extends Controller
                 $events[] = [
                     'id' => $exam->id,
                     'type' => 'live_exam',
-                    'type_label' => 'লাইভ এক্সাম',
+                    'type_label' => 'Live Exam',
                     'title' => $exam->title,
                     'description' => $exam->description,
                     'start_time' => $start ? $start->toISOString() : null,
@@ -137,16 +137,16 @@ class RoutineController extends Controller
                     'time_time' => $timeInfo['time'],
                     'time_period' => $timeInfo['period'],
                     'time_display' => $timeInfo['full'],
-                    'subject' => 'লাইভ এক্সাম',
+                    'subject' => 'Live Exam',
                     'subject_theme' => 'rose',
                     'course_id' => $course?->id,
-                    'course_title' => $course?->title ?? 'লাইভ এক্সাম',
-                    'instructor_name' => $course?->instructor?->name ?? 'পরীক্ষক',
+                    'course_title' => $course?->title ?? 'Live Exam',
+                    'instructor_name' => $course?->instructor?->name ?? 'Examiner',
                     'is_live' => $isLive,
                     'is_upcoming' => $isUpcoming,
                     'is_completed' => $isCompleted,
                     'action_url' => "/exams/{$exam->id}/take",
-                    'action_text' => $isLive ? 'পরীক্ষায় অংশ নিন' : ($isCompleted ? 'ফলাফল দেখুন' : 'সিডিউল'),
+                    'action_text' => $isLive ? 'Take Exam' : ($isCompleted ? 'View Result' : 'Schedule'),
                     'duration_minutes' => $exam->duration_minutes,
                     'total_marks' => $exam->total_marks,
                     'status' => $isLive ? 'live' : ($isUpcoming ? 'upcoming' : 'completed'),
@@ -190,8 +190,8 @@ class RoutineController extends Controller
                     'subject' => $cr->subject ?: $typeConfig['default_subject'],
                     'subject_theme' => $typeConfig['theme'],
                     'course_id' => $cr->course_id,
-                    'course_title' => $cr->course?->title ?? 'কোর্স',
-                    'instructor_name' => $cr->course?->instructor?->name ?? 'শিক্ষক',
+                    'course_title' => $cr->course?->title ?? 'Course',
+                    'instructor_name' => $cr->course?->instructor?->name ?? 'Instructor',
                     'is_live' => false,
                     'is_upcoming' => $start ? $start->isFuture() : false,
                     'is_completed' => $start ? $start->isPast() : false,
@@ -229,7 +229,7 @@ class RoutineController extends Controller
 
         $user = auth()->user();
         if (!$user->isAdmin() && !$course->isAssignedTeacher($user->id)) {
-            abort(403, 'অনুমতি নেই।');
+            abort(403, 'Unauthorized.');
         }
 
         $items = [];
@@ -248,7 +248,7 @@ class RoutineController extends Controller
                 $items[] = [
                     'id' => $lc->id,
                     'type' => 'live_class',
-                    'type_label' => 'লাইভ ক্লাস',
+                    'type_label' => 'Live Class',
                     'title' => $lc->title,
                     'description' => $lc->description,
                     'live_url' => $lc->live_url,
@@ -279,7 +279,7 @@ class RoutineController extends Controller
                 $items[] = [
                     'id' => $exam->id,
                     'type' => 'live_exam',
-                    'type_label' => 'লাইভ এক্সাম',
+                    'type_label' => 'Live Exam',
                     'title' => $exam->title,
                     'description' => $exam->description,
                     'duration_minutes' => $exam->duration_minutes,
@@ -351,7 +351,7 @@ class RoutineController extends Controller
 
         $user = auth()->user();
         if (!$user->isAdmin() && !$course->isAssignedTeacher($user->id)) {
-            abort(403, 'অনুমতি নেই।');
+            abort(403, 'Unauthorized.');
         }
 
         $validated = $request->validate([
@@ -376,7 +376,7 @@ class RoutineController extends Controller
         $routine = CourseRoutine::create($validated);
 
         return response()->json([
-            'message' => 'রুটিন সূচী সফলভাবে তৈরি করা হয়েছে।',
+            'message' => 'Routine item created successfully.',
             'item' => $routine,
         ], 201);
     }
@@ -390,11 +390,11 @@ class RoutineController extends Controller
 
         $user = auth()->user();
         if (!$user->isAdmin() && !$course->isAssignedTeacher($user->id)) {
-            abort(403, 'অনুমতি নেই।');
+            abort(403, 'Unauthorized.');
         }
 
         if ($routine->course_id !== $course->id) {
-            abort(404, 'রুটিন সূচীটি এই কোর্সের সাথে সম্পর্কিত নয়।');
+            abort(404, 'Routine item does not belong to this course.');
         }
 
         $validated = $request->validate([
@@ -413,7 +413,7 @@ class RoutineController extends Controller
         $routine->update($validated);
 
         return response()->json([
-            'message' => 'রুটিন সূচী সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'Routine item updated successfully.',
             'item' => $routine,
         ]);
     }
@@ -425,17 +425,17 @@ class RoutineController extends Controller
     {
         $user = auth()->user();
         if (!$user->isAdmin() && !$course->isAssignedTeacher($user->id)) {
-            abort(403, 'অনুমতি নেই।');
+            abort(403, 'Unauthorized.');
         }
 
         if ($routine->course_id !== $course->id) {
-            abort(404, 'রুটিন সূচীটি এই কোর্সের সাথে সম্পর্কিত নয়।');
+            abort(404, 'Routine item does not belong to this course.');
         }
 
         $routine->delete();
 
         return response()->json([
-            'message' => 'রুটিন সূচী সফলভাবে মুছে ফেলা হয়েছে।',
+            'message' => 'Routine item deleted successfully.',
         ]);
     }
 
@@ -447,39 +447,39 @@ class RoutineController extends Controller
         switch ($type) {
             case CourseRoutine::TYPE_CLASS_UPLOAD:
                 return [
-                    'label' => 'ক্লাস আপলোড',
+                    'label' => 'Class Upload',
                     'theme' => 'blue',
-                    'default_subject' => 'রেকর্ডেড ক্লাস',
-                    'default_action' => 'ক্লাস দেখুন',
+                    'default_subject' => 'Recorded Class',
+                    'default_action' => 'Watch Class',
                 ];
             case CourseRoutine::TYPE_MATERIAL:
                 return [
-                    'label' => 'স্টাডি ম্যাটেরিয়াল',
+                    'label' => 'Study Material',
                     'theme' => 'teal',
-                    'default_subject' => 'নোট ও শিট',
-                    'default_action' => 'ডাউনলোড করুন',
+                    'default_subject' => 'Notes & Sheets',
+                    'default_action' => 'Download',
                 ];
             case CourseRoutine::TYPE_BOOK_PARCEL:
                 return [
-                    'label' => 'বই / পার্সেল ডেলিভারি',
+                    'label' => 'Book / Parcel Delivery',
                     'theme' => 'amber',
-                    'default_subject' => 'বই ও কুরিয়ার',
-                    'default_action' => 'ট্র্যাকিং দেখুন',
+                    'default_subject' => 'Books & Courier',
+                    'default_action' => 'Track Delivery',
                 ];
             case CourseRoutine::TYPE_GENERAL:
             default:
                 $detected = $this->detectSubjectAndTheme($title, $courseTitle);
                 return [
-                    'label' => 'সাধারণ সূচী',
+                    'label' => 'General Routine',
                     'theme' => $detected['theme'] ?? 'emerald',
-                    'default_subject' => $detected['name'] ?? 'নোটিশ',
-                    'default_action' => 'বিস্তারিত',
+                    'default_subject' => $detected['name'] ?? 'Notice',
+                    'default_action' => 'Details',
                 ];
         }
     }
 
     /**
-     * Format time into Bengali time and period (e.g. 4:00, বিকাল)
+     * Format time into 12-hour English time and period (e.g. 4:00 PM)
      */
     protected function formatBengaliTimeParts(?Carbon $date): array
     {
@@ -487,31 +487,10 @@ class RoutineController extends Controller
             return ['time' => '', 'period' => '', 'full' => ''];
         }
 
-        $hour = (int) $date->format('g');
-        $minute = $date->format('i');
-        $hour24 = (int) $date->format('G');
-
-        $bengaliDigits = ['0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪', '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯'];
-        $bengaliTime = strtr("{$hour}:{$minute}", $bengaliDigits);
-
-        if ($hour24 >= 4 && $hour24 < 6) {
-            $period = 'ভোর';
-        } elseif ($hour24 >= 6 && $hour24 < 12) {
-            $period = 'সকাল';
-        } elseif ($hour24 >= 12 && $hour24 < 15) {
-            $period = 'দুপুর';
-        } elseif ($hour24 >= 15 && $hour24 < 18) {
-            $period = 'বিকাল';
-        } elseif ($hour24 >= 18 && $hour24 < 20) {
-            $period = 'সন্ধ্যা';
-        } else {
-            $period = 'রাত';
-        }
-
         return [
-            'time' => $bengaliTime,
-            'period' => $period,
-            'full' => "{$period} {$bengaliTime}",
+            'time' => $date->format('g:i'),
+            'period' => $date->format('A'),
+            'full' => $date->format('g:i A'),
         ];
     }
 
@@ -522,30 +501,30 @@ class RoutineController extends Controller
     {
         $combined = mb_strtolower("{$title} {$courseTitle}");
 
-        if (str_contains($combined, 'bangla') || str_contains($combined, 'বাংলা') || str_contains($combined, 'ব্যাকরণ')) {
-            return ['name' => 'বাংলা', 'theme' => 'amber'];
+        if (str_contains($combined, 'bangla') || str_contains($combined, 'grammar')) {
+            return ['name' => 'Bangla', 'theme' => 'amber'];
         }
-        if (str_contains($combined, 'english') || str_contains($combined, 'ইংরেজি') || str_contains($combined, 'grammar')) {
-            return ['name' => 'ইংরেজি', 'theme' => 'blue'];
+        if (str_contains($combined, 'english') || str_contains($combined, 'grammar')) {
+            return ['name' => 'English', 'theme' => 'blue'];
         }
-        if (str_contains($combined, 'physics') || str_contains($combined, 'পদার্থ')) {
-            return ['name' => 'পদার্থবিজ্ঞান', 'theme' => 'violet'];
+        if (str_contains($combined, 'physics')) {
+            return ['name' => 'Physics', 'theme' => 'violet'];
         }
-        if (str_contains($combined, 'chem') || str_contains($combined, 'রসায়ন') || str_contains($combined, 'রসায়ন')) {
-            return ['name' => 'রসায়ন', 'theme' => 'emerald'];
+        if (str_contains($combined, 'chem')) {
+            return ['name' => 'Chemistry', 'theme' => 'emerald'];
         }
-        if (str_contains($combined, 'math') || str_contains($combined, 'গণিত')) {
-            return ['name' => 'উচ্চতর গণিত', 'theme' => 'teal'];
+        if (str_contains($combined, 'math')) {
+            return ['name' => 'Higher Math', 'theme' => 'teal'];
         }
-        if (str_contains($combined, 'bio') || str_contains($combined, 'জীববিজ্ঞান')) {
-            return ['name' => 'জীববিজ্ঞান', 'theme' => 'green'];
+        if (str_contains($combined, 'bio')) {
+            return ['name' => 'Biology', 'theme' => 'green'];
         }
-        if (str_contains($combined, 'ict') || str_contains($combined, 'তথ্য')) {
-            return ['name' => 'আইসিটি', 'theme' => 'indigo'];
+        if (str_contains($combined, 'ict')) {
+            return ['name' => 'ICT', 'theme' => 'indigo'];
         }
 
         return [
-            'name' => $courseTitle ? mb_substr($courseTitle, 0, 15) : 'সাধারণ',
+            'name' => $courseTitle ? mb_substr($courseTitle, 0, 15) : 'General',
             'theme' => 'emerald',
         ];
     }

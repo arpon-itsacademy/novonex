@@ -21,7 +21,7 @@ class LessonAttachmentController extends Controller
     {
         $user = auth()->user();
         if (! $user->isAdmin() && ! $lesson->course->isAssignedTeacher($user->id)) {
-            abort(403, 'এই লেসনে ম্যাটেরিয়াল আপলোডের অনুমতি নেই।');
+            abort(403, 'You do not have permission to upload materials to this lesson.');
         }
 
         // If client submitted link payload to this endpoint
@@ -50,7 +50,7 @@ class LessonAttachmentController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'ফাইল সফলভাবে আপলোড হয়েছে।',
+            'message' => 'File uploaded successfully.',
             'attachment' => $attachment,
         ], 201);
     }
@@ -62,7 +62,7 @@ class LessonAttachmentController extends Controller
     {
         $user = auth()->user();
         if (! $user->isAdmin() && ! $lesson->course->isAssignedTeacher($user->id)) {
-            abort(403, 'এই লেসনে ম্যাটেরিয়াল যুক্ত করার অনুমতি নেই।');
+            abort(403, 'You do not have permission to attach materials to this lesson.');
         }
 
         $request->validate([
@@ -90,7 +90,7 @@ class LessonAttachmentController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'স্টাডি ম্যাটেরিয়াল লিংক সফলভাবে যুক্ত হয়েছে।',
+            'message' => 'Study material link added successfully.',
             'attachment' => $attachment,
         ], 201);
     }
@@ -103,7 +103,7 @@ class LessonAttachmentController extends Controller
         $user = auth()->user();
         $course = $attachment->lesson->course;
         if (! $user->isAdmin() && ! $course->isAssignedTeacher($user->id)) {
-            abort(403, 'এই ম্যাটেরিয়াল মুছে ফেলার অনুমতি নেই।');
+            abort(403, 'You do not have permission to delete this material.');
         }
 
         // Only delete from storage if it's a locally stored file (not external link)
@@ -115,7 +115,7 @@ class LessonAttachmentController extends Controller
         $attachment->delete();
 
         return response()->json([
-            'message' => 'ম্যাটেরিয়াল সফলভাবে মুছে ফেলা হয়েছে।',
+            'message' => 'Material deleted successfully.',
         ]);
     }
 
@@ -157,11 +157,11 @@ class LessonAttachmentController extends Controller
         }
 
         if (! $canAccess) {
-            abort(403, 'এই স্টাডি ম্যাটেরিয়াল ডাউনলোড করার জন্য আপনাকে কোর্সে এনরোল থাকতে হবে।');
+            abort(403, 'You must be enrolled in the course to download this study material.');
         }
 
         if (! Storage::exists($attachment->file_path)) {
-            abort(404, 'ফাইলটি স্টোরেজে খুঁজে পাওয়া যায়নি।');
+            abort(404, 'File not found in storage.');
         }
 
         return Storage::download($attachment->file_path, $attachment->file_name);

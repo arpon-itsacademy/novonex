@@ -77,7 +77,7 @@ class AdminManualEnrollmentController extends Controller
                     'status' => $b->status,
                     'courses_count' => $b->courses->count(),
                     'courses' => $b->courses->map(fn($bc) => ['id' => $bc->id, 'title' => $bc->title]),
-                    'category' => ['id' => 0, 'name' => 'কম্বো বান্ডেল'],
+                    'category' => ['id' => 0, 'name' => 'Combo Bundle'],
                     'enrollments_count' => $enrollmentsCount,
                 ];
             });
@@ -208,7 +208,7 @@ class AdminManualEnrollmentController extends Controller
         if (empty($normalizedList)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'কোনো ভ্যালিড মোবাইল নম্বর পাওয়া যায়নি।',
+                'message' => 'No valid mobile number found.',
                 'matched_users' => [],
                 'unmatched_phones' => [],
             ], 422);
@@ -288,7 +288,7 @@ class AdminManualEnrollmentController extends Controller
         if (empty($targetId)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'কোর্স বা বান্ডেল আইডি প্রদান করা আবশ্যক।',
+                'message' => 'Course or bundle ID is required.',
             ], 422);
         }
 
@@ -503,7 +503,7 @@ class AdminManualEnrollmentController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => count($enrolled) . ' জন শিক্ষার্থী সফলভাবে "' . $targetTitle . '"-এ এনরোল সম্পন্ন হয়েছে।',
+            'message' => count($enrolled) . ' students successfully enrolled in "' . $targetTitle . '"',
             'target' => [
                 'id' => $targetId,
                 'type' => $targetType,
@@ -645,7 +645,7 @@ class AdminManualEnrollmentController extends Controller
                 'title' => $course->title,
                 'slug' => $course->slug,
                 'thumbnail' => $course->thumbnail,
-                'category' => $course->categories->first()?->name ?? 'সাধারণ কোর্স',
+                'category' => $course->categories->first()?->name ?? 'General Course',
                 'total_students' => Enrollment::where('course_id', $course->id)->whereHas('user')->count(),
             ],
             'students' => $students,
@@ -682,7 +682,7 @@ class AdminManualEnrollmentController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'শিক্ষার্থীকে কোর্স থেকে সফলভাবে রিমুভ করা হয়েছে।',
+                'message' => 'Student successfully removed from course.',
             ]);
         }
 
@@ -711,13 +711,13 @@ class AdminManualEnrollmentController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'শিক্ষার্থীকে বান্ডেল থেকে সফলভাবে রিমুভ করা হয়েছে।',
+                'message' => 'Student successfully removed from bundle.',
             ]);
         }
 
         return response()->json([
             'status' => 'error',
-            'message' => 'এনরোলমেন্ট বা অর্ডার রেকর্ড পাওয়া যায়নি।',
+            'message' => 'Enrollment or order record not found.',
         ], 404);
     }
 
@@ -745,7 +745,7 @@ class AdminManualEnrollmentController extends Controller
         if (! $removeAll && empty($userIds) && empty($enrollmentIds)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'বাদ দেওয়ার জন্য অন্তত একজন শিক্ষার্থী নির্বাচন করুন।',
+                'message' => 'Please select at least one student to remove.',
             ], 422);
         }
 
@@ -833,7 +833,7 @@ class AdminManualEnrollmentController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => "সফলভাবে {$removedCount} জন শিক্ষার্থীর কোর্স এক্সেস বাতিল করা হয়েছে।",
+            'message' => "Successfully revoked course access for {$removedCount} students.",
             'removed_count' => $removedCount,
         ]);
     }

@@ -320,14 +320,14 @@ export const StudentExamRoomPage: React.FC = () => {
                             </div>
                             <div className="text-right text-xs text-slate-700">
                                 <p className="font-bold text-sm text-slate-900">{exam?.title}</p>
-                                <p className="text-slate-500">{new Date(submission?.submitted_at || Date.now()).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                                <p className="text-slate-500">{new Date(submission?.submitted_at || Date.now()).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                             </div>
                         </div>
                         <div className="mt-3 grid grid-cols-4 gap-2 text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50">
-                            <div><span className="text-slate-500 block text-[11px]">শিক্ষার্থী:</span><strong className="text-slate-900">{user?.name}</strong></div>
-                            <div><span className="text-slate-500 block text-[11px]">রোল নম্বর:</span><strong className="text-slate-900 font-mono">{user?.registration_number || `ME-2026-${user?.id}`}</strong></div>
-                            <div><span className="text-slate-500 block text-[11px]">প্রাপ্ত নম্বর:</span><strong className="text-emerald-700">{resultData.obtained_marks} / {resultData.total_marks} ({percentage}%)</strong></div>
-                            <div><span className="text-slate-500 block text-[11px]">মেরিট পজিশন:</span><strong className="text-amber-700 font-bold">#{resultData.merit_position}</strong></div>
+                            <div><span className="text-slate-500 block text-[11px]">Student:</span><strong className="text-slate-900">{user?.name}</strong></div>
+                            <div><span className="text-slate-500 block text-[11px]">Student ID / Roll:</span><strong className="text-slate-900 font-mono">{user?.registration_number || `ME-2026-${user?.id}`}</strong></div>
+                            <div><span className="text-slate-500 block text-[11px]">Score:</span><strong className="text-emerald-700">{resultData.obtained_marks} / {resultData.total_marks} ({percentage}%)</strong></div>
+                            <div><span className="text-slate-500 block text-[11px]">Merit Position:</span><strong className="text-amber-700 font-bold">#{resultData.merit_position}</strong></div>
                         </div>
                     </div>
 
@@ -444,7 +444,7 @@ export const StudentExamRoomPage: React.FC = () => {
                             <div className="flex items-center gap-2">
                                 <ClipboardList className="w-4 h-4 text-sky-500" />
                                 <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                                    প্রশ্ন ও উত্তর বিশ্লেষণ ({reviewAnswers.length} টি প্রশ্ন)
+                                    Question & Answer Breakdown ({reviewAnswers.length} Questions)
                                 </h3>
                             </div>
 
@@ -457,7 +457,7 @@ export const StudentExamRoomPage: React.FC = () => {
                                         : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                                         }`}
                                 >
-                                    সব ({reviewAnswers.length})
+                                    All ({reviewAnswers.length})
                                 </button>
                                 <button
                                     type="button"
@@ -467,7 +467,7 @@ export const StudentExamRoomPage: React.FC = () => {
                                         : 'text-emerald-600 hover:text-emerald-700'
                                         }`}
                                 >
-                                    সঠিক ({resultData.total_correct || 0})
+                                    Correct ({resultData.total_correct || 0})
                                 </button>
                                 <button
                                     type="button"
@@ -477,7 +477,7 @@ export const StudentExamRoomPage: React.FC = () => {
                                         : 'text-rose-600 hover:text-rose-700'
                                         }`}
                                 >
-                                    ভুল ({resultData.total_wrong || 0})
+                                    Incorrect ({resultData.total_wrong || 0})
                                 </button>
                                 <button
                                     type="button"
@@ -487,7 +487,7 @@ export const StudentExamRoomPage: React.FC = () => {
                                         : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                                         }`}
                                 >
-                                    ছেড়ে দেওয়া ({resultData.total_skipped || 0})
+                                    Skipped ({resultData.total_skipped || 0})
                                 </button>
                             </div>
                         </div>
@@ -517,11 +517,11 @@ export const StudentExamRoomPage: React.FC = () => {
                                         <div className="flex items-center justify-between text-xs mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-mono font-bold px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 print:bg-slate-200">
-                                                    প্রশ্ন #{idx + 1}
+                                                    Question #{idx + 1}
                                                 </span>
                                                 <span className="text-slate-400">•</span>
                                                 <span className="font-semibold text-slate-500">
-                                                    পূর্ণমান: {q.marks || 1}
+                                                    Marks: {q.marks || 1}
                                                 </span>
                                             </div>
 
@@ -529,19 +529,19 @@ export const StudentExamRoomPage: React.FC = () => {
                                                 {isCorrect && (
                                                     <span className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2.5 py-0.5 rounded-full text-xs print:bg-emerald-100">
                                                         <CheckCircle2 className="w-3.5 h-3.5" />
-                                                        সঠিক উত্তর (+{ans.marks_obtained})
+                                                        Correct (+{ans.marks_obtained})
                                                     </span>
                                                 )}
                                                 {isWrong && (
                                                     <span className="inline-flex items-center gap-1 font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 px-2.5 py-0.5 rounded-full text-xs print:bg-rose-100">
                                                         <XCircle className="w-3.5 h-3.5" />
-                                                        ভুল উত্তর ({exam?.has_negative_marking ? `-${exam.negative_marks}` : '0'})
+                                                        Incorrect ({exam?.has_negative_marking ? `-${exam.negative_marks}` : '0'})
                                                     </span>
                                                 )}
                                                 {isSkipped && (
                                                     <span className="inline-flex items-center gap-1 font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full text-xs print:bg-slate-200">
                                                         <MinusCircle className="w-3.5 h-3.5" />
-                                                        উত্তর দেওয়া হয়নি
+                                                        Unanswered
                                                     </span>
                                                 )}
                                             </div>
@@ -596,19 +596,19 @@ export const StudentExamRoomPage: React.FC = () => {
                                                                 {isCorrectOpt && isSelected && (
                                                                     <span className="px-2 py-0.5 rounded-md bg-emerald-600 text-white font-bold text-[10px] flex items-center gap-1 shadow-2xs">
                                                                         <Check className="w-3 h-3" />
-                                                                        আপনার সঠিক উত্তর
+                                                                        Your Correct Answer
                                                                     </span>
                                                                 )}
                                                                 {isCorrectOpt && !isSelected && (
                                                                     <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 font-bold text-[10px] flex items-center gap-1 border border-emerald-300 dark:border-emerald-700">
                                                                         <Check className="w-3 h-3" />
-                                                                        সঠিক উত্তর
+                                                                        Correct Answer
                                                                     </span>
                                                                 )}
                                                                 {!isCorrectOpt && isSelected && (
                                                                     <span className="px-2 py-0.5 rounded-md bg-rose-600 text-white font-bold text-[10px] flex items-center gap-1 shadow-2xs">
                                                                         <X className="w-3 h-3" />
-                                                                        আপনার ভুল উত্তর
+                                                                        Your Wrong Answer
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -623,7 +623,7 @@ export const StudentExamRoomPage: React.FC = () => {
                                             <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-xs text-amber-900 dark:text-amber-200 mt-2">
                                                 <span className="font-bold block mb-1 text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
                                                     <Award className="w-3.5 h-3.5 text-amber-600" />
-                                                    ব্যাখ্যা (Explanation):
+                                                    Explanation:
                                                 </span>
                                                 <MathView content={q.explanation} />
                                             </div>

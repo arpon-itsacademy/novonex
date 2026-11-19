@@ -19,7 +19,7 @@ return new class extends Migration
                 'layout_type' => 'builder',
                 'is_system' => true,
                 'meta_title' => 'Novonex Academy | Best Online Learning Platform in Bangladesh',
-                'meta_description' => 'বাংলাদেশের শীর্ষস্থানীয় অনলাইন এডুকেশন প্ল্যাটফর্ম। এইচএসসি ও ভর্তি পরীক্ষার সেরা প্রস্তুতি।',
+                'meta_description' => 'Leading online education platform in Bangladesh. Premier preparation for HSC and university admissions.',
                 'blocks' => Page::defaultHomeBlocks(),
             ]
         );
@@ -41,8 +41,8 @@ return new class extends Migration
                         'title' => 'Header Banner',
                         'settings' => [
                             'badge' => 'Legal & Terms',
-                            'title' => 'Privacy Policy / গোপনীয়তা নীতি',
-                            'subtitle' => 'Novonex Academy আপনার ব্যক্তিগত তথ্যের সুরক্ষা নিশ্চিত করতে বদ্ধপরিকর।',
+                            'title' => 'Privacy Policy',
+                            'subtitle' => 'Novonex Academy is dedicated to safeguarding your personal data and privacy.',
                             'buttonText' => '',
                             'buttonLink' => '',
                             'bgColor' => 'slate',
@@ -53,7 +53,7 @@ return new class extends Migration
                         'type' => 'rich_text',
                         'title' => 'Privacy Content',
                         'settings' => [
-                            'content' => "<h2>১. তথ্য সংগ্রহ ও ব্যবহার</h2>\n<p>আমরা শিক্ষার্থীদের নাম, মোবাইল নম্বর এবং ইমেইল সংগ্রহ করি একাউন্ট তৈরি ও কোর্স ব্যবস্থাপনা সংক্রান্ত যোগাযোগের জন্য।</p>\n<h2>২. পেমেন্ট ও নিরাপত্তা</h2>\n<p>সকল পেমেন্ট নিরাপদ ব্যাংকিং ও মোবাইল পেমেন্ট গেটওয়ের মাধ্যমে পরিচালিত হয়। আমরা কোনো ধরনের গোপন পিন বা পাসওয়ার্ড সংরক্ষণ করি না।</p>\n<h2>৩. যোগাযোগ</h2>\n<p>আপনার কোনো প্রশ্ন বা জিজ্ঞাসা থাকলে আমাদের সাপোর্ট টিমের সাথে সরাসরি যোগাযোগ করতে পারেন।</p>"
+                            'content' => "<h2>1. Information Collection & Usage</h2>\n<p>We collect student names, mobile numbers, and email addresses to manage accounts, communicate updates, and deliver course materials.</p>\n<h2>2. Payment & Security</h2>\n<p>All payments are securely processed through verified banking and mobile payment gateways. We do not store sensitive payment PINs or passwords.</p>\n<h2>3. Contact Us</h2>\n<p>If you have any questions or inquiries, please contact our support team directly.</p>"
                         ]
                     ]
                 ],
@@ -77,8 +77,8 @@ return new class extends Migration
                         'title' => 'Terms Banner',
                         'settings' => [
                             'badge' => 'Rules & Guidelines',
-                            'title' => 'Terms & Conditions / শর্তাবলী',
-                            'subtitle' => 'Novonex Academy প্ল্যাটফর্মটি ব্যবহারের সকল নিয়ম ও শর্তাবলী।',
+                            'title' => 'Terms & Conditions',
+                            'subtitle' => 'Rules and guidelines for using the Novonex Academy platform.',
                             'buttonText' => '',
                             'buttonLink' => '',
                             'bgColor' => 'sky',
@@ -89,7 +89,7 @@ return new class extends Migration
                         'type' => 'rich_text',
                         'title' => 'Terms Content',
                         'settings' => [
-                            'content' => "<h2>১. কোর্স এক্সেস ও ব্যবহার বিধি</h2>\n<p>কোর্সের সকল কনটেন্ট ও ভিডিও শুধুমাত্র আপনার ব্যক্তিগত শিক্ষার জন্য। কোনো ভিডিও ডাউনলোড বা অননুমোদিতভাবে শেয়ার করা আইনত দণ্ডনীয়।</p>\n<h2>২. একাউন্ট সততা</h2>\n<p>একজন শিক্ষার্থী একটি একাউন্ট ব্যবহার করবেন। একাধিক ব্যক্তির সাথে লগইন শেয়ার করলে একাউন্ট সাময়িকভাবে স্থগিত হতে পারে।</p>"
+                            'content' => "<h2>1. Course Access & Usage Rules</h2>\n<p>All course videos and study materials are strictly for individual personal educational use. Unauthorized distribution, copying, or downloading is strictly prohibited.</p>\n<h2>2. Account Integrity</h2>\n<p>Each registered account belongs to a single student. Sharing account credentials with multiple individuals may lead to temporary or permanent suspension.</p>"
                         ]
                     ]
                 ],

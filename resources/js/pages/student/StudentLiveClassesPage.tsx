@@ -57,7 +57,7 @@ export const StudentLiveClassesPage: React.FC = () => {
             const { data } = await apiClient.get('/student/live-classes');
             setLiveClasses(data.live_classes || []);
         } catch (err: any) {
-            setErrorMsg('লাইভ ক্লাসের তালিকা লোড করা যায়নি।');
+            setErrorMsg('Unable to load live classes.');
         } finally {
             setLoading(false);
         }
@@ -67,7 +67,7 @@ export const StudentLiveClassesPage: React.FC = () => {
         if (!dateStr) return '';
         try {
             const d = new Date(dateStr);
-            return d.toLocaleString('bn-BD', {
+            return d.toLocaleString('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -98,15 +98,15 @@ export const StudentLiveClassesPage: React.FC = () => {
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
                         <Radio className="w-7 h-7 text-rose-500 animate-pulse" />
-                        <span>লাইভ ক্লাস</span>
+                        <span>Live Classes</span>
                         {activeLiveCount > 0 && (
                             <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-500 text-white animate-bounce">
-                                {activeLiveCount} টি লাইভ চলছে!
+                                {activeLiveCount} Live Now!
                             </span>
                         )}
                     </h1>
                     <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                        আপনার এনরোল করা কোর্সের চলমান ও আসন্ন সকল ইন্টারঅ্যাক্টিভ লাইভ সেশন
+                        Active and upcoming interactive live sessions for your enrolled courses
                     </p>
                 </div>
 
@@ -121,7 +121,7 @@ export const StudentLiveClassesPage: React.FC = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                         }`}
                     >
-                        সকল ({liveClasses.length})
+                        All ({liveClasses.length})
                     </button>
                     <button
                         type="button"
@@ -132,7 +132,7 @@ export const StudentLiveClassesPage: React.FC = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                         }`}
                     >
-                        চলমান ও আসন্ন
+                        Live & Upcoming
                     </button>
                     <button
                         type="button"
@@ -143,7 +143,7 @@ export const StudentLiveClassesPage: React.FC = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                         }`}
                     >
-                        সমাপ্ত (রেকর্ডেড)
+                        Completed (Recorded)
                     </button>
                 </div>
             </div>
@@ -160,7 +160,7 @@ export const StudentLiveClassesPage: React.FC = () => {
             {loading ? (
                 <div className="py-24 flex flex-col items-center justify-center gap-3 bg-white rounded-3xl border border-slate-200/80 shadow-xs">
                     <Loader2 className="w-9 h-9 text-sky-600 animate-spin" />
-                    <span className="text-xs font-bold text-slate-500">লাইভ ক্লাস লোড হচ্ছে...</span>
+                    <span className="text-xs font-bold text-slate-500">Loading live classes...</span>
                 </div>
             ) : filteredClasses.length === 0 ? (
                 /* Empty state */
@@ -170,10 +170,10 @@ export const StudentLiveClassesPage: React.FC = () => {
                     </div>
                     <div className="max-w-md mx-auto space-y-1.5">
                         <h3 className="text-base sm:text-lg font-black text-slate-900">
-                            কোনো লাইভ ক্লাস নেই
+                            No live classes found
                         </h3>
                         <p className="text-xs sm:text-sm text-slate-500">
-                            আপনার এনরোল করা কোর্সে এই মুহূর্তে কোনো লাইভ ক্লাস নির্ধারিত নেই। নতুন ক্লাস যুক্ত হলে এখানে দেখা যাবে।
+                            There are no scheduled live classes in your enrolled courses right now. Newly scheduled sessions will appear here.
                         </p>
                     </div>
                     <div className="pt-2">
@@ -182,7 +182,7 @@ export const StudentLiveClassesPage: React.FC = () => {
                             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-sky-600/25"
                         >
                             <BookOpen className="w-4 h-4" />
-                            <span>আমার কোর্সসমূহ দেখুন</span>
+                            <span>Browse My Courses</span>
                         </Link>
                     </div>
                 </div>
@@ -206,21 +206,21 @@ export const StudentLiveClassesPage: React.FC = () => {
                                     {/* Top Course Badge & Status */}
                                     <div className="flex items-center justify-between gap-2">
                                         <span className="text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full truncate max-w-[180px]">
-                                            {item.course?.title || 'কোর্স'}
+                                            {item.course?.title || 'Course'}
                                         </span>
 
                                         {isLive ? (
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-xs animate-pulse">
+                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-xs animate-pulse">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                                                <span>লাইভ</span>
+                                                <span>LIVE</span>
                                             </span>
                                         ) : isCompleted ? (
                                             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
-                                                সমাপ্ত
+                                                Completed
                                             </span>
                                         ) : (
                                             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                                                আসন্ন
+                                                Upcoming
                                             </span>
                                         )}
                                     </div>
@@ -242,12 +242,12 @@ export const StudentLiveClassesPage: React.FC = () => {
                                     <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 space-y-1 text-xs text-slate-600">
                                         <div className="flex items-center gap-2">
                                             <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                                            <span>শুরুর সময়: {formatDateTime(item.start_time)}</span>
+                                            <span>Starts: {formatDateTime(item.start_time)}</span>
                                         </div>
                                         <div className="flex items-center justify-between pt-1 text-[11px] text-slate-500">
                                             <span className="flex items-center gap-1">
                                                 <MessageSquare className="w-3 h-3 text-slate-400" />
-                                                <span>{item.comments_count || 0} টি মন্তব্য</span>
+                                                <span>{item.comments_count || 0} Comments</span>
                                             </span>
                                             <span className="font-bold text-rose-600">YouTube Live</span>
                                         </div>
@@ -265,7 +265,7 @@ export const StudentLiveClassesPage: React.FC = () => {
                                         }`}
                                     >
                                         <Play className="w-3.5 h-3.5 fill-white" />
-                                        <span>{isLive ? 'এখনই ক্লাসে যোগ দাও' : 'ক্লাস রুমে প্রবেশ করো'}</span>
+                                        <span>{isLive ? 'Join Live Class Now' : 'Enter Class Room'}</span>
                                     </Link>
                                 </div>
                             </div>

@@ -93,7 +93,7 @@ class SmsMarketingController extends Controller
 
         if (empty($recipients)) {
             return response()->json([
-                'message' => 'নির্বাচিত টার্গেটে কোনো বৈধ মোবাইল নম্বর পাওয়া যায়নি।',
+                'message' => 'No valid mobile number found for the selected target.',
             ], 422);
         }
 
@@ -108,15 +108,15 @@ class SmsMarketingController extends Controller
         $campaignTitle = $titleInput;
         if (empty($campaignTitle)) {
             if ($targetType === 'course' && $course) {
-                $campaignTitle = $course->title . ' - স্টুডেন্ট নোটিশ';
+                $campaignTitle = $course->title . ' - Student Notice';
             } elseif ($targetType === 'students') {
-                $campaignTitle = 'সকল শিক্ষার্থী বাল্ক বার্তা';
+                $campaignTitle = 'All Students Bulk Notice';
             } elseif ($targetType === 'teachers') {
-                $campaignTitle = 'সকল শিক্ষক নোটিশ';
+                $campaignTitle = 'All Instructors Notice';
             } elseif ($targetType === 'custom') {
-                $campaignTitle = 'কাস্টম নম্বর ক্যাম্পেইন';
+                $campaignTitle = 'Custom Number Campaign';
             } else {
-                $campaignTitle = 'সকল ব্যবহারকারী প্রচার বার্তা';
+                $campaignTitle = 'All Users Broadcast Campaign';
             }
         }
 
@@ -138,7 +138,7 @@ class SmsMarketingController extends Controller
             // Replace variables
             $personalizedMessage = str_replace(
                 ['{name}', '{site_name}', '{course_title}'],
-                [$recipient['name'] ?: 'প্রিয় শিক্ষার্থী', $siteName, $course ? $course->title : ''],
+                [$recipient['name'] ?: 'Dear Student', $siteName, $course ? $course->title : ''],
                 $rawMessage
             );
 
@@ -163,7 +163,7 @@ class SmsMarketingController extends Controller
         ]);
 
         return response()->json([
-            'message' => "ক্যাম্পেইন সফলভাবে সম্পন্ন হয়েছে! সফল: {$sentCount} টি, ব্যর্থ: {$failedCount} টি।",
+            'message' => "Campaign completed successfully! Sent: {$sentCount}, Failed: {$failedCount}.",
             'campaign' => $campaign->load('course:id,title'),
         ]);
     }
@@ -259,7 +259,7 @@ class SmsMarketingController extends Controller
                     $normalized = User::normalizePhone($trimmed);
                     if ($normalized && User::isValidPhoneNumber($normalized)) {
                         $uniqueMap[$normalized] = [
-                            'name' => 'গ্রাহক',
+                            'name' => 'Customer',
                             'phone' => $normalized,
                         ];
                     }

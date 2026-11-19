@@ -359,9 +359,9 @@ export const ExamBuilderPage: React.FC = () => {
                     <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4 border border-indigo-100 dark:border-indigo-800/40">
                         <FileSpreadsheet className="w-7 h-7" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">পরীক্ষায় কোনো প্রশ্ন যুক্ত করা হয়নি</h3>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">No questions added to this exam yet</h3>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-lg mx-auto">
-                        প্রশ্ন তৈরি করতে নিচের সুবিধাজনক অপশনটি বেছে নিন:
+                        Choose one of the convenient options below to add questions:
                     </p>
 
                     {/* Prominent Quick Action Buttons Row */}
@@ -386,7 +386,7 @@ export const ExamBuilderPage: React.FC = () => {
                             type="button"
                             onClick={downloadExamCsvTemplate}
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-emerald-600/70 hover:border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-sm font-bold shadow-sm cursor-pointer transition-all hover:bg-emerald-100 dark:hover:bg-emerald-900/60"
-                            title="নমুনা CSV টেমপ্লেট ফাইল ডাউনলোড করুন"
+                            title="Download sample CSV template file"
                         >
                             <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                             <span>Download CSV Template</span>
@@ -420,7 +420,7 @@ export const ExamBuilderPage: React.FC = () => {
                                 type="button"
                                 onClick={() => setCsvModalOpen(true)}
                                 className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-emerald-600/20 cursor-pointer"
-                                title="CSV ফাইল আপলোড করে এক ক্লিকে অনেক প্রশ্ন যোগ করুন"
+                                title="Upload CSV file to import multiple questions at once"
                             >
                                 <FileSpreadsheet className="w-4 h-4" />
                                 <span>Bulk Import Question</span>
@@ -429,7 +429,7 @@ export const ExamBuilderPage: React.FC = () => {
                                 type="button"
                                 onClick={downloadExamCsvTemplate}
                                 className="px-3 py-2 rounded-xl border border-emerald-500/80 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
-                                title="নমুনা CSV টেমপ্লেট ডাউনলোড করুন"
+                                title="Download sample CSV template"
                             >
                                 <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                 <span>Download CSV Template</span>

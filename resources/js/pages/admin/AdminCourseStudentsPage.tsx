@@ -200,7 +200,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
             }
         } catch (err: any) {
             console.error('Failed to load students', err);
-            alert(err.response?.data?.message || 'কোর্সের শিক্ষার্থী তালিকা লোড করতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to load student list for this course.');
         } finally {
             setLoadingStudents(false);
         }
@@ -299,7 +299,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
             if (!revokingTarget.isBulk && revokingTarget.student) {
                 // Single student revoke
                 await apiClient.delete(`/admin/manual-enrollment/enrollment/${revokingTarget.student.enrollment_id}`);
-                alert(`"${revokingTarget.student.user.name}" কে সফলভাবে কোর্স থেকে বাদ দেওয়া হয়েছে।`);
+                alert(`"${revokingTarget.student.user.name}" has been successfully removed from the course.`);
             } else {
                 // Bulk revoke
                 const selectedStudents = students.filter(s => selectedEnrollmentIds.includes(s.enrollment_id));
@@ -317,7 +317,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                 }
 
                 const { data } = await apiClient.post('/admin/manual-enrollment/bulk-remove', payload);
-                alert(data.message || 'নির্বাচিত শিক্ষার্থীদের কোর্স থেকে সফলভাবে বাদ দেওয়া হয়েছে।');
+                alert(data.message || 'Selected students have been successfully removed from the course.');
             }
 
             setRevokeModalOpen(false);
@@ -330,7 +330,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
             fetchTargets();
         } catch (err: any) {
             console.error('Revoke failed', err);
-            alert(err.response?.data?.message || 'কোর্স থেকে বাদ দিতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to remove student(s) from the course.');
         } finally {
             setIsRevoking(false);
         }
@@ -339,18 +339,18 @@ export const AdminCourseStudentsPage: React.FC = () => {
     // Export CSV
     const handleExportCSV = () => {
         if (!selectedTarget || students.length === 0) {
-            alert('ডাউনলোড করার মতো কোনো শিক্ষার্থী ডাটা নেই।');
+            alert('No student data available to download.');
             return;
         }
 
-        const headers = ['#', 'Name', 'Phone', 'Email', 'ME Roll', 'Enrolled At', 'Status', 'Order Number'];
+        const headers = ['#', 'Name', 'Phone', 'Email', 'Registration Roll', 'Enrolled At', 'Status', 'Order Number'];
         const rows = students.map((s, idx) => [
             (currentPage - 1) * pagination.per_page + idx + 1,
             `"${(s.user.name || '').replace(/"/g, '""')}"`,
             `"${s.user.phone || ''}"`,
             `"${s.user.email || ''}"`,
             `"${s.user.registration_number || ''}"`,
-            `"${new Date(s.enrolled_at).toLocaleString('bn-BD')}"`,
+            `"${new Date(s.enrolled_at).toLocaleString('en-US')}"`,
             `"${s.status}"`,
             `"${s.order_number || 'N/A'}"`,
         ]);
@@ -416,7 +416,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
     // Lookup Bulk Phones
     const handleLookupPhones = async () => {
         if (!bulkPhones.trim()) {
-            alert('অনুগ্রহ করে মোবাইল নম্বরগুলো লিখুন বা পেস্ট করুন।');
+            alert('Please enter or paste mobile numbers.');
             return;
         }
 
@@ -439,12 +439,12 @@ export const AdminCourseStudentsPage: React.FC = () => {
             });
 
             if (matched.length > 0) {
-                alert(`${matched.length} জন শিক্ষার্থীকে সিস্টেমে পাওয়া গেছে ও যুক্ত করা হয়েছে!`);
+                alert(`${matched.length} students found in the system and added!`);
             } else {
-                alert('প্রদত্ত নম্বরগুলোর সাথে সিস্টেমের কোনো শিক্ষার্থীর মিল পাওয়া যায়নি।');
+                alert('No registered students found matching the provided numbers.');
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'মোবাইল নম্বর যাচাই করতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to verify mobile numbers.');
         } finally {
             setVerifyingPhones(false);
         }
@@ -455,7 +455,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
         if (!modalTarget) return;
 
         if (selectedUsers.length === 0) {
-            alert('অনুগ্রহ করে অন্তত একজন শিক্ষার্থী নির্বাচন করুন।');
+            alert('Please select at least one student.');
             return;
         }
 
@@ -469,7 +469,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                 notes: enrollNotes,
             });
 
-            alert(`সফলভাবে ${data.enrolled_count || selectedUsers.length} জন শিক্ষার্থীকে এনরোল করা হয়েছে!`);
+            alert(`Successfully enrolled ${data.enrolled_count || selectedUsers.length} students!`);
             setIsEnrollModalOpen(false);
 
             // Refresh targets count
@@ -480,7 +480,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                 fetchTargetStudents(modalTarget.type, modalTarget.id, 1, studentSearch);
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'শিক্ষার্থী এনরোল করতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to enroll students.');
         } finally {
             setSubmittingEnroll(false);
         }
@@ -499,7 +499,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 font-semibold text-sm transition-all shadow-xs"
                         >
                             <ArrowLeft className="w-4 h-4" />
-                            <span>সকল কোর্সে ফিরে যান</span>
+                            <span>Back to All Courses</span>
                         </button>
 
                         <button
@@ -508,7 +508,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm shadow-md shadow-sky-600/20 transition-all"
                         >
                             <UserPlus className="w-4 h-4" />
-                            <span>+ শিক্ষার্থী এনরোল করুন</span>
+                            <span>+ Enroll Student</span>
                         </button>
                     </div>
 
@@ -534,7 +534,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                             ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
                                             : 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
                                     }`}>
-                                        {selectedTarget.type === 'bundle' ? 'কম্বো বান্ডেল (Bundle)' : 'কোর্স (Course)'}
+                                        {selectedTarget.type === 'bundle' ? 'Combo Bundle' : 'Course'}
                                     </span>
                                     {selectedTarget.category && (
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
@@ -550,10 +550,10 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-4">
                                     <span className="inline-flex items-center gap-1.5 font-bold text-sky-600 dark:text-sky-400">
                                         <Users className="w-4 h-4" />
-                                        মোট {pagination.total || selectedTarget.enrollments_count || 0} জন শিক্ষার্থী
+                                        Total {pagination.total || selectedTarget.enrollments_count || 0} Students
                                     </span>
                                     {selectedTarget.courses_count ? (
-                                        <span>• {selectedTarget.courses_count} টি কোর্স অন্তর্ভুক্ত</span>
+                                        <span>• {selectedTarget.courses_count} Courses included</span>
                                     ) : null}
                                 </p>
                             </div>
@@ -573,7 +573,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         setStudentSearch(e.target.value);
                                         setCurrentPage(1);
                                     }}
-                                    placeholder="শিক্ষার্থীর নাম, মোবাইল নম্বর, ইমেইল বা ME রোল..."
+                                    placeholder="Student name, phone, email or roll..."
                                     className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                                 />
                                 {studentSearch && (
@@ -598,7 +598,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 text-xs font-bold transition-all cursor-pointer"
                                     >
                                         <Check className="w-4 h-4 text-sky-500" />
-                                        <span>{isAllPageSelected || selectAllAcrossPages ? 'আনসিলেক্ট করুন' : 'সবাইকে নির্বাচন করুন'}</span>
+                                        <span>{isAllPageSelected || selectAllAcrossPages ? 'Deselect All' : 'Select All'}</span>
                                     </button>
                                 )}
                                 <button
@@ -607,7 +607,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 text-xs font-bold transition-all"
                                 >
                                     <Download className="w-4 h-4 text-slate-500" />
-                                    <span>CSV ডাউনলোড</span>
+                                    <span>Download CSV</span>
                                 </button>
                             </div>
                         </div>
@@ -622,8 +622,8 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                     <div>
                                         <p className="text-sm font-bold text-slate-900 dark:text-white">
                                             {selectAllAcrossPages 
-                                                ? `এই কোর্সের সকল (${pagination.total} জন) শিক্ষার্থী নির্বাচিত` 
-                                                : `${selectedEnrollmentIds.length} জন শিক্ষার্থী নির্বাচিত`}
+                                                ? `All (${pagination.total}) students in this course selected` 
+                                                : `${selectedEnrollmentIds.length} students selected`}
                                         </p>
                                         {!selectAllAcrossPages && pagination.total > students.length && isAllPageSelected && (
                                             <button
@@ -631,7 +631,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                 onClick={handleSelectAllAcrossPages}
                                                 className="text-xs text-sky-600 dark:text-sky-400 font-semibold underline hover:text-sky-700 cursor-pointer block mt-0.5"
                                             >
-                                                এই কোর্সের সকল {pagination.total} জন শিক্ষার্থীকে সিলেক্ট করতে চান? এখানে ক্লিক করুন
+                                                Select all {pagination.total} students across all pages in this course? Click here
                                             </button>
                                         )}
                                     </div>
@@ -643,7 +643,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         onClick={handleClearSelection}
                                         className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                                     >
-                                        সিলেকশন বাতিল
+                                        Clear Selection
                                     </button>
                                     <button
                                         type="button"
@@ -651,7 +651,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-sm hover:shadow transition-all cursor-pointer"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
-                                        <span>কোর্স থেকে বাদ দিন ({selectAllAcrossPages ? pagination.total : selectedEnrollmentIds.length})</span>
+                                        <span>Remove from Course ({selectAllAcrossPages ? pagination.total : selectedEnrollmentIds.length})</span>
                                     </button>
                                 </div>
                             </div>
@@ -661,7 +661,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                         {loadingStudents ? (
                             <div className="py-20 flex flex-col items-center justify-center text-slate-400 space-y-3">
                                 <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
-                                <p className="text-sm font-semibold">শিক্ষার্থীদের তালিকা লোড হচ্ছে...</p>
+                                <p className="text-sm font-semibold">Loading students list...</p>
                             </div>
                         ) : students.length === 0 ? (
                             <div className="py-20 text-center px-4">
@@ -669,10 +669,10 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                     <Users className="w-8 h-8" />
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">
-                                    {studentSearch ? 'কোনো শিক্ষার্থী পাওয়া যায়নি' : 'এই কোর্সে এখনো কোনো শিক্ষার্থী নেই'}
+                                    {studentSearch ? 'No students found' : 'No students in this course yet'}
                                 </h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-                                    {studentSearch ? 'অন্য নাম, ফোন নম্বর বা রোল নম্বর দিয়ে আবার সার্চ করুন।' : 'ম্যানুয়াল এনরোলমেন্ট বাটনে ক্লিক করে শিক্ষার্থীদের যুক্ত করুন।'}
+                                    {studentSearch ? 'Try searching with another name, phone number, or roll.' : 'Click Enroll Student button to add students manually.'}
                                 </p>
                                 {!studentSearch && (
                                     <button
@@ -681,7 +681,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-md transition-all"
                                     >
                                         <UserPlus className="w-4 h-4" />
-                                        <span>শিক্ষার্থী এনরোল করুন</span>
+                                        <span>Enroll Student</span>
                                     </button>
                                 )}
                             </div>
@@ -696,17 +696,17 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                     checked={isAllPageSelected || selectAllAcrossPages}
                                                     onChange={handleToggleSelectAllPage}
                                                     className="w-4 h-4 rounded-sm text-sky-600 focus:ring-sky-500 border-slate-300 dark:border-slate-600 cursor-pointer"
-                                                    title="এই পৃষ্ঠার সব শিক্ষার্থী নির্বাচন করুন"
+                                                    title="Select all students on this page"
                                                 />
                                             </th>
                                             <th className="py-3.5 px-3 w-12 text-center">#</th>
-                                            <th className="py-3.5 px-4">শিক্ষার্থী (Student)</th>
-                                            <th className="py-3.5 px-4">যোগাযোগ (Contact)</th>
-                                            <th className="py-3.5 px-4">রেজিস্ট্রেশন রোল</th>
-                                            <th className="py-3.5 px-4">অ্যাক্সেস কি (Access Key)</th>
-                                            <th className="py-3.5 px-4">এনরোলমেন্টের তারিখ</th>
-                                            <th className="py-3.5 px-4">স্ট্যাটাস</th>
-                                            <th className="py-3.5 px-4 text-right">অ্যাকশন</th>
+                                            <th className="py-3.5 px-4">Student</th>
+                                            <th className="py-3.5 px-4">Contact</th>
+                                            <th className="py-3.5 px-4">Registration Roll</th>
+                                            <th className="py-3.5 px-4">Access Key</th>
+                                            <th className="py-3.5 px-4">Enrolled Date</th>
+                                            <th className="py-3.5 px-4">Status</th>
+                                            <th className="py-3.5 px-4 text-right">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm">
@@ -780,7 +780,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                                     type="button"
                                                                     onClick={() => handleCopyKey(student.access_key!)}
                                                                     className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded transition-colors text-slate-500 hover:text-sky-600 cursor-pointer"
-                                                                    title="অ্যাক্সেস কি কপি করুন"
+                                                                    title="Copy Access Key"
                                                                 >
                                                                     {copiedKey === student.access_key ? (
                                                                         <Check className="w-3 h-3 text-emerald-600" />
@@ -794,7 +794,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                         )}
                                                     </td>
                                                     <td className="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                                                        {new Date(student.enrolled_at).toLocaleDateString('bn-BD', {
+                                                        {new Date(student.enrolled_at).toLocaleDateString('en-US', {
                                                             day: 'numeric',
                                                             month: 'short',
                                                             year: 'numeric',
@@ -811,10 +811,10 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                             type="button"
                                                             onClick={() => handleOpenSingleRevoke(student)}
                                                             className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent hover:border-rose-200 dark:hover:border-rose-800 transition-all cursor-pointer"
-                                                            title="কোর্স থেকে শিক্ষার্থীকে বাদ দিন"
+                                                            title="Remove student from course"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
-                                                            <span>বাদ দিন</span>
+                                                            <span>Remove</span>
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -829,7 +829,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                         {pagination.last_page > 1 && (
                             <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 text-xs text-slate-500">
                                 <div>
-                                    মোট {pagination.total} জনের মধ্যে পৃষ্ঠা {pagination.current_page} / {pagination.last_page}
+                                    Page {pagination.current_page} of {pagination.last_page} (Total {pagination.total})
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <button
@@ -838,7 +838,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                         className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 disabled:opacity-40 font-semibold hover:bg-slate-50 transition-all"
                                     >
-                                        পূর্ববর্তী
+                                        Previous
                                     </button>
                                     <button
                                         type="button"
@@ -846,7 +846,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         onClick={() => setCurrentPage(prev => prev + 1)}
                                         className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 disabled:opacity-40 font-semibold hover:bg-slate-50 transition-all"
                                     >
-                                        পরবর্তী
+                                        Next
                                     </button>
                                 </div>
                             </div>
@@ -861,13 +861,13 @@ export const AdminCourseStudentsPage: React.FC = () => {
                         <div>
                             <div className="flex items-center gap-2 text-sky-600 dark:text-sky-400 text-xs font-black uppercase tracking-wider">
                                 <GraduationCap className="w-4 h-4" />
-                                <span>কোর্স শিক্ষার্থী ব্যবস্থাপনা</span>
+                                <span>Course Student Management</span>
                             </div>
                             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-                                শিক্ষার্থী তালিকা ও এনরোলমেন্ট
+                                Student List & Enrollment
                             </h1>
                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                যেকোনো কোর্সে ক্লিক করে সেই কোর্সের শিক্ষার্থীদের পূর্ণাঙ্গ তালিকা দেখুন অথবা নতুন শিক্ষার্থী ম্যানুয়ালি যুক্ত করুন।
+                                Click any course to view its complete student list or manually enroll new students.
                             </p>
                         </div>
                     </div>
@@ -885,7 +885,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                                 }`}
                             >
-                                সব ({targets.length})
+                                All ({targets.length})
                             </button>
                             <button
                                 type="button"
@@ -896,7 +896,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                                 }`}
                             >
-                                কোর্স ({targets.filter(t => t.type === 'course').length})
+                                Courses ({targets.filter(t => t.type === 'course').length})
                             </button>
                             <button
                                 type="button"
@@ -907,7 +907,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                                 }`}
                             >
-                                কম্বো বান্ডেল ({targets.filter(t => t.type === 'bundle').length})
+                                Combo Bundles ({targets.filter(t => t.type === 'bundle').length})
                             </button>
                         </div>
 
@@ -918,7 +918,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 type="text"
                                 value={targetSearch}
                                 onChange={(e) => setTargetSearch(e.target.value)}
-                                placeholder="কোর্স বা বান্ডেল খুঁজুন..."
+                                placeholder="Search course or bundle..."
                                 className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                             />
                             {targetSearch && (
@@ -937,7 +937,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                     {loadingTargets ? (
                         <div className="py-24 flex flex-col items-center justify-center text-slate-400 space-y-3">
                             <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
-                            <p className="text-sm font-semibold">কোর্স ও বান্ডেল লোড হচ্ছে...</p>
+                            <p className="text-sm font-semibold">Loading courses and bundles...</p>
                         </div>
                     ) : displayedTargets.length === 0 ? (
                         <div className="py-24 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 text-center p-8">
@@ -945,10 +945,10 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 <BookOpen className="w-8 h-8" />
                             </div>
                             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">
-                                কোনো কোর্স বা বান্ডেল পাওয়া যায়নি
+                                No courses or bundles found
                             </h3>
                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-                                আপনার ফিল্টার বা সার্চ কিওয়ার্ড পরিবর্তন করে আবার চেষ্টা করুন।
+                                Try changing your filter or search keywords.
                             </p>
                         </div>
                     ) : (
@@ -985,7 +985,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                         ? 'bg-purple-600 text-white'
                                                         : 'bg-sky-600 text-white'
                                                 }`}>
-                                                    {isBundle ? 'কম্বো বান্ডেল' : 'কোর্স'}
+                                                    {isBundle ? 'Combo Bundle' : 'Course'}
                                                 </span>
                                                 {target.category?.name && (
                                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-900/80 text-white backdrop-blur-xs">
@@ -998,7 +998,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                             <div className="absolute bottom-3 right-3">
                                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-white/95 dark:bg-slate-900/95 text-sky-700 dark:text-sky-300 backdrop-blur-xs shadow-md">
                                                     <Users className="w-3.5 h-3.5 text-sky-500" />
-                                                    <span>{target.enrollments_count || 0} জন শিক্ষার্থী</span>
+                                                    <span>{target.enrollments_count || 0} Students</span>
                                                 </span>
                                             </div>
                                         </div>
@@ -1012,7 +1012,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                 {isBundle && target.courses_count ? (
                                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
                                                         <Layers className="w-3.5 h-3.5" />
-                                                        <span>{target.courses_count} টি কোর্স যুক্ত আছে</span>
+                                                        <span>{target.courses_count} Courses included</span>
                                                     </p>
                                                 ) : null}
                                             </div>
@@ -1025,17 +1025,17 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                     className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white font-bold text-xs transition-all border border-sky-200/80 dark:border-sky-800"
                                                 >
                                                     <Eye className="w-4 h-4" />
-                                                    <span>শিক্ষার্থী তালিকা</span>
+                                                    <span>Student List</span>
                                                 </button>
 
                                                 <button
                                                     type="button"
                                                     onClick={() => handleOpenEnrollModal(target)}
                                                     className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition-all shrink-0"
-                                                    title="এই কোর্সে নতুন শিক্ষার্থী ম্যানুয়াল এনরোল করুন"
+                                                    title="Manually enroll new student into this course"
                                                 >
                                                     <UserPlus className="w-4 h-4" />
-                                                    <span>এনরোল</span>
+                                                    <span>Enroll</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -1055,7 +1055,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                             <div>
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-bold bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 mb-1">
-                                    {modalTarget.type === 'bundle' ? 'বান্ডেল এনরোলমেন্ট' : 'কোর্স এনরোলমেন্ট'}
+                                    {modalTarget.type === 'bundle' ? 'Bundle Enrollment' : 'Course Enrollment'}
                                 </span>
                                 <h3 className="text-lg font-black text-slate-900 dark:text-white truncate">
                                     {modalTarget.title}
@@ -1081,7 +1081,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         : 'border-transparent text-slate-400 hover:text-slate-700'
                                 }`}
                             >
-                                শিক্ষার্থী সার্চ ও নির্বাচন
+                                Search & Select Students
                             </button>
                             <button
                                 type="button"
@@ -1092,7 +1092,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         : 'border-transparent text-slate-400 hover:text-slate-700'
                                 }`}
                             >
-                                বাল্ক মোবাইল নম্বর পেস্ট
+                                Bulk Mobile Numbers
                             </button>
                         </div>
 
@@ -1102,7 +1102,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 <div className="space-y-4">
                                     <div>
                                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                            শিক্ষার্থী খুঁজুন (নাম, মোবাইল নম্বর বা ইমেইল)
+                                            Search Student (Name, Phone or Email)
                                         </label>
                                         <div className="relative">
                                             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -1110,7 +1110,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                 type="text"
                                                 value={userQuery}
                                                 onChange={(e) => handleSearchUsers(e.target.value)}
-                                                placeholder="উদাঃ 01712..., রহিম..."
+                                                placeholder="e.g. 01712..., John..."
                                                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                                             />
                                         </div>
@@ -1120,7 +1120,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                     {searchingUsers ? (
                                         <div className="py-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
                                             <Loader2 className="w-4 h-4 animate-spin text-sky-500" />
-                                            <span>খোঁজা হচ্ছে...</span>
+                                            <span>Searching...</span>
                                         </div>
                                     ) : searchResults.length > 0 ? (
                                         <div className="border border-slate-200 dark:border-slate-700 rounded-2xl divide-y divide-slate-100 dark:divide-slate-800 max-h-48 overflow-y-auto bg-slate-50/50 dark:bg-slate-850">
@@ -1146,7 +1146,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                         <div className="flex items-center gap-2">
                                                             {user.is_enrolled && (
                                                                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                                                                    ইতিমধ্যেই যুক্ত
+                                                                    Already Enrolled
                                                                 </span>
                                                             )}
                                                             <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
@@ -1163,7 +1163,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         </div>
                                     ) : userQuery.length >= 2 ? (
                                         <p className="text-xs text-slate-400 text-center py-2">
-                                            কোনো শিক্ষার্থী পাওয়া যায়নি।
+                                            No students found.
                                         </p>
                                     ) : null}
                                 </div>
@@ -1172,7 +1172,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 <div className="space-y-4">
                                     <div>
                                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                            মোবাইল নম্বরসমূহ (কমা, স্পেস বা নতুন লাইনে পেস্ট করুন)
+                                            Mobile Numbers (paste with comma, space or newline)
                                         </label>
                                         <textarea
                                             rows={4}
@@ -1194,13 +1194,13 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         ) : (
                                             <Search className="w-3.5 h-3.5" />
                                         )}
-                                        <span>নম্বরগুলো যাচাই করে তালিকায় যোগ করুন</span>
+                                        <span>Verify Numbers & Add to List</span>
                                     </button>
 
                                     {unmatchedPhones.length > 0 && (
                                         <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800 text-xs">
                                             <p className="font-bold text-amber-800 dark:text-amber-300 mb-1">
-                                                নিম্নোক্ত {unmatchedPhones.length} টি নম্বরের অ্যাকাউন্ট পাওয়া যায়নি:
+                                                No accounts found for the following {unmatchedPhones.length} numbers:
                                             </p>
                                             <p className="text-amber-700 dark:text-amber-400 font-mono text-[11px] break-all">
                                                 {unmatchedPhones.join(', ')}
@@ -1214,13 +1214,13 @@ export const AdminCourseStudentsPage: React.FC = () => {
                             {selectedUsers.length > 0 && (
                                 <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                                     <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
-                                        <span>এনরোলমেন্টের জন্য নির্বাচিত ({selectedUsers.length} জন):</span>
+                                        <span>Selected for enrollment ({selectedUsers.length} students):</span>
                                         <button
                                             type="button"
                                             onClick={() => setSelectedUsers([])}
                                             className="text-rose-500 hover:underline"
                                         >
-                                            ক্লিয়ার করুন
+                                            Clear
                                         </button>
                                     </div>
                                     <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2 bg-slate-50 dark:bg-slate-800 rounded-xl">
@@ -1252,18 +1252,18 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                         onChange={(e) => setSendSms(e.target.checked)}
                                         className="w-4 h-4 rounded-sm border-slate-300 text-sky-600 focus:ring-sky-500"
                                     />
-                                    <span>শিক্ষার্থীকে কনফার্মেশন SMS পাঠান (যদি গেটওয়ে কনফিগার করা থাকে)</span>
+                                    <span>Send confirmation SMS to student (if SMS gateway configured)</span>
                                 </label>
 
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        অ্যাডমিন নোট (ঐচ্ছিক)
+                                        Admin Note (Optional)
                                     </label>
                                     <input
                                         type="text"
                                         value={enrollNotes}
                                         onChange={(e) => setEnrollNotes(e.target.value)}
-                                        placeholder="উদাঃ অফলাইন পেমেন্ট / ডিরেক্ট অ্যাডমিশন"
+                                        placeholder="e.g. Offline Payment / Direct Admission"
                                         className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
                                     />
                                 </div>
@@ -1277,7 +1277,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 onClick={() => setIsEnrollModalOpen(false)}
                                 className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
                             >
-                                বাতিল
+                                Cancel
                             </button>
                             <button
                                 type="button"
@@ -1290,7 +1290,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 ) : (
                                     <Check className="w-4 h-4" />
                                 )}
-                                <span>{selectedUsers.length} জন শিক্ষার্থীকে এনরোল করুন</span>
+                                <span>Enroll {selectedUsers.length} Students</span>
                             </button>
                         </div>
                     </div>
@@ -1310,8 +1310,8 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 <div>
                                     <h3 className="text-base font-bold text-slate-900 dark:text-white">
                                         {revokingTarget.isBulk
-                                            ? 'শিক্ষার্থীদের কোর্স এক্সেস বাতিল'
-                                            : 'শিক্ষার্থীর কোর্স এক্সেস বাতিল'}
+                                            ? 'Revoke Students Course Access'
+                                            : 'Revoke Student Course Access'}
                                     </h3>
                                     <p className="text-xs text-slate-500 truncate max-w-[240px]">
                                         {selectedTarget?.title}
@@ -1336,11 +1336,11 @@ export const AdminCourseStudentsPage: React.FC = () => {
                             {revokingTarget.isBulk ? (
                                 <div className="p-4 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40">
                                     <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
-                                        আপনি কি নিশ্চিতভাবে{' '}
+                                        Are you sure you want to remove{' '}
                                         <span className="text-rose-600 dark:text-rose-400 font-extrabold text-base">
-                                            {revokingTarget.selectAllPages ? pagination.total : selectedEnrollmentIds.length} জন
+                                            {revokingTarget.selectAllPages ? pagination.total : selectedEnrollmentIds.length} students
                                         </span>{' '}
-                                        শিক্ষার্থীকে এই {selectedTarget?.type === 'bundle' ? 'বান্ডেল' : 'কোর্স'} থেকে বাদ দিতে চান?
+                                        from this {selectedTarget?.type === 'bundle' ? 'bundle' : 'course'}?
                                     </p>
                                 </div>
                             ) : revokingTarget.student ? (
@@ -1362,7 +1362,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                             </div>
                                         )}
                                         <div className="font-mono text-xs text-sky-600 dark:text-sky-400 font-semibold pt-0.5">
-                                            রোল: {revokingTarget.student.user.registration_number || `ME-2026-${revokingTarget.student.user_id}`}
+                                            Roll: {revokingTarget.student.user.registration_number || `ME-2026-${revokingTarget.student.user_id}`}
                                         </div>
                                     </div>
                                 </div>
@@ -1371,7 +1371,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                             <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2.5">
                                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
                                 <span>
-                                    <strong>সতর্কবার্তা:</strong> বাদ দিলে শিক্ষার্থী আর এই কোর্সের ড্যাশবোর্ড, ভিডিও, রুটিন, রিসোর্স ও পরীক্ষায় এক্সেস করতে পারবে না।
+                                    <strong>Warning:</strong> Removing access will prevent the student from accessing this course's dashboard, videos, routine, resources, and exams.
                                 </span>
                             </div>
                         </div>
@@ -1387,7 +1387,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 }}
                                 className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
                             >
-                                বাতিল
+                                Cancel
                             </button>
                             <button
                                 type="button"
@@ -1402,8 +1402,8 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                 )}
                                 <span>
                                     {revokingTarget.isBulk
-                                        ? `হ্যাঁ, ${revokingTarget.selectAllPages ? pagination.total : selectedEnrollmentIds.length} জনকে বাদ দিন`
-                                        : 'হ্যাঁ, বাদ দিন'}
+                                        ? `Yes, Remove ${revokingTarget.selectAllPages ? pagination.total : selectedEnrollmentIds.length} Students`
+                                        : 'Yes, Remove'}
                                 </span>
                             </button>
                         </div>

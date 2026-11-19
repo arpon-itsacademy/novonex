@@ -92,14 +92,14 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
             const { data } = await apiClient.get('/user/devices');
             setDevices(data.devices || []);
         } catch (err: any) {
-            setDeviceErrorMsg('ডিভাইস তালিকা লোড করা যায়নি। আবার চেষ্টা করুন।');
+            setDeviceErrorMsg('Unable to load device list. Please try again.');
         } finally {
             setDevicesLoading(false);
         }
     };
 
     const handleRevokeDevice = async (id: number) => {
-        if (!window.confirm('আপনি কি নিশ্চিত যে এই ডিভাইসটি লগআউট করতে চান?')) {
+        if (!window.confirm('Are you sure you want to log out this device?')) {
             return;
         }
 
@@ -108,17 +108,17 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
         setDeviceErrorMsg('');
         try {
             const { data } = await apiClient.delete(`/user/devices/${id}`);
-            setDeviceSuccessMsg(data.message || 'ডিভাইসটি সফলভাবে লগআউট করা হয়েছে।');
+            setDeviceSuccessMsg(data.message || 'Device logged out successfully.');
             await fetchDevices();
         } catch (err: any) {
-            setDeviceErrorMsg(err.response?.data?.message || 'ডিভাইস লগআউট করতে সমস্যা হয়েছে।');
+            setDeviceErrorMsg(err.response?.data?.message || 'Failed to log out device.');
         } finally {
             setDeviceActionLoading(null);
         }
     };
 
     const handleLogoutOthers = async () => {
-        if (!window.confirm('বর্তমান ডিভাইসটি ব্যতীত অন্য সকল ডিভাইস থেকে লগআউট করতে চান?')) {
+        if (!window.confirm('Are you sure you want to log out all other devices except this one?')) {
             return;
         }
 
@@ -127,10 +127,10 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
         setDeviceErrorMsg('');
         try {
             const { data } = await apiClient.post('/user/devices/logout-others');
-            setDeviceSuccessMsg(data.message || 'অন্যান্য সকল ডিভাইস থেকে সফলভাবে লগআউট হয়েছে।');
+            setDeviceSuccessMsg(data.message || 'Logged out from all other devices successfully.');
             await fetchDevices();
         } catch (err: any) {
-            setDeviceErrorMsg(err.response?.data?.message || 'লগআউট করতে সমস্যা হয়েছে।');
+            setDeviceErrorMsg(err.response?.data?.message || 'Failed to log out other devices.');
         } finally {
             setDeviceActionLoading(null);
         }
@@ -147,12 +147,12 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                 name,
                 email
             });
-            setProfileSuccessMsg(data.message || 'প্রোফাইল সফলভাবে আপডেট হয়েছে!');
+            setProfileSuccessMsg(data.message || 'Profile updated successfully!');
             if (updateUser && data.user) {
                 updateUser(data.user);
             }
         } catch (err: any) {
-            const msg = err.response?.data?.message || 'প্রোফাইল আপডেট ব্যর্থ হয়েছে। তথ্য যাচাই করুন।';
+            const msg = err.response?.data?.message || 'Profile update failed. Please check your inputs.';
             setProfileErrorMsg(msg);
         } finally {
             setProfileLoading(false);
@@ -166,13 +166,13 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
         setPasswordErrorMsg('');
 
         if (newPassword.length < 8) {
-            setPasswordErrorMsg('নতুন পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।');
+            setPasswordErrorMsg('New password must be at least 8 characters long.');
             setPasswordLoading(false);
             return;
         }
 
         if (newPassword !== newPasswordConfirm) {
-            setPasswordErrorMsg('নতুন পাসওয়ার্ড ও কনফার্ম পাসওয়ার্ড মিলছে না।');
+            setPasswordErrorMsg('New password and confirm password do not match.');
             setPasswordLoading(false);
             return;
         }
@@ -183,12 +183,12 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                 password: newPassword,
                 password_confirmation: newPasswordConfirm
             });
-            setPasswordSuccessMsg(data.message || 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।');
+            setPasswordSuccessMsg(data.message || 'Password changed successfully.');
             setCurrentPassword('');
             setNewPassword('');
             setNewPasswordConfirm('');
         } catch (err: any) {
-            const msg = err.response?.data?.message || err.response?.data?.errors?.current_password?.[0] || 'পাসওয়ার্ড পরিবর্তন করা যায়নি।';
+            const msg = err.response?.data?.message || err.response?.data?.errors?.current_password?.[0] || 'Unable to change password.';
             setPasswordErrorMsg(msg);
         } finally {
             setPasswordLoading(false);
@@ -201,10 +201,10 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
     };
 
     const formatDate = (dateStr?: string | null) => {
-        if (!dateStr) return 'অজানা';
+        if (!dateStr) return 'Unknown';
         try {
             const d = new Date(dateStr);
-            return d.toLocaleString('bn-BD', {
+            return d.toLocaleString('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -227,16 +227,16 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                         </div>
                         <div>
                             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                                {user?.name || 'শিক্ষার্থীর নাম'}
+                                {user?.name || 'Student Name'}
                             </h1>
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                                <span>ফোন: <span className="font-semibold text-slate-700">{user?.phone}</span></span>
+                                <span>Phone: <span className="font-semibold text-slate-700">{user?.phone}</span></span>
                                 <span>•</span>
                                 <span>
-                                    রেজিস্ট্রেশন নং: <span className="font-extrabold text-indigo-700 font-mono bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-md">{user?.registration_number || 'লোড হচ্ছে...'}</span>
+                                    Registration No: <span className="font-extrabold text-indigo-700 font-mono bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-md">{user?.registration_number || 'Loading...'}</span>
                                 </span>
                                 <span>•</span>
-                                <span>রোল: <span className="text-sky-600 font-bold uppercase">{user?.role || 'student'}</span></span>
+                                <span>Role: <span className="text-sky-600 font-bold uppercase">{user?.role || 'student'}</span></span>
                             </div>
                         </div>
                     </div>
@@ -246,22 +246,22 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                         {activeView === 'devices' && (
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-sky-50 text-sky-700 border border-sky-200 text-xs sm:text-sm font-bold shadow-2xs">
                                 <Smartphone className="w-4 h-4 text-sky-600" />
-                                <span>লগইন ডিভাইস ও নিরাপত্তা</span>
+                                <span>Active Devices & Security</span>
                                 <span className="px-2 py-0.5 text-xs rounded-full bg-sky-200/80 text-sky-800 font-extrabold">
-                                    {devices.length}/2 টি সক্রিয়
+                                    {devices.length}/2 Active
                                 </span>
                             </div>
                         )}
                         {activeView === 'profile' && (
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-sky-50 text-sky-700 border border-sky-200 text-xs sm:text-sm font-bold shadow-2xs">
                                 <UserIcon className="w-4 h-4 text-sky-600" />
-                                <span>প্রোফাইল তথ্য ও একাউন্ট</span>
+                                <span>Profile & Account Info</span>
                             </div>
                         )}
                         {activeView === 'password' && (
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-sky-50 text-sky-700 border border-sky-200 text-xs sm:text-sm font-bold shadow-2xs">
                                 <KeyRound className="w-4 h-4 text-sky-600" />
-                                <span>পাসওয়ার্ড পরিবর্তন</span>
+                                <span>Change Password</span>
                             </div>
                         )}
                     </div>
@@ -279,20 +279,20 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                             </div>
                             <div className="space-y-1">
                                 <h2 className="text-base font-extrabold text-slate-900">
-                                    ডিভাইস নিরাপত্তা নীতিমালা: সর্বোচ্চ ২টি সক্রিয় ডিভাইস
+                                    Device Security Policy: Maximum 2 Active Devices
                                 </h2>
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    আপনার অ্যাকাউন্ট সুরক্ষা ও কোর্স কন্টেন্টের গোপনীয়তা নিশ্চিত করতে একটি অ্যাকাউন্ট থেকে
-                                    <strong> একসাথে সর্বোচ্চ ২টি ডিভাইসে</strong> লগইন করা যাবে। আপনি ৩য় কোনো নতুন ডিভাইসে লগইন করলে আগের সবচেয়ে পুরোনো ডিভাইসটি স্বয়ংক্রিয়ভাবে লগআউট হয়ে যাবে।
+                                    To ensure account security and copyright protection of course content, an account can be logged in on 
+                                    <strong> a maximum of 2 devices simultaneously</strong>. Logging in on a 3rd device will automatically log out your oldest active session.
                                 </p>
                                 <div className="pt-2 flex flex-wrap items-center gap-2">
                                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white text-sky-700 border border-sky-200">
                                         <CheckCircle2 className="w-3.5 h-3.5 text-sky-600" />
-                                        সর্বোচ্চ সীমা: ২ টি ডিভাইস
+                                        Max Limit: 2 Devices
                                     </span>
                                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white text-indigo-700 border border-indigo-200">
                                         <Clock className="w-3.5 h-3.5 text-indigo-600" />
-                                        বর্তমানে লগইন আছে: {devices.length} টি
+                                        Currently Active: {devices.length}
                                     </span>
                                 </div>
                             </div>
@@ -318,10 +318,10 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                             <div>
                                 <h3 className="text-base font-black text-slate-900">
-                                    লগইন থাকা ডিভাইসসমূহ ({devices.length}/2)
+                                    Active Sessions ({devices.length}/2)
                                 </h3>
                                 <p className="text-xs text-slate-500">
-                                    নিচে আপনার অ্যাকাউন্টে বর্তমানে অ্যাক্টিভ থাকা ডিভাইসগুলোর বিবরণ দেওয়া হলো
+                                    Below are the devices currently logged into your account
                                 </p>
                             </div>
 
@@ -333,7 +333,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                     className="px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 hover:text-sky-600 hover:border-sky-200 text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer"
                                 >
                                     <RefreshCw className={`w-3.5 h-3.5 ${devicesLoading ? 'animate-spin' : ''}`} />
-                                    <span>রিফ্রেশ</span>
+                                    <span>Refresh</span>
                                 </button>
 
                                 {devices.some(d => !d.is_current) && (
@@ -344,7 +344,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                         className="px-3.5 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer"
                                     >
                                         <LogOut className="w-3.5 h-3.5" />
-                                        <span>অন্যান্য সব ডিভাইস লগআউট</span>
+                                        <span>Log Out All Other Devices</span>
                                     </button>
                                 )}
                             </div>
@@ -354,11 +354,11 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                         {devicesLoading ? (
                             <div className="py-12 flex flex-col items-center justify-center gap-3 text-slate-400">
                                 <RefreshCw className="w-8 h-8 animate-spin text-sky-500" />
-                                <span className="text-xs font-semibold">ডিভাইস তালিকা লোড হচ্ছে...</span>
+                                <span className="text-xs font-semibold">Loading device list...</span>
                             </div>
                         ) : devices.length === 0 ? (
                             <div className="py-12 text-center text-slate-400 text-sm">
-                                কোনো সক্রিয় সেশন পাওয়া যায়নি।
+                                No active device sessions found.
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -395,13 +395,13 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                                             </h4>
                                                             {device.is_current && (
                                                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200">
-                                                                    বর্তমান ডিভাইস
+                                                                    Current Device
                                                                 </span>
                                                             )}
                                                         </div>
                                                         <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
                                                             <Globe className="w-3 h-3 text-slate-400" />
-                                                            <span>আইপি: {device.ip_address || 'অজানা'}</span>
+                                                            <span>IP: {device.ip_address || 'Unknown'}</span>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -410,7 +410,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                                                 <div className="flex items-center gap-1.5">
                                                     <Clock className="w-3.5 h-3.5 text-slate-400" />
-                                                    <span>সর্বশেষ সক্রিয়: {formatDate(device.last_used_at)}</span>
+                                                    <span>Last Active: {formatDate(device.last_used_at)}</span>
                                                 </div>
 
                                                 {!device.is_current ? (
@@ -420,11 +420,11 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                                         disabled={deviceActionLoading === device.id}
                                                         className="px-2.5 py-1 rounded-lg text-rose-600 hover:bg-rose-50 font-bold transition-colors cursor-pointer"
                                                     >
-                                                        {deviceActionLoading === device.id ? 'লগআউট হচ্ছে...' : 'লগআউট করুন'}
+                                                        {deviceActionLoading === device.id ? 'Logging out...' : 'Log Out'}
                                                     </button>
                                                 ) : (
                                                     <span className="text-[11px] font-bold text-sky-600">
-                                                        এখন ব্যবহার করছেন
+                                                        Using Now
                                                     </span>
                                                 )}
                                             </div>
@@ -441,8 +441,8 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
             {activeView === 'profile' && (
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
                     <div>
-                        <h3 className="text-base font-black text-slate-900">ব্যক্তিগত তথ্য</h3>
-                        <p className="text-xs text-slate-500">আপনার নাম ও ইমেইল ঠিকানা আপডেট করুন</p>
+                        <h3 className="text-base font-black text-slate-900">Personal Information</h3>
+                        <p className="text-xs text-slate-500">Update your full name and email address</p>
                     </div>
 
                     {profileSuccessMsg && (
@@ -461,7 +461,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                     <form onSubmit={handleUpdateProfile} className="space-y-4 max-w-xl">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                পূর্ণ নাম
+                                Full Name
                             </label>
                             <input
                                 type="text"
@@ -469,37 +469,37 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-hidden transition-all"
-                                placeholder="আপনার নাম লিখুন"
+                                placeholder="Enter your full name"
                             />
                         </div>
 
                         {/* Auto-Generated Registration Number */}
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                                <span>রেজিস্ট্রেশন নম্বর (স্টুডেন্ট আইডি)</span>
+                                <span>Registration Number (Student ID)</span>
                                 <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
-                                    অটো-জেনারেটেড
+                                    Auto-Generated
                                 </span>
                             </label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     disabled
-                                    value={user?.registration_number || 'লোড হচ্ছে...'}
+                                    value={user?.registration_number || 'Loading...'}
                                     className="w-full px-4 py-2.5 rounded-xl border border-indigo-200 bg-indigo-50/40 text-indigo-900 font-mono font-bold text-sm cursor-not-allowed select-all"
                                 />
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-md">
-                                    স্থায়ী আইডি
+                                    Permanent ID
                                 </span>
                             </div>
                             <p className="text-[11px] text-slate-400 mt-1">
-                                এই ইউনিক রেজিস্ট্রেশন নম্বরটি আপনার প্রতিটি কোর্স, লাইভ ক্লাস, পরীক্ষা ও সার্টিফিকেটের জন্য স্থায়ী স্টুডেন্ট আইডি হিসেবে ব্যবহৃত হবে।
+                                This unique registration number acts as your permanent student ID across all courses, live classes, exams, and certificates.
                             </p>
                         </div>
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                মোবাইল নম্বর (স্থায়ী)
+                                Mobile Number (Permanent)
                             </label>
                             <div className="relative">
                                 <input
@@ -509,17 +509,17 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 text-sm font-medium cursor-not-allowed"
                                 />
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 bg-slate-200 px-2 py-0.5 rounded-md">
-                                    পরিবর্তনযোগ্য নয়
+                                    Non-changeable
                                 </span>
                             </div>
                             <p className="text-[11px] text-slate-400 mt-1">
-                                মোবাইল নম্বরটি আপনার মূল একাউন্ট আইডি হিসেবে ব্যবহৃত হয় বিধায় এটি পরিবর্তন করা যাবে না।
+                                Your mobile number is used as your primary login identifier and cannot be modified directly.
                             </p>
                         </div>
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                ইমেইল ঠিকানা
+                                Email Address
                             </label>
                             <input
                                 type="email"
@@ -538,7 +538,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                 className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-sky-600/20 hover:from-sky-700 hover:to-indigo-700 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60"
                             >
                                 {profileLoading && <RefreshCw className="w-4 h-4 animate-spin" />}
-                                <span>{profileLoading ? 'সংরক্ষণ হচ্ছে...' : 'তথ্য সংরক্ষণ করুন'}</span>
+                                <span>{profileLoading ? 'Saving...' : 'Save Profile'}</span>
                             </button>
                         </div>
                     </form>
@@ -549,8 +549,8 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
             {activeView === 'password' && (
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
                     <div>
-                        <h3 className="text-base font-black text-slate-900">পাসওয়ার্ড পরিবর্তন করুন</h3>
-                        <p className="text-xs text-slate-500">আপনার বর্তমান পাসওয়ার্ড যাচাই করে নতুন পাসওয়ার্ড দিন</p>
+                        <h3 className="text-base font-black text-slate-900">Change Password</h3>
+                        <p className="text-xs text-slate-500">Verify your current password and choose a secure new password</p>
                     </div>
 
                     {passwordSuccessMsg && (
@@ -569,7 +569,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                     <form onSubmit={handleChangePassword} className="space-y-4 max-w-xl">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                বর্তমান পাসওয়ার্ড
+                                Current Password
                             </label>
                             <div className="relative">
                                 <input
@@ -578,7 +578,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                     value={currentPassword}
                                     onChange={(e) => setCurrentPassword(e.target.value)}
                                     className="w-full px-4 py-2.5 pr-11 rounded-xl border border-slate-200 text-sm font-medium focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-hidden transition-all"
-                                    placeholder="আপনার বর্তমান পাসওয়ার্ড লিখুন"
+                                    placeholder="Enter your current password"
                                 />
                                 <button
                                     type="button"
@@ -592,7 +592,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                নতুন পাসওয়ার্ড (কমপক্ষে ৮ অক্ষর)
+                                New Password (minimum 8 characters)
                             </label>
                             <div className="relative">
                                 <input
@@ -601,7 +601,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     className="w-full px-4 py-2.5 pr-11 rounded-xl border border-slate-200 text-sm font-medium focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-hidden transition-all"
-                                    placeholder="নতুন গোপন পাসওয়ার্ড"
+                                    placeholder="Enter a new secure password"
                                 />
                                 <button
                                     type="button"
@@ -615,7 +615,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                নতুন পাসওয়ার্ড নিশ্চিত করুন
+                                Confirm New Password
                             </label>
                             <div className="relative">
                                 <input
@@ -624,7 +624,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                     value={newPasswordConfirm}
                                     onChange={(e) => setNewPasswordConfirm(e.target.value)}
                                     className="w-full px-4 py-2.5 pr-11 rounded-xl border border-slate-200 text-sm font-medium focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-hidden transition-all"
-                                    placeholder="নতুন পাসওয়ার্ডটি পুনরায় লিখুন"
+                                    placeholder="Re-type your new password"
                                 />
                                 <button
                                     type="button"
@@ -643,7 +643,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                 className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-sky-600/20 hover:from-sky-700 hover:to-indigo-700 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60"
                             >
                                 {passwordLoading && <RefreshCw className="w-4 h-4 animate-spin" />}
-                                <span>{passwordLoading ? 'পরিবর্তন হচ্ছে...' : 'পাসওয়ার্ড আপডেট করুন'}</span>
+                                <span>{passwordLoading ? 'Updating...' : 'Update Password'}</span>
                             </button>
                         </div>
                     </form>

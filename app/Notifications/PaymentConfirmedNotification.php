@@ -25,8 +25,8 @@ class PaymentConfirmedNotification extends Notification
 
         return [
             'type' => 'payment_confirmed',
-            'title' => 'পেমেন্ট সফল ও এনরোলমেন্ট নিশ্চিত',
-            'message' => "আপনার {$course->title} কোর্সের পেমেন্ট অনুমোদিত হয়েছে। এখন ক্লাস শুরু করতে পারেন!",
+            'title' => 'Payment Successful & Enrollment Confirmed',
+            'message' => "Your payment for {$course->title} has been confirmed. You can start your classes now!",
             'order_id' => $this->order->id,
             'order_number' => $this->order->order_number,
             'course_id' => $course->id,

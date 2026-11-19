@@ -64,7 +64,7 @@ class AdminCourseController extends Controller
             'discount_deadline' => ['nullable', 'date'],
             'how_to_buy_url' => ['nullable', 'string', 'max:500'],
         ], [
-            'sale_price.lte' => 'অফার মূল্য অবশ্যই রেগুলার মূল্যের সমান বা কম হতে হবে।',
+            'sale_price.lte' => 'Sale price must be less than or equal to regular price.',
         ]);
 
         $slug = ! empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['title']);
@@ -108,7 +108,7 @@ class AdminCourseController extends Controller
         AuditLog::log('course_created', 'Course', $course->id, null, $course->toArray());
 
         return response()->json([
-            'message' => 'কোর্স সফলভাবে তৈরি হয়েছে।',
+            'message' => 'Course created successfully.',
             'course' => $course->load(['instructors', 'categories']),
         ], 201);
     }
@@ -147,7 +147,7 @@ class AdminCourseController extends Controller
             'discount_deadline' => ['nullable', 'date'],
             'how_to_buy_url' => ['nullable', 'string', 'max:500'],
         ], [
-            'sale_price.lte' => 'অফার মূল্য অবশ্যই রেগুলার মূল্যের সমান বা কম হতে হবে।',
+            'sale_price.lte' => 'Sale price must be less than or equal to regular price.',
         ]);
 
         $oldValues = $course->toArray();
@@ -187,7 +187,7 @@ class AdminCourseController extends Controller
         AuditLog::log('course_updated', 'Course', $course->id, $oldValues, $course->toArray());
 
         return response()->json([
-            'message' => 'কোর্স সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'Course updated successfully.',
             'course' => $course->fresh(['instructors', 'categories']),
         ]);
     }
@@ -200,7 +200,7 @@ class AdminCourseController extends Controller
         AuditLog::log('course_trashed', 'Course', $course->id, $oldValues, null);
 
         return response()->json([
-            'message' => 'কোর্সটি ট্র্যাশে সরানো হয়েছে। প্রয়োজনে ট্র্যাশ থেকে পুনরুদ্ধার করা যাবে।',
+            'message' => 'Course moved to trash. You can restore it if needed.',
         ]);
     }
 
@@ -212,7 +212,7 @@ class AdminCourseController extends Controller
         AuditLog::log('course_restored', 'Course', $course->id, null, $course->toArray());
 
         return response()->json([
-            'message' => 'কোর্সটি সফলভাবে পুনরুদ্ধার করা হয়েছে।',
+            'message' => 'Course restored successfully.',
             'course' => $course,
         ]);
     }
@@ -233,7 +233,7 @@ class AdminCourseController extends Controller
         AuditLog::log('course_permanently_deleted', 'Course', $id, $oldValues, null);
 
         return response()->json([
-            'message' => 'কোর্সটি স্থায়ীভাবে মুছে ফেলা হয়েছে।',
+            'message' => 'Course permanently deleted.',
         ]);
     }
 

@@ -36,7 +36,7 @@ apiClient.interceptors.response.use(
 );
 
 export function formatBDT(amount: number): string {
-    return '৳' + Number(amount || 0).toLocaleString('en-US');
+    return 'Tk ' + Number(amount || 0).toLocaleString('en-US');
 }
 
 export function getImageUrl(path?: string | null): string {

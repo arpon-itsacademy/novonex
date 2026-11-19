@@ -23,7 +23,7 @@ class AuthController extends Controller
     public static function parseDeviceName(?string $userAgent): string
     {
         if (empty($userAgent)) {
-            return 'অজানা ডিভাইস (Device)';
+            return 'Unknown Device';
         }
 
         $platform = 'Device';
@@ -119,15 +119,15 @@ class AuthController extends Controller
             $user = User::where('email', strtolower($loginInput))->first();
         } else {
             return response()->json([
-                'message' => 'সঠিক বাংলাদেশি মোবাইল নম্বর অথবা ইমেইল প্রদান করুন।',
-                'errors' => ['phone' => ['সঠিক বাংলাদেশি মোবাইল নম্বর অথবা ইমেইল দিন।']],
+                'message' => 'Please enter a valid mobile number or email.',
+                'errors' => ['phone' => ['Please enter a valid mobile number or email.']],
             ], 422);
         }
 
         if (! $user) {
             return response()->json([
-                'message' => 'মোবাইল নম্বর অথবা পাসওয়ার্ড সঠিক নয়।',
-                'errors' => ['phone' => ['মোবাইল নম্বর অথবা পাসওয়ার্ড সঠিক নয়।']],
+                'message' => 'Invalid mobile number or password.',
+                'errors' => ['phone' => ['Invalid mobile number or password.']],
             ], 401);
         }
 
@@ -145,21 +145,21 @@ class AuthController extends Controller
 
         if (! $passwordMatches) {
             return response()->json([
-                'message' => 'মোবাইল নম্বর অথবা পাসওয়ার্ড সঠিক নয়।',
-                'errors' => ['phone' => ['মোবাইল নম্বর অথবা পাসওয়ার্ড সঠিক নয়।']],
+                'message' => 'Invalid mobile number or password.',
+                'errors' => ['phone' => ['Invalid mobile number or password.']],
             ], 401);
         }
 
         if ($user->status !== User::STATUS_ACTIVE) {
             return response()->json([
-                'message' => 'আপনার অ্যাকাউন্টটি নিষ্ক্রিয় করা আছে। অনুগ্রহ করে অ্যাডমিনের সাথে যোগাযোগ করুন।',
+                'message' => 'Your account is deactivated. Please contact support.',
             ], 403);
         }
 
         $token = self::issueDeviceToken($user, $request);
 
         return response()->json([
-            'message' => 'সফলভাবে লগইন হয়েছে।',
+            'message' => 'Logged in successfully.',
             'token' => $token,
             'user' => [
                 'id' => $user->id,
@@ -188,15 +188,15 @@ class AuthController extends Controller
 
         if (! $normalizedPhone || ! User::isValidPhoneNumber($normalizedPhone)) {
             return response()->json([
-                'message' => 'অনুগ্রহ করে সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন।',
-                'errors' => ['phone' => ['সঠিক বাংলাদেশি মোবাইল নম্বর প্রদান করুন।']],
+                'message' => 'Please provide a valid 11-digit Bangladeshi mobile number.',
+                'errors' => ['phone' => ['Please provide a valid Bangladeshi mobile number.']],
             ], 422);
         }
 
         if (User::where('phone', $normalizedPhone)->exists()) {
             return response()->json([
-                'message' => 'এই মোবাইল নম্বরটি ইতিমধ্যে নিবন্ধিত রয়েছে।',
-                'errors' => ['phone' => ['এই মোবাইল নম্বরটি ইতিমধ্যে ব্যবহার করা হয়েছে।']],
+                'message' => 'This mobile number is already registered.',
+                'errors' => ['phone' => ['This mobile number is already in use.']],
             ], 422);
         }
 
@@ -223,11 +223,11 @@ class AuthController extends Controller
                 ]
             );
 
-            $smsMessage = "NovoNex-এ আপনার OTP কোড হল: {$otpCode}। এটি {$smsSettings->otp_expiration_minutes} মিনিট কার্যকর থাকবে।";
+            $smsMessage = "Your NovoNex OTP code is: {$otpCode}. Valid for {$smsSettings->otp_expiration_minutes} minutes.";
             $smsService->sendSms($normalizedPhone, $smsMessage);
 
             return response()->json([
-                'message' => 'আপনার ফোনে ৬ ডিজিটের একটি ওটিপি কোড পাঠানো হয়েছে। নম্বর যাচাই করার পর অ্যাকাউন্ট চালু হবে।',
+                'message' => 'A 6-digit OTP has been sent to your phone. Account will be activated upon verification.',
                 'requires_otp' => true,
                 'phone' => $normalizedPhone,
             ]);
@@ -245,7 +245,7 @@ class AuthController extends Controller
         $token = self::issueDeviceToken($user, $request);
 
         return response()->json([
-            'message' => 'রেজিস্ট্রেশন সফলভাবে সম্পন্ন হয়েছে।',
+            'message' => 'Registration completed successfully.',
             'token' => $token,
             'user' => [
                 'id' => $user->id,
@@ -285,7 +285,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()?->delete();
 
         return response()->json([
-            'message' => 'সফলভাবে লগআউট করা হয়েছে।',
+            'message' => 'Logged out successfully.',
         ]);
     }
 
@@ -302,7 +302,7 @@ class AuthController extends Controller
 
         if (! $normalizedPhone) {
             return response()->json([
-                'message' => 'সঠিক বাংলাদেশি মোবাইল নম্বর প্রদান করুন।',
+                'message' => 'Please provide a valid Bangladeshi mobile number.',
             ], 422);
         }
 
@@ -310,7 +310,7 @@ class AuthController extends Controller
 
         if (! $user) {
             return response()->json([
-                'message' => 'এই মোবাইল নম্বরের সাথে নিবন্ধিত কোনো অ্যাকাউন্ট পাওয়া যায়নি।',
+                'message' => 'No account found registered with this mobile number.',
             ], 404);
         }
 
@@ -318,7 +318,7 @@ class AuthController extends Controller
         if ($lastOtp && $lastOtp->created_at->addSeconds(60)->isFuture()) {
             $secondsRemaining = now()->diffInSeconds($lastOtp->created_at->addSeconds(60));
             return response()->json([
-                'message' => "পুনরায় ওটিপি পাঠাতে {$secondsRemaining} সেকেন্ড অপেক্ষা করুন।",
+                'message' => "Please wait {$secondsRemaining} seconds before requesting a new OTP.",
                 'seconds_remaining' => $secondsRemaining,
             ], 429);
         }
@@ -338,11 +338,11 @@ class AuthController extends Controller
             ],
         ]);
 
-        $smsMessage = "NovoNex-এ আপনার পাসওয়ার্ড রিসেট OTP কোড হল: {$otpCode}। এটি ১০ মিনিট কার্যকর থাকবে।";
+        $smsMessage = "Your NovoNex password reset OTP is: {$otpCode}. Valid for 10 minutes.";
         $smsService->sendSms($normalizedPhone, $smsMessage);
 
         return response()->json([
-            'message' => 'আপনার মোবাইল নম্বরে ৬ ডিজিটের একটি ওটিপি কোড পাঠানো হয়েছে।',
+            'message' => 'A 6-digit OTP code has been sent to your mobile number.',
             'phone' => $normalizedPhone,
         ]);
     }
@@ -366,26 +366,26 @@ class AuthController extends Controller
 
         if (! $verification) {
             return response()->json([
-                'message' => 'কোনো ওটিপি অনুরোধ পাওয়া যায়নি। নতুন ওটিপি পাঠান।',
+                'message' => 'No OTP request found. Please request a new OTP.',
             ], 404);
         }
 
         if ($verification->expires_at->isPast()) {
             return response()->json([
-                'message' => 'ওটিপি কোডের মেয়াদ শেষ হয়ে গেছে। নতুন ওটিপি পাঠান।',
+                'message' => 'OTP code has expired. Please request a new OTP.',
             ], 422);
         }
 
         if ($verification->attempts >= 5) {
             return response()->json([
-                'message' => 'সর্বোচ্চ সংখ্যক ভুল চেষ্টার সীমা অতিক্রম হয়েছে। নতুন ওটিপি পাঠান।',
+                'message' => 'Maximum attempt limit exceeded. Please request a new OTP.',
             ], 429);
         }
 
         if (! Hash::check($validated['otp'], $verification->otp_hash)) {
             $verification->increment('attempts');
             return response()->json([
-                'message' => 'ভুল ওটিপি কোড। অনুগ্রহ করে সঠিক কোড দিন।',
+                'message' => 'Incorrect OTP code. Please enter the valid code.',
                 'remaining_attempts' => max(0, 5 - $verification->attempts),
             ], 422);
         }
@@ -393,7 +393,7 @@ class AuthController extends Controller
         $verification->update(['verified_at' => now()]);
 
         return response()->json([
-            'message' => 'ওটিপি সফলভাবে যাচাই হয়েছে। এবার আপনার নতুন পাসওয়ার্ড সেট করুন।',
+            'message' => 'OTP verified successfully. Now set your new password.',
             'verified' => true,
         ]);
     }
@@ -420,7 +420,7 @@ class AuthController extends Controller
 
         if (! $verification) {
             return response()->json([
-                'message' => 'যাচাইকরণের মেয়াদ শেষ হয়ে গেছে। অনুগ্রহ করে পুনরায় ওটিপি দিয়ে শুরু করুন।',
+                'message' => 'Verification session expired. Please restart with a new OTP.',
             ], 422);
         }
 
@@ -433,7 +433,7 @@ class AuthController extends Controller
         $token = self::issueDeviceToken($user, $request);
 
         return response()->json([
-            'message' => 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে। স্বাগতম!',
+            'message' => 'Password reset successfully. Welcome back!',
             'token' => $token,
             'user' => [
                 'id' => $user->id,
@@ -491,7 +491,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'message' => 'ডিভাইসটি সফলভাবে লগআউট করা হয়েছে।',
+            'message' => 'Device logged out successfully.',
         ]);
     }
 
@@ -506,7 +506,7 @@ class AuthController extends Controller
         $user->tokens()->where('id', '!=', $currentTokenId)->delete();
 
         return response()->json([
-            'message' => 'অন্যান্য সকল ডিভাইস থেকে সফলভাবে লগআউট সম্পন্ন হয়েছে।',
+            'message' => 'Logged out from all other devices successfully.',
         ]);
     }
 
@@ -528,7 +528,7 @@ class AuthController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'প্রোফাইল তথ্য সফলভাবে আপডেট হয়েছে।',
+            'message' => 'Profile information updated successfully.',
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -555,8 +555,8 @@ class AuthController extends Controller
 
         if (! Hash::check($validated['current_password'], $user->password)) {
             return response()->json([
-                'message' => 'বর্তমান পাসওয়ার্ডটি সঠিক নয়।',
-                'errors' => ['current_password' => ['বর্তমান পাসওয়ার্ড সঠিক নয়।']],
+                'message' => 'Current password is incorrect.',
+                'errors' => ['current_password' => ['Current password is incorrect.']],
             ], 422);
         }
 
@@ -565,7 +565,7 @@ class AuthController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।',
+            'message' => 'Password changed successfully.',
         ]);
     }
 }

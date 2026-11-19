@@ -29,19 +29,19 @@ class OtpController extends Controller
 
         if (! $verification) {
             return response()->json([
-                'message' => 'কোনো সক্রিয় ওটিপি অনুরোধ পাওয়া যায়নি। নতুন ওটিপি পাঠান।',
+                'message' => 'No active OTP request found. Please request a new OTP.',
             ], 404);
         }
 
         if ($verification->expires_at->isPast()) {
             return response()->json([
-                'message' => 'ওটিপি কোডের মেয়াদ শেষ হয়ে গেছে। অনুগ্রহ করে নতুন ওটিপি পাঠান।',
+                'message' => 'OTP code has expired. Please request a new OTP.',
             ], 422);
         }
 
         if ($verification->attempts >= 5) {
             return response()->json([
-                'message' => 'সর্বোচ্চ সংখ্যক ভুল চেষ্টার সীমা অতিক্রম হয়েছে। নতুন ওটিপি পাঠান।',
+                'message' => 'Maximum attempt limit exceeded. Please request a new OTP.',
             ], 429);
         }
 
@@ -49,7 +49,7 @@ class OtpController extends Controller
             $verification->increment('attempts');
 
             return response()->json([
-                'message' => 'ভুল ওটিপি কোড। অনুগ্রহ করে সঠিক কোড দিন।',
+                'message' => 'Incorrect OTP code. Please enter the valid code.',
                 'remaining_attempts' => max(0, 5 - $verification->attempts),
             ], 422);
         }
@@ -66,7 +66,7 @@ class OtpController extends Controller
             // Prevent collision if email was registered concurrently
             if (User::where('email', $payload['email'])->exists()) {
                 return response()->json([
-                    'message' => 'এই ইমেইল ঠিকানাটি ইতিমধ্যে অন্য অ্যাকাউন্টে নিবন্ধিত হয়েছে।',
+                    'message' => 'This email address is already registered.',
                 ], 422);
             }
 
@@ -92,7 +92,7 @@ class OtpController extends Controller
             $token = AuthController::issueDeviceToken($user, $request);
 
             return response()->json([
-                'message' => 'ওটিপি সফলভাবে যাচাই হয়েছে এবং অ্যাকাউন্ট সক্রিয় হয়েছে।',
+                'message' => 'OTP verified successfully and account activated.',
                 'token' => $token,
                 'user' => [
                     'id' => $user->id,
@@ -107,7 +107,7 @@ class OtpController extends Controller
         }
 
         return response()->json([
-            'message' => 'ওটিপি সফলভাবে যাচাই হয়েছে।',
+            'message' => 'OTP verified successfully.',
         ]);
     }
 
@@ -126,7 +126,7 @@ class OtpController extends Controller
             $secondsRemaining = now()->diffInSeconds($lastOtp->created_at->addSeconds($smsSettings->otp_resend_cooldown_seconds));
 
             return response()->json([
-                'message' => "পুনরায় ওটিপি পাঠাতে {$secondsRemaining} সেকেন্ড অপেক্ষা করুন।",
+                'message' => "Please wait {$secondsRemaining} seconds before requesting a new OTP.",
                 'seconds_remaining' => $secondsRemaining,
             ], 429);
         }
@@ -146,11 +146,11 @@ class OtpController extends Controller
             'payload' => $existingPayload,
         ]);
 
-        $smsMessage = "Novonex Academy-তে আপনার নতুন OTP কোড হল: {$otpCode}। এটি {$smsSettings->otp_expiration_minutes} মিনিট কার্যকর থাকবে।";
+        $smsMessage = "Your new NovoNex OTP is: {$otpCode}. Valid for {$smsSettings->otp_expiration_minutes} minutes.";
         $smsService->sendSms($normalizedPhone, $smsMessage);
 
         return response()->json([
-            'message' => 'নতুন ওটিপি কোড পাঠানো হয়েছে।',
+            'message' => 'New OTP code sent successfully.',
         ]);
     }
 }

@@ -285,7 +285,7 @@ export const AdminBundleFormPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1.5">Regular Price (৳ BDT) *</label>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">Regular Price (Tk BDT) *</label>
                             <input
                                 type="number"
                                 min={0}
@@ -302,7 +302,7 @@ export const AdminBundleFormPage: React.FC = () => {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1.5">Bundle Sale Price (৳ BDT) *</label>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">Bundle Sale Price (Tk BDT) *</label>
                             <input
                                 type="number"
                                 min={0}

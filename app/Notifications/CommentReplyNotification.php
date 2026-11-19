@@ -27,8 +27,8 @@ class CommentReplyNotification extends Notification
 
         return [
             'type' => 'comment_reply',
-            'title' => 'প্রশ্নের উত্তর পেয়েছেন',
-            'message' => "শিক্ষক {$teacher->name} আপনার '{$lesson->title}' ক্লাসের প্রশ্নের উত্তর দিয়েছেন।",
+            'title' => 'New Reply to Question',
+            'message' => "Instructor {$teacher->name} replied to your question in '{$lesson->title}'.",
             'reply_id' => $this->reply->id,
             'lesson_id' => $lesson->id,
             'course_id' => $course->id,

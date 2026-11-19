@@ -448,9 +448,9 @@ export const AdminFooterBuilderPage: React.FC = () => {
                             {/* Logo Status & Preview */}
                             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div>
-                                    <span className="text-xs font-bold text-slate-800 block">ওয়েবসাইট লোগো (Website Logo)</span>
+                                    <span className="text-xs font-bold text-slate-800 block">Website Logo</span>
                                     <span className="text-[11px] text-slate-500 block">
-                                        ফুটার স্বয়ংক্রিয়ভাবে আপনার সাইটের মূল লোগো (Appearance &gt; General Settings থেকে) প্রদর্শন করে।
+                                        The footer automatically displays your main website logo (configured in Appearance &gt; General Settings).
                                     </span>
                                 </div>
                                 {logoUrl ? (

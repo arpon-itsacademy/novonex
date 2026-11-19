@@ -429,8 +429,8 @@ export const AiQuestionGeneratorModal: React.FC<AiQuestionGeneratorModalProps> =
                                         {
                                             key: 'bn',
                                             flag: '🇧🇩',
-                                            label: 'Bengali (বাংলা)',
-                                            desc: 'Questions, choices & explanations strictly in Bengali (বাংলা).',
+                                            label: 'Bengali',
+                                            desc: 'Questions, choices & explanations strictly in Bengali.',
                                         },
                                         {
                                             key: 'en',
@@ -441,8 +441,8 @@ export const AiQuestionGeneratorModal: React.FC<AiQuestionGeneratorModalProps> =
                                         {
                                             key: 'mixed',
                                             flag: '🌐',
-                                            label: 'Bilingual (বাংলা + English)',
-                                            desc: 'Bangla phrasing with standard English terms and formulas.',
+                                            label: 'Bilingual (Bengali + English)',
+                                            desc: 'Bengali phrasing with standard English terms and formulas.',
                                         },
                                     ].map(item => {
                                         const isSelected = language === item.key;

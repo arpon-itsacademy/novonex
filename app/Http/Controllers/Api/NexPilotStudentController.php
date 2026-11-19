@@ -36,7 +36,7 @@ class NexPilotStudentController extends Controller
         if (!$pilot) {
             return response()->json([
                 'has_access' => false,
-                'message' => 'এই কোর্সের জন্য বর্তমানে কোনো সক্রিয় NexPilot প্রস্তুত নেই। শীঘ্রই যুক্ত হবে।',
+                'message' => 'No active NexPilot available for this course yet. Coming soon.',
             ], 404);
         }
 
@@ -55,7 +55,7 @@ class NexPilotStudentController extends Controller
         if (!$hasAccess) {
             return response()->json([
                 'has_access' => false,
-                'message' => 'এই কোর্সের জন্য NexPilot AI আনলক করা নেই। কোর্স ড্যাশবোর্ড থেকে আনলক করুন।',
+                'message' => 'NexPilot AI is locked for this course. Please unlock it from course dashboard.',
             ], 403);
         }
 
@@ -145,7 +145,7 @@ class NexPilotStudentController extends Controller
         );
 
         if (!$hasAccess) {
-            return response()->json(['message' => 'অ্যাক্সেস অনুমোদিত নয়।'], 403);
+            return response()->json(['message' => 'Access denied.'], 403);
         }
 
         $messages = NexPilotChatMessage::where('user_id', $user->id)
@@ -192,7 +192,7 @@ class NexPilotStudentController extends Controller
         );
 
         if (!$hasAccess) {
-            return response()->json(['message' => 'অ্যাক্সেস অনুমোদিত নয়।'], 403);
+            return response()->json(['message' => 'Access denied.'], 403);
         }
 
         // Check student usage & dollar limit
@@ -214,7 +214,7 @@ class NexPilotStudentController extends Controller
         if (!$user->isAdmin() && (float) $usage->total_usd_spent >= $maxLimit) {
             $usage->update(['is_blocked' => true]);
             return response()->json([
-                'message' => "আপনার নির্ধারিত NexPilot ব্যালেন্স (\${$maxLimit}) শেষ হয়ে গেছে। অনুগ্রহ করে সাপোর্টে যোগাযোগ করুন।",
+                'message' => "Your allocated NexPilot balance (\${$maxLimit}) has expired. Please contact support.",
                 'is_limit_reached' => true,
             ], 403);
         }
@@ -223,7 +223,7 @@ class NexPilotStudentController extends Controller
         $apiKey = $pilot->getEffectiveApiKey();
         if (empty($apiKey)) {
             return response()->json([
-                'message' => 'সিস্টেমে OpenAI API Key কনফিগার করা নেই। অনুগ্রহ করে অ্যাডমিনের সাথে যোগাযোগ করুন।',
+                'message' => 'OpenAI API Key is not configured. Please contact support.',
             ], 500);
         }
 
@@ -323,15 +323,15 @@ class NexPilotStudentController extends Controller
             ]);
 
             if (!$response->successful()) {
-                $errorMsg = $response->json('error.message') ?? 'OpenAI API ত্রুটি (Status ' . $response->status() . ')';
+                $errorMsg = $response->json('error.message') ?? 'OpenAI API error (Status ' . $response->status() . ')';
                 Log::error('OpenAI NexPilot Error: ' . $errorMsg, ['response' => $response->body()]);
                 return response()->json([
-                    'message' => 'AI মডেলের সাথে সংযোগে সমস্যা হয়েছে: ' . $errorMsg,
+                    'message' => 'Error connecting to AI model: ' . $errorMsg,
                 ], 502);
             }
 
             $respData = $response->json();
-            $assistantReply = $respData['choices'][0]['message']['content'] ?? 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।';
+            $assistantReply = $respData['choices'][0]['message']['content'] ?? 'Sorry, no answer could be generated.';
             $usageData = $respData['usage'] ?? [];
             $promptTokens = (int) ($usageData['prompt_tokens'] ?? 0);
             $completionTokens = (int) ($usageData['completion_tokens'] ?? 0);
@@ -406,7 +406,7 @@ class NexPilotStudentController extends Controller
         } catch (\Throwable $e) {
             Log::error('NexPilot sendMessage Exception: ' . $e->getMessage());
             return response()->json([
-                'message' => 'সার্ভার প্রক্রিয়াকরণে সমস্যা হয়েছে: ' . $e->getMessage(),
+                'message' => 'Server processing error: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -427,7 +427,7 @@ class NexPilotStudentController extends Controller
 
         if (!$enrollment) {
             return response()->json([
-                'message' => 'আপনাকে প্রথমে এই কোর্সে এনরোল করতে হবে।',
+                'message' => 'You must enroll in this course first.',
             ], 422);
         }
 
@@ -441,7 +441,7 @@ class NexPilotStudentController extends Controller
             return response()->json([
                 'success' => true,
                 'is_free' => true,
-                'message' => 'NexPilot AI সফলভাবে আপনার কোর্সে সক্রিয় করা হয়েছে!',
+                'message' => 'NexPilot AI activated for your course successfully!',
                 'redirect_url' => "/student/courses/{$course->id}/nexpilot",
             ]);
         }
@@ -455,7 +455,7 @@ class NexPilotStudentController extends Controller
 
         if (Payment::where('transaction_ref', $validated['transaction_ref'])->exists()) {
             return response()->json([
-                'message' => 'এই ট্রানজেকশন আইডিটি ইতিমধ্যে ব্যবহৃত হয়েছে।',
+                'message' => 'This transaction ID has already been used.',
             ], 422);
         }
 
@@ -487,7 +487,7 @@ class NexPilotStudentController extends Controller
         return response()->json([
             'success' => true,
             'requires_approval' => true,
-            'message' => 'NexPilot পেমেন্ট সাবমিট হয়েছে। অ্যাডমিন পেমেন্ট যাচাই করলে স্বয়ংক্রিয়ভাবে সক্রিয় হবে।',
+            'message' => 'NexPilot payment submitted. It will activate once approved.',
         ]);
     }
 }

@@ -27,8 +27,8 @@ class NewLessonCommentNotification extends Notification
 
         return [
             'type' => 'lesson_comment',
-            'title' => 'নতুন প্রশ্ন/মন্তব্য',
-            'message' => "{$student->name} {$course->title} কোর্সের '{$lesson->title}' ক্লাসে একটি প্রশ্ন করেছেন।",
+            'title' => 'New Question / Comment',
+            'message' => "{$student->name} asked a question in '{$lesson->title}' of {$course->title}.",
             'comment_id' => $this->comment->id,
             'lesson_id' => $lesson->id,
             'course_id' => $course->id,

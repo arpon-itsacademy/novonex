@@ -258,7 +258,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
     };
 
     const handleDeleteCoupon = async (coupon: CouponItem) => {
-        if (!window.confirm(`আপনি কি কুপন "${coupon.code}" ট্র্যাশে পাঠাতে চান? পরবর্তীতে ট্র্যাশ থেকে এটি যেকোনো সময় পুনরুদ্ধার করা যাবে।`)) return;
+        if (!window.confirm(`Are you sure you want to move coupon "${coupon.code}" to trash? You can restore it from trash anytime.`)) return;
 
         try {
             await apiClient.delete(`/admin/coupons/${coupon.id}`);
@@ -283,14 +283,14 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                 total_coupons: prev.total_coupons + 1,
                 trashed_coupons: Math.max(0, (prev.trashed_coupons || 1) - 1),
             }));
-            alert(`কুপন "${coupon.code}" সফলভাবে পুনরুদ্ধার করা হয়েছে!`);
+            alert(`Coupon "${coupon.code}" restored successfully!`);
         } catch (err) {
             alert('Failed to restore coupon.');
         }
     };
 
     const handleForceDeleteCoupon = async (coupon: CouponItem) => {
-        if (!window.confirm(`সতর্কতা: আপনি কি নিশ্চিতভাবে কুপন "${coupon.code}" স্থায়ীভাবে মুছে ফেলতে চান? এটি আর কখনোই পুনরুদ্ধার করা যাবে না!`)) return;
+        if (!window.confirm(`Warning: Are you sure you want to permanently delete coupon "${coupon.code}"? This action cannot be undone!`)) return;
 
         try {
             await apiClient.delete(`/admin/coupons/${coupon.id}/force-delete`);
@@ -491,7 +491,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                         Discount Coupons
                     </h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                        Create flat (৳) or percentage (%) discount coupons for all courses, specific courses/categories, or target specific individual students by phone number.
+                        Create flat (Tk) or percentage (%) discount coupons for all courses, specific courses/categories, or target specific individual students by phone number.
                     </p>
                 </div>
 
@@ -567,7 +567,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                         className="px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500"
                     >
                         <option value="">All Types</option>
-                        <option value="fixed">Flat Discount (৳)</option>
+                        <option value="fixed">Flat Discount (Tk)</option>
                         <option value="percentage">Percentage (%)</option>
                     </select>
 
@@ -599,11 +599,11 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                 : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
                         }`}
                     >
-                        <option value="">All Status (সকল সক্রিয়)</option>
+                        <option value="">All Statuses</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                         <option value="expired">Expired</option>
-                        <option value="trashed">🗑️ ট্র্যাশ / Trash ({stats.trashed_coupons || 0})</option>
+                        <option value="trashed">🗑️ Trash ({stats.trashed_coupons || 0})</option>
                     </select>
 
                     <button
@@ -617,10 +617,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                 ? 'bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-200'
                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
                         }`}
-                        title="Trash / রিসাইকেল বিন"
+                        title="Trash / Recycle Bin"
                     >
                         <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                        <span>{statusFilter === 'trashed' ? 'সব কুপনে ফিরুন' : `ট্র্যাশ (${stats.trashed_coupons || 0})`}</span>
+                        <span>{statusFilter === 'trashed' ? 'Back to All Coupons' : `Trash (${stats.trashed_coupons || 0})`}</span>
                     </button>
 
                     <button
@@ -641,7 +641,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                     <div className="flex items-center gap-2">
                         <Trash2 className="w-4 h-4 text-rose-600 shrink-0" />
                         <span className="font-semibold">
-                            ট্র্যাশ মোড (Trash Bin): এখানে মুছে ফেলা কুপন সংরক্ষিত রয়েছে। আপনি কুপন পুনরুদ্ধার (Restore) করতে পারেন অথবা ডাটাবেজ থেকে স্থায়ীভাবে মুছে ফেলতে পারেন।
+                            Trash Mode: Previously deleted coupons are stored here. You can restore them or permanently delete them from the database.
                         </span>
                     </div>
                 </div>
@@ -852,18 +852,18 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                         <button
                                                             onClick={() => handleRestoreCoupon(coupon)}
                                                             className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-lg transition-colors cursor-pointer"
-                                                            title="পুনরুদ্ধার করুন (Restore)"
+                                                            title="Restore"
                                                         >
                                                             <RotateCcw className="w-3.5 h-3.5" />
-                                                            <span>পুনরুদ্ধার</span>
+                                                            <span>Restore</span>
                                                         </button>
                                                         <button
                                                             onClick={() => handleForceDeleteCoupon(coupon)}
                                                             className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300 rounded-lg transition-colors cursor-pointer"
-                                                            title="স্থায়ীভাবে মুছুন (Permanent Delete)"
+                                                            title="Permanent Delete"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
-                                                            <span>স্থায়ী মুছুন</span>
+                                                            <span>Delete Forever</span>
                                                         </button>
                                                     </>
                                                 ) : (
@@ -967,14 +967,14 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                         onChange={(e) => setFormData(prev => ({ ...prev, discount_type: e.target.value as 'fixed' | 'percentage' }))}
                                         className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500 dark:text-white cursor-pointer"
                                     >
-                                        <option value="fixed">Flat Discount (Fixed ৳)</option>
+                                        <option value="fixed">Flat Discount (Fixed Tk)</option>
                                         <option value="percentage">Percentage Discount (%)</option>
                                     </select>
                                 </div>
 
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
-                                        {formData.discount_type === 'percentage' ? 'Discount Percentage (%)' : 'Discount Amount (৳)'} <span className="text-rose-500">*</span>
+                                        {formData.discount_type === 'percentage' ? 'Discount Percentage (%)' : 'Discount Amount (Tk)'} <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         type="number"
@@ -993,7 +993,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                             {/* Default settings banner */}
                             <div className="flex items-center gap-2 p-2.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 text-indigo-800 dark:text-indigo-300 text-xs">
                                 <CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0" />
-                                <span>এই কুপনটি স্বয়ংক্রিয়ভাবে সব কোর্সের জন্য প্রযোজ্য এবং ব্যবহারের কোনো সীমা থাকবে না (আনলিমিটেড)।</span>
+                                <span>This coupon automatically applies to all courses and has unlimited usage limit.</span>
                             </div>
 
                             {/* 3. Advance Toggle Button */}
@@ -1005,10 +1005,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                 >
                                     <span className="flex items-center gap-2">
                                         <Sliders className="w-4 h-4 text-indigo-600" />
-                                        <span>Advance (অ্যাডভান্সড অপশন)</span>
+                                        <span>Advanced Options</span>
                                     </span>
                                     <div className="flex items-center gap-1.5 text-slate-400 text-xs font-normal">
-                                        <span>{showAdvanced ? 'হাইড করুন' : 'ক্লিক করে বাকি কাজ করুন'}</span>
+                                        <span>{showAdvanced ? 'Hide' : 'Click to configure'}</span>
                                         {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                     </div>
                                 </button>
@@ -1021,7 +1021,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                     {formData.discount_type === 'percentage' && (
                                         <div>
                                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-                                                সর্বোচ্চ ছাড়ের সীমা / Max Discount Cap (৳)
+                                                Max Discount Cap (Tk)
                                             </label>
                                             <input
                                                 type="number"
@@ -1029,7 +1029,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                 min="0"
                                                 value={formData.max_discount_amount}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, max_discount_amount: e.target.value }))}
-                                                placeholder="ফাঁকা রাখলে আনলিমিটেড (Unlimited)"
+                                                placeholder="Leave empty for Unlimited"
                                                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
                                             />
                                         </div>
@@ -1037,7 +1037,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
 
                                     <div>
                                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-                                            ন্যূনতম কোর্সের মূল্য / Min Course Price (৳)
+                                            Min Course Price (Tk)
                                         </label>
                                         <input
                                             type="number"
@@ -1045,10 +1045,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                             min="0"
                                             value={formData.min_order_amount}
                                             onChange={(e) => setFormData(prev => ({ ...prev, min_order_amount: e.target.value }))}
-                                            placeholder="ফাঁকা রাখলে কোনো ন্যূনতম মূল্য প্রযোজ্য নয় (No Minimum Limit)"
+                                            placeholder="Leave empty for No Minimum Limit"
                                             className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white transition-all shadow-sm"
                                         />
-                                        <p className="text-[11px] text-slate-400 mt-1">কোর্স বা কার্টের মোট মূল্য এই টাকার সমান বা বেশি হলে তবেই কুপনটি প্রযোজ্য হবে।</p>
+                                        <p className="text-[11px] text-slate-400 mt-1">Coupon is applicable only if order total is equal or greater than this amount.</p>
                                     </div>
 
                                     {/* Scope: Open vs Course vs Category */}
@@ -1098,10 +1098,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                 <div className="flex items-center justify-between">
                                                     <label className="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                                         <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
-                                                        <span>কোর্স নির্বাচন করুন (Select Courses):</span>
+                                                        <span>Select Courses:</span>
                                                     </label>
                                                     <span className="text-[11px] text-slate-400">
-                                                        {formData.course_ids.length > 0 ? `${formData.course_ids.length}টি নির্বাচিত` : 'কোনোটি নির্বাচিত নয়'}
+                                                        {formData.course_ids.length > 0 ? `${formData.course_ids.length} selected` : 'None selected'}
                                                     </span>
                                                 </div>
 
@@ -1109,7 +1109,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                 {selectedCoursesList.length > 0 && (
                                                     <div className="flex flex-wrap items-center gap-1.5 p-2 bg-indigo-50/70 dark:bg-indigo-950/40 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
                                                         <span className="text-[10px] font-bold text-indigo-800 dark:text-indigo-300 mr-1">
-                                                            নির্বাচিত:
+                                                            Selected:
                                                         </span>
                                                         {selectedCoursesList.map(c => (
                                                             <span
@@ -1121,7 +1121,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                                     type="button"
                                                                     onClick={() => setFormData(prev => ({ ...prev, course_ids: prev.course_ids.filter(id => id !== c.id) }))}
                                                                     className="text-slate-400 hover:text-rose-600 rounded p-0.5 transition-colors cursor-pointer"
-                                                                    title="মুছে ফেলুন"
+                                                                    title="Remove"
                                                                 >
                                                                     <X className="w-3 h-3" />
                                                                 </button>
@@ -1132,7 +1132,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                             onClick={() => setFormData(prev => ({ ...prev, course_ids: [] }))}
                                                             className="text-[10px] text-rose-500 hover:underline ml-auto cursor-pointer"
                                                         >
-                                                            সব মুছুন
+                                                            Clear All
                                                         </button>
                                                     </div>
                                                 )}
@@ -1144,7 +1144,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                         type="text"
                                                         value={courseSearchTerm}
                                                         onChange={(e) => setCourseSearchTerm(e.target.value)}
-                                                        placeholder="কোর্সের নাম লিখে সার্চ করুন (যেমনঃ Physics, HSC, Math...)"
+                                                        placeholder="Search course by title (e.g. Physics, HSC, Math...)"
                                                         className="w-full pl-9 pr-8 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
                                                     />
                                                     {courseSearchTerm && (
@@ -1194,7 +1194,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                         })
                                                     ) : (
                                                         <div className="text-center py-4 text-xs text-slate-400">
-                                                            "{courseSearchTerm}" দিয়ে কোনো কোর্স পাওয়া যায়নি
+                                                            No courses found matching "{courseSearchTerm}"
                                                         </div>
                                                     )}
                                                 </div>
@@ -1207,10 +1207,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                 <div className="flex items-center justify-between">
                                                     <label className="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                                         <FolderKanban className="w-3.5 h-3.5 text-indigo-600" />
-                                                        <span>ক্যাটেগরি নির্বাচন করুন (Select Categories):</span>
+                                                        <span>Select Categories:</span>
                                                     </label>
                                                     <span className="text-[11px] text-slate-400">
-                                                        {formData.category_ids.length > 0 ? `${formData.category_ids.length}টি নির্বাচিত` : 'কোনোটি নির্বাচিত নয়'}
+                                                        {formData.category_ids.length > 0 ? `${formData.category_ids.length} selected` : 'None selected'}
                                                     </span>
                                                 </div>
 
@@ -1218,7 +1218,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                 {selectedCategoriesList.length > 0 && (
                                                     <div className="flex flex-wrap items-center gap-1.5 p-2 bg-amber-50/70 dark:bg-amber-950/40 rounded-xl border border-amber-100 dark:border-amber-900/50">
                                                         <span className="text-[10px] font-bold text-amber-800 dark:text-amber-300 mr-1">
-                                                            নির্বাচিত:
+                                                            Selected:
                                                         </span>
                                                         {selectedCategoriesList.map(cat => (
                                                             <span
@@ -1230,7 +1230,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                                     type="button"
                                                                     onClick={() => setFormData(prev => ({ ...prev, category_ids: prev.category_ids.filter(id => id !== cat.id) }))}
                                                                     className="text-slate-400 hover:text-rose-600 rounded p-0.5 transition-colors cursor-pointer"
-                                                                    title="মুছে ফেলুন"
+                                                                    title="Remove"
                                                                 >
                                                                     <X className="w-3 h-3" />
                                                                 </button>
@@ -1241,7 +1241,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                             onClick={() => setFormData(prev => ({ ...prev, category_ids: [] }))}
                                                             className="text-[10px] text-rose-500 hover:underline ml-auto cursor-pointer"
                                                         >
-                                                            সব মুছুন
+                                                            Clear All
                                                         </button>
                                                     </div>
                                                 )}
@@ -1253,7 +1253,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                         type="text"
                                                         value={categorySearchTerm}
                                                         onChange={(e) => setCategorySearchTerm(e.target.value)}
-                                                        placeholder="ক্যাটেগরির নাম লিখে সার্চ করুন..."
+                                                        placeholder="Search categories..."
                                                         className="w-full pl-9 pr-8 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
                                                     />
                                                     {categorySearchTerm && (
@@ -1305,7 +1305,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                         })
                                                     ) : (
                                                         <div className="text-center py-4 text-xs text-slate-400">
-                                                            "{categorySearchTerm}" দিয়ে কোনো ক্যাটেগরি পাওয়া যায়নি
+                                                            No categories found matching "{categorySearchTerm}"
                                                         </div>
                                                     )}
                                                 </div>

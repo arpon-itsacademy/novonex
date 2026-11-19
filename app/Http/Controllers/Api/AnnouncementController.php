@@ -164,7 +164,7 @@ class AnnouncementController extends Controller
 
         if ($validated['target_type'] === 'all' && ! $isAdmin) {
             return response()->json([
-                'message' => 'শুধুমাত্র অ্যাডমিন সকল শিক্ষার্থীকে নোটিফিকেশন পাঠাতে পারেন।',
+                'message' => 'Only admins can send notifications to all students.',
             ], 403);
         }
 
@@ -174,14 +174,14 @@ class AnnouncementController extends Controller
 
         if ($validated['target_type'] === 'course') {
             if (empty($validated['target_id'])) {
-                return response()->json(['message' => 'কোর্স নির্বাচন করুন।'], 422);
+                return response()->json(['message' => 'Please select a course.'], 422);
             }
 
             $course = Course::findOrFail($validated['target_id']);
 
             // Teacher permission check
             if (! $isAdmin && ! $course->isAssignedTeacher($user->id)) {
-                return response()->json(['message' => 'আপনি এই কোর্সের শিক্ষক নন।'], 403);
+                return response()->json(['message' => 'You are not an instructor for this course.'], 403);
             }
 
             $targetTitle = $course->title;
@@ -203,7 +203,7 @@ class AnnouncementController extends Controller
                 $bundles = CourseBundle::whereIn('id', $bundleIds)->get();
                 $bundleNames = $bundles->pluck('title')->toArray();
                 if (! empty($bundleNames)) {
-                    $extraBundleInfo = 'যুক্ত বান্ডেল: ' . implode(', ', $bundleNames);
+                    $extraBundleInfo = 'Attached Bundles: ' . implode(', ', $bundleNames);
                 }
 
                 $bundleStudentIds = Order::whereIn('bundle_id', $bundleIds)
@@ -215,7 +215,7 @@ class AnnouncementController extends Controller
             $recipientUserIds = array_values(array_unique(array_merge($directStudentIds, $bundleStudentIds)));
         } elseif ($validated['target_type'] === 'bundle') {
             if (empty($validated['target_id'])) {
-                return response()->json(['message' => 'বান্ডেল নির্বাচন করুন।'], 422);
+                return response()->json(['message' => 'Please select a bundle.'], 422);
             }
 
             $bundle = CourseBundle::findOrFail($validated['target_id']);
@@ -235,7 +235,7 @@ class AnnouncementController extends Controller
                     ->exists();
 
                 if (! $bundleHasTeacherCourse) {
-                    return response()->json(['message' => 'এই বান্ডেলে আপনার কোনো কোর্স অন্তর্ভুক্ত নেই।'], 403);
+                    return response()->json(['message' => 'None of your courses are in this bundle.'], 403);
                 }
             }
 
@@ -261,13 +261,13 @@ class AnnouncementController extends Controller
             $recipientUserIds = array_values(array_unique(array_merge($bundleStudentIds, $courseStudentIds)));
         } else {
             // All students
-            $targetTitle = 'সকল শিক্ষার্থী';
+            $targetTitle = 'All Students';
             $recipientUserIds = User::where('role', User::ROLE_STUDENT)->pluck('id')->toArray();
         }
 
         if (empty($recipientUserIds)) {
             return response()->json([
-                'message' => 'এই সিলেকশনে বর্তমানে কোনো সক্রিয় শিক্ষার্থী খুঁজে পাওয়া যায়নি।',
+                'message' => 'No active students found in this selection.',
             ], 422);
         }
 
@@ -287,7 +287,7 @@ class AnnouncementController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "সফলভাবে মোট {$students->count()} জন শিক্ষার্থীর কাছে নোটিফিকেশন পাঠানো হয়েছে।",
+            'message' => "Notification successfully sent to {$students->count()} students.",
             'recipients_count' => $students->count(),
             'target_title' => $targetTitle,
             'extra_info' => $extraBundleInfo,

@@ -40,7 +40,7 @@
                     <div class="mt-5 flex items-center justify-between">
                         <div>
                             @if ($course->price > 0)
-                                <span class="text-lg font-bold text-indigo-600">৳{{ number_format($course->sale_price ?? $course->price, 0) }}</span>
+                                <span class="text-lg font-bold text-indigo-600">Tk {{ number_format($course->sale_price ?? $course->price, 0) }}</span>
                             @else
                                 <span class="text-lg font-bold text-indigo-600">Free</span>
                             @endif

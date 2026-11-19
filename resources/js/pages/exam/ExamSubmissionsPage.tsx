@@ -157,11 +157,11 @@ export const ExamSubmissionsPage: React.FC = () => {
             setCanvasModalOpen(false);
             setEvaluatingAttachment(null);
             fetchSubmissions();
-            alert('খাতা মূল্যায়ন ও দাগানো সফলভাবে সংরক্ষিত হয়েছে!');
+            alert('Paper evaluation and annotations saved successfully!');
         } catch (err: any) {
             console.error('Failed to upload evaluated attachment', err);
-            const msg = err.response?.data?.message || err.message || 'মূল্যায়িত খাতা আপলোড করতে সমস্যা হয়েছে।';
-            alert(`মূল্যায়িত খাতা সংরক্ষণ করতে সমস্যা হয়েছে: ${msg}`);
+            const msg = err.response?.data?.message || err.message || 'Failed to upload evaluated paper.';
+            alert(`Failed to save evaluated paper: ${msg}`);
         }
     };
 
@@ -644,11 +644,11 @@ export const ExamSubmissionsPage: React.FC = () => {
                                                                                     />
                                                                                     {hasEvaluated && (
                                                                                         <span className="absolute top-1.5 left-1.5 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                                                                            ✓ মূল্যায়িত খাতা
+                                                                                            ✓ Evaluated Paper
                                                                                         </span>
                                                                                     )}
                                                                                     <span className="absolute bottom-1.5 right-1.5 bg-slate-900/80 text-white text-[10px] font-mono px-1.5 py-0.5 rounded">
-                                                                                        পৃষ্ঠা {fIdx + 1}
+                                                                                        Page {fIdx + 1}
                                                                                     </span>
                                                                                 </div>
                                                                             )}
@@ -659,16 +659,16 @@ export const ExamSubmissionsPage: React.FC = () => {
                                                                                         type="button"
                                                                                         onClick={() => handleOpenCanvas(ans, fIdx, file, q)}
                                                                                         className="flex-1 py-1.5 px-2 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-xs transition-all cursor-pointer"
-                                                                                        title="খাতা দাগান / মূল্যায়ন করুন"
+                                                                                        title="Annotate / Evaluate Paper"
                                                                                     >
                                                                                         <Pen className="w-3.5 h-3.5" />
-                                                                                        <span>{hasEvaluated ? 'পুনরায় দাগান' : 'খাতা দাগান'}</span>
+                                                                                        <span>{hasEvaluated ? 'Re-annotate' : 'Annotate Paper'}</span>
                                                                                     </button>
                                                                                     <button
                                                                                         type="button"
                                                                                         onClick={() => setPreviewImage(displayUrl)}
                                                                                         className="p-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
-                                                                                        title="বড় করে দেখুন"
+                                                                                        title="Zoom View"
                                                                                     >
                                                                                         <Eye className="w-4 h-4" />
                                                                                     </button>

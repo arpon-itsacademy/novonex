@@ -172,7 +172,7 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
     const handleHighlight = () => insertAtCursor('<mark>', '</mark>');
     const handleQuote = () => insertAtCursor('<blockquote>', '</blockquote>');
     const handleTable = () => insertAtCursor(
-        '\n<table border="1" cellpadding="6">\n  <thead>\n    <tr>\n      <th>কলাম ১</th>\n      <th>কলাম ২</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>বিবরণ ১</td>\n      <td>বিবরণ ২</td>\n    </tr>\n  </tbody>\n</table>\n'
+        '\n<table border="1" cellpadding="6">\n  <thead>\n    <tr>\n      <th>Column 1</th>\n      <th>Column 2</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>Description 1</td>\n      <td>Description 2</td>\n    </tr>\n  </tbody>\n</table>\n'
     );
     const handleSuperscript = () => insertAtCursor('<sup>', '</sup>');
     const handleSubscript = () => insertAtCursor('<sub>', '</sub>');
@@ -345,7 +345,7 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                                 type="button"
                                 onClick={handleH2}
                                 className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
-                                title="Heading 2 (বড় শিরোনাম)"
+                                title="Heading 2"
                             >
                                 <Heading2 className="w-4 h-4" />
                             </button>
@@ -353,7 +353,7 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                                 type="button"
                                 onClick={handleH3}
                                 className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
-                                title="Heading 3 (উপ-শিরোনাম)"
+                                title="Heading 3"
                             >
                                 <Heading3 className="w-4 h-4" />
                             </button>
@@ -361,7 +361,7 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                                 type="button"
                                 onClick={handleHighlight}
                                 className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-amber-600 dark:text-amber-400"
-                                title="Highlight (হাইলাইট)"
+                                title="Highlight"
                             >
                                 <Highlighter className="w-4 h-4" />
                             </button>
@@ -369,7 +369,7 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                                 type="button"
                                 onClick={handleQuote}
                                 className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
-                                title="Blockquote (উদ্ধৃতি বা বিশেষ তথ্য)"
+                                title="Blockquote"
                             >
                                 <Quote className="w-4 h-4" />
                             </button>
@@ -377,7 +377,7 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                                 type="button"
                                 onClick={handleTable}
                                 className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
-                                title="Table (টেবিল যুক্ত করুন)"
+                                title="Table"
                             >
                                 <Table className="w-4 h-4" />
                             </button>

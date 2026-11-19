@@ -101,7 +101,7 @@ const SearchableCourseSelect: React.FC<{
                                 {selectedCourse.title}
                             </span>
                             <span className="text-[10px] px-2 py-0.5 rounded-md font-mono font-bold bg-sky-50 text-sky-700 shrink-0">
-                                ৳{selectedCourse.price}
+                                Tk {selectedCourse.price}
                             </span>
                         </div>
                     ) : (
@@ -188,7 +188,7 @@ const SearchableCourseSelect: React.FC<{
 
                                         <div className="flex items-center gap-2 shrink-0">
                                             <span className="text-[11px] font-mono font-bold text-slate-500">
-                                                ৳{course.price}
+                                                Tk {course.price}
                                             </span>
                                             {isSelected && <Check className="w-4 h-4 text-sky-600" />}
                                         </div>
@@ -264,7 +264,7 @@ const SearchableBundleSelect: React.FC<{
                                 </span>
                             )}
                             <span className="text-[10px] px-2 py-0.5 rounded-md font-mono font-bold bg-emerald-50 text-emerald-700 shrink-0">
-                                ৳{selectedBundle.sale_price}
+                                Tk {selectedBundle.sale_price}
                             </span>
                         </div>
                     ) : (
@@ -357,7 +357,7 @@ const SearchableBundleSelect: React.FC<{
 
                                         <div className="flex items-center gap-2 shrink-0">
                                             <span className="text-[11px] font-mono font-bold text-emerald-600">
-                                                ৳{bundle.sale_price}
+                                                Tk {bundle.sale_price}
                                             </span>
                                             {isSelected && <Check className="w-4 h-4 text-purple-600" />}
                                         </div>
@@ -609,7 +609,7 @@ export const AdminAutoSmsPushPage: React.FC = () => {
             .replace(/{course_title}/g, 'HSC Physics Mastery')
             .replace(/{bundle_title}/g, 'HSC Science Complete Bundle')
             .replace(/{order_id}/g, 'ORD-10293')
-            .replace(/{amount}/g, '৳2,500.00')
+            .replace(/{amount}/g, 'Tk 2,500.00')
             .replace(/{site_name}/g, 'NovoNex')
             .replace(/{login_url}/g, 'https://nexcourses.com/login');
     };
@@ -977,7 +977,7 @@ export const AdminAutoSmsPushPage: React.FC = () => {
 
                                                 {itemPrice !== undefined && itemPrice !== null && (
                                                     <span className="text-[11px] font-mono font-bold text-slate-500">
-                                                        (৳{itemPrice})
+                                                        (Tk {itemPrice})
                                                     </span>
                                                 )}
                                             </div>

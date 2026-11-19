@@ -84,7 +84,7 @@ export const AdminRolesPage: React.FC = () => {
         } catch (err: any) {
             setAlertMessage({
                 type: 'error',
-                text: err.response?.data?.message || 'রোল লোড করতে সমস্যা হয়েছে।',
+                text: err.response?.data?.message || 'Failed to load roles.',
             });
         } finally {
             setLoading(false);
@@ -138,11 +138,11 @@ export const AdminRolesPage: React.FC = () => {
     const handleSaveRole = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formName.trim()) {
-            setFormError('রোলের নাম প্রদান করুন।');
+            setFormError('Please enter role name.');
             return;
         }
         if (selectedPermissions.length === 0) {
-            setFormError('অন্তত একটি পারমিশন নির্বাচন করুন।');
+            setFormError('Please select at least one permission.');
             return;
         }
 
@@ -159,15 +159,15 @@ export const AdminRolesPage: React.FC = () => {
         try {
             if (editingRole) {
                 const { data } = await apiClient.put(`/admin/roles/${editingRole.id}`, payload);
-                setAlertMessage({ type: 'success', text: data.message || 'রোল আপডেট হয়েছে!' });
+                setAlertMessage({ type: 'success', text: data.message || 'Role updated successfully!' });
             } else {
                 const { data } = await apiClient.post('/admin/roles', payload);
-                setAlertMessage({ type: 'success', text: data.message || 'নতুন রোল তৈরি হয়েছে!' });
+                setAlertMessage({ type: 'success', text: data.message || 'New role created successfully!' });
             }
             setModalOpen(false);
             fetchRoles();
         } catch (err: any) {
-            setFormError(err.response?.data?.message || 'রোল সংরক্ষণ ব্যর্থ হয়েছে।');
+            setFormError(err.response?.data?.message || 'Failed to save role.');
         } finally {
             setSaving(false);
         }
@@ -183,14 +183,14 @@ export const AdminRolesPage: React.FC = () => {
         setDeleting(true);
         try {
             const { data } = await apiClient.delete(`/admin/roles/${roleToDelete.id}`);
-            setAlertMessage({ type: 'success', text: data.message || 'রোল মুছে ফেলা হয়েছে।' });
+            setAlertMessage({ type: 'success', text: data.message || 'Role deleted successfully.' });
             setDeleteModalOpen(false);
             setRoleToDelete(null);
             fetchRoles();
         } catch (err: any) {
             setAlertMessage({
                 type: 'error',
-                text: err.response?.data?.message || 'রোল মুছতে ব্যর্থ হয়েছে।',
+                text: err.response?.data?.message || 'Failed to delete role.',
             });
             setDeleteModalOpen(false);
         } finally {
@@ -218,10 +218,10 @@ export const AdminRolesPage: React.FC = () => {
                         </div>
                         <div>
                             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                                কাস্টম রোল ও পারমিশন কন্ট্রোল
+                                Custom Roles & Permissions
                             </h1>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                প্রতিটি স্টাফ বা মডারেটরের জন্য কাস্টম রোল তৈরি করে নির্দিষ্ট ফিচারের অ্যাক্সেস নির্ধারণ করুন।
+                                Create custom staff and moderator roles with fine-grained access control to specific system modules.
                             </p>
                         </div>
                     </div>
@@ -232,7 +232,7 @@ export const AdminRolesPage: React.FC = () => {
                         type="button"
                         onClick={fetchRoles}
                         className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-sky-600 transition shadow-2xs cursor-pointer"
-                        title="রিফ্রেশ করুন"
+                        title="Refresh"
                     >
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                     </button>
@@ -242,7 +242,7 @@ export const AdminRolesPage: React.FC = () => {
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition shadow-sm shadow-sky-600/30 cursor-pointer"
                     >
                         <Plus className="w-4 h-4" />
-                        <span>নতুন রোল তৈরি করুন</span>
+                        <span>Create New Role</span>
                     </button>
                 </div>
             </div>
@@ -283,7 +283,7 @@ export const AdminRolesPage: React.FC = () => {
                             {roles.length}
                         </span>
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            মোট কাস্টম রোল
+                            Total Custom Roles
                         </span>
                     </div>
                 </div>
@@ -297,7 +297,7 @@ export const AdminRolesPage: React.FC = () => {
                             {roles.reduce((acc, r) => acc + (r.users_count || 0), 0)}
                         </span>
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            নিয়োজিত ইউজার
+                            Assigned Users
                         </span>
                     </div>
                 </div>
@@ -311,7 +311,7 @@ export const AdminRolesPage: React.FC = () => {
                             {allPermissionKeys.length}
                         </span>
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            মোট পারমিশন পয়েন্ট
+                            Permission Nodes
                         </span>
                     </div>
                 </div>
@@ -325,7 +325,7 @@ export const AdminRolesPage: React.FC = () => {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="রোলের নাম বা বিবরণ দিয়ে খুঁজুন..."
+                        placeholder="Search roles by name or description..."
                         className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                     />
                 </div>
@@ -335,7 +335,7 @@ export const AdminRolesPage: React.FC = () => {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-20 text-slate-400 space-y-3">
                     <RefreshCw className="w-8 h-8 animate-spin text-sky-500" />
-                    <p className="text-xs font-semibold">রোলসমূহ লোড হচ্ছে...</p>
+                    <p className="text-xs font-semibold">Loading roles...</p>
                 </div>
             ) : filteredRoles.length === 0 ? (
                 <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-12 text-center space-y-3">
@@ -343,10 +343,10 @@ export const AdminRolesPage: React.FC = () => {
                         <Shield className="w-6 h-6" />
                     </div>
                     <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">
-                        কোনো কাস্টম রোল পাওয়া যায়নি
+                        No custom roles found
                     </h3>
                     <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        আপনার অ্যাকাডেমির বিভিন্ন কাজের জন্য (যেমন: লাইব্রেরিয়ান, কোর্স ম্যানেজার, অ্যাকাউন্ট্যান্ট) নতুন রোল তৈরি করুন।
+                        Create roles for staff members (e.g. Librarian, Course Manager, Accountant) to manage platform operations.
                     </p>
                     <button
                         type="button"
@@ -354,7 +354,7 @@ export const AdminRolesPage: React.FC = () => {
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
                     >
                         <Plus className="w-4 h-4" />
-                        <span>প্রথম রোল তৈরি করুন</span>
+                        <span>Create First Role</span>
                     </button>
                 </div>
             ) : (
@@ -384,7 +384,7 @@ export const AdminRolesPage: React.FC = () => {
 
                                         <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 flex items-center gap-1">
                                             <Users className="w-3 h-3" />
-                                            <span>{role.users_count || 0} জন ইউজার</span>
+                                            <span>{role.users_count || 0} Users</span>
                                         </span>
                                     </div>
 
@@ -398,10 +398,10 @@ export const AdminRolesPage: React.FC = () => {
                                     <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
                                         <div className="flex items-center justify-between text-[11px]">
                                             <span className="font-bold text-slate-600 dark:text-slate-300">
-                                                বরাদ্দকৃত পারমিশন:
+                                                Assigned Permissions:
                                             </span>
                                             <span className="font-extrabold text-sky-600">
-                                                {permCount} টি
+                                                {permCount}
                                             </span>
                                         </div>
                                         <div className="flex flex-wrap gap-1.5 max-h-24 overflow-hidden">
@@ -420,7 +420,7 @@ export const AdminRolesPage: React.FC = () => {
                                             })}
                                             {permCount > 4 && (
                                                 <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-sky-50 dark:bg-sky-950/50 text-sky-600">
-                                                    +{permCount - 4} টি আরও
+                                                    +{permCount - 4} more
                                                 </span>
                                             )}
                                         </div>
@@ -435,7 +435,7 @@ export const AdminRolesPage: React.FC = () => {
                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
                                     >
                                         <Edit2 className="w-3.5 h-3.5 text-sky-500" />
-                                        <span>এডিট</span>
+                                        <span>Edit</span>
                                     </button>
                                     <button
                                         type="button"
@@ -443,7 +443,7 @@ export const AdminRolesPage: React.FC = () => {
                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
-                                        <span>মুছুন</span>
+                                        <span>Delete</span>
                                     </button>
                                 </div>
                             </div>
@@ -464,10 +464,10 @@ export const AdminRolesPage: React.FC = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-extrabold text-slate-900 dark:text-white text-base">
-                                        {editingRole ? `রোল সম্পাদনা: ${editingRole.name}` : 'নতুন কাস্টম রোল তৈরি করুন'}
+                                        {editingRole ? `Edit Role: ${editingRole.name}` : 'Create New Custom Role'}
                                     </h3>
                                     <p className="text-[11px] text-slate-400">
-                                        রোলের নাম এবং অ্যাক্সেসযোগ্য মডিউলের পারমিশন নির্বাচন করুন।
+                                        Configure role name and select accessible module permissions.
                                     </p>
                                 </div>
                             </div>
@@ -493,40 +493,40 @@ export const AdminRolesPage: React.FC = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        রোলের নাম <span className="text-rose-500">*</span>
+                                        Role Name <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         required
                                         value={formName}
                                         onChange={(e) => setFormName(e.target.value)}
-                                        placeholder="যেমন: লাইব্রেরিয়ান, কোর্স ম্যানেজার, হিসাবরক্ষক"
+                                        placeholder="e.g. Librarian, Course Manager, Moderator"
                                         className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        স্লাগ / আইডেন্টিফায়ার (ঐচ্ছিক)
+                                        Slug / Identifier (Optional)
                                     </label>
                                     <input
                                         type="text"
                                         value={formSlug}
                                         onChange={(e) => setFormSlug(e.target.value)}
-                                        placeholder="যেমন: librarian (খালি রাখলে স্বয়ংক্রিয় তৈরি হবে)"
+                                        placeholder="e.g. librarian (auto-generated if left empty)"
                                         className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-800 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                                     />
                                 </div>
 
                                 <div className="sm:col-span-2">
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        রোলের সংক্ষিপ্ত বিবরণ (ঐচ্ছিক)
+                                        Role Description (Optional)
                                     </label>
                                     <input
                                         type="text"
                                         value={formDescription}
                                         onChange={(e) => setFormDescription(e.target.value)}
-                                        placeholder="এই রোলটির দায়িত্ব ও উদ্দেশ্য লিখুন..."
+                                        placeholder="Describe the duties and purpose of this role..."
                                         className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                                     />
                                 </div>
@@ -537,10 +537,10 @@ export const AdminRolesPage: React.FC = () => {
                                 <div className="flex items-center gap-2">
                                     <Lock className="w-4 h-4 text-sky-500" />
                                     <h4 className="font-extrabold text-slate-900 dark:text-white text-sm">
-                                        মডিউলভিত্তিক পারমিশন নির্বাচন করুন
+                                        Select Module Permissions
                                     </h4>
                                     <span className="text-[11px] font-bold text-slate-400">
-                                        ({selectedPermissions.length}/{allPermissionKeys.length} টি নির্বাচিত)
+                                        ({selectedPermissions.length}/{allPermissionKeys.length} selected)
                                     </span>
                                 </div>
 
@@ -549,7 +549,7 @@ export const AdminRolesPage: React.FC = () => {
                                     onClick={handleSelectAllGlobal}
                                     className="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline cursor-pointer"
                                 >
-                                    {isAllSelected ? 'সব আনচেক করুন' : 'সকল পারমিশন সিলেক্ট করুন'}
+                                    {isAllSelected ? 'Uncheck All' : 'Select All Permissions'}
                                 </button>
                             </div>
 
@@ -576,7 +576,7 @@ export const AdminRolesPage: React.FC = () => {
                                                             {mod.name}
                                                         </span>
                                                         <span className="text-[10px] text-slate-400 font-medium">
-                                                            {modSelectedCount}/{modPermKeys.length} টি সক্রিয়
+                                                            {modSelectedCount}/{modPermKeys.length} active
                                                         </span>
                                                     </div>
                                                 </div>
@@ -586,7 +586,7 @@ export const AdminRolesPage: React.FC = () => {
                                                     onClick={() => handleToggleModuleAll(modPermKeys)}
                                                     className="text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-sky-600 cursor-pointer"
                                                 >
-                                                    {isModAllSelected ? 'আনচেক করুন' : 'মডিউলের সব নির্বাচন করুন'}
+                                                    {isModAllSelected ? 'Uncheck All' : 'Select Module All'}
                                                 </button>
                                             </div>
 
@@ -634,7 +634,7 @@ export const AdminRolesPage: React.FC = () => {
                                     onClick={() => setModalOpen(false)}
                                     className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                                 >
-                                    বাতিল
+                                    Cancel
                                 </button>
                                 <button
                                     type="submit"
@@ -642,7 +642,7 @@ export const AdminRolesPage: React.FC = () => {
                                     className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition shadow-sm shadow-sky-600/30 disabled:opacity-60 cursor-pointer"
                                 >
                                     {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                                    <span>{editingRole ? 'রোল আপডেট করুন' : 'রোল সংরক্ষণ করুন'}</span>
+                                    <span>{editingRole ? 'Update Role' : 'Save Role'}</span>
                                 </button>
                             </div>
                         </form>
@@ -659,14 +659,14 @@ export const AdminRolesPage: React.FC = () => {
                         </div>
                         <div>
                             <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                                আপনি কি নিশ্চিত?
+                                Are you sure?
                             </h3>
                             <p className="text-xs text-slate-500 mt-1">
-                                কাস্টম রোল <strong>'{roleToDelete.name}'</strong> স্থায়ীভাবে মুছে ফেলা হবে।
+                                Custom role <strong>'{roleToDelete.name}'</strong> will be permanently deleted.
                             </p>
                             {(roleToDelete.users_count || 0) > 0 && (
                                 <p className="text-xs text-rose-600 font-bold mt-2 bg-rose-50 dark:bg-rose-950/50 p-2 rounded-xl border border-rose-200 dark:border-rose-900">
-                                    সতর্কতা: এই রোলে বর্তমানে {roleToDelete.users_count} জন ইউজার নিয়োজিত আছে। প্রথমে তাদের রোল পরিবর্তন করুন।
+                                    Warning: Currently {roleToDelete.users_count} user(s) are assigned to this role. Reassign their roles before deletion.
                                 </p>
                             )}
                         </div>
@@ -676,7 +676,7 @@ export const AdminRolesPage: React.FC = () => {
                                 onClick={() => setDeleteModalOpen(false)}
                                 className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 cursor-pointer"
                             >
-                                বাতিল
+                                Cancel
                             </button>
                             <button
                                 type="button"
@@ -684,7 +684,7 @@ export const AdminRolesPage: React.FC = () => {
                                 disabled={deleting || (roleToDelete.users_count || 0) > 0}
                                 className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs disabled:opacity-50 cursor-pointer"
                             >
-                                {deleting ? 'মুছে ফেলা হচ্ছে...' : 'হ্যাঁ, মুছে ফেলুন'}
+                                {deleting ? 'Deleting...' : 'Yes, Delete'}
                             </button>
                         </div>
                     </div>

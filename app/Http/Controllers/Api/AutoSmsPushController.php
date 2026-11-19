@@ -166,7 +166,7 @@ class AutoSmsPushController extends Controller
 
         $rendered = str_replace(
             ['{student_name}', '{course_title}', '{bundle_title}', '{order_id}', '{amount}', '{site_name}', '{login_url}'],
-            ['Test Student', $courseTitle, $bundleTitle, 'ORD-9988', '৳1,500.00', 'NovoNex', url('/login')],
+            ['Test Student', $courseTitle, $bundleTitle, 'ORD-9988', 'Tk 1,500.00', 'NovoNex', url('/login')],
             $validated['template']
         );
 

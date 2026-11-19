@@ -75,7 +75,7 @@ export const AdminCourseEditPage: React.FC = () => {
     const [fakeEnrollmentCount, setFakeEnrollmentCount] = useState<string>('0');
     const [classStartsAt, setClassStartsAt] = useState<string>('');
     const [actionButtons, setActionButtons] = useState<CourseActionButton[]>([
-        { id: 'btn-outline', label: 'কোর্স আউটলাইন', type: 'link', url: '' }
+        { id: 'btn-outline', label: 'Course Outline', type: 'link', url: '' }
     ]);
     const [enrolledButtons, setEnrolledButtons] = useState<EnrolledActionButton[]>([]);
     const [uploadingButtonFileId, setUploadingButtonFileId] = useState<string | null>(null);
@@ -136,7 +136,7 @@ export const AdminCourseEditPage: React.FC = () => {
     const handleAddActionButton = () => {
         const newBtn: CourseActionButton = {
             id: 'btn-' + Date.now(),
-            label: 'কোর্স আউটলাইন',
+            label: 'Course Outline',
             type: 'link',
             url: '',
         };
@@ -189,7 +189,7 @@ export const AdminCourseEditPage: React.FC = () => {
                 });
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'ফাইল আপলোড করতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to upload file.');
         } finally {
             setUploadingButtonFileId(null);
             e.target.value = '';
@@ -417,11 +417,11 @@ export const AdminCourseEditPage: React.FC = () => {
                             value={description}
                             onChange={setDescription}
                             label="Course Full Description (Microsoft Word Style Editor)"
-                            placeholder="কোর্সের বিস্তারিত বিবরণ, ওভারভিউ, ফরম্যাটেড টেক্সট বা সূত্র এখানে লিখুন..."
+                            placeholder="Write detailed course overview, syllabus, rich text or equations here..."
                             minHeight="220px"
                         />
                         <p className="text-[11px] text-slate-400 mt-1">
-                            মাইক্রোসফট ওয়ার্ড এর মতো বোল্ড, ইতালিক, আন্ডারলাইন, হেডিং, লিস্ট, টেবিল ও ম্যাথ সূত্র ব্যবহার করতে পারেন।
+                            Use Word-like formatting: bold, italic, underline, headings, lists, tables, and mathematical formulas.
                         </p>
                     </div>
 
@@ -548,7 +548,7 @@ export const AdminCourseEditPage: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                Regular Price (৳) - Enter 0 for Free
+                                Regular Price (Tk) - Enter 0 for Free
                             </label>
                             <input
                                 type="number"
@@ -562,7 +562,7 @@ export const AdminCourseEditPage: React.FC = () => {
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                Sale Price (৳) - Optional
+                                Sale Price (Tk) - Optional
                             </label>
                             <input
                                 type="number"
@@ -581,46 +581,46 @@ export const AdminCourseEditPage: React.FC = () => {
                             <div className="flex items-center gap-2">
                                 <GraduationCap className="w-5 h-5 text-indigo-600" />
                                 <h3 className="text-sm font-bold text-slate-800">
-                                    ব্যাজ ও সময়সূচী (ভর্তি সংখ্যা ও ক্লাস শুরু)
+                                    Badges & Schedule (Enrolled Count & Start Date)
                                 </h3>
                             </div>
                             <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-100/70 px-2.5 py-0.5 rounded-full">
-                                কোর্স পেজ ব্যাজ
+                                Course Page Badge
                             </span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                                     <Users className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>ভর্তি সংখ্যা (বেস/ফেক কাউন্ট)</span>
+                                    <span>Enrolled Count (Base / Offset Count)</span>
                                 </label>
                                 <input
                                     type="number"
                                     min={0}
                                     value={fakeEnrollmentCount}
                                     onChange={(e) => setFakeEnrollmentCount(e.target.value)}
-                                    placeholder="যেমন: 157 (আসল ভর্তির সাথে যোগ হবে)"
+                                    placeholder="e.g. 150 (added to real enrollments)"
                                     className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <p className="text-[11px] text-slate-400 mt-1">
-                                    কোর্স পেজে ভর্তিকৃত মোট শিক্ষার্থী দেখানোর জন্য এই সংখ্যা ব্যবহৃত হবে।
+                                    This number will be displayed as total enrolled students on the course card.
                                 </p>
                             </div>
 
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                                     <Calendar className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>ক্লাস শুরু (তারিখ বা স্ট্যাটাস)</span>
+                                    <span>Class Starts (Date or Status)</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={classStartsAt}
                                     onChange={(e) => setClassStartsAt(e.target.value)}
-                                    placeholder="যেমন: Nov 09, 2026 অথবা ভর্তি চলছে"
+                                    placeholder="e.g. Nov 09, 2026 or Admission Ongoing"
                                     className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <p className="text-[11px] text-slate-400 mt-1">
-                                    ক্যালেন্ডার ব্যাজে ক্লাস শুরুর তারিখ বা স্ট্যাটাস প্রদর্শিত হবে।
+                                    Displays in the calendar badge on the course card.
                                 </p>
                             </div>
                         </div>
@@ -632,52 +632,52 @@ export const AdminCourseEditPage: React.FC = () => {
                             <div className="flex items-center gap-2">
                                 <Tag className="w-5 h-5 text-indigo-600" />
                                 <h3 className="text-sm font-bold text-slate-800">
-                                    কুপন অফার ও কাউন্টডাউন টাইমার (কোর্স কার্ড প্রমোশন)
+                                    Coupon Promotion & Countdown Timer
                                 </h3>
                             </div>
                             <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-100/70 px-2.5 py-0.5 rounded-full">
-                                কোর্স সাইডবার প্রমোশন
+                                Course Sidebar Promo
                             </span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                                     <Tag className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>কুপন কোড (Coupon Code)</span>
+                                    <span>Coupon Code</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={couponCode}
                                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                    placeholder="যেমন: ACPPOWERPLAY500"
+                                    placeholder="e.g. NOVONEX500"
                                     className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono font-bold uppercase focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <p className="text-[11px] text-slate-400 mt-1">
-                                    শিক্ষার্থীরা সাইডবার থেকে এই কোডে 'প্রয়োগ করো' ক্লিক করে সরাসরি ডিসকাউন্ট নিতে পারবে।
+                                    Students can click 'Apply' in the sidebar to auto-apply this coupon at checkout.
                                 </p>
                             </div>
 
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                                     <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>ছাড়ের লেখা (Discount Text)</span>
+                                    <span>Discount Text</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={couponDiscountText}
                                     onChange={(e) => setCouponDiscountText(e.target.value)}
-                                    placeholder="যেমন: ৳500 ছাড় (খালি রাখলে ছাড়ের পরিমাণ অটো দেখাবে)"
+                                    placeholder="e.g. Tk 500 Discount"
                                     className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <p className="text-[11px] text-slate-400 mt-1">
-                                    কুপন কোডের পাশে ছাড়ের বিবরণ দেখাবে।
+                                    Displays next to the coupon code badge.
                                 </p>
                             </div>
 
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                                     <Clock className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>অফার শেষের তারিখ ও সময় (কাউন্টডাউন টাইমার)</span>
+                                    <span>Offer Expiry Date & Time (Countdown Timer)</span>
                                 </label>
                                 <input
                                     type="datetime-local"
@@ -686,24 +686,24 @@ export const AdminCourseEditPage: React.FC = () => {
                                     className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <p className="text-[11px] text-slate-400 mt-1">
-                                    দিন, ঘণ্টা, মিনিট ও সেকেন্ড এর লাইভ কাউন্টডাউন চলার জন্য শেষ সময় দিন।
+                                    Set the deadline for the live days/hours/minutes countdown banner.
                                 </p>
                             </div>
 
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                                     <PlayCircle className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>'কোর্সটি কীভাবে কিনবেন' ভিডিও লিংক</span>
+                                    <span>'How to Enroll' Video URL</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={howToBuyUrl}
                                     onChange={(e) => setHowToBuyUrl(e.target.value)}
-                                    placeholder="যেমন: https://www.youtube.com/watch?v=..."
+                                    placeholder="e.g. https://www.youtube.com/watch?v=..."
                                     className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <p className="text-[11px] text-slate-400 mt-1">
-                                    বাটনে ক্লিক করলে ভিডিওটি পপআপে প্লে হবে।
+                                    Opens in a video modal popup when clicked by students.
                                 </p>
                             </div>
                         </div>
@@ -716,10 +716,10 @@ export const AdminCourseEditPage: React.FC = () => {
                                 <FileText className="w-5 h-5 text-sky-600" />
                                 <div>
                                     <h3 className="text-sm font-bold text-slate-800">
-                                        কোর্স আউটলাইন ও কাস্টম বাটন
+                                        Course Outline & Custom Buttons
                                     </h3>
                                     <p className="text-[11px] text-slate-500">
-                                        কোর্স বিস্তারিত পেজের সাইডবারে "কোর্সটি কিনুন" বাটনের নিচে এই বাটনগুলো দেখাবে।
+                                        These buttons appear below the 'Enroll' button on the course details sidebar.
                                     </p>
                                 </div>
                             </div>
@@ -729,7 +729,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition cursor-pointer"
                             >
                                 <Plus className="w-3.5 h-3.5" />
-                                <span>+ নতুন বাটন যোগ করুন</span>
+                                <span>+ Add New Button</span>
                             </button>
                         </div>
 
@@ -743,13 +743,13 @@ export const AdminCourseEditPage: React.FC = () => {
                                         {/* Button Label */}
                                         <div className="flex-1">
                                             <label className="block text-[11px] font-bold text-slate-600 mb-1">
-                                                বাটন নাম (যেমন: কোর্স আউটলাইন / কোর্সটি কীভাবে কিনবেন)
+                                                Button Name (e.g. Course Outline / How to Enroll)
                                             </label>
                                             <input
                                                 type="text"
                                                 value={btn.label}
                                                 onChange={(e) => handleUpdateButton(btn.id, { label: e.target.value })}
-                                                placeholder="বাটনের নাম লিখুন"
+                                                placeholder="Enter button label"
                                                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500 focus:bg-white"
                                             />
                                         </div>
@@ -757,7 +757,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                         {/* Type Selector: File Upload vs Link */}
                                         <div className="w-full sm:w-48">
                                             <label className="block text-[11px] font-bold text-slate-600 mb-1">
-                                                টাইপ
+                                                Type
                                             </label>
                                             <div className="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200 w-full">
                                                 <button
@@ -811,7 +811,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                             >
                                                 <Upload className="w-3.5 h-3.5" />
                                                 <span>
-                                                    {uploadingButtonFileId === btn.id ? 'Uploading...' : 'ফাইল আপলোড করুন (PDF/Doc/Image)'}
+                                                    {uploadingButtonFileId === btn.id ? 'Uploading...' : 'Upload File (PDF/Doc/Image)'}
                                                 </span>
                                             </label>
 
@@ -826,11 +826,11 @@ export const AdminCourseEditPage: React.FC = () => {
                                                         rel="noopener noreferrer"
                                                         className="text-emerald-700 hover:underline font-bold inline-flex items-center gap-1 ml-2"
                                                     >
-                                                        ভিউ <ExternalLink className="w-3 h-3" />
+                                                        View <ExternalLink className="w-3 h-3" />
                                                     </a>
                                                 </div>
                                             ) : (
-                                                <span className="text-xs text-slate-400">কোনো ফাইল এখনও আপলোড করা হয়নি</span>
+                                                <span className="text-xs text-slate-400">No file uploaded yet</span>
                                             )}
                                         </div>
                                     ) : (
@@ -839,7 +839,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                                 type="url"
                                                 value={btn.url}
                                                 onChange={(e) => handleUpdateButton(btn.id, { url: e.target.value })}
-                                                placeholder="https://drive.google.com/... বা লিঙ্ক দিন"
+                                                placeholder="https://drive.google.com/... or enter URL"
                                                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-sky-500 focus:bg-white"
                                             />
                                         </div>
@@ -849,7 +849,7 @@ export const AdminCourseEditPage: React.FC = () => {
 
                             {actionButtons.length === 0 && (
                                 <p className="text-xs text-slate-400 text-center py-3 bg-white rounded-xl border border-dashed border-slate-200">
-                                    কোনো পাবলিক অ্যাকশন বাটন নেই। উপরে "+ নতুন বাটন যোগ করুন" এ ক্লিক করুন।
+                                    No action buttons created yet. Click "+ Add New Button" above.
                                 </p>
                             )}
                         </div>
@@ -864,13 +864,13 @@ export const AdminCourseEditPage: React.FC = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                                        <span>এনরোল্ড শিক্ষার্থী বাটন ও অ্যাক্সেস কি (Enrolled Students Only)</span>
+                                        <span>Enrolled Students Action Buttons & Access Keys</span>
                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
                                             Private / Dashboard
                                         </span>
                                     </h3>
                                     <p className="text-[11px] text-slate-500 mt-0.5">
-                                        কোর্সটি কেনার পর শিক্ষার্থী তার ড্যাশবোর্ড থেকে "আমার কোর্স"-এ গেলে এই বাটনগুলো ও তার ইউনিক অ্যাক্সেস কি দেখতে পারবে (যেমন: Join our Facebook Discussion Group)।
+                                        After enrolling, students can see these buttons and their unique access key on their dashboard (e.g. Join our Facebook Discussion Group).
                                     </p>
                                 </div>
                             </div>
@@ -880,7 +880,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                 className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition cursor-pointer shrink-0"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>+ নতুন গ্রুপ বাটন যোগ করুন</span>
+                                <span>+ Add Group Button</span>
                             </button>
                         </div>
 
@@ -893,13 +893,13 @@ export const AdminCourseEditPage: React.FC = () => {
                                     <div className="flex items-center justify-between gap-3">
                                         <div className="flex-1">
                                             <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                                                বাটনের নাম (যেমন: Join our Facebook Discussion Group / Telegram Group)
+                                                Button Name (e.g. Join our Facebook Discussion Group / Telegram Group)
                                             </label>
                                             <input
                                                 type="text"
                                                 value={btn.label}
                                                 onChange={(e) => handleUpdateEnrolledButton(btn.id, { label: e.target.value })}
-                                                placeholder="বাটনের নাম লিখুন"
+                                                placeholder="Enter button label"
                                                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:bg-white"
                                             />
                                         </div>
@@ -908,7 +908,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                             type="button"
                                             onClick={() => handleRemoveEnrolledButton(btn.id)}
                                             className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer shrink-0 mt-5"
-                                            title="বাটন ডিলিট করুন"
+                                            title="Delete button"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
@@ -917,7 +917,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                     {/* URL Input */}
                                     <div>
                                         <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                                            গ্রুপ বা ডিসকাশন লিংক (Facebook / Telegram / Discord / WhatsApp URL)
+                                            Community or Group URL (Facebook / Telegram / Discord / WhatsApp)
                                         </label>
                                         <input
                                             type="url"
@@ -939,16 +939,16 @@ export const AdminCourseEditPage: React.FC = () => {
                                             />
                                             <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                                                 <Key className="w-3.5 h-3.5 text-amber-500" />
-                                                <span>এই বাটনের জন্য শিক্ষার্থীর অ্যাক্সেস কি (Access Key) প্রয়োজন?</span>
+                                                <span>Does this button require a Student Access Key?</span>
                                             </span>
                                         </label>
                                         {btn.requires_access_key ? (
                                             <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 shrink-0">
-                                                🔑 অ্যাক্সেস কি সক্রিয় (Verification Key On)
+                                                🔑 Verification Key Active
                                             </span>
                                         ) : (
                                             <span className="text-[11px] text-slate-400">
-                                                সরাসরি গ্রুপে প্রবেশ করতে পারবে
+                                                Direct access without verification key
                                             </span>
                                         )}
                                     </div>
@@ -957,7 +957,7 @@ export const AdminCourseEditPage: React.FC = () => {
 
                             {enrolledButtons.length === 0 && (
                                 <p className="text-xs text-slate-400 text-center py-4 bg-white rounded-xl border border-dashed border-indigo-200">
-                                    কোনো প্রাইভেট গ্রুপ বা এনরোল্ড শিক্ষার্থী বাটন তৈরি করা হয়নি। উপরে "+ নতুন গ্রুপ বাটন যোগ করুন" এ ক্লিক করুন।
+                                    No private community or enrolled buttons added yet. Click "+ Add Group Button" above.
                                 </p>
                             )}
                         </div>
@@ -970,10 +970,10 @@ export const AdminCourseEditPage: React.FC = () => {
                                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                                 <div>
                                     <h3 className="text-sm font-bold text-slate-800">
-                                        কোর্স ফিচারসমূহ (Course Features)
+                                        Course Features
                                     </h3>
                                     <p className="text-[11px] text-slate-500">
-                                        কোর্স পেজের সাইডবারে এই সুবিধাগুলো চেকলিস্ট আকারে দেখাবে।
+                                        These features will be displayed as a checklist on the course page sidebar.
                                     </p>
                                 </div>
                             </div>
@@ -982,7 +982,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                 onClick={() => setFeatures(DEFAULT_FEATURES)}
                                 className="text-xs text-sky-600 hover:text-sky-700 font-semibold hover:underline cursor-pointer"
                             >
-                                ডিফল্ট ফিচার রিস্টোর করুন
+                                Restore Default Features
                             </button>
                         </div>
 
@@ -1020,7 +1020,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                             handleAddFeature();
                                         }
                                     }}
-                                    placeholder="নতুন ফিচার লিখুন (যেমন: লাইভ সাপোর্ট ও ডিসকাশন গ্রুপ)..."
+                                    placeholder="Add new feature (e.g. 24/7 Live Support & Doubt Solving)..."
                                     className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
                                 />
                                 <button
@@ -1029,7 +1029,7 @@ export const AdminCourseEditPage: React.FC = () => {
                                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1 shrink-0 cursor-pointer"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
-                                    <span>যোগ করুন</span>
+                                    <span>Add</span>
                                 </button>
                             </div>
                         </div>

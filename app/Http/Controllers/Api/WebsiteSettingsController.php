@@ -47,7 +47,7 @@ class WebsiteSettingsController extends Controller
         AuditLog::log('website_settings_updated', 'WebsiteSetting', $settings->id, null, $validated);
 
         return response()->json([
-            'message' => 'ওয়েবসাইট সেটিংস সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'Website settings updated successfully.',
             'settings' => $settings,
         ]);
     }
@@ -72,7 +72,7 @@ class WebsiteSettingsController extends Controller
         AuditLog::log('header_settings_updated', 'WebsiteSetting', $settings->id, null, $validated);
 
         return response()->json([
-            'message' => 'হেডার বিল্ডার সেটিংস সফলভাবে সংরক্ষণ করা হয়েছে।',
+            'message' => 'Header builder settings saved successfully.',
             'settings' => $settings,
             'header_settings' => $settings->header_settings,
         ]);
@@ -98,7 +98,7 @@ class WebsiteSettingsController extends Controller
         AuditLog::log('footer_settings_updated', 'WebsiteSetting', $settings->id, null, $validated);
 
         return response()->json([
-            'message' => 'ফুটার বিল্ডার সেটিংস সফলভাবে সংরক্ষণ করা হয়েছে।',
+            'message' => 'Footer builder settings saved successfully.',
             'settings' => $settings,
             'footer_settings' => $settings->footer_settings,
         ]);
@@ -136,7 +136,7 @@ class WebsiteSettingsController extends Controller
         AuditLog::log('manual_payment_settings_updated', 'WebsiteSetting', $settings->id, null, $validated);
 
         return response()->json([
-            'message' => 'ম্যানুয়াল পেমেন্ট সেটিংস সফলভাবে সংরক্ষণ করা হয়েছে।',
+            'message' => 'Manual payment settings saved successfully.',
             'settings' => $settings,
             'manual_payment_settings' => $settings->manual_payment_settings,
         ]);

@@ -8,22 +8,17 @@ import {
     ClipboardList, 
     TicketPercent, 
     Search, 
-    Loader2, 
-    AlertTriangle,
-    Layers,
+    AlertTriangle, 
+    Loader2,
     Calendar,
-    Tag
+    ArrowLeft
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 type TrashTab = 'courses' | 'bundles' | 'exams' | 'coupons';
 
 export const AdminTrashPage: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<TrashTab>(() => {
-        const p = new URLSearchParams(window.location.search);
-        const tab = p.get('tab') as TrashTab;
-        return ['courses', 'bundles', 'exams', 'coupons'].includes(tab) ? tab : 'courses';
-    });
-
+    const [activeTab, setActiveTab] = useState<TrashTab>('courses');
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -34,34 +29,33 @@ export const AdminTrashPage: React.FC = () => {
     }, [activeTab, search]);
 
     const fetchTrashItems = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
-            let url = '';
-            const params: any = { status: 'trashed' };
-            if (search.trim()) params.search = search.trim();
+            let endpoint = '';
+            if (activeTab === 'courses') endpoint = '/admin/courses';
+            else if (activeTab === 'bundles') endpoint = '/admin/bundles';
+            else if (activeTab === 'exams') endpoint = '/exams';
+            else if (activeTab === 'coupons') endpoint = '/admin/coupons';
 
-            if (activeTab === 'courses') {
-                url = '/admin/courses';
+            const { data } = await apiClient.get(endpoint, {
+                params: {
+                    status: 'trashed',
+                    search: search.trim() || undefined,
+                }
+            });
+
+            // Adjust based on differing API payload formats
+            if (activeTab === 'exams') {
+                setItems(data.data || data.exams || []);
             } else if (activeTab === 'bundles') {
-                url = '/admin/bundles';
-                params.per_page = 50;
-            } else if (activeTab === 'exams') {
-                url = '/exams';
+                setItems(data.bundles || data.data || []);
             } else if (activeTab === 'coupons') {
-                url = '/admin/coupons';
-            }
-
-            const res = await apiClient.get(url, { params });
-            if (activeTab === 'coupons') {
-                setItems(res.data.coupons?.data || []);
-            } else if (activeTab === 'bundles') {
-                const bList = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : (res.data?.bundles || []);
-                setItems(bList);
+                setItems(data.coupons || data.data || []);
             } else {
-                setItems(res.data?.data || []);
+                setItems(data.courses || data.data || []);
             }
         } catch (err) {
-            console.error('Failed to load trash items', err);
+            console.error('Failed to fetch trash items', err);
             setItems([]);
         } finally {
             setLoading(false);
@@ -79,16 +73,16 @@ export const AdminTrashPage: React.FC = () => {
 
             await apiClient.post(url);
             setItems(prev => prev.filter(item => item.id !== id));
-            alert(`"${title}" সফলভাবে পুনরুদ্ধার করা হয়েছে!`);
+            alert(`"${title}" restored successfully!`);
         } catch (err: any) {
-            alert(err.response?.data?.message || 'পুনরুদ্ধার করতে ব্যর্থ হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to restore item.');
         } finally {
             setActionLoadingId(null);
         }
     };
 
     const handleForceDelete = async (id: number, title: string) => {
-        if (!window.confirm(`সতর্কতা: আপনি কি নিশ্চিতভাবে "${title}" স্থায়ীভাবে মুছে ফেলতে চান? এটি আর কখনোই পুনরুদ্ধার করা যাবে না!`)) {
+        if (!window.confirm(`Warning: Are you sure you want to permanently delete "${title}"? This action cannot be undone!`)) {
             return;
         }
 
@@ -103,17 +97,17 @@ export const AdminTrashPage: React.FC = () => {
             await apiClient.delete(url);
             setItems(prev => prev.filter(item => item.id !== id));
         } catch (err: any) {
-            alert(err.response?.data?.message || 'স্থায়ীভাবে মুছে ফেলতে ব্যর্থ হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to permanently delete item.');
         } finally {
             setActionLoadingId(null);
         }
     };
 
     const tabConfig = [
-        { id: 'courses' as TrashTab, label: 'কোর্স (Courses)', icon: BookOpen, color: 'text-indigo-600' },
-        { id: 'bundles' as TrashTab, label: 'বান্ডেল (Bundles)', icon: Boxes, color: 'text-sky-600' },
-        { id: 'exams' as TrashTab, label: 'পরীক্ষা (Exams)', icon: ClipboardList, color: 'text-purple-600' },
-        { id: 'coupons' as TrashTab, label: 'কুপন (Coupons)', icon: TicketPercent, color: 'text-emerald-600' },
+        { id: 'courses' as TrashTab, label: 'Courses', icon: BookOpen, color: 'text-indigo-600' },
+        { id: 'bundles' as TrashTab, label: 'Bundles', icon: Boxes, color: 'text-sky-600' },
+        { id: 'exams' as TrashTab, label: 'Exams', icon: ClipboardList, color: 'text-purple-600' },
+        { id: 'coupons' as TrashTab, label: 'Coupons', icon: TicketPercent, color: 'text-emerald-600' },
     ];
 
     return (
@@ -123,10 +117,10 @@ export const AdminTrashPage: React.FC = () => {
                 <div>
                     <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
                         <Trash2 className="w-7 h-7 text-rose-600" />
-                        <span>রিসাইকেল বিন / ট্র্যাশ (Recycle Bin)</span>
+                        <span>Recycle Bin / Trash</span>
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                        মুছে ফেলা কোর্স, বান্ডেল, পরীক্ষা ও কুপনগুলো এখানে সাময়িকভাবে সংরক্ষিত থাকে। এখান থেকে পুনরুদ্ধার (Restore) অথবা চিরতরে মুছে ফেলতে পারেন।
+                        Deleted courses, bundles, exams, and coupons are temporarily preserved here. You can restore them or permanently delete them.
                     </p>
                 </div>
             </div>
@@ -165,12 +159,12 @@ export const AdminTrashPage: React.FC = () => {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="ট্র্যাশের আইটেম সার্চ করুন..."
+                        placeholder="Search trash items..."
                         className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-rose-500 dark:text-white"
                     />
                 </div>
                 <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    মোট পাওয়া গেছে: <span className="font-bold text-slate-800 dark:text-white">{items.length}</span>টি
+                    Total Found: <span className="font-bold text-slate-800 dark:text-white">{items.length}</span> items
                 </div>
             </div>
 
@@ -180,10 +174,10 @@ export const AdminTrashPage: React.FC = () => {
                     <table className="w-full text-left text-xs">
                         <thead className="bg-slate-50 dark:bg-slate-850 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                             <tr>
-                                <th className="py-4 px-6">আইটেমের বিবরণ</th>
-                                <th className="py-4 px-4">মূল্য / তথ্য</th>
-                                <th className="py-4 px-4">মুছে ফেলার সময়</th>
-                                <th className="py-4 px-6 text-right">পদক্ষেপ (Actions)</th>
+                                <th className="py-4 px-6">Item Details</th>
+                                <th className="py-4 px-4">Price / Info</th>
+                                <th className="py-4 px-4">Deleted Date</th>
+                                <th className="py-4 px-6 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium">
@@ -192,7 +186,7 @@ export const AdminTrashPage: React.FC = () => {
                                     <td colSpan={4} className="py-16 text-center text-slate-400">
                                         <div className="flex flex-col items-center justify-center gap-2">
                                             <Loader2 className="w-7 h-7 animate-spin text-rose-500" />
-                                            <span>ট্র্যাশ লোড হচ্ছে...</span>
+                                            <span>Loading trash items...</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -201,15 +195,15 @@ export const AdminTrashPage: React.FC = () => {
                                     <td colSpan={4} className="py-16 text-center text-slate-400">
                                         <div className="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
                                             <Trash2 className="w-10 h-10 text-slate-300 dark:text-slate-600" />
-                                            <p className="font-bold text-slate-700 dark:text-slate-300">ট্র্যাশ সম্পূর্ণ খালি!</p>
-                                            <p className="text-xs text-slate-500">এই বিভাগে বর্তমানে কোনো মুছে ফেলা আইটেম নেই।</p>
+                                            <p className="font-bold text-slate-700 dark:text-slate-300">Trash is completely empty!</p>
+                                            <p className="text-xs text-slate-500">There are currently no deleted items in this category.</p>
                                         </div>
                                     </td>
                                 </tr>
                             ) : (
                                 items.map((item) => {
                                     const title = item.title || item.code || `Item #${item.id}`;
-                                    const deletedAt = item.deleted_at ? new Date(item.deleted_at).toLocaleString() : 'N/A';
+                                    const deletedAt = item.deleted_at ? new Date(item.deleted_at).toLocaleString('en-US') : 'N/A';
 
                                     return (
                                         <tr key={item.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
@@ -249,8 +243,8 @@ export const AdminTrashPage: React.FC = () => {
                                                 )}
                                                 {activeTab === 'exams' && (
                                                     <div className="space-y-0.5 text-[11px] text-slate-500">
-                                                        <div>পূর্ণমান: {item.total_marks}</div>
-                                                        <div>সময়: {item.duration_minutes} মিনিট</div>
+                                                        <div>Marks: {item.total_marks}</div>
+                                                        <div>Duration: {item.duration_minutes} mins</div>
                                                     </div>
                                                 )}
                                             </td>
@@ -271,20 +265,20 @@ export const AdminTrashPage: React.FC = () => {
                                                         onClick={() => handleRestore(item.id, title)}
                                                         disabled={actionLoadingId === item.id}
                                                         className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 font-bold rounded-xl flex items-center gap-1.5 text-xs transition-colors cursor-pointer border border-emerald-200 dark:border-emerald-800 disabled:opacity-50"
-                                                        title="পুনরুদ্ধার করুন (Restore)"
+                                                        title="Restore"
                                                     >
                                                         <RotateCcw className="w-3.5 h-3.5" />
-                                                        <span>পুনরুদ্ধার</span>
+                                                        <span>Restore</span>
                                                     </button>
                                                     <button
                                                         type="button"
                                                         onClick={() => handleForceDelete(item.id, title)}
                                                         disabled={actionLoadingId === item.id}
                                                         className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 font-bold rounded-xl flex items-center gap-1.5 text-xs transition-colors cursor-pointer border border-rose-200 dark:border-rose-800 disabled:opacity-50"
-                                                        title="স্থায়ীভাবে মুছে ফেলুন (Permanent Delete)"
+                                                        title="Permanent Delete"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
-                                                        <span>স্থায়ী মুছুন</span>
+                                                        <span>Delete Forever</span>
                                                     </button>
                                                 </div>
                                             </td>

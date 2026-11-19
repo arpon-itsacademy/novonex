@@ -81,12 +81,12 @@ export const AdminUserCreatePage: React.FC = () => {
         setSuccessMessage(null);
 
         if (!name.trim() || !phone.trim() || !email.trim() || !password) {
-            setErrorMessage('অনুগ্রহ করে নাম, ফোন, ইমেইল এবং পাসওয়ার্ড সঠিকভাবে পূরণ করুন।');
+            setErrorMessage('Please fill in name, phone, email, and password correctly.');
             return;
         }
 
         if (roleType === 'custom' && !selectedCustomRoleId) {
-            setErrorMessage('অনুগ্রহ করে একটি কাস্টম রোল নির্বাচন করুন।');
+            setErrorMessage('Please select a custom role.');
             return;
         }
 
@@ -110,7 +110,7 @@ export const AdminUserCreatePage: React.FC = () => {
 
         try {
             const { data } = await apiClient.post('/admin/users', payload);
-            setSuccessMessage(data.message || 'নতুন ইউজার সফলভাবে তৈরি করা হয়েছে!');
+            setSuccessMessage(data.message || 'New user created successfully!');
             setTimeout(() => {
                 navigate('/admin/users');
             }, 1200);
@@ -118,9 +118,9 @@ export const AdminUserCreatePage: React.FC = () => {
             const resData = err.response?.data;
             if (resData?.errors) {
                 const firstError = Object.values(resData.errors)[0] as string[];
-                setErrorMessage(firstError?.[0] || resData.message || 'ইউজার তৈরি করতে সমস্যা হয়েছে।');
+                setErrorMessage(firstError?.[0] || resData.message || 'Failed to create user.');
             } else {
-                setErrorMessage(resData?.message || 'ইউজার তৈরি করতে সমস্যা হয়েছে।');
+                setErrorMessage(resData?.message || 'Failed to create user.');
             }
         } finally {
             setSubmitting(false);
@@ -137,7 +137,7 @@ export const AdminUserCreatePage: React.FC = () => {
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-sky-600 transition mb-2"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" />
-                        <span>সকল ইউজার তালিকায় ফিরুন</span>
+                        <span>Back to Users List</span>
                     </Link>
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-sky-500/20">
@@ -145,10 +145,10 @@ export const AdminUserCreatePage: React.FC = () => {
                         </div>
                         <div>
                             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                                নতুন ইউজার তৈরি করুন
+                                Create New User
                             </h1>
                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                সিস্টেমের জন্য নতুন শিক্ষার্থী, শিক্ষক, অ্যাডমিন বা কাস্টম রোল স্টাফ অ্যাকাউন্ট যোগ করুন।
+                                Add a new student, teacher, administrator, or custom staff account to the system.
                             </p>
                         </div>
                     </div>
@@ -175,27 +175,27 @@ export const AdminUserCreatePage: React.FC = () => {
                 <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-5">
                     <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm pb-3 border-b border-slate-100 dark:border-slate-800">
                         <User className="w-4 h-4 text-sky-500" />
-                        <span>মৌলিক তথ্য (Basic Details)</span>
+                        <span>Basic Details</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                পুরো নাম <span className="text-rose-500">*</span>
+                                Full Name <span className="text-rose-500">*</span>
                             </label>
                             <input
                                 type="text"
                                 required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="যেমন: মো: আরিফুল ইসলাম"
+                                placeholder="e.g. Ariful Islam"
                                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                             />
                         </div>
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                মোবাইল নম্বর <span className="text-rose-500">*</span>
+                                Phone Number <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
                                 <Phone className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -212,7 +212,7 @@ export const AdminUserCreatePage: React.FC = () => {
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                ইমেইল ঠিকানা <span className="text-rose-500">*</span>
+                                Email Address <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
                                 <Mail className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -230,7 +230,7 @@ export const AdminUserCreatePage: React.FC = () => {
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
                                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    লগইন পাসওয়ার্ড <span className="text-rose-500">*</span>
+                                    Login Password <span className="text-rose-500">*</span>
                                 </label>
                                 <button
                                     type="button"
@@ -238,7 +238,7 @@ export const AdminUserCreatePage: React.FC = () => {
                                     className="text-[11px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 cursor-pointer"
                                 >
                                     <Sparkles className="w-3 h-3" />
-                                    <span>অটো জেনারেট</span>
+                                    <span>Auto Generate</span>
                                 </button>
                             </div>
                             <div className="relative">
@@ -248,7 +248,7 @@ export const AdminUserCreatePage: React.FC = () => {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="কমপক্ষে ৬ অক্ষর"
+                                    placeholder="At least 6 characters"
                                     className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden font-mono"
                                 />
                                 <button
@@ -267,7 +267,7 @@ export const AdminUserCreatePage: React.FC = () => {
                 <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-5">
                     <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm pb-3 border-b border-slate-100 dark:border-slate-800">
                         <Shield className="w-4 h-4 text-sky-500" />
-                        <span>রোল ও অ্যাক্সেস নির্ধারণ (Role & Permissions)</span>
+                        <span>Role & Permissions</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -292,8 +292,8 @@ export const AdminUserCreatePage: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <span className="font-extrabold text-sm block">শিক্ষার্থী (Student)</span>
-                                <span className="text-[11px] text-slate-500">কোর্সে ভর্তি ও ক্লাস করার অ্যাক্সেস</span>
+                                <span className="font-extrabold text-sm block">Student</span>
+                                <span className="text-[11px] text-slate-500">Course enrollment and learning access</span>
                             </div>
                         </label>
 
@@ -318,8 +318,8 @@ export const AdminUserCreatePage: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <span className="font-extrabold text-sm block">শিক্ষক (Teacher)</span>
-                                <span className="text-[11px] text-slate-500">কোর্স পরিচালনা ও খাতা মূল্যায়ন</span>
+                                <span className="font-extrabold text-sm block">Teacher</span>
+                                <span className="text-[11px] text-slate-500">Course management and exam grading</span>
                             </div>
                         </label>
 
@@ -344,8 +344,8 @@ export const AdminUserCreatePage: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <span className="font-extrabold text-sm block">কাস্টম রোল (Staff)</span>
-                                <span className="text-[11px] text-slate-500">লাইব্রেরিয়ান, কোর্স ম্যানেজার ইত্যাদি</span>
+                                <span className="font-extrabold text-sm block">Custom Role (Staff)</span>
+                                <span className="text-[11px] text-slate-500">Librarian, Course Manager, Moderator</span>
                             </div>
                         </label>
 
@@ -370,8 +370,8 @@ export const AdminUserCreatePage: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <span className="font-extrabold text-sm block">সুপার অ্যাডমিন</span>
-                                <span className="text-[11px] text-slate-500">সম্পূর্ণ সিস্টেম নিয়ন্ত্রণ ও এক্সেস</span>
+                                <span className="font-extrabold text-sm block">Super Admin</span>
+                                <span className="text-[11px] text-slate-500">Full system access and control</span>
                             </div>
                         </label>
                     </div>
@@ -381,7 +381,7 @@ export const AdminUserCreatePage: React.FC = () => {
                         <div className="p-4 rounded-2xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/60 space-y-3 animate-fadeIn">
                             <div className="flex items-center justify-between">
                                 <label className="block text-xs font-bold text-purple-900 dark:text-purple-200">
-                                    কাস্টম রোল নির্বাচন করুন <span className="text-rose-500">*</span>
+                                    Select Custom Role <span className="text-rose-500">*</span>
                                 </label>
                                 <Link
                                     to="/admin/users/roles"
@@ -389,23 +389,23 @@ export const AdminUserCreatePage: React.FC = () => {
                                     className="text-[11px] font-bold text-purple-700 dark:text-purple-300 hover:underline flex items-center gap-1"
                                 >
                                     <Plus className="w-3 h-3" />
-                                    <span>নতুন কাস্টম রোল তৈরি করুন</span>
+                                    <span>Create New Role</span>
                                 </Link>
                             </div>
 
                             {loadingRoles ? (
                                 <div className="text-xs text-purple-600 flex items-center gap-2">
                                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                                    <span>রোল তালিকা লোড হচ্ছে...</span>
+                                    <span>Loading roles...</span>
                                 </div>
                             ) : roles.length === 0 ? (
                                 <div className="text-xs text-purple-800 dark:text-purple-200 space-y-1">
-                                    <p>বর্তমানে কোনো কাস্টম রোল তৈরি করা নেই।</p>
+                                    <p>No custom roles created yet.</p>
                                     <Link
                                         to="/admin/users/roles"
                                         className="inline-block text-xs font-bold text-purple-700 underline"
                                     >
-                                        প্রথমে একটি কাস্টম রোল তৈরি করুন &rarr;
+                                        Create a custom role first &rarr;
                                     </Link>
                                 </div>
                             ) : (
@@ -427,7 +427,7 @@ export const AdminUserCreatePage: React.FC = () => {
                                                         {r.name}
                                                     </span>
                                                     <span className="text-[10px] text-slate-400 font-mono">
-                                                        {r.permissions?.length || 0} টি অনুমোদিত ফিচার
+                                                        {r.permissions?.length || 0} permissions assigned
                                                     </span>
                                                 </div>
                                                 <input
@@ -449,30 +449,30 @@ export const AdminUserCreatePage: React.FC = () => {
                     {roleType === 'teacher' && (
                         <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/60 space-y-3 animate-fadeIn">
                             <span className="font-bold text-xs text-indigo-900 dark:text-indigo-200 block">
-                                শিক্ষক প্রোফাইল তথ্য (Teacher Profile Details)
+                                Teacher Profile Details
                             </span>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        পদবী (Designation)
+                                        Designation
                                     </label>
                                     <input
                                         type="text"
                                         value={designation}
                                         onChange={(e) => setDesignation(e.target.value)}
-                                        placeholder="যেমন: সিনিয়র গণিত শিক্ষক"
+                                        placeholder="e.g. Senior Instructor"
                                         className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        প্রতিষ্ঠান (Institution)
+                                        Institution
                                     </label>
                                     <input
                                         type="text"
                                         value={institution}
                                         onChange={(e) => setInstitution(e.target.value)}
-                                        placeholder="যেমন: ঢাকা বিশ্ববিদ্যালয়"
+                                        placeholder="e.g. University of Dhaka"
                                         className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                                     />
                                 </div>
@@ -483,7 +483,7 @@ export const AdminUserCreatePage: React.FC = () => {
                     {/* Account Status */}
                     <div className="pt-2">
                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                            অ্যাকাউন্ট স্ট্যাটাস
+                            Account Status
                         </label>
                         <div className="flex items-center gap-4">
                             <label className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
@@ -495,7 +495,7 @@ export const AdminUserCreatePage: React.FC = () => {
                                     onChange={() => setStatus('active')}
                                     className="text-emerald-600 focus:ring-emerald-500"
                                 />
-                                <span className="text-emerald-600">সক্রিয় (Active)</span>
+                                <span className="text-emerald-600">Active</span>
                             </label>
                             <label className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
                                 <input
@@ -506,7 +506,7 @@ export const AdminUserCreatePage: React.FC = () => {
                                     onChange={() => setStatus('inactive')}
                                     className="text-rose-600 focus:ring-rose-500"
                                 />
-                                <span className="text-rose-600">নিষ্ক্রিয় (Inactive)</span>
+                                <span className="text-rose-600">Inactive</span>
                             </label>
                         </div>
                     </div>
@@ -519,7 +519,7 @@ export const AdminUserCreatePage: React.FC = () => {
                         onClick={() => navigate('/admin/users')}
                         className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                     >
-                        বাতিল
+                        Cancel
                     </button>
                     <button
                         type="submit"
@@ -527,7 +527,7 @@ export const AdminUserCreatePage: React.FC = () => {
                         className="inline-flex items-center gap-2 px-7 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition shadow-sm shadow-sky-600/30 disabled:opacity-60 cursor-pointer"
                     >
                         {submitting && <RefreshCw className="w-4 h-4 animate-spin" />}
-                        <span>{submitting ? 'ইউজার তৈরি হচ্ছে...' : 'ইউজার অ্যাকাউন্ট তৈরি করুন'}</span>
+                        <span>{submitting ? 'Creating User...' : 'Create User Account'}</span>
                     </button>
                 </div>
             </form>

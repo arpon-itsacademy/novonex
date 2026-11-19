@@ -35,61 +35,55 @@ import { HeaderMenuItem } from '../../types';
 const DEFAULT_NAV_ITEMS: HeaderMenuItem[] = [
     {
         id: '1',
-        label: 'হোম',
-        label_en: 'Home',
-        url: '/',
+        label: 'AI ML',
+        label_en: 'AI ML',
+        url: '/courses',
         is_external: false,
-        highlight: false,
+        highlight: true,
     },
     {
         id: '2',
-        label: 'কোর্সসমূহ',
-        label_en: 'Courses',
+        label: 'Course Details',
+        label_en: 'Course Details',
         url: '/courses',
         is_external: false,
         highlight: false,
         children: [
-            { id: '2-1', label: 'সকল কোর্সসমূহ', label_en: 'All Courses', url: '/courses' },
-            { id: '2-2', label: 'HSC একাডেমিক সাইকেল', label_en: 'HSC Academic Cycle', url: '/courses' },
-            { id: '2-3', label: 'ইঞ্জিনিয়ারিং ও ভার্সিটি ভর্তি', label_en: 'Engineering & Varsity Admission', url: '/courses' },
-            { id: '2-4', label: 'ফ্রি ট্রায়াল ক্লাস', label_en: 'Free Trial Classes', url: '/courses?type=free' },
+            { id: '2-1', label: 'All Courses', label_en: 'All Courses', url: '/courses' },
+            { id: '2-2', label: 'Academic Courses', label_en: 'Academic Courses', url: '/courses?type=academic' },
+            { id: '2-3', label: 'Admission & Varsity', label_en: 'Admission & Varsity', url: '/courses?type=admission' },
+            { id: '2-4', label: 'Recorded Batches', label_en: 'Recorded Batches', url: '/courses' },
         ],
     },
     {
         id: '3',
-        label: 'বইসমূহ ও বান্ডেল',
-        label_en: 'Books & Bundles',
+        label: 'Success Story',
+        label_en: 'Success Story',
         url: '/courses',
         is_external: false,
         highlight: false,
-        children: [
-            { id: '3-1', label: 'কম্বো কোর্স বান্ডেল', label_en: 'Combo Course Bundles', url: '/courses' },
-            { id: '3-2', label: 'লেকচার শিট ও নোটবুক', label_en: 'Lecture Sheets & Notes', url: '/courses' },
-        ],
     },
     {
         id: '4',
-        label: 'ফ্রি রিসোর্স',
-        label_en: 'Free Resources',
-        url: '/courses?type=free',
+        label: 'Bootcamps / Events',
+        label_en: 'Bootcamps / Events',
+        url: '/courses?type=live',
         is_external: false,
         highlight: false,
     },
     {
         id: '5',
-        label: 'যোগাযোগ',
-        label_en: 'Contact Us',
-        url: '/p/contact',
+        label: 'More',
+        label_en: 'More',
+        url: '/courses',
         is_external: false,
         highlight: false,
-    },
-    {
-        id: '6',
-        label: 'ই-বুক ও এক্সাম',
-        label_en: 'E-Books & Exams',
-        url: '/student/exams',
-        is_external: false,
-        highlight: true,
+        children: [
+            { id: '5-1', label: 'Live Exams & Quizzes', label_en: 'Live Exams & Quizzes', url: '/student/exams' },
+            { id: '5-2', label: 'Free Trial Classes', label_en: 'Free Trial Classes', url: '/courses?type=free' },
+            { id: '5-3', label: 'Class Routine', label_en: 'Class Routine', url: '/student/routine' },
+            { id: '5-4', label: 'Contact Us', label_en: 'Contact Us', url: '/p/contact' },
+        ],
     },
 ];
 
@@ -263,7 +257,7 @@ export const Navbar: React.FC = () => {
                                     rel="noopener noreferrer"
                                     className="underline font-bold text-[11px] opacity-90 hover:opacity-100 inline-flex items-center gap-0.5 ml-1"
                                 >
-                                    <span>বিস্তারিত দেখুন</span>
+                                    <span>View Details</span>
                                     <ChevronRight className="w-3 h-3" />
                                 </a>
                             ) : (
@@ -271,7 +265,7 @@ export const Navbar: React.FC = () => {
                                     to={headerSettings.announcement_link}
                                     className="underline font-bold text-[11px] opacity-90 hover:opacity-100 inline-flex items-center gap-0.5 ml-1"
                                 >
-                                    <span>বিস্তারিত দেখুন</span>
+                                    <span>View Details</span>
                                     <ChevronRight className="w-3 h-3" />
                                 </Link>
                             )
@@ -426,7 +420,7 @@ export const Navbar: React.FC = () => {
                             type="button"
                             onClick={() => setSearchModalOpen(true)}
                             className="p-2 text-slate-600 dark:text-slate-300 hover:text-[#25a2ee] dark:hover:text-[#25a2ee] hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-                            title="কোর্স খুঁজুন"
+                            title="Search Courses"
                         >
                             <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
@@ -447,7 +441,7 @@ export const Navbar: React.FC = () => {
                                         type="button"
                                         onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
                                         className="p-2 text-slate-700 dark:text-slate-200 hover:text-[#25a2ee] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer relative"
-                                        title="নোটিফিকেশনসমূহ"
+                                        title="Notifications"
                                     >
                                         <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                                         {unreadCount > 0 && (
@@ -461,21 +455,21 @@ export const Navbar: React.FC = () => {
                                             onMouseLeave={() => setNotifDropdownOpen(false)}
                                         >
                                             <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                                <span className="text-xs font-bold text-slate-800 dark:text-slate-100">নোটিফিকেশনসমূহ</span>
+                                                <span className="text-xs font-bold text-slate-800 dark:text-slate-100">Notifications</span>
                                                 {unreadCount > 0 && (
                                                     <button
                                                         onClick={markAllRead}
                                                         className="text-[10px] font-bold text-[#25a2ee] hover:underline flex items-center gap-1 cursor-pointer"
                                                     >
                                                         <CheckCheck className="w-3 h-3" />
-                                                        <span>পড়েছি চিহ্নিত করুন</span>
+                                                        <span>Mark all as read</span>
                                                     </button>
                                                 )}
                                             </div>
                                             <div className="max-h-60 overflow-y-auto divide-y divide-slate-50 dark:divide-slate-800">
                                                 {notifications.length === 0 ? (
                                                     <div className="p-4 text-center text-xs text-slate-400">
-                                                        কোনো নতুন নোটিফিকেশন নেই
+                                                        No new notifications
                                                     </div>
                                                 ) : (
                                                     notifications.slice(0, 8).map((n) => (
@@ -488,7 +482,7 @@ export const Navbar: React.FC = () => {
                                                         >
                                                             <div className="flex items-center justify-between gap-1">
                                                                 <p className="text-xs font-bold text-slate-800 dark:text-slate-100 line-clamp-1">
-                                                                    {n.data?.title || n.title || 'বিজ্ঞপ্তি'}
+                                                                    {n.data?.title || n.title || 'Notice'}
                                                                 </p>
                                                                 {!n.read_at && (
                                                                     <span className="w-1.5 h-1.5 rounded-full bg-[#25a2ee] shrink-0" />
@@ -522,27 +516,27 @@ export const Navbar: React.FC = () => {
                                     type="button"
                                     onClick={logout}
                                     className="p-2 text-slate-400 hover:text-[#CC1200] hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
-                                    title="লগআউট"
+                                    title="Logout"
                                 >
                                     <LogOut className="w-4 h-4" />
                                 </button>
                             </div>
                         ) : (
                             <div className="flex items-center gap-2 sm:gap-2.5">
-                                {/* লগইন (Login) Outline Pill Button */}
+                                {/* Login Outline Pill Button */}
                                 <Link
                                     to="/login"
-                                    className="px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:border-[#25a2ee] hover:text-[#25a2ee] dark:hover:border-[#25a2ee] dark:hover:text-[#25a2ee] transition-all cursor-pointer"
+                                    className="px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:border-[#25a2ee] hover:text-[#25a2ee] dark:hover:border-[#25a2ee] dark:hover:text-[#25a2ee] transition-all cursor-pointer"
                                 >
-                                    লগইন
+                                    Login
                                 </Link>
 
-                                {/* রেজিস্ট্রেশন (Registration) Solid Pill Button in #CC1200 */}
+                                {/* Registration Solid Pill Button in #CC1200 */}
                                 <Link
                                     to="/register"
-                                    className="px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-white bg-[#CC1200] hover:bg-[#a80e00] shadow-sm shadow-[#CC1200]/25 transition-all cursor-pointer whitespace-nowrap"
+                                    className="px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold text-white bg-[#CC1200] hover:bg-[#a80e00] shadow-sm shadow-[#CC1200]/25 transition-all cursor-pointer whitespace-nowrap"
                                 >
-                                    রেজিস্ট্রেশন
+                                    Registration
                                 </Link>
                             </div>
                         )}
@@ -634,7 +628,7 @@ export const Navbar: React.FC = () => {
                                         className="flex-1 py-2 text-center font-bold text-white bg-[#25a2ee] hover:bg-[#1784ce] rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
                                     >
                                         <Shield className="w-4 h-4" />
-                                        <span>{user.role === 'admin' ? 'অ্যাডমিন প্যানেল' : `ড্যাশবোর্ড (${user.name.split(' ')[0]})`}</span>
+                                        <span>{user.role === 'admin' ? 'Admin Panel' : `Dashboard (${user.name.split(' ')[0]})`}</span>
                                     </Link>
                                     <button
                                         type="button"
@@ -643,7 +637,7 @@ export const Navbar: React.FC = () => {
                                             logout();
                                         }}
                                         className="p-2 text-[#CC1200] hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl transition-colors cursor-pointer"
-                                        title="লগআউট"
+                                        title="Logout"
                                     >
                                         <LogOut className="w-4 h-4" />
                                     </button>
@@ -655,14 +649,14 @@ export const Navbar: React.FC = () => {
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="py-2 text-center font-bold text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl text-xs hover:border-[#25a2ee] hover:text-[#25a2ee] transition-all"
                                     >
-                                        লগইন
+                                        Login
                                     </Link>
                                     <Link
                                         to="/register"
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="py-2 text-center font-extrabold text-white bg-[#CC1200] hover:bg-[#a80e00] rounded-xl text-xs shadow-sm transition-all"
+                                        className="py-2 text-center font-bold text-white bg-[#CC1200] hover:bg-[#a80e00] rounded-xl text-xs shadow-sm transition-all"
                                     >
-                                        রেজিস্ট্রেশন
+                                        Registration
                                     </Link>
                                 </div>
                             )}
@@ -678,7 +672,7 @@ export const Navbar: React.FC = () => {
                         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-white text-sm">
                                 <Search className="w-4 h-4 text-sky-600" />
-                                <span>কোর্স বা বিষয় খুঁজুন</span>
+                                <span>Search Courses or Topics</span>
                             </div>
                             <button
                                 type="button"
@@ -697,7 +691,7 @@ export const Navbar: React.FC = () => {
                                     autoFocus
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="কোর্সের নাম লিখুন (যেমন: HSC Physics, Math...)"
+                                    placeholder="Type course name (e.g. Fundamental Calculus, Physics...)"
                                     className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:ring-2 focus:ring-sky-500 dark:text-white"
                                 />
                             </div>
@@ -706,7 +700,7 @@ export const Navbar: React.FC = () => {
                                 type="submit"
                                 className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-2xl text-xs sm:text-sm shadow-md transition-all cursor-pointer"
                             >
-                                সার্চ করুন
+                                Search
                             </button>
                         </form>
                     </div>
@@ -766,7 +760,7 @@ export const Navbar: React.FC = () => {
                             <div className="flex items-center gap-2.5 min-w-0 pr-6 sm:pr-0">
                                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
                                 <span className="font-extrabold truncate text-white">
-                                    {headerSettings?.banner_title || 'নতুন ব্যাচে প্রথম ক্লাস একদম ফ্রি!'}
+                                    {headerSettings?.banner_title || 'First class is completely free in the new batch!'}
                                 </span>
                                 {headerSettings?.banner_subtitle && (
                                     <span className="hidden md:inline text-xs text-white/90 truncate font-medium">
@@ -837,7 +831,7 @@ export const Navbar: React.FC = () => {
                             handleDismissBanner();
                         }}
                         className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 w-6 h-6 rounded-full bg-black/40 hover:bg-black/75 text-white flex items-center justify-center transition-all cursor-pointer z-30 backdrop-blur-xs"
-                        title="ব্যানার বন্ধ করুন (Close Banner)"
+                        title="Close Banner"
                         aria-label="Close banner"
                     >
                         <X className="w-3.5 h-3.5" />

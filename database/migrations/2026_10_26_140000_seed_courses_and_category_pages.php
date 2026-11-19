@@ -15,12 +15,12 @@ return new class extends Migration
         Page::firstOrCreate(
             ['slug' => 'courses'],
             [
-                'title' => 'সকল কোর্সসমূহ',
+                'title' => 'All Courses',
                 'status' => 'published',
                 'layout_type' => 'builder',
                 'is_system' => true,
-                'meta_title' => 'সকল কোর্সসমূহ - Novonex Academy',
-                'meta_description' => 'আপনার লক্ষ্য অর্জনের জন্য উপযুক্ত কোর্সটি বেছে নিন। অভিজ্ঞ শিক্ষকদের সাথে পূর্ণাঙ্গ প্রস্তুতি।',
+                'meta_title' => 'All Courses - Novonex Academy',
+                'meta_description' => 'Choose the right course to achieve your goals. Comprehensive preparation with experienced mentors.',
                 'blocks' => Page::defaultCoursesBlocks(),
             ]
         );

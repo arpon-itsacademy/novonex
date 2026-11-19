@@ -237,7 +237,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
     // Add user from live search results
     const handleAddUserToQueue = (candidate: UserCandidate) => {
         if (queuedStudents.some((s) => s.id === candidate.id)) {
-            alert(`${candidate.name} ইতিমধ্যে তালিকায় যোগ করা হয়েছে।`);
+            alert(`${candidate.name} is already in the list.`);
             return;
         }
         setQueuedStudents((prev) => [...prev, candidate]);
@@ -248,7 +248,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
     // Parse and verify bulk phone numbers
     const handleVerifyBulkPhones = async () => {
         if (!bulkPhonesInput.trim()) {
-            alert('অনুগ্রহ করে এক বা একাধিক ফোন নম্বর লিখুন বা পেস্ট করুন।');
+            alert('Please enter or paste one or more phone numbers.');
             return;
         }
 
@@ -277,10 +277,10 @@ export const AdminManualEnrollmentPage: React.FC = () => {
             }
 
             if (matched.length === 0 && unmatched.length > 0) {
-                alert('প্রদত্ত নম্বরগুলোর কোনোটির সাথে রেজিস্ট্রার্ড কোনো অ্যাকাউন্ট পাওয়া যায়নি।');
+                alert('No registered accounts found matching the provided numbers.');
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'ফোন নম্বর যাচাইয়ে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to verify phone numbers.');
         } finally {
             setParsingBulk(false);
         }
@@ -294,7 +294,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
     // Clear entire queue
     const handleClearQueue = () => {
         if (queuedStudents.length === 0) return;
-        if (window.confirm('আপনি কি তালিকা থেকে সকল শিক্ষার্থী সরাতে চান?')) {
+        if (window.confirm('Are you sure you want to remove all students from the list?')) {
             setQueuedStudents([]);
             setUnmatchedPhones([]);
         }
@@ -303,12 +303,12 @@ export const AdminManualEnrollmentPage: React.FC = () => {
     // Perform enrollment
     const handleEnrollSubmit = async () => {
         if (!selectedTarget) {
-            alert('অনুগ্রহ করে প্রথমে কোর্স বা বান্ডেল নির্বাচন করুন।');
+            alert('Please select a course or bundle first.');
             return;
         }
 
         if (queuedStudents.length === 0) {
-            alert('এনরোল করার জন্য অন্তত একজন শিক্ষার্থী নির্বাচন করুন।');
+            alert('Please select at least one student to enroll.');
             return;
         }
 
@@ -318,19 +318,19 @@ export const AdminManualEnrollmentPage: React.FC = () => {
         if (readyStudents.length === 0) {
             alert(
                 selectedTarget.type === 'bundle'
-                    ? 'নির্বাচিত সকল শিক্ষার্থী ইতিমধ্যে এই বান্ডেলে এনরোল্ড রয়েছেন।'
-                    : 'নির্বাচিত সকল শিক্ষার্থী ইতিমধ্যে এই কোর্সে এনরোল্ড রয়েছেন।'
+                    ? 'All selected students are already enrolled in this bundle.'
+                    : 'All selected students are already enrolled in this course.'
             );
             return;
         }
 
-        const typeLabel = selectedTarget.type === 'bundle' ? 'বান্ডেল' : 'কোর্স';
-        let confirmMsg = `আপনি কি ${readyStudents.length} জন শিক্ষার্থীকে "${selectedTarget.title}" ${typeLabel}-এ ম্যানুয়ালি এনরোল করাতে চান?`;
+        const typeLabel = selectedTarget.type === 'bundle' ? 'bundle' : 'course';
+        let confirmMsg = `Do you want to manually enroll ${readyStudents.length} student(s) into "${selectedTarget.title}" ${typeLabel}?`;
         if (selectedTarget.type === 'bundle') {
-            confirmMsg += `\n(শিক্ষার্থীরা এই বান্ডেলের অন্তর্গত সকল ${selectedTarget.courses_count || selectedTarget.courses?.length || ''} টি কোর্সে পূর্ণ অ্যাক্সেস পাবেন)`;
+            confirmMsg += `\n(Students will receive full access to all ${selectedTarget.courses_count || selectedTarget.courses?.length || ''} courses in this bundle)`;
         }
         if (alreadyEnrolledCount > 0) {
-            confirmMsg += `\n(${alreadyEnrolledCount} জন শিক্ষার্থী ইতিমধ্যে এনরোল্ড থাকায় তাদের বাদ রাখা হবে)`;
+            confirmMsg += `\n(${alreadyEnrolledCount} student(s) already enrolled and will be skipped)`;
         }
 
         if (!window.confirm(confirmMsg)) return;
@@ -354,7 +354,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
             // refresh targets
             fetchTargets();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'এনরোলমেন্ট সম্পন্ন করতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to complete enrollment.');
         } finally {
             setEnrolling(false);
         }
@@ -371,10 +371,10 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                         </div>
                         <div>
                             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                                ম্যানুয়াল এনরোলমেন্ট (Manual Enrollment)
+                                Manual Enrollment
                             </h1>
                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                কোর্স বা বান্ডেল নির্বাচন করে শিক্ষার্থী বা একাধিক ফোন নম্বর দিয়ে নিমেষেই ব্যাচে এনরোল করান
+                                Select course or bundle and enroll students instantly using search or bulk phone numbers.
                             </p>
                         </div>
                     </div>
@@ -392,7 +392,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                         }`}
                     >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>নতুন এনরোলমেন্ট</span>
+                        <span>New Enrollment</span>
                     </button>
 
                     <button
@@ -405,7 +405,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                         }`}
                     >
                         <History className="w-3.5 h-3.5" />
-                        <span>এনরোলমেন্ট হিস্ট্রি</span>
+                        <span>Enrollment History</span>
                     </button>
                 </div>
             </div>
@@ -432,14 +432,14 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                         : 'bg-slate-100 text-slate-500'
                                 }`}
                             >
-                                {selectedTarget ? <Check className="w-4 h-4" /> : '১'}
+                                {selectedTarget ? <Check className="w-4 h-4" /> : '1'}
                             </div>
                             <div className="truncate">
-                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">ধাপ ১</div>
+                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Step 1</div>
                                 <div className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-200 truncate">
                                     {selectedTarget
                                         ? `${selectedTarget.type === 'bundle' ? '📦 ' : '📚 '}${selectedTarget.title}`
-                                        : 'কোর্স বা বান্ডেল নির্বাচন করুন'}
+                                        : 'Select Course or Bundle'}
                                 </div>
                             </div>
                         </div>
@@ -447,7 +447,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                         <div
                             onClick={() => {
                                 if (selectedTarget) setCurrentStep(2);
-                                else alert('অনুগ্রহ করে প্রথমে একটি কোর্স বা বান্ডেল নির্বাচন করুন।');
+                                else alert('Please select a course or bundle first.');
                             }}
                             className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-3 ${
                                 currentStep === 2
@@ -460,12 +460,12 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                     currentStep === 2 ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-500'
                                 }`}
                             >
-                                {'২'}
+                                {'2'}
                             </div>
                             <div className="truncate">
-                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">ধাপ ২</div>
+                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Step 2</div>
                                 <div className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-200 truncate">
-                                    শিক্ষার্থী যোগ ও এনরোল ({queuedStudents.length})
+                                    Add Students & Enroll ({queuedStudents.length})
                                 </div>
                             </div>
                         </div>
@@ -478,10 +478,10 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                 <div>
                                     <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                                         <BookOpen className="w-5 h-5 text-sky-600" />
-                                        <span>কোন কোর্স বা বান্ডেলে শিক্ষার্থী এনরোল করাতে চান?</span>
+                                        <span>Which course or bundle do you want to enroll students into?</span>
                                     </h3>
                                     <p className="text-xs text-slate-500">
-                                        যেটিতে শিক্ষার্থীদের ফ্রি বা সরাসরি অ্যাক্সেস দিতে চান সেটি সিলেক্ট করুন
+                                        Select the course or bundle you want to grant direct or free access to.
                                     </p>
                                 </div>
 
@@ -492,7 +492,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                         type="text"
                                         value={targetSearch}
                                         onChange={(e) => setTargetSearch(e.target.value)}
-                                        placeholder="১-২ অক্ষর লিখলেই কোর্স/বান্ডেল চলে আসবে..."
+                                        placeholder="Type 1-2 letters to search courses/bundles..."
                                         className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-sky-500 placeholder:text-slate-400"
                                         autoFocus
                                     />
@@ -520,7 +520,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                                         }`}
                                     >
-                                        <span>সব দেখুন</span>
+                                        <span>View All</span>
                                         <span className="text-[10px] px-1.5 py-0.2 bg-white/20 rounded-full font-mono">
                                             {targets.length}
                                         </span>
@@ -536,7 +536,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                         }`}
                                     >
                                         <BookOpen className="w-3.5 h-3.5" />
-                                        <span>কোর্সসমূহ</span>
+                                        <span>Courses</span>
                                         <span className="text-[10px] px-1.5 py-0.2 bg-white/20 rounded-full font-mono">
                                             {coursesCount}
                                         </span>
@@ -552,7 +552,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                         }`}
                                     >
                                         <Package className="w-3.5 h-3.5" />
-                                        <span>বান্ডেলসমূহ</span>
+                                        <span>Bundles</span>
                                         <span className="text-[10px] px-1.5 py-0.2 bg-white/20 rounded-full font-mono">
                                             {bundlesCount}
                                         </span>
@@ -560,20 +560,20 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                 </div>
 
                                 <div className="text-[11px] text-slate-400 font-medium">
-                                    মোট {filteredTargets.length} টি ফলাফল পাওয়া গেছে
+                                    Total {filteredTargets.length} results found
                                 </div>
                             </div>
 
                             {loadingTargets ? (
                                 <div className="p-12 text-center space-y-3">
                                     <Loader2 className="w-8 h-8 animate-spin text-sky-600 mx-auto" />
-                                    <p className="text-xs text-slate-500 font-semibold">কোর্স ও বান্ডেল লোড হচ্ছে...</p>
+                                    <p className="text-xs text-slate-500 font-semibold">Loading courses and bundles...</p>
                                 </div>
                             ) : filteredTargets.length === 0 ? (
                                 <div className="p-12 text-center space-y-3 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
                                     <AlertCircle className="w-8 h-8 text-slate-400 mx-auto" />
                                     <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
-                                        "{targetSearch}" দিয়ে কোনো কোর্স বা বান্ডেল পাওয়া যায়নি
+                                        No courses or bundles found matching "{targetSearch}"
                                     </p>
                                     <button
                                         type="button"
@@ -583,7 +583,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                         }}
                                         className="text-xs font-bold text-sky-600 hover:underline cursor-pointer"
                                     >
-                                        সার্চ রিসেট করুন
+                                        Reset Search
                                     </button>
                                 </div>
                             ) : (
@@ -626,13 +626,12 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                                 <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex items-center gap-1">
                                                                     <Package className="w-3 h-3" />
                                                                     <span>
-                                                                        বান্ডেল ({item.courses_count || item.courses?.length || 0}{' '}
-                                                                        কোর্স)
+                                                                        Bundle ({item.courses_count || item.courses?.length || 0} Courses)
                                                                     </span>
                                                                 </span>
                                                             ) : (
                                                                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 truncate max-w-[120px]">
-                                                                    {item.category?.name || 'কোর্স'}
+                                                                    {item.category?.name || 'Course'}
                                                                 </span>
                                                             )}
                                                             <span className="text-[10px] text-slate-400 ml-auto flex items-center gap-1">
@@ -652,7 +651,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                     <div className="mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
                                                         <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-1 flex items-center gap-1">
                                                             <Layers className="w-3 h-3 text-purple-500" />
-                                                            <span>অন্তর্ভুক্ত কোর্সসমূহ:</span>
+                                                            <span>Included Courses:</span>
                                                         </div>
                                                         <div className="flex flex-wrap gap-1">
                                                             {item.courses.slice(0, 2).map((subC) => (
@@ -664,8 +663,8 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                                 </span>
                                                             ))}
                                                             {item.courses.length > 2 && (
-                                                                <span className="px-1.5 py-0.5 bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 text-[10px] rounded font-bold">
-                                                                    +{item.courses.length - 2} আরও
+                                                                <span className="px-1.5 py-0.5 bg-purple-50 dark:purple-950 text-purple-600 dark:text-purple-300 text-[10px] rounded font-bold">
+                                                                    +{item.courses.length - 2} more
                                                                 </span>
                                                             )}
                                                         </div>
@@ -682,12 +681,12 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                                     : 'text-sky-600 dark:text-sky-400'
                                                             }`}
                                                         >
-                                                            ৳{item.price}
+                                                            Tk {item.price}
                                                         </span>
                                                         {item.sale_price !== null &&
                                                             item.regular_price > item.price && (
                                                                 <span className="text-[10px] text-slate-400 line-through">
-                                                                    ৳{item.regular_price}
+                                                                    Tk {item.regular_price}
                                                                 </span>
                                                             )}
                                                     </div>
@@ -714,7 +713,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                             {selectedTarget && (
                                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div className="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2">
-                                        <span>নির্বাচিত {selectedTarget.type === 'bundle' ? 'বান্ডেল' : 'কোর্স'}:</span>
+                                        <span>Selected {selectedTarget.type === 'bundle' ? 'Bundle' : 'Course'}:</span>
                                         <strong className="text-slate-900 dark:text-white font-extrabold flex items-center gap-1">
                                             {selectedTarget.type === 'bundle' ? (
                                                 <Package className="w-4 h-4 text-purple-600" />
@@ -729,7 +728,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                         onClick={() => setCurrentStep(2)}
                                         className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-600/20 transition cursor-pointer"
                                     >
-                                        <span>পরবর্তী ধাপ (শিক্ষার্থী যোগ করুন)</span>
+                                        <span>Next Step (Add Students)</span>
                                         <ChevronRight className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -767,12 +766,12 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                             {selectedTarget.type === 'bundle' ? (
                                                 <>
                                                     <Package className="w-3.5 h-3.5 text-amber-300" />
-                                                    <span>টার্গেট বান্ডেল (সকল কোর্সে অ্যাক্সেস পাবেন)</span>
+                                                    <span>Target Bundle (Full access to all courses)</span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <BookOpen className="w-3.5 h-3.5 text-sky-300" />
-                                                    <span>টার্গেট কোর্স</span>
+                                                    <span>Target Course</span>
                                                 </>
                                             )}
                                         </div>
@@ -780,14 +779,14 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                             {selectedTarget.title}
                                         </h3>
                                         <div className="text-xs text-white/85 mt-0.5 flex flex-wrap items-center gap-3">
-                                            <span>রেগুলার ফি: ৳{selectedTarget.price}</span>
+                                            <span>Regular Fee: Tk {selectedTarget.price}</span>
                                             <span>•</span>
-                                            <span>পূর্বে এনরোল্ড: {selectedTarget.enrollments_count || 0} জন</span>
+                                            <span>Previously Enrolled: {selectedTarget.enrollments_count || 0}</span>
                                             {selectedTarget.type === 'bundle' && selectedTarget.courses && (
                                                 <>
                                                     <span>•</span>
                                                     <span className="text-amber-200 font-bold">
-                                                        {selectedTarget.courses.length} টি কোর্স অন্তর্ভুক্ত
+                                                        {selectedTarget.courses.length} Courses Included
                                                     </span>
                                                 </>
                                             )}
@@ -800,7 +799,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                     onClick={() => setCurrentStep(1)}
                                     className="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-xs font-bold text-white transition self-start sm:self-auto cursor-pointer"
                                 >
-                                    কোর্স/বান্ডেল পরিবর্তন
+                                    Change Course/Bundle
                                 </button>
                             </div>
 
@@ -810,10 +809,10 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                     <div>
                                         <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                                             <Users className="w-5 h-5 text-sky-600" />
-                                            <span>শিক্ষার্থী নির্বাচন করুন</span>
+                                            <span>Select Students</span>
                                         </h3>
                                         <p className="text-xs text-slate-500">
-                                            নাম বা নম্বর দিয়ে সার্চ করে অথবা একসাথে একাধিক নম্বর দিয়ে যুক্ত করুন
+                                            Search by name or number, or paste multiple phone numbers in bulk
                                         </p>
                                     </div>
 
@@ -829,7 +828,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                             }`}
                                         >
                                             <Search className="w-3.5 h-3.5" />
-                                            <span>লাইভ সার্চ</span>
+                                            <span>Live Search</span>
                                         </button>
                                         <button
                                             type="button"
@@ -841,7 +840,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                             }`}
                                         >
                                             <Phone className="w-3.5 h-3.5" />
-                                            <span>একাধিক নম্বর (Bulk)</span>
+                                            <span>Bulk Numbers</span>
                                         </button>
                                     </div>
                                 </div>
@@ -855,7 +854,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                 type="text"
                                                 value={userSearchQuery}
                                                 onChange={(e) => handleUserSearchChange(e.target.value)}
-                                                placeholder="শিক্ষার্থীর নাম, মোবাইল নম্বর বা ইমেইল লিখুন..."
+                                                placeholder="Type student name, phone or email..."
                                                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-sky-500"
                                             />
                                             {searchingUsers && (
@@ -884,7 +883,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                                         </span>
                                                                         {cand.is_enrolled && (
                                                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
-                                                                                ইতিমধ্যে এনরোল্ড
+                                                                                Already Enrolled
                                                                             </span>
                                                                         )}
                                                                     </div>
@@ -906,7 +905,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                                 }`}
                                                             >
                                                                 <Plus className="w-3.5 h-3.5" />
-                                                                <span>{isAlreadyQueued ? 'যোগ করা হয়েছে' : 'তালিকায় যোগ করুন'}</span>
+                                                                <span>{isAlreadyQueued ? 'Added' : 'Add to List'}</span>
                                                             </button>
                                                         </div>
                                                     );
@@ -921,20 +920,20 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                     <div className="space-y-3">
                                         <div className="space-y-1.5">
                                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                                                কমা (,) অথবা নতুন লাইন দিয়ে মোবাইল নম্বরগুলো পেস্ট করুন:
+                                                Paste mobile numbers separated by comma (,) or newlines:
                                             </label>
                                             <textarea
                                                 rows={4}
                                                 value={bulkPhonesInput}
                                                 onChange={(e) => setBulkPhonesInput(e.target.value)}
-                                                placeholder="যেমন: 01711111111, 01822222222, 01933333333 অথবা এক লাইনে একটি করে নম্বর পেস্ট করুন..."
+                                                placeholder="e.g. 01711111111, 01822222222, 01933333333 or paste one number per line..."
                                                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-mono focus:ring-2 focus:ring-sky-500 leading-relaxed"
                                             />
                                         </div>
 
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                             <p className="text-[11px] text-slate-500">
-                                                * সিস্টেম স্বয়ংক্রিয়ভাবে নম্বরগুলোর ফরম্যাট ঠিক করে ডাটাবেজ থেকে স্টুডেন্ট অ্যাকাউন্ট খুঁজে বের করবে
+                                                * The system will automatically standardize number formats and find matching student accounts.
                                             </p>
                                             <button
                                                 type="button"
@@ -947,7 +946,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                 ) : (
                                                     <Search className="w-4 h-4" />
                                                 )}
-                                                <span>{parsingBulk ? 'যাচাই করা হচ্ছে...' : 'নম্বরগুলো যাচাই ও যোগ করুন'}</span>
+                                                <span>{parsingBulk ? 'Verifying...' : 'Verify Numbers & Add'}</span>
                                             </button>
                                         </div>
 
@@ -956,7 +955,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                             <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 space-y-2 animate-in fade-in">
                                                 <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
                                                     <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                                                    <span>{unmatchedPhones.length} টি নম্বরের সাথে কোনো অ্যাকাউন্ট পাওয়া যায়নি:</span>
+                                                    <span>No accounts found matching {unmatchedPhones.length} numbers:</span>
                                                 </div>
                                                 <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                                                     {unmatchedPhones.map((ph, idx) => (
@@ -969,7 +968,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                     ))}
                                                 </div>
                                                 <p className="text-[11px] text-amber-700 dark:text-amber-400">
-                                                    এই নম্বরের শিক্ষার্থীদের প্রথমে প্ল্যাটফর্মে রেজিস্টার করতে হবে অথবা 'All Users &gt; Create User' থেকে অ্যাকাউন্ট তৈরি করতে পারেন।
+                                                    Students with these numbers must register on the platform first, or an admin can create accounts for them from 'All Users &gt; Create User'.
                                                 </p>
                                             </div>
                                         )}
@@ -986,10 +985,10 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                         </div>
                                         <div>
                                             <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                                                এনরোলমেন্টের জন্য নির্বাচিত শিক্ষার্থী ({queuedStudents.length} জন)
+                                                Selected Students for Enrollment ({queuedStudents.length})
                                             </h4>
                                             <p className="text-[11px] text-slate-500">
-                                                কনফার্ম করলে নিচের শিক্ষার্থীদের অ্যাকাউন্টে কোর্সের পূর্ণ অ্যাক্সেস চালু হবে
+                                                Confirming will grant full course access to the students below
                                             </p>
                                         </div>
                                     </div>
@@ -1001,7 +1000,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition cursor-pointer self-start sm:self-auto"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
-                                            <span>সব ক্লিয়ার করুন</span>
+                                            <span>Clear All</span>
                                         </button>
                                     )}
                                 </div>
@@ -1009,9 +1008,9 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                 {queuedStudents.length === 0 ? (
                                     <div className="p-10 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl space-y-2">
                                         <Users className="w-8 h-8 text-slate-400 mx-auto" />
-                                        <p className="text-xs font-bold text-slate-500">এখনো কোনো শিক্ষার্থী যুক্ত করা হয়নি।</p>
+                                        <p className="text-xs font-bold text-slate-500">No students added yet.</p>
                                         <p className="text-[11px] text-slate-400">
-                                            উপরের সার্চ বক্স বা একাধিক নম্বরের ইনপুট থেকে শিক্ষার্থী যুক্ত করুন।
+                                            Add students using the search box above or bulk phone numbers.
                                         </p>
                                     </div>
                                 ) : (
@@ -1020,11 +1019,11 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                             <thead>
                                                 <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
                                                     <th className="py-2.5 px-3">#</th>
-                                                    <th className="py-2.5 px-3">শিক্ষার্থী</th>
-                                                    <th className="py-2.5 px-3">মোবাইল নম্বর</th>
-                                                    <th className="py-2.5 px-3">ইমেইল</th>
-                                                    <th className="py-2.5 px-3">স্ট্যাটাস</th>
-                                                    <th className="py-2.5 px-3 text-right">মুছুন</th>
+                                                    <th className="py-2.5 px-3">Student</th>
+                                                    <th className="py-2.5 px-3">Phone</th>
+                                                    <th className="py-2.5 px-3">Email</th>
+                                                    <th className="py-2.5 px-3">Status</th>
+                                                    <th className="py-2.5 px-3 text-right">Remove</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -1049,12 +1048,12 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                             {cand.is_enrolled ? (
                                                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">
                                                                     <AlertTriangle className="w-3 h-3" />
-                                                                    <span>ইতিমধ্যে এনরোল্ড</span>
+                                                                    <span>Already Enrolled</span>
                                                                 </span>
                                                             ) : (
                                                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
                                                                     <Check className="w-3 h-3" />
-                                                                    <span>প্রস্তুত</span>
+                                                                    <span>Ready</span>
                                                                 </span>
                                                             )}
                                                         </td>
@@ -1063,7 +1062,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                                 type="button"
                                                                 onClick={() => handleRemoveFromQueue(cand.id)}
                                                                 className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition cursor-pointer"
-                                                                title="তালিকা থেকে মুছুন"
+                                                                title="Remove from list"
                                                             >
                                                                 <Trash2 className="w-3.5 h-3.5" />
                                                             </button>
@@ -1090,23 +1089,23 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                 />
                                                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                                                     <Send className="w-3.5 h-3.5 text-sky-600" />
-                                                    <span>শিক্ষার্থীর ফোনে কনফার্মেশন SMS পাঠান</span>
+                                                    <span>Send confirmation SMS to student</span>
                                                 </span>
                                             </label>
                                             <p className="text-[11px] text-slate-500 pl-7">
-                                                এনরোলমেন্ট সফল হলে শিক্ষার্থীর ফোন নম্বরে শুভেচ্ছা বার্তা পাঠানো হবে (যদি SMS ব্যালেন্স থাকে)।
+                                                Upon successful enrollment, a greeting SMS will be sent to the student (if SMS balance available).
                                             </p>
                                         </div>
 
                                         <div>
                                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                                অ্যাডমিন রিমার্কস / নোট (ঐচ্ছিক)
+                                                Admin Remarks / Note (Optional)
                                             </label>
                                             <input
                                                 type="text"
                                                 value={enrollmentNotes}
                                                 onChange={(e) => setEnrollmentNotes(e.target.value)}
-                                                placeholder="যেমন: অফিস ক্যাশ পেমেন্ট, স্কলারশিপ বা ব্যাচ নম্বর..."
+                                                placeholder="e.g. Office cash payment, scholarship, batch number..."
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium"
                                             />
                                         </div>
@@ -1115,9 +1114,9 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                     {/* Action Button */}
                                     <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                         <div className="text-xs text-slate-600 dark:text-slate-400">
-                                            মোট এনরোল যোগ্য শিক্ষার্থী:{' '}
+                                            Total eligible students to enroll:{' '}
                                             <strong className="text-sky-600 font-extrabold">
-                                                {queuedStudents.filter((s) => !s.is_enrolled).length} জন
+                                                {queuedStudents.filter((s) => !s.is_enrolled).length}
                                             </strong>
                                         </div>
 
@@ -1138,8 +1137,8 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                             )}
                                             <span>
                                                 {enrolling
-                                                    ? 'এনরোল করা হচ্ছে...'
-                                                    : `${selectedTarget.type === 'bundle' ? 'বান্ডেল' : 'কোর্স'} এনরোলমেন্ট নিশ্চিত করুন`}
+                                                    ? 'Enrolling...'
+                                                    : `Confirm ${selectedTarget.type === 'bundle' ? 'Bundle' : 'Course'} Enrollment`}
                                             </span>
                                         </button>
                                     </div>
@@ -1157,17 +1156,17 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                         <div>
                             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                                 <History className="w-5 h-5 text-sky-600" />
-                                <span>ম্যানুয়াল এনরোলমেন্ট হিস্ট্রি ({historyTotal})</span>
+                                <span>Manual Enrollment History ({historyTotal})</span>
                             </h3>
                             <p className="text-xs text-slate-500">
-                                অ্যাডমিন প্যানেল থেকে সম্পন্ন হওয়া অতীতের ম্যানুয়াল এনরোলমেন্টের রেকর্ড
+                                Records of past manual enrollments performed from the admin panel
                             </p>
                         </div>
                         <button
                             type="button"
                             onClick={fetchHistory}
                             className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer"
-                            title="রিফ্রেশ"
+                            title="Refresh"
                         >
                             <RotateCcw className="w-4 h-4" />
                         </button>
@@ -1176,13 +1175,13 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                     {loadingHistory ? (
                         <div className="p-12 text-center space-y-3">
                             <Loader2 className="w-8 h-8 animate-spin text-sky-600 mx-auto" />
-                            <p className="text-xs text-slate-500 font-semibold">হিস্ট্রি লোড হচ্ছে...</p>
+                            <p className="text-xs text-slate-500 font-semibold">Loading history...</p>
                         </div>
                     ) : historyItems.length === 0 ? (
                         <div className="p-12 text-center space-y-2 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
                             <History className="w-8 h-8 text-slate-400 mx-auto" />
                             <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
-                                কোনো ম্যানুয়াল এনরোলমেন্ট রেকর্ড পাওয়া যায়নি
+                                No manual enrollment records found
                             </p>
                         </div>
                     ) : (
@@ -1190,12 +1189,12 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                             <table className="w-full text-left text-xs">
                                 <thead>
                                     <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-                                        <th className="py-2.5 px-3">অর্ডার নং</th>
-                                        <th className="py-2.5 px-3">শিক্ষার্থী</th>
-                                        <th className="py-2.5 px-3">আইটেম (কোর্স/বান্ডেল)</th>
-                                        <th className="py-2.5 px-3">রিমার্কস / নোট</th>
-                                        <th className="py-2.5 px-3">তারিখ ও সময়</th>
-                                        <th className="py-2.5 px-3">স্ট্যাটাস</th>
+                                        <th className="py-2.5 px-3">Order No</th>
+                                        <th className="py-2.5 px-3">Student</th>
+                                        <th className="py-2.5 px-3">Item (Course/Bundle)</th>
+                                        <th className="py-2.5 px-3">Remarks / Note</th>
+                                        <th className="py-2.5 px-3">Date & Time</th>
+                                        <th className="py-2.5 px-3">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -1221,11 +1220,11 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                     <div className="flex items-center gap-1.5">
                                                         {isBundle ? (
                                                             <span className="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[10px] shrink-0">
-                                                                বান্ডেল
+                                                                Bundle
                                                             </span>
                                                         ) : (
                                                             <span className="px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold text-[10px] shrink-0">
-                                                                কোর্স
+                                                                Course
                                                             </span>
                                                         )}
                                                         <span className="font-semibold text-slate-800 dark:text-slate-200 line-clamp-1">
@@ -1237,7 +1236,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                                     {item.notes || 'Manual admin enrollment'}
                                                 </td>
                                                 <td className="py-3 px-3 text-slate-500 text-[11px] whitespace-nowrap">
-                                                    {new Date(item.created_at).toLocaleString('bn-BD', {
+                                                    {new Date(item.created_at).toLocaleString('en-US', {
                                                         day: 'numeric',
                                                         month: 'short',
                                                         year: 'numeric',
@@ -1270,7 +1269,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                 <Sparkles className="w-7 h-7" />
                             </div>
                             <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                                এনরোলমেন্ট সফল হয়েছে!
+                                Enrollment Successful!
                             </h3>
                             <p className="text-xs text-slate-500">{enrollResult.message}</p>
                         </div>
@@ -1278,15 +1277,15 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                         {/* Breakdown summary */}
                         <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-center">
                             <div>
-                                <div className="text-xs text-slate-400">নতুন এনরোল্ড</div>
+                                <div className="text-xs text-slate-400">Newly Enrolled</div>
                                 <div className="text-lg font-black text-emerald-600">{enrollResult.enrolled_count}</div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-400">পূর্বে এনরোল্ড ছিল</div>
+                                <div className="text-xs text-slate-400">Already Enrolled</div>
                                 <div className="text-lg font-black text-amber-600">{enrollResult.already_enrolled_count}</div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-400">ব্যর্থ</div>
+                                <div className="text-xs text-slate-400">Failed</div>
                                 <div className="text-lg font-black text-rose-600">{enrollResult.failed_count}</div>
                             </div>
                         </div>
@@ -1295,7 +1294,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                         {enrollResult.enrolled && enrollResult.enrolled.length > 0 && (
                             <div className="space-y-1.5">
                                 <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                                    এনরোল্ড শিক্ষার্থী তালিকা:
+                                    Enrolled Students List:
                                 </div>
                                 <div className="max-h-36 overflow-y-auto space-y-1">
                                     {enrollResult.enrolled.map((en, idx) => (
@@ -1320,7 +1319,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                 }}
                                 className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
                             >
-                                হিস্ট্রি দেখুন
+                                View History
                             </button>
                             <button
                                 type="button"
@@ -1330,7 +1329,7 @@ export const AdminManualEnrollmentPage: React.FC = () => {
                                 }}
                                 className="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-600/20 transition cursor-pointer"
                             >
-                                আরো এনরোল করুন
+                                Enroll More
                             </button>
                         </div>
                     </div>

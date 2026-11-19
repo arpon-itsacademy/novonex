@@ -104,7 +104,7 @@ class AdminPageController extends Controller
                     'type' => 'rich_text',
                     'title' => 'Main Content',
                     'settings' => [
-                        'content' => "<p>এখানে আপনার পেজের বিস্তারিত বিষয়বস্তু লিখুন...</p>"
+                        'content' => "<p>Write your detailed page content here...</p>"
                     ]
                 ]
             ];
@@ -123,7 +123,7 @@ class AdminPageController extends Controller
         AuditLog::log('page_created', 'Page', $page->id, null, ['title' => $page->title, 'slug' => $page->slug]);
 
         return response()->json([
-            'message' => 'নতুন পেজ সফলভাবে তৈরি হয়েছে।',
+            'message' => 'New page created successfully.',
             'page' => $page,
         ], 201);
     }
@@ -160,7 +160,7 @@ class AdminPageController extends Controller
         $page->save();
 
         return response()->json([
-            'message' => 'ডিফল্ট টেমপ্লেট সফলভাবে রিস্টোর করা হয়েছে।',
+            'message' => 'Default template restored successfully.',
             'page' => $page,
         ]);
     }
@@ -185,7 +185,7 @@ class AdminPageController extends Controller
         // Prevent slug change for system pages
         if ($page->is_system && in_array($page->slug, ['home', 'courses']) && $validated['slug'] !== $page->slug) {
             return response()->json([
-                'message' => 'সিস্টেম পেজের স্লাগ পরিবর্তন করা সম্ভব নয়।',
+                'message' => 'System page slug cannot be modified.',
             ], 422);
         }
 
@@ -206,7 +206,7 @@ class AdminPageController extends Controller
                         if (!isset($block['settings']['showAllTab']) || $block['settings']['showAllTab']) {
                             $newTabs[] = [
                                 'id' => 'tab_all',
-                                'label' => $block['settings']['allTabLabel'] ?? 'সকল কোর্স',
+                                'label' => $block['settings']['allTabLabel'] ?? 'All Courses',
                                 'type' => 'category',
                                 'categorySlug' => 'all',
                             ];
@@ -231,7 +231,7 @@ class AdminPageController extends Controller
                             $newTabs = [
                                 [
                                     'id' => 'tab_all',
-                                    'label' => 'সকল কোর্স',
+                                    'label' => 'All Courses',
                                     'type' => 'category',
                                     'categorySlug' => 'all',
                                 ]
@@ -265,7 +265,7 @@ class AdminPageController extends Controller
         AuditLog::log('page_updated', 'Page', $page->id, $oldData, $page->only(['title', 'slug', 'status']));
 
         return response()->json([
-            'message' => 'পেজের পরিবর্তন ও ডিজাইন সফলভাবে সংরক্ষণ করা হয়েছে।',
+            'message' => 'Page design and changes saved successfully.',
             'page' => $page,
         ]);
     }
@@ -279,7 +279,7 @@ class AdminPageController extends Controller
 
         if ($page->is_system) {
             return response()->json([
-                'message' => 'সিস্টেম পেজ ডিলিট করা যাবে না। আপনি চাইলে ড্রাফট করে রাখতে পারেন বা এর ডিজাইন পরিবর্তন করতে পারেন।',
+                'message' => 'System page cannot be deleted. You can set it to draft or customize its design.',
             ], 403);
         }
 
@@ -289,7 +289,7 @@ class AdminPageController extends Controller
         AuditLog::log('page_deleted', 'Page', $id, ['title' => $title], null);
 
         return response()->json([
-            'message' => "'{$title}' পেজটি সফলভাবে ডিলিট করা হয়েছে।",
+            'message' => "'{$title}' page deleted successfully.",
         ]);
     }
 
@@ -305,7 +305,7 @@ class AdminPageController extends Controller
         AuditLog::log('page_status_toggled', 'Page', $page->id, null, ['status' => $newStatus]);
 
         return response()->json([
-            'message' => 'পেজের স্ট্যাটাস আপডেট করা হয়েছে।',
+            'message' => 'Page status updated successfully.',
             'page' => $page,
         ]);
     }
@@ -333,7 +333,7 @@ class AdminPageController extends Controller
         AuditLog::log('page_duplicated', 'Page', $newPage->id, ['original_id' => $id], null);
 
         return response()->json([
-            'message' => 'পেজ সফলভাবে ক্লোন করা হয়েছে।',
+            'message' => 'Page cloned successfully.',
             'page' => $newPage,
         ]);
     }
@@ -346,7 +346,7 @@ class AdminPageController extends Controller
         $synced = Page::syncCategoryPages();
 
         return response()->json([
-            'message' => 'সকল কোর্স ও ক্যাটাগরি পেজ সফলভাবে সিঙ্ক করা হয়েছে।',
+            'message' => 'All course and category pages synchronized successfully.',
             'count' => count($synced),
         ]);
     }

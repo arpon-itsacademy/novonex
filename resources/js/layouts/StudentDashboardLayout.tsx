@@ -117,7 +117,7 @@ export const StudentDashboardLayout: React.FC = () => {
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
                     <Loader2 className="w-8 h-8 text-sky-600 animate-spin" />
-                    <span className="text-xs font-bold text-slate-500">লোড হচ্ছে...</span>
+                    <span className="text-xs font-bold text-slate-500">Loading...</span>
                 </div>
             </div>
         );
@@ -143,68 +143,68 @@ export const StudentDashboardLayout: React.FC = () => {
 
     const menuItems: MenuItem[] = [
         {
-            title: 'হোম',
+            title: 'Home',
             path: '/student',
             icon: Home,
             exact: true
         },
         {
-            title: 'নতুন কোর্স অ্যাড করুন',
+            title: 'Explore Courses',
             path: '/courses',
             icon: PlusCircle
         },
         {
-            title: 'আমার কোর্স',
+            title: 'My Courses',
             path: '/student/my-courses',
             icon: BookOpen
         },
         {
-            title: 'লাইভ ক্লাস',
+            title: 'Live Classes',
             path: '/student/live-classes',
             icon: Radio
         },
         {
-            title: 'রুটিন',
+            title: 'Routine',
             path: '/student/routine',
             icon: Calendar,
         },
         {
-            title: 'পরীক্ষা',
+            title: 'Exams',
             path: '/student/exams',
             icon: ClipboardList
         },
         {
-            title: 'লিডারবোর্ড',
+            title: 'Leaderboard',
             path: '/student/leaderboard',
             icon: Trophy
         },
         {
-            title: 'অর্ডারসমূহ',
+            title: 'Orders',
             path: '/student/orders',
             icon: ShoppingCart
         },
         {
-            title: 'রেফারেন্স',
+            title: 'Affiliate & Referrals',
             path: '/student/affiliate',
             icon: Share2
         },
         {
-            title: 'প্রোফাইল ও সেটিংস',
+            title: 'Profile & Settings',
             path: '/student/settings',
             icon: Settings,
             children: [
                 {
-                    title: 'লগইন ডিভাইস',
+                    title: 'Login Devices',
                     path: '/student/settings/devices',
                     icon: Smartphone
                 },
                 {
-                    title: 'প্রোফাইল তথ্য',
+                    title: 'Profile Info',
                     path: '/student/settings/profile',
                     icon: UserIcon
                 },
                 {
-                    title: 'পাসওয়ার্ড পরিবর্তন',
+                    title: 'Change Password',
                     path: '/student/settings/password',
                     icon: KeyRound
                 }
@@ -301,7 +301,7 @@ export const StudentDashboardLayout: React.FC = () => {
                                                         toggleSubmenu(item.title);
                                                     }}
                                                     className="p-1 rounded-lg hover:bg-sky-100/60 transition-colors"
-                                                    title={isSubmenuOpen ? 'সংকোচন করুন' : 'প্রসারিত করুন'}
+                                                    title={isSubmenuOpen ? 'Collapse' : 'Expand'}
                                                 >
                                                     <ChevronDown
                                                         className={`w-3.5 h-3.5 transition-transform duration-200 ${isSubmenuOpen ? 'rotate-180 text-sky-600' : 'text-slate-400'
@@ -387,7 +387,7 @@ export const StudentDashboardLayout: React.FC = () => {
                                 <PhoneCall className="w-4 h-4" />
                             </div>
                             <div className="truncate">
-                                <span className="text-[10px] font-bold text-slate-500 block leading-tight">সাহায্য প্রয়োজন?</span>
+                                <span className="text-[10px] font-bold text-slate-500 block leading-tight">Need Help?</span>
                                 <a
                                     href={`tel:${supportPhone}`}
                                     className="text-xs font-extrabold text-sky-700 hover:underline truncate block"
@@ -402,7 +402,7 @@ export const StudentDashboardLayout: React.FC = () => {
                             <Link
                                 to="/student/settings/profile"
                                 className="flex items-center gap-2 truncate hover:opacity-80 transition-opacity group"
-                                title="প্রোফাইল তথ্য ও সেটিংস"
+                                title="Profile & Settings"
                             >
                                 <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-amber-500 text-white font-bold text-xs flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                     {user.name.charAt(0).toUpperCase()}
@@ -415,7 +415,7 @@ export const StudentDashboardLayout: React.FC = () => {
                                 type="button"
                                 onClick={logout}
                                 className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
-                                title="লগআউট"
+                                title="Logout"
                             >
                                 <LogOut className="w-4 h-4" />
                             </button>
@@ -446,7 +446,7 @@ export const StudentDashboardLayout: React.FC = () => {
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="কী খুঁজছেন?"
+                                    placeholder="Search here..."
                                     className="w-full bg-white rounded-full pl-9 pr-4 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 border border-slate-200/80 shadow-2xs focus:outline-hidden focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"
                                 />
                             </div>
@@ -458,7 +458,7 @@ export const StudentDashboardLayout: React.FC = () => {
                         {/* Academic Category Pill */}
                         <div className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-slate-200/80 text-xs font-bold text-slate-700 shadow-2xs">
                             <span className="w-2 h-2 rounded-full bg-sky-500"></span>
-                            <span>এইচএসসি</span>
+                            <span>HSC</span>
                             <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                         </div>
 
@@ -482,21 +482,21 @@ export const StudentDashboardLayout: React.FC = () => {
                                     onMouseLeave={() => setNotifDropdownOpen(false)}
                                 >
                                     <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
-                                        <span className="text-xs font-bold text-slate-800">নোটিফিকেশনসমূহ</span>
+                                        <span className="text-xs font-bold text-slate-800">Notifications</span>
                                         {unreadCount > 0 && (
                                             <button
                                                 onClick={markAllRead}
                                                 className="text-[10px] font-bold text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1 cursor-pointer"
                                             >
                                                 <CheckCheck className="w-3 h-3" />
-                                                <span>পড়েছি চিহ্নিত করুন</span>
+                                                <span>Mark all read</span>
                                             </button>
                                         )}
                                     </div>
                                     <div className="max-h-60 overflow-y-auto divide-y divide-slate-50">
                                         {notifications.length === 0 ? (
                                             <div className="p-4 text-center text-xs text-slate-400">
-                                                কোনো নতুন নোটিফিকেশন নেই
+                                                No new notifications
                                             </div>
                                         ) : (
                                             notifications.slice(0, 8).map((n) => (
@@ -508,7 +508,7 @@ export const StudentDashboardLayout: React.FC = () => {
                                                 >
                                                     <div className="flex items-center justify-between gap-1">
                                                         <p className="text-xs font-bold text-slate-800 line-clamp-1">
-                                                            {n.data?.title || n.title || 'বিজ্ঞপ্তি'}
+                                                            {n.data?.title || n.title || 'Notification'}
                                                         </p>
                                                         {!n.read_at && (
                                                             <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
@@ -528,7 +528,7 @@ export const StudentDashboardLayout: React.FC = () => {
                         {/* Student Profile Avatar */}
                         <Link
                             to="/student/settings/profile"
-                            title="প্রোফাইল তথ্য ও সেটিংস"
+                            title="Profile & Settings"
                             className="flex items-center gap-2 group cursor-pointer"
                         >
                             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-sky-500 via-sky-600 to-amber-500 p-0.5 shadow-2xs group-hover:scale-105 transition-transform">

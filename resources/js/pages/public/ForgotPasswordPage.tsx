@@ -61,7 +61,7 @@ export const ForgotPasswordPage: React.FC = () => {
         setSuccessMessage(null);
 
         if (!phone.trim()) {
-            setError('অনুগ্রহ করে আপনার মোবাইল নম্বর দিন।');
+            setError('Please enter your mobile number.');
             return;
         }
 
@@ -71,11 +71,11 @@ export const ForgotPasswordPage: React.FC = () => {
                 phone: phone.trim(),
             });
 
-            setSuccessMessage(data.message || 'আপনার ফোনে ওটিপি কোড পাঠানো হয়েছে।');
+            setSuccessMessage(data.message || 'An OTP code has been sent to your phone.');
             setResendCooldown(60);
             setStep(2);
         } catch (err: any) {
-            setError(err.response?.data?.message || 'ওটিপি পাঠাতে ব্যর্থ হয়েছে। অনুগ্রহ করে সঠিক মোবাইল নম্বর দিন।');
+            setError(err.response?.data?.message || 'Failed to send OTP. Please provide a valid mobile number.');
         } finally {
             setLoading(false);
         }
@@ -93,10 +93,10 @@ export const ForgotPasswordPage: React.FC = () => {
                 phone: phone.trim(),
             });
 
-            setSuccessMessage(data.message || 'নতুন ওটিপি কোড পাঠানো হয়েছে।');
+            setSuccessMessage(data.message || 'A new OTP code has been sent.');
             setResendCooldown(60);
         } catch (err: any) {
-            setError(err.response?.data?.message || 'ওটিপি পুনরায় পাঠাতে সমস্যা হয়েছে।');
+            setError(err.response?.data?.message || 'Failed to resend OTP. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -109,7 +109,7 @@ export const ForgotPasswordPage: React.FC = () => {
         setSuccessMessage(null);
 
         if (otp.trim().length !== 6) {
-            setError('অনুগ্রহ করে ৬ ডিজিটের ওটিপি কোডটি লিখুন।');
+            setError('Please enter the 6-digit OTP code.');
             return;
         }
 
@@ -120,10 +120,10 @@ export const ForgotPasswordPage: React.FC = () => {
                 otp: otp.trim(),
             });
 
-            setSuccessMessage(data.message || 'ওটিপি যাচাই সফল হয়েছে! এবার নতুন পাসওয়ার্ড দিন।');
+            setSuccessMessage(data.message || 'OTP verified successfully! Now set a new password.');
             setStep(3);
         } catch (err: any) {
-            setError(err.response?.data?.message || 'ভুল ওটিপি কোড। অনুগ্রহ করে আবার চেষ্টা করুন।');
+            setError(err.response?.data?.message || 'Invalid OTP code. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -136,12 +136,12 @@ export const ForgotPasswordPage: React.FC = () => {
         setSuccessMessage(null);
 
         if (newPassword.length < 8) {
-            setError('পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।');
+            setError('Password must be at least 8 characters.');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setError('দুইটি পাসওয়ার্ড মিলছে না। অনুগ্রহ করে নিশ্চিত হয়ে লিখুন।');
+            setError('Passwords do not match. Please try again.');
             return;
         }
 
@@ -154,7 +154,7 @@ export const ForgotPasswordPage: React.FC = () => {
                 password_confirmation: confirmPassword,
             });
 
-            setSuccessMessage(data.message || 'পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!');
+            setSuccessMessage(data.message || 'Password changed successfully!');
             
             // Auto login user
             if (data.token && data.user) {
@@ -168,7 +168,7 @@ export const ForgotPasswordPage: React.FC = () => {
                 navigate('/login');
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || 'পাসওয়ার্ড রিসেট করতে ব্যর্থ হয়েছে।');
+            setError(err.response?.data?.message || 'Failed to reset password. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -195,12 +195,12 @@ export const ForgotPasswordPage: React.FC = () => {
                     )}
                     <div>
                         <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                            পাসওয়ার্ড রিসেট
+                            Reset Password
                         </h2>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                            {step === 1 && 'আপনার নিবন্ধিত মোবাইল নম্বর দিন'}
-                            {step === 2 && 'ফোনে প্রেরিত ওটিপি (OTP) কোড যাচাই করুন'}
-                            {step === 3 && 'আপনার অ্যাকাউন্টের জন্য নতুন পাসওয়ার্ড সেট করুন'}
+                            {step === 1 && 'Enter your registered mobile number'}
+                            {step === 2 && 'Verify the 6-digit OTP sent to your phone'}
+                            {step === 3 && 'Set a new password for your account'}
                         </p>
                     </div>
                 </div>
@@ -232,7 +232,7 @@ export const ForgotPasswordPage: React.FC = () => {
                     <form onSubmit={handleSendOtp} className="space-y-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                মোবাইল নম্বর
+                                Mobile Number
                             </label>
                             <div className="relative">
                                 <input
@@ -246,7 +246,7 @@ export const ForgotPasswordPage: React.FC = () => {
                                 <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                             </div>
                             <p className="text-[11px] text-slate-400 mt-1">
-                                এই নম্বরে ৬ সংখ্যার একটি ভেরিফিকেশন ওটিপি পাঠানো হবে।
+                                A 6-digit verification code will be sent to this number.
                             </p>
                         </div>
 
@@ -259,7 +259,7 @@ export const ForgotPasswordPage: React.FC = () => {
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
                                 <>
-                                    <span>ওটিপি কোড পাঠান</span>
+                                    <span>Send OTP Code</span>
                                     <ArrowRight className="w-4 h-4" />
                                 </>
                             )}
@@ -273,14 +273,14 @@ export const ForgotPasswordPage: React.FC = () => {
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
                                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    ৬ ডিজিটের ওটিপি কোড
+                                    6-Digit OTP Code
                                 </label>
                                 <button
                                     type="button"
                                     onClick={() => setStep(1)}
                                     className="text-xs font-bold text-sky-600 hover:underline"
                                 >
-                                    নম্বর পরিবর্তন
+                                    Change Number
                                 </button>
                             </div>
 
@@ -299,7 +299,7 @@ export const ForgotPasswordPage: React.FC = () => {
                         <div className="text-center">
                             {resendCooldown > 0 ? (
                                 <span className="text-xs text-slate-400">
-                                    পুনরায় কোড পাঠাতে অপেক্ষা করুন: <strong className="text-sky-600 font-mono">{resendCooldown}s</strong>
+                                    Resend code in: <strong className="text-sky-600 font-mono">{resendCooldown}s</strong>
                                 </span>
                             ) : (
                                 <button
@@ -309,7 +309,7 @@ export const ForgotPasswordPage: React.FC = () => {
                                     className="text-xs font-bold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1 cursor-pointer"
                                 >
                                     <RefreshCw className="w-3.5 h-3.5" />
-                                    <span>আবার কোড পাঠান</span>
+                                    <span>Resend Code</span>
                                 </button>
                             )}
                         </div>
@@ -323,7 +323,7 @@ export const ForgotPasswordPage: React.FC = () => {
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
                                 <>
-                                    <span>ওটিপি যাচাই করুন</span>
+                                    <span>Verify OTP</span>
                                     <ArrowRight className="w-4 h-4" />
                                 </>
                             )}
@@ -336,7 +336,7 @@ export const ForgotPasswordPage: React.FC = () => {
                     <form onSubmit={handleResetPassword} className="space-y-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                নতুন পাসওয়ার্ড
+                                New Password
                             </label>
                             <div className="relative">
                                 <input
@@ -345,7 +345,7 @@ export const ForgotPasswordPage: React.FC = () => {
                                     minLength={8}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    placeholder="কমপক্ষে ৮ অক্ষরের পাসওয়ার্ড"
+                                    placeholder="At least 8 characters"
                                     className="w-full pl-10 pr-11 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
                                 />
                                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -361,7 +361,7 @@ export const ForgotPasswordPage: React.FC = () => {
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                নতুন পাসওয়ার্ডটি আবার লিখুন
+                                Confirm New Password
                             </label>
                             <div className="relative">
                                 <input
@@ -370,7 +370,7 @@ export const ForgotPasswordPage: React.FC = () => {
                                     minLength={8}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="পাসওয়ার্ড নিশ্চিত করুন"
+                                    placeholder="Confirm password"
                                     className="w-full pl-10 pr-11 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
                                 />
                                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -393,7 +393,7 @@ export const ForgotPasswordPage: React.FC = () => {
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
                                 <>
-                                    <span>পাসওয়ার্ড সেট করুন ও লগইন করুন</span>
+                                    <span>Reset Password & Login</span>
                                     <ArrowRight className="w-4 h-4" />
                                 </>
                             )}
@@ -403,10 +403,10 @@ export const ForgotPasswordPage: React.FC = () => {
 
                 {/* Back to Login Link */}
                 <div className="text-center text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    মনে পড়েছে?{' '}
+                    Remember your password?{' '}
                     <Link to="/login" className="font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 inline-flex items-center gap-1">
                         <ArrowLeft className="w-3.5 h-3.5" />
-                        <span>লগইন করুন</span>
+                        <span>Login</span>
                     </Link>
                 </div>
             </div>

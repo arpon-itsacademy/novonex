@@ -34,7 +34,7 @@ return new class extends Migration
             'default_discount_amount' => 0.00,
             'min_payout_amount' => 500.00,
             'require_course_purchase' => true,
-            'terms_notice' => 'আমাদের যেকোনো একটি কোর্স কেনা থাকলেই আপনি অ্যাফিলিয়েট পার্টনার হিসেবে কাজ করতে পারবেন। আপনার লিংকের মাধ্যমে কোনো শিক্ষার্থী কোর্স কিনলে আপনি নির্ধারিত কমিশন পেয়ে যাবেন।',
+            'terms_notice' => 'You must be enrolled in at least one course to become an affiliate partner. You will earn the designated commission whenever a student purchases a course using your referral link.',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

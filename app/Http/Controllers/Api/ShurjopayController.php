@@ -79,7 +79,7 @@ class ShurjopayController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'shurjoPay সেটিংস সফলভাবে সংরক্ষণ করা হয়েছে।',
+            'message' => 'shurjoPay settings saved successfully.',
             'settings' => $setting->fresh()->shurjopay_settings,
         ]);
     }
@@ -226,7 +226,7 @@ class ShurjopayController extends Controller
                     'payment_status' => Order::PAYMENT_PAID,
                     'order_status' => Order::ORDER_COMPLETED,
                     'payment_method' => 'free',
-                    'notes' => $validated['notes'] ?? '১০০% ডিসকাউন্ট / কুপন কোড প্রয়োগে ফ্রি এনরোলমেন্ট',
+                    'notes' => $validated['notes'] ?? '100% Discount / Free Enrollment with Coupon Code',
                 ]);
 
                 if ($coupon) {
@@ -253,7 +253,7 @@ class ShurjopayController extends Controller
                     'payment_method' => 'free',
                     'status' => Payment::STATUS_APPROVED,
                     'verified_at' => now(),
-                    'notes' => '১০০% ডিসকাউন্ট / ফ্রি এনরোলমেন্ট অনুমোদিত',
+                    'notes' => '100% Discount / Free Enrollment Approved',
                 ]);
 
                 // Immediately create active Enrollment
@@ -296,7 +296,7 @@ class ShurjopayController extends Controller
             return response()->json([
                 'success' => true,
                 'is_free' => true,
-                'message' => '১০০% ডিসকাউন্টে কোর্সে সফলভাবে এনরোল সম্পন্ন হয়েছে!',
+                'message' => 'Enrolled in course with 100% discount successfully!',
                 'order_number' => $order->order_number,
                 'order' => $order->load(['course', 'latestPayment']),
                 'redirect_url' => "/order-status/{$order->order_number}?status=success",
@@ -559,7 +559,7 @@ class ShurjopayController extends Controller
             }
         }
 
-        $errMsg = urlencode($verify['message'] ?? 'পেমেন্ট সম্পন্ন হতে ব্যর্থ হয়েছে বা বাতিল করা হয়েছে।');
+        $errMsg = urlencode($verify['message'] ?? 'Payment failed or was cancelled.');
         return redirect("/order-status/{$order->order_number}?status=failed&message={$errMsg}");
     }
 

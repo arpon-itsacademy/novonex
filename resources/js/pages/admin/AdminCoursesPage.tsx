@@ -46,7 +46,7 @@ export const AdminCoursesPage: React.FC = () => {
     };
 
     const handleDeleteCourse = async (courseId: number) => {
-        if (!window.confirm('আপনি কি নিশ্চিতভাবে এই কোর্সটি ট্র্যাশে সরাতে চান? পরবর্তীতে ট্র্যাশ থেকে এটি যেকোনো সময় পুনরুদ্ধার করা যাবে।')) return;
+        if (!window.confirm('Are you sure you want to move this course to trash? You can restore it from trash anytime.')) return;
 
         try {
             await apiClient.delete(`/admin/courses/${courseId}`);
@@ -60,14 +60,14 @@ export const AdminCoursesPage: React.FC = () => {
         try {
             await apiClient.post(`/admin/courses/${courseId}/restore`);
             setCourses(prev => prev.filter(c => c.id !== courseId));
-            alert('কোর্সটি সফলভাবে পুনরুদ্ধার করা হয়েছে!');
+            alert('Course restored successfully!');
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to restore course.');
         }
     };
 
     const handleForceDeleteCourse = async (courseId: number) => {
-        if (!window.confirm('সতর্কতা: আপনি কি নিশ্চিতভাবে কোর্সটি স্থায়ীভাবে মুছে ফেলতে চান? এটি আর কখনোই পুনরুদ্ধার করা যাবে না!')) return;
+        if (!window.confirm('Warning: Are you sure you want to permanently delete this course? This action cannot be undone!')) return;
 
         try {
             await apiClient.delete(`/admin/courses/${courseId}/force-delete`);
@@ -115,11 +115,11 @@ export const AdminCoursesPage: React.FC = () => {
                             statusFilter === 'trashed' ? 'border-rose-300 text-rose-700 bg-rose-50' : 'border-slate-200 text-slate-700'
                         }`}
                     >
-                        <option value="">All Statuses (সকল স্ট্যাটাস)</option>
+                        <option value="">All Statuses</option>
                         <option value="published">Published</option>
                         <option value="draft">Draft</option>
                         <option value="archived">Archived</option>
-                        <option value="trashed">🗑️ ট্র্যাশ (Trash)</option>
+                        <option value="trashed">🗑️ Trash</option>
                     </select>
 
                     <button
@@ -130,10 +130,10 @@ export const AdminCoursesPage: React.FC = () => {
                                 ? 'bg-rose-100 text-rose-800 border border-rose-300'
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
                         }`}
-                        title="Trash / রিসাইকেল বিন"
+                        title="Trash / Recycle Bin"
                     >
                         <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                        <span>{statusFilter === 'trashed' ? 'সব কোর্সে ফিরুন' : 'ট্র্যাশ (Trash)'}</span>
+                        <span>{statusFilter === 'trashed' ? 'Back to All Courses' : 'Trash'}</span>
                     </button>
                 </div>
             </div>
@@ -143,7 +143,7 @@ export const AdminCoursesPage: React.FC = () => {
                 <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-2 text-xs text-rose-800">
                     <Trash2 className="w-4 h-4 text-rose-600 shrink-0" />
                     <span className="font-semibold">
-                        ট্র্যাশ মোড (Trash Bin): এখানে পূর্বে মুছে ফেলা কোর্সগুলো সংরক্ষিত আছে। আপনি যেকোনো সময় কোর্স পুনরুদ্ধার (Restore) করতে পারেন অথবা ডাটাবেজ থেকে স্থায়ীভাবে মুছে ফেলতে পারেন।
+                        Trash Mode: Previously deleted courses are stored here. You can restore them or permanently delete them from the database.
                     </span>
                 </div>
             )}
@@ -270,19 +270,19 @@ export const AdminCoursesPage: React.FC = () => {
                                                     <>
                                                         <button
                                                             onClick={() => handleRestoreCourse(course.id)}
-                                                            title="পুনরুদ্ধার করুন (Restore)"
+                                                            title="Restore"
                                                             className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg flex items-center gap-1 text-xs transition-colors cursor-pointer border border-emerald-200"
                                                         >
                                                             <RotateCcw className="w-3.5 h-3.5" />
-                                                            <span>পুনরুদ্ধার</span>
+                                                            <span>Restore</span>
                                                         </button>
                                                         <button
                                                             onClick={() => handleForceDeleteCourse(course.id)}
-                                                            title="স্থায়ীভাবে মুছুন (Permanent Delete)"
+                                                            title="Permanent Delete"
                                                             className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg flex items-center gap-1 text-xs transition-colors cursor-pointer border border-rose-200"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
-                                                            <span>স্থায়ী মুছুন</span>
+                                                            <span>Delete Forever</span>
                                                         </button>
                                                     </>
                                                 ) : (

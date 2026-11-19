@@ -17,12 +17,12 @@ class EnrollmentController extends Controller
         $user = auth()->user();
 
         if ($course->status !== Course::STATUS_PUBLISHED) {
-            abort(404, 'কোর্সটি সক্রিয় নেই।');
+            abort(404, 'Course is not active.');
         }
 
         if ($course->price > 0) {
             return response()->json([
-                'message' => 'এটি একটি পেইড কোর্স। এনরোল করার জন্য চেকআউট সম্পন্ন করুন।',
+                'message' => 'This is a paid course. Please complete checkout to enroll.',
             ], 422);
         }
 
@@ -40,7 +40,7 @@ class EnrollmentController extends Controller
             }
 
             return response()->json([
-                'message' => 'আপনি ইতিমধ্যে এই কোর্সে এনরোল করেছেন।',
+                'message' => 'You are already enrolled in this course.',
                 'enrollment' => $enrollment,
             ]);
         }
@@ -58,7 +58,7 @@ class EnrollmentController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'অভিনন্দন! ফ্রি কোর্সে সফলভাবে এনরোল সম্পন্ন হয়েছে।',
+            'message' => 'Congratulations! You have enrolled in this free course successfully.',
             'enrollment' => $enrollment,
         ], 201);
     }
@@ -137,7 +137,7 @@ class EnrollmentController extends Controller
         }
 
         if (! $canAccess) {
-            abort(403, 'এই ক্লাসে প্রবেশ করার জন্য আপনাকে কোর্সে এনরোল হতে হবে।');
+            abort(403, 'You must be enrolled in the course to access this class.');
         }
 
         // Track last accessed

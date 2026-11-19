@@ -260,11 +260,11 @@ export const AdminNexPilotEditPage: React.FC = () => {
                         {/* Price in BDT */}
                         <div>
                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                NexPilot Add-on Fee (৳) <span className="text-rose-500">*</span>
+                                NexPilot Add-on Fee (Tk) <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
                                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">
-                                    ৳
+                                    Tk
                                 </span>
                                 <input
                                     type="number"

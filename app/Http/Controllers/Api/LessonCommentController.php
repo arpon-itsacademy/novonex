@@ -52,7 +52,7 @@ class LessonCommentController extends Controller
         }
 
         return response()->json([
-            'message' => 'আপনার প্রশ্ন/মন্তব্য প্রকাশিত হয়েছে।',
+            'message' => 'Your question/comment has been posted.',
             'comment' => $comment->load('user:id,name,role', 'replies'),
         ], 201);
     }
@@ -82,7 +82,7 @@ class LessonCommentController extends Controller
         }
 
         return response()->json([
-            'message' => 'উত্তর সফলভাবে যোগ করা হয়েছে।',
+            'message' => 'Reply added successfully.',
             'reply' => $reply->load('user:id,name,role'),
         ], 201);
     }

@@ -71,18 +71,18 @@ class AffiliateStudentController extends Controller
         $settings = AffiliateSetting::current();
 
         if (!$settings->is_enabled) {
-            return response()->json(['message' => 'অ্যাফিলিয়েট প্রোগ্রামটি বর্তমানে বন্ধ রয়েছে।'], 400);
+            return response()->json(['message' => 'The affiliate program is currently inactive.'], 400);
         }
 
         if ($settings->require_course_purchase && !$user->hasPurchasedAnyCourse()) {
             return response()->json([
-                'message' => 'অ্যাফিলিয়েট হতে হলে আপনাকে কমপক্ষে একটি কোর্সে ভর্তি বা কেনা থাকতে হবে।',
+                'message' => 'You must be enrolled in at least one course to become an affiliate.',
             ], 403);
         }
 
         if ($user->affiliateProfile) {
             return response()->json([
-                'message' => 'আপনি ইতিমধ্যে একজন নিবন্ধিত অ্যাফিলিয়েট পার্টনার।',
+                'message' => 'You are already a registered affiliate partner.',
                 'profile' => $user->affiliateProfile,
             ]);
         }
@@ -100,7 +100,7 @@ class AffiliateStudentController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'অভিনন্দন! আপনি সফলভাবে অ্যাফিলিয়েট পার্টনার হিসেবে যুক্ত হয়েছেন।',
+            'message' => 'Congratulations! You have successfully joined as an affiliate partner.',
             'profile' => $profile,
         ], 201);
     }
@@ -114,7 +114,7 @@ class AffiliateStudentController extends Controller
         $profile = $user->affiliateProfile;
 
         if (!$profile) {
-            return response()->json(['message' => 'অ্যাফিলিয়েট প্রোফাইল পাওয়া যায়নি।'], 404);
+            return response()->json(['message' => 'Affiliate profile not found.'], 404);
         }
 
         $validated = $request->validate([
@@ -125,7 +125,7 @@ class AffiliateStudentController extends Controller
         $profile->update($validated);
 
         return response()->json([
-            'message' => 'উত্তোলন অ্যাকাউন্ট নম্বর সংরক্ষিত হয়েছে।',
+            'message' => 'Withdrawal account number saved successfully.',
             'profile' => $profile,
         ]);
     }
@@ -139,7 +139,7 @@ class AffiliateStudentController extends Controller
         $profile = $user->affiliateProfile;
 
         if (!$profile || $profile->status !== AffiliateProfile::STATUS_ACTIVE) {
-            return response()->json(['message' => 'অ্যাফিলিয়েট অ্যাকাউন্টটি সক্রিয় নয়।'], 403);
+            return response()->json(['message' => 'Affiliate account is inactive.'], 403);
         }
 
         $settings = AffiliateSetting::current();
@@ -152,7 +152,7 @@ class AffiliateStudentController extends Controller
 
         if ($validated['amount'] > $profile->balance) {
             return response()->json([
-                'message' => 'আপনার উত্তোলনের পরিমাণ উপলব্ধ ব্যালেন্সের চেয়ে বেশি হতে পারবে না। বর্তমান ব্যালেন্স: ৳' . $profile->balance,
+                'message' => 'Withdrawal amount cannot exceed available balance. Current balance: Tk ' . $profile->balance,
             ], 422);
         }
 
@@ -171,7 +171,7 @@ class AffiliateStudentController extends Controller
         });
 
         return response()->json([
-            'message' => 'উত্তোলন রিকোয়েস্ট সফলভাবে পাঠানো হয়েছে। অ্যাডমিন যাচাই করে আপনার অ্যাকাউন্টে টাকা পাঠিয়ে দেবেন।',
+            'message' => 'Withdrawal request submitted successfully. Payment will be processed upon admin verification.',
             'payout' => $payout,
             'balance' => $profile->balance,
         ], 201);
@@ -184,7 +184,7 @@ class AffiliateStudentController extends Controller
     {
         $settings = AffiliateSetting::current();
         if (!$settings->is_enabled) {
-            return response()->json(['valid' => false, 'message' => 'অ্যাফিলিয়েট প্রোগ্রাম বর্তমানে বন্ধ আছে।'], 400);
+            return response()->json(['valid' => false, 'message' => 'Affiliate program is currently inactive.'], 400);
         }
 
         $profile = AffiliateProfile::where('affiliate_code', $code)
@@ -192,7 +192,7 @@ class AffiliateStudentController extends Controller
             ->first();
 
         if (!$profile) {
-            return response()->json(['valid' => false, 'message' => 'রেফারেল কোডটি সঠিক নয় বা মেয়াদোত্তীর্ণ।'], 404);
+            return response()->json(['valid' => false, 'message' => 'Invalid or expired referral code.'], 404);
         }
 
         $courseId = $request->integer('course_id');
@@ -230,8 +230,8 @@ class AffiliateStudentController extends Controller
             'discount_amount' => $discountAmount,
             'cookie_days' => $settings->cookie_days,
             'message' => $discountAmount > 0
-                ? "রেফারেল কোডটি কার্যকর! আপনি ৳{$discountAmount} ছাড় পাচ্ছেন।"
-                : 'রেফারেল কোডটি সফলভাবে যুক্ত হয়েছে।',
+                ? "Referral code applied! You get Tk {$discountAmount} discount."
+                : 'Referral code applied successfully.',
         ]);
     }
 }

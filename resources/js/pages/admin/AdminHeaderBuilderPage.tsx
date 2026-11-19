@@ -42,12 +42,12 @@ const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
     brand_subtitle: '',
     brand_subtitle_en: '',
     announcement_enabled: false,
-    announcement_text: '🎉 নতুন ব্যাচে ভর্তি চলছে! ২০% ছাড়ে এখনই এনরোল করুন।',
-    announcement_text_en: '🎉 New batch admission open! Enroll now with 20% discount.',
+    announcement_text: '🎉 New batch admission open! Enroll now with special discount.',
+    announcement_text_en: '🎉 New batch admission open! Enroll now with special discount.',
     announcement_link: '/courses',
     announcement_bg: '#CC1200',
     cta_button_enabled: false,
-    cta_button_text: 'ফ্রি ক্লাস',
+    cta_button_text: 'Free Classes',
     cta_button_text_en: 'Free Classes',
     cta_button_link: '/courses?type=free',
     banner_enabled: false,
@@ -57,20 +57,20 @@ const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
     banner_link_open_new_tab: false,
     banner_bg_color: '#8a0000',
     banner_text_color: '#ffffff',
-    banner_title: 'নতুন ব্যাচে প্রথম ক্লাস একদম ফ্রি!',
-    banner_subtitle: 'রেজিস্ট্রার করতে এখনই জয়েন করুন',
-    banner_btn_text: 'ক্লিক করুন',
+    banner_title: 'First class of the new batch is completely free!',
+    banner_subtitle: 'Join now to register',
+    banner_btn_text: 'Click Here',
     banner_btn_link: '/courses',
     banner_btn_bg: '#16a34a',
     banner_btn_text_color: '#ffffff',
-    banner_secondary_text: 'কল করুন ১৬৯১০',
+    banner_secondary_text: 'Hotline 16910',
     banner_secondary_link: 'tel:16910',
     banner_closeable: true,
     banner_show_on: 'all',
     menu_items: [
         {
             id: '1',
-            label: 'হোম',
+            label: 'Home',
             label_en: 'Home',
             url: '/',
             is_external: false,
@@ -78,33 +78,33 @@ const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
         },
         {
             id: '2',
-            label: 'কোর্সসমূহ',
+            label: 'Courses',
             label_en: 'Courses',
             url: '/courses',
             is_external: false,
             highlight: false,
             children: [
-                { id: '2-1', label: 'সকল কোর্সসমূহ', label_en: 'All Courses', url: '/courses' },
-                { id: '2-2', label: 'HSC একাডেমিক সাইকেল', label_en: 'HSC Academic Cycle', url: '/courses' },
-                { id: '2-3', label: 'ইঞ্জিনিয়ারিং ও ভার্সিটি ভর্তি', label_en: 'Engineering & Varsity Admission', url: '/courses' },
-                { id: '2-4', label: 'ফ্রি ট্রায়াল ক্লাস', label_en: 'Free Trial Classes', url: '/courses?type=free' },
+                { id: '2-1', label: 'All Courses', label_en: 'All Courses', url: '/courses' },
+                { id: '2-2', label: 'HSC Academic Cycle', label_en: 'HSC Academic Cycle', url: '/courses' },
+                { id: '2-3', label: 'Engineering & Varsity Admission', label_en: 'Engineering & Varsity Admission', url: '/courses' },
+                { id: '2-4', label: 'Free Trial Classes', label_en: 'Free Trial Classes', url: '/courses?type=free' },
             ],
         },
         {
             id: '3',
-            label: 'বইসমূহ ও বান্ডেল',
+            label: 'Books & Bundles',
             label_en: 'Books & Bundles',
             url: '/courses',
             is_external: false,
             highlight: false,
             children: [
-                { id: '3-1', label: 'কম্বো কোর্স বান্ডেল', label_en: 'Combo Course Bundles', url: '/courses' },
-                { id: '3-2', label: 'লেকচার শিট ও নোটবুক', label_en: 'Lecture Sheets & Notes', url: '/courses' },
+                { id: '3-1', label: 'Combo Course Bundles', label_en: 'Combo Course Bundles', url: '/courses' },
+                { id: '3-2', label: 'Lecture Sheets & Notes', label_en: 'Lecture Sheets & Notes', url: '/courses' },
             ],
         },
         {
             id: '4',
-            label: 'ফ্রি রিসোর্স',
+            label: 'Free Resources',
             label_en: 'Free Resources',
             url: '/courses?type=free',
             is_external: false,
@@ -112,7 +112,7 @@ const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
         },
         {
             id: '5',
-            label: 'যোগাযোগ',
+            label: 'Contact Us',
             label_en: 'Contact Us',
             url: '/p/contact',
             is_external: false,
@@ -120,7 +120,7 @@ const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
         },
         {
             id: '6',
-            label: 'ই-বুক ও এক্সাম',
+            label: 'E-Books & Exams',
             label_en: 'E-Books & Exams',
             url: '/student/exams',
             is_external: false,
@@ -222,7 +222,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
     const handleAddMenuItem = () => {
         const newItem: HeaderMenuItem = {
             id: Date.now().toString(),
-            label: 'নতুন মেনু',
+            label: 'New Menu',
             label_en: 'New Menu',
             url: '/',
             is_external: false,
@@ -265,8 +265,8 @@ export const AdminHeaderBuilderPage: React.FC = () => {
 
         const newSub = {
             id: Date.now().toString(),
-            label: 'নতুন সাব-মেনু',
-            label_en: 'New Sub Menu',
+            label: 'New Submenu',
+            label_en: 'New Submenu',
             url: parent.url || '/courses',
             is_external: false,
         };
@@ -487,10 +487,10 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                             {headerSettings.show_auth_buttons && (
                                 <div className="flex items-center gap-2">
                                     <span className="hidden sm:inline px-3.5 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-xl">
-                                        লগইন
+                                        Login
                                     </span>
                                     <span className="hidden sm:inline px-3.5 py-1.5 text-xs font-bold text-white bg-[#CC1200] rounded-xl shadow-xs">
-                                        রেজিস্ট্রেশন
+                                        Registration
                                     </span>
                                 </div>
                             )}
@@ -519,7 +519,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                     <div className="flex items-center gap-2 truncate pr-6 sm:pr-0">
                                         <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
                                         <span className="font-extrabold truncate text-white">
-                                            {headerSettings.banner_title || 'নতুন ব্যাচে প্রথম ক্লাস একদম ফ্রি!'}
+                                            {headerSettings.banner_title || 'First class of the new batch is free!'}
                                         </span>
                                         {headerSettings.banner_subtitle && (
                                             <span className="hidden md:inline text-xs opacity-90 truncate font-medium text-white/90">
@@ -837,22 +837,22 @@ export const AdminHeaderBuilderPage: React.FC = () => {
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1 w-full">
                                                 <div>
-                                                    <label className="block text-[10px] font-bold text-slate-500 mb-1">মেনু লেবেল (Menu Label)</label>
+                                                    <label className="block text-[10px] font-bold text-slate-500 mb-1">Menu Label</label>
                                                     <input
                                                         type="text"
                                                         value={item.label}
                                                         onChange={(e) => handleUpdateMenuItem(idx, { label: e.target.value, label_en: e.target.value })}
-                                                        placeholder="যেমন: কোর্সসমূহ"
+                                                        placeholder="e.g. Courses"
                                                         className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-sky-500"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-[10px] font-bold text-slate-500 mb-1">লিংক URL (Link URL)</label>
+                                                    <label className="block text-[10px] font-bold text-slate-500 mb-1">Link URL</label>
                                                     <input
                                                         type="text"
                                                         value={item.url}
                                                         onChange={(e) => handleUpdateMenuItem(idx, { url: e.target.value })}
-                                                        placeholder="যেমন: /courses"
+                                                        placeholder="e.g. /courses"
                                                         className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-sky-500"
                                                     />
                                                 </div>
@@ -866,7 +866,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                         onChange={(e) => handleUpdateMenuItem(idx, { highlight: e.target.checked })}
                                                         className="w-4 h-4 text-sky-600 rounded"
                                                     />
-                                                    <span>✨ হাইলাইট</span>
+                                                    <span>✨ Highlight</span>
                                                 </label>
 
                                                 <label className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold cursor-pointer">
@@ -876,14 +876,14 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                         onChange={(e) => handleUpdateMenuItem(idx, { is_external: e.target.checked })}
                                                         className="w-4 h-4 text-sky-600 rounded"
                                                     />
-                                                    <span>এক্সটার্নাল</span>
+                                                    <span>External</span>
                                                 </label>
 
                                                 <button
                                                     type="button"
                                                     onClick={() => handleDeleteMenuItem(idx)}
                                                     className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition cursor-pointer"
-                                                    title="মুছুন"
+                                                    title="Delete"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -895,7 +895,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                             <div className="flex items-center justify-between">
                                                 <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
                                                     <Layers className="w-3.5 h-3.5 text-sky-600" />
-                                                    <span>ড্রপডাউন সাব-মেনু লিঙ্ক ({item.children?.length || 0})</span>
+                                                    <span>Dropdown Submenu Links ({item.children?.length || 0})</span>
                                                 </span>
                                                 <button
                                                     type="button"
@@ -903,7 +903,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                     className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-sky-700 bg-white hover:bg-sky-50 border border-sky-200 rounded-lg cursor-pointer transition shadow-2xs"
                                                 >
                                                     <Plus className="w-3 h-3" />
-                                                    <span>সাব-মেনু যোগ করুন</span>
+                                                    <span>Add Submenu</span>
                                                 </button>
                                             </div>
 
@@ -916,7 +916,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                                     type="text"
                                                                     value={sub.label}
                                                                     onChange={(e) => handleUpdateSubMenuItem(idx, sIdx, { label: e.target.value, label_en: e.target.value })}
-                                                                    placeholder="সাব-মেনু লেবেল (যেমন: HSC সাইকেল)"
+                                                                    placeholder="Submenu Label (e.g. HSC Cycle)"
                                                                     className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-sky-500"
                                                                 />
                                                             </div>
@@ -925,7 +925,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                                     type="text"
                                                                     value={sub.url}
                                                                     onChange={(e) => handleUpdateSubMenuItem(idx, sIdx, { url: e.target.value })}
-                                                                    placeholder="URL (যেমন: /courses)"
+                                                                    placeholder="URL (e.g. /courses)"
                                                                     className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono focus:ring-1 focus:ring-sky-500"
                                                                 />
                                                             </div>
@@ -943,7 +943,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                                     type="button"
                                                                     onClick={() => handleDeleteSubMenuItem(idx, sIdx)}
                                                                     className="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded cursor-pointer"
-                                                                    title="মুছুন"
+                                                                    title="Delete"
                                                                 >
                                                                     <Trash2 className="w-3.5 h-3.5" />
                                                                 </button>
@@ -973,14 +973,14 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <h4 className="text-sm font-bold text-slate-900">
-                                            10 Minute School স্টাইল হেডার ব্যানার চালু করুন
+                                            Enable Promotional Header Banner
                                         </h4>
                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-white shadow-xs">
-                                            10MS Style
+                                            Top Banner
                                         </span>
                                     </div>
                                     <p className="text-xs text-slate-500 mt-1">
-                                        ওয়েবসাইটের হেডারের ঠিক নিচে একটি স্লিম ও আকর্ষণীয় প্রমোশনাল ব্যানার প্রদর্শন করবে।
+                                        Displays an attractive, slim promotional ribbon directly beneath the main navbar.
                                     </p>
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer shrink-0">
@@ -999,7 +999,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                     {/* Banner Mode Selector */}
                                     <div>
                                         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                            ব্যানারের ধরন নির্বাচন করুন (Banner Type)
+                                            Select Banner Type
                                         </label>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             {/* Option A: Image Banner */}
@@ -1013,7 +1013,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                 <div className="flex items-center justify-between mb-1.5">
                                                     <div className="flex items-center gap-2">
                                                         <ImageIcon className="w-4 h-4 text-sky-600" />
-                                                        <span className="text-sm font-bold text-slate-900">ছবি / ব্যানার গ্রাফিক্স (Image Banner)</span>
+                                                        <span className="text-sm font-bold text-slate-900">Image Banner Graphic</span>
                                                     </div>
                                                     <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${headerSettings.banner_mode !== 'text' ? 'border-sky-600 bg-sky-600' : 'border-slate-300'
                                                         }`}>
@@ -1021,7 +1021,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 <p className="text-xs text-slate-500">
-                                                    10 Minute School-এর মতো কাস্টম ডিজাইন করা স্লিম ব্যানার ছবি আপলোড করুন।
+                                                    Upload a custom-designed wide graphic banner.
                                                 </p>
                                             </div>
 
@@ -1036,7 +1036,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                 <div className="flex items-center justify-between mb-1.5">
                                                     <div className="flex items-center gap-2">
                                                         <Palette className="w-4 h-4 text-emerald-600" />
-                                                        <span className="text-sm font-bold text-slate-900">ব্যাকগ্রাউন্ড কালার ও টেক্সট (Color & Text)</span>
+                                                        <span className="text-sm font-bold text-slate-900">Color & Text Banner</span>
                                                     </div>
                                                     <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${headerSettings.banner_mode === 'text' ? 'border-sky-600 bg-sky-600' : 'border-slate-300'
                                                         }`}>
@@ -1044,7 +1044,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 <p className="text-xs text-slate-500">
-                                                    কোনো ছবি ছাড়া ব্যাকগ্রাউন্ড কালার পছন্দ করে কাস্টম টেক্সট ও বাটন তৈরি করুন।
+                                                    Configure background color with custom headline, subtitle and action button.
                                                 </p>
                                             </div>
                                         </div>
@@ -1055,13 +1055,13 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                         <div className="space-y-5 p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
                                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
                                                 <ImageIcon className="w-4 h-4 text-sky-600" />
-                                                <span>ব্যানার ছবি আপলোড ও কনফিগারেশন</span>
+                                                <span>Banner Graphic Upload & Settings</span>
                                             </h4>
 
                                             {/* Banner Image Preview / Upload Box */}
                                             <div>
                                                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                                    ব্যানার ইমেজ (Banner Graphic)
+                                                    Banner Graphic Image
                                                 </label>
                                                 {headerSettings.banner_image_url ? (
                                                     <div className="relative rounded-2xl border border-slate-200 p-2 bg-slate-900 overflow-hidden group">
@@ -1103,10 +1103,10 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                     <div className="border-2 border-dashed border-slate-200 hover:border-sky-400 rounded-2xl p-6 text-center transition-colors bg-slate-50/50">
                                                         <UploadCloud className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                                                         <p className="text-xs font-bold text-slate-700 mb-1">
-                                                            আপনার ব্যানার ছবি আপলোড করুন
+                                                            Upload Your Banner Graphic
                                                         </p>
                                                         <p className="text-[11px] text-slate-400 mb-3">
-                                                            প্রস্তাবিত সাইজ: ১২০০×১২০ বা ১৯২০×১৫০ পিক্সেল (স্লিম অনুপাত)
+                                                            Recommended size: 1200×120 or 1920×150 px (wide slim aspect ratio)
                                                         </p>
                                                         <div className="flex items-center justify-center gap-2">
                                                             <button
@@ -1148,7 +1148,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                                                        ব্যানার ক্লিক লিংক (Click URL)
+                                                        Banner Click URL
                                                     </label>
                                                     <input
                                                         type="text"
@@ -1158,13 +1158,13 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                                                     />
                                                     <span className="text-[11px] text-slate-400 mt-1 block">
-                                                        ভিজিটর ব্যানারে ক্লিক করলে এই লিংকে রিডাইরেক্ট হবে।
+                                                        Visitors will be redirected to this link when clicking the banner.
                                                     </span>
                                                 </div>
 
                                                 <div>
                                                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                                                        ব্যাকগ্রাউন্ড কালার (Edge Fill Background Color)
+                                                        Edge Fill Background Color
                                                     </label>
                                                     <div className="flex items-center gap-2">
                                                         <input
@@ -1181,7 +1181,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                         />
                                                     </div>
                                                     <span className="text-[11px] text-slate-400 mt-1 block">
-                                                        ব্যানার ছবির দুই পাশের খালি অংশ এই কালারে ফিল হবে (যেমন: লাল #8a0000)।
+                                                        Outer edges on wide screens will fill with this color.
                                                     </span>
                                                 </div>
                                             </div>
@@ -1193,17 +1193,17 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                         <div className="space-y-5 p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
                                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
                                                 <Palette className="w-4 h-4 text-emerald-600" />
-                                                <span>ব্যাকগ্রাউন্ড কালার ও টেক্সট কনফিগারেশন</span>
+                                                <span>Background Color & Text Configuration</span>
                                             </h4>
 
                                             {/* Background Color Presets */}
                                             <div>
                                                 <label className="block text-xs font-bold text-slate-700 mb-2">
-                                                    ব্যাকগ্রাউন্ড কালার নির্ধারণ করুন (Background Color)
+                                                    Select Background Color
                                                 </label>
                                                 <div className="flex flex-wrap items-center gap-2 mb-3">
                                                     {[
-                                                        { label: '10MS Crimson Red', color: '#8a0000' },
+                                                        { label: 'NovoNex Crimson Red', color: '#8a0000' },
                                                         { label: 'Deep Maroon', color: '#680000' },
                                                         { label: 'Royal Blue', color: '#1e40af' },
                                                         { label: 'Sky Blue', color: '#0284c7' },
@@ -1246,25 +1246,25 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                                                        প্রধান টেক্সট / শিরোনাম (Headline)
+                                                        Headline
                                                     </label>
                                                     <input
                                                         type="text"
                                                         value={headerSettings.banner_title || ''}
                                                         onChange={(e) => handleUpdate('banner_title', e.target.value)}
-                                                        placeholder="e.g. নতুন ব্যাচে প্রথম ক্লাস একদম ফ্রি!"
+                                                        placeholder="e.g. First class of the new batch is free!"
                                                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                                                     />
                                                 </div>
                                                 <div>
                                                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                                                        সাবটাইটেল / বিবরণ (Subtitle)
+                                                        Subtitle
                                                     </label>
                                                     <input
                                                         type="text"
                                                         value={headerSettings.banner_subtitle || ''}
                                                         onChange={(e) => handleUpdate('banner_subtitle', e.target.value)}
-                                                        placeholder="e.g. রেজিস্ট্রার করতে এখনই জয়েন করুন"
+                                                        placeholder="e.g. Join now to register"
                                                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                                                     />
                                                 </div>
@@ -1273,21 +1273,21 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                             {/* CTA Button Settings */}
                                             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
                                                 <span className="text-xs font-bold text-slate-700 block">
-                                                    অ্যাকশন বাটন সেটিংস (Call to Action Button)
+                                                    Call to Action Button Settings
                                                 </span>
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                                     <div>
-                                                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">বাটন টেক্সট</label>
+                                                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">Button Text</label>
                                                         <input
                                                             type="text"
                                                             value={headerSettings.banner_btn_text || ''}
                                                             onChange={(e) => handleUpdate('banner_btn_text', e.target.value)}
-                                                            placeholder="e.g. ক্লিক করুন"
+                                                            placeholder="e.g. Enroll Now"
                                                             className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs"
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">বাটন লিংক</label>
+                                                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">Button Link</label>
                                                         <input
                                                             type="text"
                                                             value={headerSettings.banner_btn_link || ''}
@@ -1297,7 +1297,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">বাটন কালার</label>
+                                                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">Button Color</label>
                                                         <div className="flex items-center gap-2">
                                                             <input
                                                                 type="color"
@@ -1316,23 +1316,23 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Secondary Hotline Badge (Like 10MS "কল করুন ১৬৯১০") */}
+                                            {/* Secondary Hotline Badge */}
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                                                        হটলাইন / সেকেন্ডারি টেক্সট (যেমন: কল করুন ১৬৯১০)
+                                                        Hotline / Secondary Text (e.g. Call 16910)
                                                     </label>
                                                     <input
                                                         type="text"
                                                         value={headerSettings.banner_secondary_text || ''}
                                                         onChange={(e) => handleUpdate('banner_secondary_text', e.target.value)}
-                                                        placeholder="e.g. কল করুন ১৬৯১০"
+                                                        placeholder="e.g. Call 16910"
                                                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800"
                                                     />
                                                 </div>
                                                 <div>
                                                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                                                        হটলাইন লিংক / ফোন নম্বর
+                                                        Hotline Link / Phone Number
                                                     </label>
                                                     <input
                                                         type="text"
@@ -1349,7 +1349,7 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                     {/* COMMON BANNER OPTIONS */}
                                     <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
                                         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                                            ডিসপ্লে ও দৃশ্যমানতার সেটিংস (Visibility Settings)
+                                            Visibility Settings
                                         </h4>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <label className="flex items-center gap-3 cursor-pointer p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50">
@@ -1361,25 +1361,25 @@ export const AdminHeaderBuilderPage: React.FC = () => {
                                                 />
                                                 <div>
                                                     <span className="text-xs font-bold text-slate-800 block">
-                                                        ক্রস (X) বাটন দিয়ে বন্ধ করার সুযোগ দিন
+                                                        Allow closing with Close (X) button
                                                     </span>
                                                     <span className="text-[11px] text-slate-500 block">
-                                                        ভিজিটর ব্যানারের ক্রস বাটনে চাপলে ব্যানারটি বন্ধ করতে পারবে।
+                                                        Visitors can dismiss the banner by clicking the close button.
                                                     </span>
                                                 </div>
                                             </label>
 
                                             <div className="p-3.5 rounded-xl border border-slate-200 space-y-1">
                                                 <span className="text-xs font-bold text-slate-800 block">
-                                                    ব্যানার প্রদর্শনের স্থান
+                                                    Banner Display Location
                                                 </span>
                                                 <select
                                                     value={headerSettings.banner_show_on || 'all'}
                                                     onChange={(e) => handleUpdate('banner_show_on', e.target.value as any)}
                                                     className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-800 bg-white"
                                                 >
-                                                    <option value="all">সকল পাবলিক পেজে দেখাবে (All Public Pages)</option>
-                                                    <option value="home">শুধুমাত্র হোম পেজে দেখাবে (Home Page Only)</option>
+                                                    <option value="all">All Public Pages</option>
+                                                    <option value="home">Home Page Only</option>
                                                 </select>
                                             </div>
                                         </div>

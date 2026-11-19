@@ -29,7 +29,7 @@
                         <td class="px-4 py-4 text-slate-600">{{ $course->instructor?->name ?? 'Unassigned' }}</td>
                         <td class="px-4 py-4 text-slate-600">
                             @if ($course->price > 0)
-                                ৳{{ number_format($course->sale_price ?? $course->price, 0) }}
+                                Tk {{ number_format($course->sale_price ?? $course->price, 0) }}
                             @else
                                 Free
                             @endif

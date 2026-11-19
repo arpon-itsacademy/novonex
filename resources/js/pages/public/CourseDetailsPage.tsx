@@ -176,7 +176,7 @@ export const CourseDetailsPage: React.FC = () => {
     const hasDiscount = course.sale_price !== null && course.sale_price !== undefined && Number(course.sale_price) < Number(course.price);
     const promoCoupon = course.coupon_code || 'ACPPOWERPLAY500';
     const discountAmount = hasDiscount ? Math.round(Number(course.price) - Number(course.sale_price)) : 500;
-    const discountText = course.coupon_discount_text || `৳${discountAmount} ছাড়`;
+    const discountText = course.coupon_discount_text || `Tk ${discountAmount} OFF`;
 
     const handleApplyCoupon = () => {
         if (navigator.clipboard) {
@@ -239,7 +239,7 @@ export const CourseDetailsPage: React.FC = () => {
                                             })}
                                         </div>
                                         <span className="text-xs text-slate-300 font-medium">
-                                            ইন্সট্রাক্টর: <strong className="text-white font-bold">{allInstructors.map((i: any) => i.name).join(', ')}</strong>
+                                            Instructor: <strong className="text-white font-bold">{allInstructors.map((i: any) => i.name).join(', ')}</strong>
                                         </span>
                                     </div>
                                 )}
@@ -357,7 +357,7 @@ export const CourseDetailsPage: React.FC = () => {
                                 <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
                                     <GraduationCap className="w-5 h-5" />
                                 </div>
-                                <h2 className="text-xl font-black text-slate-900 tracking-tight">কোর্স ইন্সট্রাক্টরবৃন্দ</h2>
+                                <h2 className="text-xl font-black text-slate-900 tracking-tight">Course Instructors</h2>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {allInstructors.length > 0 ? (
@@ -371,7 +371,7 @@ export const CourseDetailsPage: React.FC = () => {
                                         const designation = teacher.designation 
                                             || teacher.teacher_profile?.designation 
                                             || teacher.teacherProfile?.designation 
-                                            || 'অনলাইন শিক্ষক ও মেন্টর';
+                                            || 'Online Instructor & Mentor';
                                         const institution = teacher.institution 
                                             || teacher.teacher_profile?.institution 
                                             || teacher.teacherProfile?.institution;
@@ -424,12 +424,12 @@ export const CourseDetailsPage: React.FC = () => {
                                     <div className="p-4 sm:p-5 rounded-2xl border border-slate-100 bg-slate-50/70 flex items-center gap-4">
                                         <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-sky-500 to-amber-500 p-0.5 shadow-md shrink-0 flex items-center justify-center">
                                             <div className="w-full h-full rounded-[14px] bg-slate-900 text-white flex items-center justify-center font-black text-2xl">
-                                                M
+                                                N
                                             </div>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-slate-900 text-base">মনোলগ এডু বিশেষজ্ঞ ফ্যাকাল্টি</h4>
-                                            <p className="text-xs text-slate-500 font-medium mt-0.5">অভিজ্ঞ একাডেমিক ও ভর্তি মেন্টরবৃন্দ</p>
+                                            <h4 className="font-bold text-slate-900 text-base">NovoNex Expert Faculty</h4>
+                                            <p className="text-xs text-slate-500 font-medium mt-0.5">Experienced Academic & Admission Mentors</p>
                                         </div>
                                     </div>
                                 )}
@@ -480,7 +480,7 @@ export const CourseDetailsPage: React.FC = () => {
                                     </div>
                                     <div className="min-w-0">
                                         <span className="text-xs sm:text-sm font-bold text-slate-700 block truncate">
-                                            ভর্তি সংখ্যা
+                                            Enrolled Students
                                         </span>
                                         <span className="text-2xl sm:text-3xl font-black text-sky-600 leading-tight block">
                                             {totalEnrolled}
@@ -512,7 +512,7 @@ export const CourseDetailsPage: React.FC = () => {
                                     </div>
                                     <div className="min-w-0">
                                         <span className="text-xs sm:text-sm font-bold text-slate-700 block truncate">
-                                            ক্লাস শুরু
+                                            Classes Start
                                         </span>
                                         <span className="text-base sm:text-lg font-black text-amber-600 truncate block leading-tight">
                                             {course.class_starts_at || 'Nov 09, 2026'}
@@ -536,7 +536,7 @@ export const CourseDetailsPage: React.FC = () => {
                                         onClick={handleApplyCoupon}
                                         className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black shadow-xs transition cursor-pointer whitespace-nowrap"
                                     >
-                                        {copiedCoupon ? 'প্রয়োগ হয়েছে!' : 'প্রয়োগ করো'}
+                                        {copiedCoupon ? 'Applied!' : 'Apply'}
                                     </button>
                                 </div>
 
@@ -544,19 +544,19 @@ export const CourseDetailsPage: React.FC = () => {
                                 <div className="grid grid-cols-4 gap-2 text-center">
                                     <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
                                         <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.days}</span>
-                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">দিন</span>
+                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Days</span>
                                     </div>
                                     <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
                                         <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.hours}</span>
-                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">ঘণ্টা</span>
+                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Hours</span>
                                     </div>
                                     <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
                                         <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.minutes}</span>
-                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">মিনিট</span>
+                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Mins</span>
                                     </div>
                                     <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
                                         <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.seconds}</span>
-                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">সেকেন্ড</span>
+                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Secs</span>
                                     </div>
                                 </div>
                             </div>
@@ -587,7 +587,7 @@ export const CourseDetailsPage: React.FC = () => {
                                         className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all"
                                     >
                                         <PlayCircle className="w-5 h-5" />
-                                        <span>ক্লাস শুরু করুন</span>
+                                        <span>Start Learning</span>
                                     </Link>
                                 ) : course.price === 0 ? (
                                     <button
@@ -596,25 +596,25 @@ export const CourseDetailsPage: React.FC = () => {
                                         className="w-full py-4 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 transition-all disabled:opacity-50 cursor-pointer"
                                     >
                                         <Sparkles className="w-5 h-5" />
-                                        <span>{enrollingFree ? 'এনরোল হচ্ছে...' : 'ফ্রিতে ক্লাস শুরু করুন'}</span>
+                                        <span>{enrollingFree ? 'Enrolling...' : 'Start Learning for Free'}</span>
                                     </button>
                                 ) : (
                                     <Link
                                         to={`/checkout/${course.slug}${promoCoupon ? `?coupon=${promoCoupon}` : ''}`}
                                         className="w-full py-4 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/35 transition-all"
                                     >
-                                        <span>কোর্সটি কিনুন</span>
+                                        <span>Enroll Now</span>
                                     </Link>
                                 )}
 
-                                {/* Secondary: 'কোর্সটি কীভাবে কিনবেন' button */}
+                                {/* Secondary: 'How to Enroll' button */}
                                 <button
                                     type="button"
                                     onClick={() => setShowHowToBuyModal(true)}
                                     className="w-full py-3.5 px-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-sky-600 font-bold text-base flex items-center justify-center gap-2.5 shadow-2xs transition group cursor-pointer"
                                 >
                                     <PlayCircle className="w-5 h-5 text-slate-400 group-hover:text-sky-600 transition" />
-                                    <span>কোর্সটি কীভাবে কিনবেন</span>
+                                    <span>How to Enroll</span>
                                 </button>
 
                                 {/* Custom Action Buttons (Outline, etc.) */}
@@ -642,7 +642,7 @@ export const CourseDetailsPage: React.FC = () => {
 
                             {/* Course Features Checklist */}
                             <div className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-600 font-medium">
-                                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">এই কোর্সে যা যা থাকছে:</h4>
+                                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">What is included in this course:</h4>
                                 {courseFeatures.map((feat, idx) => (
                                     <div key={idx} className="flex items-start gap-2.5">
                                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
@@ -672,8 +672,8 @@ export const CourseDetailsPage: React.FC = () => {
                                 <PlayCircle className="w-6 h-6" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-black text-slate-900">কোর্সটি কীভাবে কিনবেন?</h3>
-                                <p className="text-xs text-slate-500">সহজ ৪টি ধাপে কোর্সটিতে ভর্তি হোন</p>
+                                <h3 className="text-lg font-black text-slate-900">How to Enroll in this Course?</h3>
+                                <p className="text-xs text-slate-500">Enroll easily in 4 simple steps</p>
                             </div>
                         </div>
 
@@ -703,19 +703,19 @@ export const CourseDetailsPage: React.FC = () => {
                             <div className="space-y-2.5 py-1">
                                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
                                     <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
-                                    <p className="text-xs text-slate-700 font-medium">নিচে বা সাইডবারে <strong className="text-sky-700">"কোর্সটি কিনুন"</strong> বাটনে ক্লিক করে চেকআউট পেজে যান।</p>
+                                    <p className="text-xs text-slate-700 font-medium">Click the <strong className="text-sky-700">"Enroll Now"</strong> button below or in the sidebar to go to the checkout page.</p>
                                 </div>
                                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
                                     <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
-                                    <p className="text-xs text-slate-700 font-medium">কুপন কোড <strong className="text-sky-700 font-mono">{promoCoupon}</strong> স্বয়ংক্রিয়ভাবে ডিসকাউন্ট প্রযোজ্য করবে।</p>
+                                    <p className="text-xs text-slate-700 font-medium">Coupon code <strong className="text-sky-700 font-mono">{promoCoupon}</strong> will automatically apply your discount.</p>
                                 </div>
                                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
                                     <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
-                                    <p className="text-xs text-slate-700 font-medium">বিকাশ, নগদ, রকেট অথবা সুর্যপে এর মাধ্যমে পেমেন্ট সম্পন্ন করুন।</p>
+                                    <p className="text-xs text-slate-700 font-medium">Complete payment via bKash, Nagad, Rocket, or shurjoPay online gateway.</p>
                                 </div>
                                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
                                     <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">4</span>
-                                    <p className="text-xs text-slate-700 font-medium">পেমেন্ট নিশ্চিত হওয়ার সাথে সাথে আপনার ড্যাশবোর্ডে কোর্সটি চালু হয়ে যাবে।</p>
+                                    <p className="text-xs text-slate-700 font-medium">Once payment is confirmed, the course will be unlocked immediately in your dashboard.</p>
                                 </div>
                             </div>
                         )}
@@ -726,7 +726,7 @@ export const CourseDetailsPage: React.FC = () => {
                                 onClick={() => setShowHowToBuyModal(false)}
                                 className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md transition"
                             >
-                                <span>কোর্সটি কিনুন</span>
+                                <span>Enroll Now</span>
                                 <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>

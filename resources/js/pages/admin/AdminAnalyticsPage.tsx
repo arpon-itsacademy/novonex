@@ -179,8 +179,8 @@ export const AdminAnalyticsPage: React.FC = () => {
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                 <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-                                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} tickFormatter={(v) => `৳${v}`} />
-                                <Tooltip formatter={(val: any) => [`৳${Number(val).toLocaleString()}`, 'Revenue']} />
+                                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} tickFormatter={(v) => `Tk ${v}`} />
+                                <Tooltip formatter={(val: any) => [`Tk ${Number(val).toLocaleString()}`, 'Revenue']} />
                                 <Area type="monotone" dataKey="revenue" stroke="#0ea5e9" strokeWidth={2.5} fill="url(#areaColor)" />
                             </AreaChart>
                         </ResponsiveContainer>
@@ -195,8 +195,8 @@ export const AdminAnalyticsPage: React.FC = () => {
                             <BarChart data={monthly_trends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                 <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-                                <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} tickFormatter={(v) => `৳${v}`} />
-                                <Tooltip formatter={(val: any) => [`৳${Number(val).toLocaleString()}`, 'Revenue']} />
+                                <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} tickFormatter={(v) => `Tk ${v}`} />
+                                <Tooltip formatter={(val: any) => [`Tk ${Number(val).toLocaleString()}`, 'Revenue']} />
                                 <Bar dataKey="revenue" fill="#6366f1" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>

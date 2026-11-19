@@ -67,20 +67,20 @@ export const StudentDashboardPage: React.FC = () => {
         }
     };
 
-    // Calculate time-aware Bengali greeting
-    const getBengaliGreeting = () => {
+    // Calculate time-aware English greeting
+    const getGreeting = () => {
         const hour = new Date().getHours();
-        if (hour >= 5 && hour < 12) return 'শুভ সকাল';
-        if (hour >= 12 && hour < 16) return 'শুভ দুপুর';
-        if (hour >= 16 && hour < 18) return 'শুভ বিকাল';
-        return 'শুভ রাত্রি';
+        if (hour >= 5 && hour < 12) return 'Good Morning';
+        if (hour >= 12 && hour < 16) return 'Good Afternoon';
+        if (hour >= 16 && hour < 20) return 'Good Evening';
+        return 'Good Night';
     };
 
     if (loading) {
         return (
             <div className="py-20 flex flex-col items-center justify-center gap-3">
                 <Loader2 className="w-8 h-8 text-sky-600 animate-spin" />
-                <span className="text-xs font-bold text-slate-500">ড্যাশবোর্ড লোড হচ্ছে...</span>
+                <span className="text-xs font-bold text-slate-500">Loading dashboard...</span>
             </div>
         );
     }
@@ -94,7 +94,7 @@ export const StudentDashboardPage: React.FC = () => {
             : '/courses';
 
     const recentCourseTitle = recentCourse?.course?.title || 'SSC 26 Free Crash Course';
-    const recentLessonTitle = recentCourse?.last_lesson?.title || 'লেকচার -০১ | বাংলা ব্যাকরণ (সমাস)';
+    const recentLessonTitle = recentCourse?.last_lesson?.title || 'Lecture - 01 | Orientation & Fundamentals';
     const progressPercent = recentCourse?.progress_percentage || 0;
 
     return (
@@ -103,15 +103,15 @@ export const StudentDashboardPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                        {getBengaliGreeting()}, {user?.name || 'শিক্ষার্থী'}
+                        {getGreeting()}, {user?.name || 'Student'}
                     </h1>
                     <div className="flex items-center gap-2 mt-1">
                         <p className="text-xs sm:text-sm font-bold text-slate-500">
-                            আজকে পড়া শুরু করো
+                            Start learning today
                         </p>
                         {user?.registration_number && (
                             <span className="text-[11px] font-extrabold text-sky-700 bg-sky-50 border border-sky-200/80 px-2 py-0.5 rounded-full font-mono">
-                                আইডি: {user.registration_number}
+                                ID: {user.registration_number}
                             </span>
                         )}
                     </div>
@@ -123,9 +123,9 @@ export const StudentDashboardPage: React.FC = () => {
                         type="button"
                         className="px-4 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-2 transition-all cursor-pointer"
                     >
-                        <span>প্রোফাইল পূরণ করো</span>
+                        <span>Complete Profile</span>
                         <span className="bg-white/25 px-2 py-0.5 rounded-full text-[10px] tracking-wide font-black">
-                            +৫০ পয়েন্ট
+                            +50 pts
                         </span>
                     </button>
                 </div>
@@ -149,10 +149,10 @@ export const StudentDashboardPage: React.FC = () => {
                         ) : (
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-600/40 via-slate-900 to-sky-950 flex flex-col items-center justify-center p-3 text-center">
                                 <span className="text-[10px] font-bold text-sky-400 uppercase tracking-widest">
-                                    বাংলা ব্যাকরণ
+                                    Core Syllabus
                                 </span>
-                                <span className="text-xl font-black text-white mt-1">সমাস</span>
-                                <span className="text-[10px] text-sky-200/80">ভিডিও ক্লাস</span>
+                                <span className="text-xl font-black text-white mt-1">Fundamentals</span>
+                                <span className="text-[10px] text-sky-200/80">Video Lesson</span>
                             </div>
                         )}
 
@@ -167,7 +167,7 @@ export const StudentDashboardPage: React.FC = () => {
                     {/* Course & Lesson Details */}
                     <div className="flex-1 min-w-0 w-full space-y-2">
                         <span className="text-[11px] font-bold text-slate-400 block">
-                            লেটেস্ট ক্লাস
+                            Latest Lecture
                         </span>
                         <h3 className="font-extrabold text-slate-900 text-sm sm:text-base leading-snug line-clamp-1">
                             {recentCourseTitle}
@@ -195,7 +195,7 @@ export const StudentDashboardPage: React.FC = () => {
                                 to={continueUrl}
                                 className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-bold text-xs rounded-full transition-all shadow-md shadow-sky-600/20"
                             >
-                                <span>শুরু করো</span>
+                                <span>Resume Learning</span>
                                 <ArrowRight className="w-3.5 h-3.5" />
                             </Link>
                         </div>
@@ -211,17 +211,17 @@ export const StudentDashboardPage: React.FC = () => {
                             {activeLiveClass ? (
                                 <div className="inline-flex items-center gap-1.5 text-xs font-black text-rose-600">
                                     <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-                                    <span>🔴 লাইভ চলছে</span>
+                                    <span>🔴 Live Now</span>
                                 </div>
                             ) : upcomingLiveClass ? (
                                 <div className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-700">
                                     <span className="w-2 h-2 rounded-full bg-sky-500" />
-                                    <span>আসন্ন লাইভ ক্লাস</span>
+                                    <span>Upcoming Live Class</span>
                                 </div>
                             ) : (
                                 <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500">
                                     <Radio className="w-3.5 h-3.5 text-slate-400" />
-                                    <span>লাইভ ক্লাস</span>
+                                    <span>Live Classes</span>
                                 </div>
                             )}
 
@@ -229,7 +229,7 @@ export const StudentDashboardPage: React.FC = () => {
                                 to="/student/live-classes"
                                 className="text-[11px] font-bold text-sky-600 hover:underline"
                             >
-                                সবগুলো দেখুন
+                                View All
                             </Link>
                         </div>
 
@@ -242,7 +242,7 @@ export const StudentDashboardPage: React.FC = () => {
                                     {activeLiveClass.title}
                                 </h4>
                                 <p className="text-xs text-slate-500 mt-1 line-clamp-1">
-                                    {activeLiveClass.creator ? `মেন্টর: ${activeLiveClass.creator.name}` : 'ইন্টারঅ্যাক্টিভ লাইভ সেশন ও প্রশ্নোত্তর'}
+                                    {activeLiveClass.creator ? `Instructor: ${activeLiveClass.creator.name}` : 'Interactive live session & Q&A'}
                                 </p>
                             </div>
                         ) : upcomingLiveClass ? (
@@ -256,7 +256,7 @@ export const StudentDashboardPage: React.FC = () => {
                                 <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
                                     <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                                     <span>
-                                        {new Date(upcomingLiveClass.start_time).toLocaleString('bn-BD', {
+                                        {new Date(upcomingLiveClass.start_time).toLocaleString('en-US', {
                                             month: 'short',
                                             day: 'numeric',
                                             hour: '2-digit',
@@ -268,10 +268,10 @@ export const StudentDashboardPage: React.FC = () => {
                         ) : (
                             <div>
                                 <h4 className="font-extrabold text-slate-900 text-sm leading-snug">
-                                    এই মুহূর্তে কোনো লাইভ ক্লাস নেই
+                                    No live classes at the moment
                                 </h4>
                                 <p className="text-xs text-slate-500 mt-1.5">
-                                    নতুন লাইভ ক্লাস শিডিউল করা হলে আপনার ড্যাশবোর্ডে সরাসরি নোটিফিকেশন ও লিংক পাবেন।
+                                    Newly scheduled live classes will show up directly on your dashboard.
                                 </p>
                             </div>
                         )}
@@ -284,21 +284,21 @@ export const StudentDashboardPage: React.FC = () => {
                                 className="w-full py-2.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold text-xs rounded-full transition-all shadow-md shadow-rose-600/25 text-center flex items-center justify-center gap-2"
                             >
                                 <Radio className="w-3.5 h-3.5 text-white animate-pulse" />
-                                <span>এখনই ক্লাসে যুক্ত হও</span>
+                                <span>Join Live Class Now</span>
                             </Link>
                         ) : upcomingLiveClass ? (
                             <Link
                                 to={`/student/live-classes/${upcomingLiveClass.id}`}
                                 className="w-full py-2.5 bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-bold text-xs rounded-full transition-all shadow-md shadow-sky-600/20 text-center block"
                             >
-                                বিস্তারিত ও রুম লিংক
+                                View Details & Room
                             </Link>
                         ) : (
                             <Link
                                 to="/student/live-classes"
                                 className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-full transition-all text-center block"
                             >
-                                লাইভ ক্লাসের তালিকা
+                                Browse Live Classes
                             </Link>
                         )}
                     </div>
@@ -307,7 +307,7 @@ export const StudentDashboardPage: React.FC = () => {
 
             {/* 4-Card Quick Actions / Category Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                {/* 1. চলমান কোর্স */}
+                {/* 1. Enrolled Courses */}
                 <Link
                     to="/student/my-courses"
                     className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:border-sky-300 hover:shadow-sm transition-all group flex items-center gap-3.5"
@@ -317,15 +317,15 @@ export const StudentDashboardPage: React.FC = () => {
                     </div>
                     <div>
                         <div className="font-extrabold text-slate-800 text-sm group-hover:text-sky-600 transition-colors">
-                            চলমান কোর্স
+                            Enrolled Courses
                         </div>
                         <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-                            {totalEnrolled} টি কোর্স
+                            {totalEnrolled} Courses
                         </div>
                     </div>
                 </Link>
 
-                {/* 2. পরীক্ষা */}
+                {/* 2. Exams */}
                 <Link
                     to="/student/exams"
                     className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:border-amber-300 hover:shadow-sm transition-all group flex items-center justify-between relative"
@@ -336,19 +336,19 @@ export const StudentDashboardPage: React.FC = () => {
                         </div>
                         <div>
                             <div className="font-extrabold text-slate-800 text-sm group-hover:text-amber-600 transition-colors">
-                                পরীক্ষা
+                                Exams & Quizzes
                             </div>
                             <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-                                মডেল টেস্ট ও কুইজ
+                                Model Tests & Practice
                             </div>
                         </div>
                     </div>
                     <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black shrink-0">
-                        {availableExams.length}টি
+                        {availableExams.length}
                     </span>
                 </Link>
 
-                {/* 3. রুটিন */}
+                {/* 3. Routine */}
                 <Link
                     to="/student/routine"
                     className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:border-amber-300 hover:shadow-sm transition-all group flex items-center gap-3.5"
@@ -358,15 +358,15 @@ export const StudentDashboardPage: React.FC = () => {
                     </div>
                     <div>
                         <div className="font-extrabold text-slate-800 text-sm group-hover:text-amber-600 transition-colors">
-                            রুটিন
+                            Class Routine
                         </div>
                         <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-                            ক্লাস সিডিউল
+                            Live & Upload Schedules
                         </div>
                     </div>
                 </Link>
 
-                {/* 4. ফ্রি রিসোর্স */}
+                {/* 4. Free Resources */}
                 <Link
                     to="/courses?type=free"
                     className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:border-emerald-300 hover:shadow-sm transition-all group flex items-center gap-3.5"
@@ -376,10 +376,10 @@ export const StudentDashboardPage: React.FC = () => {
                     </div>
                     <div>
                         <div className="font-extrabold text-slate-800 text-sm group-hover:text-emerald-700 transition-colors">
-                            ফ্রি রিসোর্স
+                            Free Resources
                         </div>
                         <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-                            নোট ও হ্যান্ডনোট
+                            Lecture Notes & Sheets
                         </div>
                     </div>
                 </Link>
@@ -387,18 +387,18 @@ export const StudentDashboardPage: React.FC = () => {
 
             {/* Bottom 2-Column Section: Take Exam & Today's Routine */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {/* Left: পরীক্ষা দাও (Take Exams) */}
+                {/* Left: Take Exams */}
                 <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-slate-200/80 flex flex-col justify-between">
                     <div>
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
                             <h3 className="font-extrabold text-slate-900 text-base">
-                                পরীক্ষা দাও
+                                Take Exams
                             </h3>
                             <Link
                                 to="/student/exams"
                                 className="text-xs font-bold text-sky-600 hover:text-sky-700 transition-colors"
                             >
-                                সব দেখুন
+                                View All
                             </Link>
                         </div>
 
@@ -406,13 +406,13 @@ export const StudentDashboardPage: React.FC = () => {
                         {availableExams.length === 0 ? (
                             <div className="py-8 text-center text-slate-400 space-y-2">
                                 <FileText className="w-8 h-8 text-slate-300 mx-auto" />
-                                <p className="text-xs font-bold text-slate-600">বর্তমানে কোনো পরীক্ষা নির্ধারিত নেই</p>
-                                <p className="text-[11px] text-slate-400">নতুন মডেল টেস্ট ও কুইজ প্রকাশিত হলে এখানে দেখতে পাবেন।</p>
+                                <p className="text-xs font-bold text-slate-600">No exams scheduled at the moment</p>
+                                <p className="text-[11px] text-slate-400">Newly published model tests and quizzes will appear here.</p>
                             </div>
                         ) : (
                             <div className="space-y-2.5">
                                 {availableExams.slice(0, 3).map((exam) => {
-                                    const courseName = exam.course?.title || exam.courses?.[0]?.title || 'মডেল টেস্ট';
+                                    const courseName = exam.course?.title || exam.courses?.[0]?.title || 'Model Test';
                                     return (
                                         <div
                                             key={exam.id}
@@ -424,7 +424,7 @@ export const StudentDashboardPage: React.FC = () => {
                                                     ? 'bg-rose-500 text-white animate-pulse shadow-xs' 
                                                     : 'bg-sky-50 text-sky-700'
                                             }`}>
-                                                {exam.is_live_active ? '🔴' : `${exam.duration_minutes}′`}
+                                                {exam.is_live_active ? '🔴' : `${exam.duration_minutes}m`}
                                             </div>
 
                                             {/* Details */}
@@ -435,13 +435,13 @@ export const StudentDashboardPage: React.FC = () => {
                                                     </h4>
                                                     {exam.is_live_active && (
                                                         <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-700 shrink-0">
-                                                            লাইভ
+                                                            Live
                                                         </span>
                                                     )}
                                                 </div>
                                                 <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
-                                                    {courseName} • {exam.duration_minutes} মিনিট
-                                                    {exam.is_live_expired && ' • প্র্যাকটিস মোড'}
+                                                    {courseName} • {exam.duration_minutes} mins
+                                                    {exam.is_live_expired && ' • Practice Mode'}
                                                 </p>
                                             </div>
 
@@ -454,7 +454,7 @@ export const StudentDashboardPage: React.FC = () => {
                                                         : 'bg-sky-50 hover:bg-sky-600 hover:text-white text-sky-700'
                                                 }`}
                                             >
-                                                {exam.is_live_active ? 'অংশ নিন' : 'শুরু'}
+                                                {exam.is_live_active ? 'Participate' : 'Start'}
                                             </Link>
                                         </div>
                                     );
@@ -468,12 +468,12 @@ export const StudentDashboardPage: React.FC = () => {
                             to="/student/exams"
                             className="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline"
                         >
-                            সকল পরীক্ষার তালিকা দেখুন →
+                            View All Exams →
                         </Link>
                     </div>
                 </div>
 
-                {/* Right: আজকের রুটিন (Today's Routine) */}
+                {/* Right: Today's Routine */}
                 <div
                     id="student-routine-section"
                     className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-slate-200/80 flex flex-col justify-between"
@@ -481,13 +481,13 @@ export const StudentDashboardPage: React.FC = () => {
                     <div>
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
                             <h3 className="font-extrabold text-slate-900 text-base">
-                                আজকের রুটিন
+                                Today's Schedule
                             </h3>
                             <Link
                                 to="/student/routine"
                                 className="text-xs font-bold text-[#0B4B34] hover:text-emerald-800 transition-colors cursor-pointer"
                             >
-                                রুটিন ক্যালেন্ডার
+                                Routine Calendar
                             </Link>
                         </div>
 
@@ -496,7 +496,7 @@ export const StudentDashboardPage: React.FC = () => {
                             {todayRoutineEvents.length === 0 ? (
                                 <div className="py-8 text-center text-slate-400 space-y-2">
                                     <Calendar className="w-8 h-8 text-slate-300 mx-auto" />
-                                    <p className="text-xs">আজকের দিনে নির্ধারিত কোনো ক্লাস বা পরীক্ষা নেই।</p>
+                                    <p className="text-xs">No classes or exams scheduled for today.</p>
                                 </div>
                             ) : (
                                 todayRoutineEvents.slice(0, 3).map((evt: any) => (
@@ -528,12 +528,12 @@ export const StudentDashboardPage: React.FC = () => {
                                                 </h4>
                                                 {evt.is_live && (
                                                     <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-rose-500 text-white shrink-0 animate-pulse">
-                                                        লাইভ চলছে
+                                                        Live Now
                                                     </span>
                                                 )}
                                                 {evt.type === 'book_parcel' && (
                                                     <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-orange-100 text-orange-800 shrink-0">
-                                                        বই/পার্সেল
+                                                        Book / Parcel
                                                     </span>
                                                 )}
                                             </div>
@@ -545,7 +545,7 @@ export const StudentDashboardPage: React.FC = () => {
                                             to={evt.action_url || '/student/routine'}
                                             className="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 hover:bg-emerald-50 hover:text-[#0B4B34] text-slate-600 shrink-0 transition-colors self-center"
                                         >
-                                            {evt.is_live ? 'যুক্ত হন' : (evt.action_text || 'দেখুন')}
+                                            {evt.is_live ? 'Join' : (evt.action_text || 'View')}
                                         </Link>
                                     </div>
                                 ))
@@ -558,8 +558,7 @@ export const StudentDashboardPage: React.FC = () => {
                             to="/student/routine"
                             className="text-xs font-bold text-[#0B4B34] hover:text-emerald-800 hover:underline"
                         >
-                            পূর্ণাঙ্গ রুটিন ক্যালেন্ডার দেখুন →
-                            কোর্সের পূর্ণাঙ্গ সময়সূচি দেখুন →
+                            View Full Routine Schedule →
                         </Link>
                     </div>
                 </div>

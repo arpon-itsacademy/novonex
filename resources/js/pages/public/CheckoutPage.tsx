@@ -398,13 +398,13 @@ export const CheckoutPage: React.FC = () => {
                                         </div>
                                         <div>
                                             <span className="inline-block text-[11px] font-black uppercase tracking-wider bg-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full mb-1">
-                                                ১০০% ডিসকাউন্ট সক্রিয়
+                                                100% Discount Active
                                             </span>
                                             <h3 className="text-lg font-black text-slate-900 tracking-tight">
-                                                সম্পূর্ণ বিনামূল্যে এনরোল করুন
+                                                Enroll Completely Free
                                             </h3>
                                             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                                                আপনার ডিসকাউন্ট বা কুপন কোড সফলভাবে যুক্ত হয়েছে। কোনো পেমেন্ট পরিশোধ করতে হবে না, নিচের বাটনে ক্লিক করে সাথে সাথে কোর্সে যুক্ত হয়ে যান।
+                                                Your discount or coupon code has been applied successfully. No payment required. Click below to enroll immediately.
                                             </p>
                                         </div>
                                     </div>
@@ -412,13 +412,13 @@ export const CheckoutPage: React.FC = () => {
 
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                        অতিরিক্ত নোট (ঐচ্ছিক)
+                                        Additional Notes (Optional)
                                     </label>
                                     <input
                                         type="text"
                                         value={notes}
                                         onChange={(e) => setNotes(e.target.value)}
-                                        placeholder="কোনো বিশেষ নোট বা রেফারেন্স থাকলে লিখুন"
+                                        placeholder="Write any special notes or references here"
                                         className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:bg-white"
                                     />
                                 </div>
@@ -439,12 +439,12 @@ export const CheckoutPage: React.FC = () => {
                                     {submitting ? (
                                         <>
                                             <Loader2 className="w-5 h-5 animate-spin" />
-                                            <span>এনরোল সম্পন্ন হচ্ছে...</span>
+                                            <span>Completing enrollment...</span>
                                         </>
                                     ) : (
                                         <>
                                             <CheckCircle2 className="w-5 h-5" />
-                                            <span>সম্পূর্ণ বিনামূল্যে এনরোল করুন (৳০)</span>
+                                            <span>Enroll Completely Free (Tk 0)</span>
                                             <ArrowRight className="w-5 h-5 ml-1" />
                                         </>
                                     )}
@@ -476,14 +476,14 @@ export const CheckoutPage: React.FC = () => {
                                                     <div>
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-extrabold text-base text-slate-900">
-                                                                অনলাইন পেমেন্ট
+                                                                Online Payment
                                                             </span>
                                                             <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full shadow-2xs">
-                                                                অটোমেটিক এক্সপ্রেস
+                                                                Instant Gateway
                                                             </span>
                                                         </div>
                                                         <span className="text-xs text-slate-500 font-medium block mt-0.5">
-                                                            bKash, Nagad, Rocket, Cards বা Net Banking দিয়ে সাথে সাথে পেমেন্ট করুন
+                                                            Pay instantly with bKash, Nagad, Rocket, Cards, or Net Banking
                                                         </span>
                                                     </div>
                                                 </div>
@@ -513,7 +513,7 @@ export const CheckoutPage: React.FC = () => {
                                             <div className="flex items-center gap-3">
                                                 <div className="h-px bg-slate-200 flex-1"></div>
                                                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                                    বা ম্যানুয়াল সেন্ড মানি (TrxID)
+                                                    Or Manual Send Money (TrxID)
                                                 </span>
                                                 <div className="h-px bg-slate-200 flex-1"></div>
                                             </div>
@@ -546,7 +546,7 @@ export const CheckoutPage: React.FC = () => {
                                 {!isShurjopayAllowed && availableGateways.length === 0 && (
                                     <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
-                                        <span>এই কোর্সের জন্য বর্তমানে কোনো পেমেন্ট মেথড সক্রিয় নেই। অনুগ্রহ করে সাপোর্টে যোগাযোগ করুন।</span>
+                                        <span>No payment methods are currently active for this course. Please contact support.</span>
                                     </div>
                                 )}
 
@@ -589,7 +589,7 @@ export const CheckoutPage: React.FC = () => {
                                             {submitting ? (
                                                 <>
                                                     <Loader2 className="w-5 h-5 animate-spin" />
-                                                    <span>shurjoPay গেটওয়েতে সংযোগ হচ্ছে...</span>
+                                                    <span>Connecting to shurjoPay...</span>
                                                 </>
                                             ) : (
                                                 <>
@@ -794,7 +794,7 @@ export const CheckoutPage: React.FC = () => {
                                             <div className="flex items-center gap-1.5">
                                                 <span className="font-mono font-bold text-xs text-emerald-900">{appliedReferral.code}</span>
                                                 <span className="text-[10px] font-bold px-1.5 py-0.5 bg-emerald-200/80 text-emerald-800 rounded">
-                                                    {appliedReferral.discount_amount > 0 ? `৳${appliedReferral.discount_amount} Off` : 'Code Active'}
+                                                    {appliedReferral.discount_amount > 0 ? `Tk ${appliedReferral.discount_amount} Off` : 'Code Active'}
                                                 </span>
                                             </div>
                                             <p className="text-[11px] text-emerald-700 mt-0.5">
@@ -856,7 +856,7 @@ export const CheckoutPage: React.FC = () => {
                                             <div className="flex items-center gap-1.5">
                                                 <span className="font-mono font-bold text-xs text-amber-900">{appliedCoupon.code}</span>
                                                 <span className="text-[10px] font-bold px-1.5 py-0.5 bg-amber-200/80 text-amber-800 rounded">
-                                                    -৳{appliedCoupon.calculated_discount} OFF
+                                                    -Tk {appliedCoupon.calculated_discount} OFF
                                                 </span>
                                             </div>
                                             <p className="text-[11px] text-amber-700 mt-0.5">

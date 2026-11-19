@@ -195,7 +195,7 @@ export const AdminAccessKeysPage: React.FC = () => {
             const { data } = await apiClient.post('/admin/access-keys/verify', { key: trimmed });
             setVerifyResult({
                 valid: data.found ?? true,
-                message: data.found ? 'শিক্ষার্থী ও অ্যাক্সেস কি সফলভাবে ভেরিফাই হয়েছে!' : (data.message || 'অ্যাক্সেস কি পাওয়া যায়নি।'),
+                message: data.found ? 'Student and access key verified successfully!' : (data.message || 'Access key not found.'),
                 enrollment: data.found ? {
                     id: data.enrollment_id,
                     access_key: data.access_key,
@@ -209,7 +209,7 @@ export const AdminAccessKeysPage: React.FC = () => {
         } catch (err: any) {
             setVerifyResult({
                 valid: false,
-                message: err.response?.data?.message || 'অ্যাক্সেস কি পাওয়া যায়নি অথবা সঠিক নয়।'
+                message: err.response?.data?.message || 'Access key not found or invalid.'
             });
             setShowVerifyModal(true);
         } finally {
@@ -219,7 +219,7 @@ export const AdminAccessKeysPage: React.FC = () => {
 
     // Regenerate student access key
     const handleRegenerateKey = async (enrollmentId: number) => {
-        if (!confirm('আপনি কি এই শিক্ষার্থীর জন্য নতুন অ্যাক্সেস কি তৈরি করতে চান? পূর্বের কি বাতিল হয়ে যাবে।')) {
+        if (!confirm('Are you sure you want to generate a new access key for this student? The previous key will be invalidated.')) {
             return;
         }
 
@@ -234,7 +234,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                 ));
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'অ্যাক্সেস কি তৈরি করতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to generate access key.');
         } finally {
             setRegeneratingId(null);
         }
@@ -249,10 +249,10 @@ export const AdminAccessKeysPage: React.FC = () => {
                         <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-xs border border-white/20">
                             <KeyRound className="w-6 h-6 text-sky-200" />
                         </div>
-                        <h1 className="text-2xl font-bold tracking-tight">Access Key (অ্যাক্সেস কি ম্যানেজমেন্ট)</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Access Key Management</h1>
                     </div>
                     <p className="text-sky-100 text-sm mt-2 max-w-2xl">
-                        কোর্সের শিক্ষার্থীদের অ্যাক্সেস কি তালিকা দেখুন, কপি করুন অথবা ফেসবুক গ্রুপ ও প্রাইভেট কমিউনিটিতে রিকোয়েস্ট দেওয়া শিক্ষার্থীর অ্যাক্সেস কি সরাসরি ভেরিফাই করুন।
+                        View and copy enrolled students' access keys, or instantly verify keys provided by students requesting entry to Facebook groups or private communities.
                     </p>
                 </div>
             </div>
@@ -262,7 +262,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                 <div className="flex items-center gap-2 mb-3">
                     <ShieldCheck className="w-5 h-5 text-emerald-500" />
                     <h2 className="font-bold text-slate-800 dark:text-slate-100 text-sm">
-                        সরাসরি অ্যাক্সেস কি ভেরিফিকেশন (Quick Key Verifier)
+                        Quick Key Verifier
                     </h2>
                 </div>
                 <form onSubmit={handleVerifyKey} className="flex flex-col sm:flex-row gap-3">
@@ -272,7 +272,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                             type="text"
                             value={verifyKeyInput}
                             onChange={(e) => setVerifyKeyInput(e.target.value.toUpperCase())}
-                            placeholder="এখানে অ্যাক্সেস কি পেস্ট করুন (যেমন: MN-ABCD-1234)..."
+                            placeholder="Paste access key here (e.g. MN-ABCD-1234)..."
                             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white font-mono text-sm placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                         />
                     </div>
@@ -286,7 +286,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                         ) : (
                             <UserCheck className="w-4 h-4" />
                         )}
-                        <span>ভেরিফাই করুন</span>
+                        <span>Verify Key</span>
                     </button>
                 </form>
             </div>
@@ -302,11 +302,11 @@ export const AdminAccessKeysPage: React.FC = () => {
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 font-semibold text-sm transition-all shadow-xs cursor-pointer w-fit"
                         >
                             <ArrowLeft className="w-4 h-4" />
-                            <span>সকল কোর্সে ফিরে যান</span>
+                            <span>Back to Courses</span>
                         </button>
 
                         <div className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-                            মোট শিক্ষার্থী: <span className="text-slate-900 dark:text-white font-bold">{pagination.total}</span> জন
+                            Total Enrolled: <span className="text-slate-900 dark:text-white font-bold">{pagination.total}</span>
                         </div>
                     </div>
 
@@ -329,7 +329,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                                     {selectedCourse.title}
                                 </h2>
                                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                    কোর্সের প্রতিটি শিক্ষার্থীর জন্য নির্ধারিত স্বয়ংক্রিয় অ্যাক্সেস কি তালিকা নিচে রয়েছে।
+                                    Below is the list of auto-generated access keys assigned to students in this course.
                                 </p>
                             </div>
                         </div>
@@ -341,7 +341,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                                 type="text"
                                 value={studentSearch}
                                 onChange={(e) => setStudentSearch(e.target.value)}
-                                placeholder="নাম, ফোন বা কি দিয়ে খুঁজুন..."
+                                placeholder="Search by name, phone or key..."
                                 className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-xs placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                             />
                         </div>
@@ -352,7 +352,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                         {loadingStudents ? (
                             <div className="py-20 flex flex-col items-center justify-center text-slate-400 space-y-3">
                                 <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
-                                <p className="text-sm font-semibold">শিক্ষার্থীদের অ্যাক্সেস কি লোড হচ্ছে...</p>
+                                <p className="text-sm font-semibold">Loading students' access keys...</p>
                             </div>
                         ) : students.length === 0 ? (
                             <div className="py-20 text-center px-4">
@@ -360,10 +360,10 @@ export const AdminAccessKeysPage: React.FC = () => {
                                     <Users className="w-8 h-8" />
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">
-                                    {studentSearch ? 'কোনো শিক্ষার্থী পাওয়া যায়নি' : 'এই কোর্সে এখনো কোনো শিক্ষার্থী নেই'}
+                                    {studentSearch ? 'No students found' : 'No students enrolled in this course yet'}
                                 </h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-                                    {studentSearch ? 'অন্য নাম, মোবাইল নম্বর বা অ্যাক্সেস কি লিখে আবার চেষ্টা করুন।' : 'কোর্সে শিক্ষার্থী এনরোল হলে তাদের অ্যাক্সেস কি স্বয়ংক্রিয়ভাবে তৈরি হবে।'}
+                                    {studentSearch ? 'Try searching with another name, phone number or key.' : 'Access keys will be generated automatically when students enroll.'}
                                 </p>
                             </div>
                         ) : (
@@ -372,11 +372,11 @@ export const AdminAccessKeysPage: React.FC = () => {
                                     <thead>
                                         <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-850/50 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
                                             <th className="py-3.5 px-4 w-12 text-center">#</th>
-                                            <th className="py-3.5 px-4">শিক্ষার্থী (Student)</th>
-                                            <th className="py-3.5 px-4">মোবাইল ও ইমেইল</th>
-                                            <th className="py-3.5 px-4">অ্যাক্সেস কি (Access Key)</th>
-                                            <th className="py-3.5 px-4">এনরোলমেন্ট তারিখ</th>
-                                            <th className="py-3.5 px-4 text-right">রিসেন্ট/নতুন কি</th>
+                                            <th className="py-3.5 px-4">Student</th>
+                                            <th className="py-3.5 px-4">Phone & Email</th>
+                                            <th className="py-3.5 px-4">Access Key</th>
+                                            <th className="py-3.5 px-4">Enrollment Date</th>
+                                            <th className="py-3.5 px-4 text-right">Regenerate Key</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm">
@@ -434,24 +434,24 @@ export const AdminAccessKeysPage: React.FC = () => {
                                                                         ? 'bg-emerald-600 text-white'
                                                                         : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                                                                 }`}
-                                                                title="অ্যাক্সেস কি কপি করুন"
+                                                                title="Copy access key"
                                                             >
                                                                 {isCopied ? (
                                                                     <>
                                                                         <Check className="w-3.5 h-3.5" />
-                                                                        <span className="text-[11px] font-bold">কপি হয়েছে</span>
+                                                                        <span className="text-[11px] font-bold">Copied</span>
                                                                     </>
                                                                 ) : (
                                                                     <>
                                                                         <Copy className="w-3.5 h-3.5" />
-                                                                        <span className="text-[11px]">কপি</span>
+                                                                        <span className="text-[11px]">Copy</span>
                                                                     </>
                                                                 )}
                                                             </button>
                                                         </div>
                                                     </td>
                                                     <td className="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                                                        {student.enrolled_at ? new Date(student.enrolled_at).toLocaleDateString('bn-BD', {
+                                                        {student.enrolled_at ? new Date(student.enrolled_at).toLocaleDateString('en-US', {
                                                             day: 'numeric',
                                                             month: 'short',
                                                             year: 'numeric'
@@ -463,10 +463,10 @@ export const AdminAccessKeysPage: React.FC = () => {
                                                             onClick={() => handleRegenerateKey(student.enrollment_id)}
                                                             disabled={regeneratingId === student.enrollment_id}
                                                             className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer disabled:opacity-50"
-                                                            title="নতুন অ্যাক্সেস কি জেনারেট করুন"
+                                                            title="Generate new access key"
                                                         >
                                                             <RefreshCw className={`w-3.5 h-3.5 ${regeneratingId === student.enrollment_id ? 'animate-spin' : ''}`} />
-                                                            <span>নতুন কি</span>
+                                                            <span>New Key</span>
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -481,7 +481,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                         {pagination.last_page > 1 && (
                             <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 text-xs text-slate-500">
                                 <div>
-                                    পৃষ্ঠা {pagination.current_page} / {pagination.last_page} (মোট {pagination.total} জন)
+                                    Page {pagination.current_page} of {pagination.last_page} (Total {pagination.total})
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <button
@@ -490,7 +490,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                                         onClick={() => fetchCourseStudents(selectedCourse.id, pagination.current_page - 1, studentSearch)}
                                         className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 font-semibold disabled:opacity-40 cursor-pointer"
                                     >
-                                        পূর্ববর্তী
+                                        Previous
                                     </button>
                                     <button
                                         type="button"
@@ -498,7 +498,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                                         onClick={() => fetchCourseStudents(selectedCourse.id, pagination.current_page + 1, studentSearch)}
                                         className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 font-semibold disabled:opacity-40 cursor-pointer"
                                     >
-                                        পরবর্তী
+                                        Next
                                     </button>
                                 </div>
                             </div>
@@ -516,13 +516,13 @@ export const AdminAccessKeysPage: React.FC = () => {
                                 type="text"
                                 value={courseSearch}
                                 onChange={(e) => setCourseSearch(e.target.value)}
-                                placeholder="কোর্সের নাম দিয়ে খুঁজুন..."
+                                placeholder="Search by course name..."
                                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-sm placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                             />
                         </div>
 
                         <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
-                            মোট কোর্স: <span className="text-slate-800 dark:text-slate-200 font-bold">{courses.length}</span> টি
+                            Total Courses: <span className="text-slate-800 dark:text-slate-200 font-bold">{courses.length}</span>
                         </div>
                     </div>
 
@@ -530,16 +530,16 @@ export const AdminAccessKeysPage: React.FC = () => {
                     {loadingCourses ? (
                         <div className="py-20 flex flex-col items-center justify-center text-slate-400 space-y-3">
                             <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
-                            <p className="text-sm font-semibold">কোর্স তালিকা লোড হচ্ছে...</p>
+                            <p className="text-sm font-semibold">Loading courses...</p>
                         </div>
                     ) : courses.length === 0 ? (
                         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-20 text-center px-4">
                             <BookOpen className="w-12 h-12 text-slate-400 mx-auto mb-3" />
                             <h3 className="text-base font-bold text-slate-700 dark:text-slate-300">
-                                কোনো কোর্স পাওয়া যায়নি
+                                No courses found
                             </h3>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                অন্য কোনো নাম লিখে আবার সার্চ করুন।
+                                Try searching with another name.
                             </p>
                         </div>
                     ) : (
@@ -575,7 +575,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                                             </h3>
                                             <div className="flex items-center gap-2 mt-3 text-xs text-slate-500 dark:text-slate-400">
                                                 <Users className="w-4 h-4 text-sky-500" />
-                                                <span>এনরোল্ড শিক্ষার্থী: <strong className="text-slate-800 dark:text-slate-200 font-bold">{course.enrollments_count || 0}</strong> জন</span>
+                                                <span>Enrolled Students: <strong className="text-slate-800 dark:text-slate-200 font-bold">{course.enrollments_count || 0}</strong></span>
                                             </div>
                                         </div>
 
@@ -585,7 +585,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                                             className="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white dark:bg-slate-800 dark:hover:bg-sky-600 dark:text-sky-300 dark:hover:text-white font-bold text-xs transition-all cursor-pointer"
                                         >
                                             <KeyRound className="w-4 h-4" />
-                                            <span>শিক্ষার্থী ও অ্যাক্সেস কি তালিকা</span>
+                                            <span>Students & Access Keys</span>
                                         </button>
                                     </div>
                                 </div>
@@ -609,7 +609,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                                     <AlertCircle className="w-6 h-6" />
                                 )}
                                 <h3 className="font-bold text-base">
-                                    {verifyResult.valid ? 'সঠিক অ্যাক্সেস কি (Valid Access Key)' : 'অকার্যকর অ্যাক্সেস কি (Invalid)'}
+                                    {verifyResult.valid ? 'Valid Access Key' : 'Invalid Access Key'}
                                 </h3>
                             </div>
                             <button
@@ -629,14 +629,14 @@ export const AdminAccessKeysPage: React.FC = () => {
                             {verifyResult.enrollment && (
                                 <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700 space-y-3">
                                     <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
-                                        <span className="text-xs text-slate-500">অ্যাক্সেস কি:</span>
+                                        <span className="text-xs text-slate-500">Access Key:</span>
                                         <span className="font-mono font-bold text-sky-600 dark:text-sky-400">
                                             {verifyResult.enrollment.access_key}
                                         </span>
                                     </div>
 
                                     <div>
-                                        <div className="text-xs text-slate-400">শিক্ষার্থীর নাম:</div>
+                                        <div className="text-xs text-slate-400">Student Name:</div>
                                         <div className="font-bold text-slate-900 dark:text-white text-base">
                                             {verifyResult.enrollment.user.name}
                                         </div>
@@ -644,13 +644,13 @@ export const AdminAccessKeysPage: React.FC = () => {
 
                                     <div className="grid grid-cols-2 gap-2 text-xs">
                                         <div>
-                                            <span className="text-slate-400">মোবাইল: </span>
+                                            <span className="text-slate-400">Phone: </span>
                                             <span className="font-semibold text-slate-700 dark:text-slate-300">
                                                 {verifyResult.enrollment.user.phone || '—'}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="text-slate-400">ইমেইল: </span>
+                                            <span className="text-slate-400">Email: </span>
                                             <span className="font-semibold text-slate-700 dark:text-slate-300">
                                                 {verifyResult.enrollment.user.email || '—'}
                                             </span>
@@ -658,14 +658,14 @@ export const AdminAccessKeysPage: React.FC = () => {
                                     </div>
 
                                     <div className="border-t border-slate-200 dark:border-slate-700 pt-2">
-                                        <div className="text-xs text-slate-400">কোর্সের নাম:</div>
+                                        <div className="text-xs text-slate-400">Course Name:</div>
                                         <div className="font-bold text-sky-700 dark:text-sky-300 text-sm mt-0.5">
                                             {verifyResult.enrollment.course.title}
                                         </div>
                                     </div>
 
                                     <div className="text-xs text-slate-500 pt-1">
-                                        এনরোলমেন্ট তারিখ: {new Date(verifyResult.enrollment.enrolled_at).toLocaleDateString('bn-BD', {
+                                        Enrollment Date: {new Date(verifyResult.enrollment.enrolled_at).toLocaleDateString('en-US', {
                                             day: 'numeric',
                                             month: 'short',
                                             year: 'numeric'
@@ -679,7 +679,7 @@ export const AdminAccessKeysPage: React.FC = () => {
                                 onClick={() => setShowVerifyModal(false)}
                                 className="w-full py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold text-sm cursor-pointer"
                             >
-                                বন্ধ করুন
+                                Close
                             </button>
                         </div>
                     </div>

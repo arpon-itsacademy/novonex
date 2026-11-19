@@ -39,7 +39,7 @@ class PublicPageController extends Controller
             return response()->json([
                 'page' => [
                     'id' => 0,
-                    'title' => 'সকল কোর্সসমূহ',
+                    'title' => 'All Courses',
                     'slug' => 'courses',
                     'status' => 'published',
                     'layout_type' => 'builder',
@@ -63,7 +63,7 @@ class PublicPageController extends Controller
                         'layout_type' => 'category',
                         'is_system' => false,
                         'meta_title' => $cat->name . ' - Novonex Academy',
-                        'meta_description' => $cat->description ?? ($cat->name . ' বিষয়ের সকল কোর্স।'),
+                        'meta_description' => $cat->description ?? ($cat->name . ' all courses.'),
                         'blocks' => Page::defaultCategoryBlocks($cat),
                     ]
                 );
@@ -72,7 +72,7 @@ class PublicPageController extends Controller
 
         if (!$page) {
             return response()->json([
-                'message' => 'পেজটি খুঁজে পাওয়া যায়নি।',
+                'message' => 'Page not found.',
             ], 404);
         }
 
@@ -81,7 +81,7 @@ class PublicPageController extends Controller
             $user = $request->user('sanctum');
             if (!$user || $user->role !== User::ROLE_ADMIN) {
                 return response()->json([
-                    'message' => 'এই পেজটি বর্তমানে ড্রাফট বা অপ্রকাশিত অবস্থায় রয়েছে।',
+                    'message' => 'This page is currently draft or unpublished.',
                 ], 404);
             }
         }

@@ -92,7 +92,7 @@ class MediaController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'ফাইল সফলভাবে মিডিয়া লাইব্রেরিতে যুক্ত হয়েছে।',
+            'message' => 'File added to media library successfully.',
             'media' => $media->load('user:id,name'),
         ], 201);
     }
@@ -118,7 +118,7 @@ class MediaController extends Controller
         $media->delete();
 
         return response()->json([
-            'message' => 'ফাইলটি মিডিয়া লাইব্রেরি থেকে মুছে ফেলা হয়েছে।',
+            'message' => 'File deleted from media library successfully.',
         ]);
     }
 }

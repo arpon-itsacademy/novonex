@@ -71,7 +71,7 @@ class CoursePurchaseSmsService
         $bundleTitle = $order->bundle?->title ?? ($order->course?->title ?? 'Course Bundle');
         $studentName = $user?->name ?? 'Student';
         $orderNumber = $order->order_number ?? '#' . $order->id;
-        $amount = '৳' . number_format((float) $order->final_amount, 2);
+        $amount = 'Tk ' . number_format((float) $order->final_amount, 2);
         $loginUrl = url('/login');
         $siteName = 'NovoNex';
 

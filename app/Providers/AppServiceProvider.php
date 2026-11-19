@@ -69,7 +69,7 @@ class AppServiceProvider extends ServiceProvider
                 \App\Models\User::firstOrCreate(
                     ['phone' => '+8801700000001'],
                     [
-                        'name' => 'অ্যাডমিন (Admin)',
+                        'name' => 'Admin',
                         'email' => 'admin@novonex.com',
                         'password' => \Illuminate\Support\Facades\Hash::make('password123'),
                         'role' => \App\Models\User::ROLE_ADMIN,

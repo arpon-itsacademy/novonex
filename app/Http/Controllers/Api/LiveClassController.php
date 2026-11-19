@@ -41,7 +41,7 @@ class LiveClassController extends Controller
     {
         $user = auth()->user();
         if (! $user->isAdmin() && ! $course->isAssignedTeacher($user->id)) {
-            abort(403, 'এই কোর্সের লাইভ ক্লাস পরিচালনার অনুমতি আপনার নেই।');
+            abort(403, 'You do not have permission to manage live classes for this course.');
         }
     }
 
@@ -97,7 +97,7 @@ class LiveClassController extends Controller
         $liveClass->comments_count = 0;
 
         return response()->json([
-            'message' => 'লাইভ ক্লাস সফলভাবে তৈরি করা হয়েছে।',
+            'message' => 'Live class created successfully.',
             'live_class' => $liveClass,
         ], 201);
     }
@@ -110,7 +110,7 @@ class LiveClassController extends Controller
         $this->authorizeCourseAccess($course);
 
         if ($liveClass->course_id !== $course->id) {
-            abort(404, 'লাইভ ক্লাসটি এই কোর্সের অন্তর্ভুক্ত নয়।');
+            abort(404, 'Live class does not belong to this course.');
         }
 
         $validated = $request->validate([
@@ -127,7 +127,7 @@ class LiveClassController extends Controller
         $liveClass->loadCount('comments');
 
         return response()->json([
-            'message' => 'লাইভ ক্লাস সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'Live class updated successfully.',
             'live_class' => $liveClass,
         ]);
     }
@@ -140,13 +140,13 @@ class LiveClassController extends Controller
         $this->authorizeCourseAccess($course);
 
         if ($liveClass->course_id !== $course->id) {
-            abort(404, 'লাইভ ক্লাসটি এই কোর্সের অন্তর্ভুক্ত নয়।');
+            abort(404, 'Live class does not belong to this course.');
         }
 
         $liveClass->delete();
 
         return response()->json([
-            'message' => 'লাইভ ক্লাসটি সফলভাবে মুছে ফেলা হয়েছে।',
+            'message' => 'Live class deleted successfully.',
         ]);
     }
 
@@ -158,7 +158,7 @@ class LiveClassController extends Controller
         $this->authorizeCourseAccess($course);
 
         if ($liveClass->course_id !== $course->id) {
-            abort(404, 'লাইভ ক্লাসটি এই কোর্সের অন্তর্ভুক্ত নয়।');
+            abort(404, 'Live class does not belong to this course.');
         }
 
         $validated = $request->validate([
@@ -169,7 +169,7 @@ class LiveClassController extends Controller
         $liveClass->loadCount('comments');
 
         return response()->json([
-            'message' => 'লাইভ ক্লাসের স্ট্যাটাস আপডেট হয়েছে।',
+            'message' => 'Live class status updated.',
             'live_class' => $liveClass,
         ]);
     }
@@ -236,7 +236,7 @@ class LiveClassController extends Controller
 
         if (!$isEnrolled && !$user->isAdmin() && !$course->isAssignedTeacher($user->id)) {
             return response()->json([
-                'message' => 'এই লাইভ ক্লাসে অংশ নিতে হলে আপনাকে সংশ্লিষ্ট কোর্সে এনরোল করতে হবে।',
+                'message' => 'You must be enrolled in the course to attend this live class.',
             ], 403);
         }
 
@@ -285,7 +285,7 @@ class LiveClassController extends Controller
 
         if (!$isEnrolled && !$user->isAdmin() && !$course->isAssignedTeacher($user->id)) {
             return response()->json([
-                'message' => 'মন্তব্য করার জন্য কোর্সে এনরোলমেন্ট প্রয়োজন।',
+                'message' => 'Course enrollment required to post comments.',
             ], 403);
         }
 
@@ -301,7 +301,7 @@ class LiveClassController extends Controller
         $comment->load('user:id,name,email,role');
 
         return response()->json([
-            'message' => 'মন্তব্য সফলভাবে প্রকাশ করা হয়েছে।',
+            'message' => 'Comment posted successfully.',
             'comment' => $comment,
         ], 201);
     }

@@ -71,13 +71,13 @@ interface DrawAction {
 }
 
 const PRESET_COLORS = [
-    { name: 'লাল (Red)', hex: '#ef4444' },
-    { name: 'সবুজ (Green)', hex: '#10b981' },
-    { name: 'নীল (Blue)', hex: '#2563eb' },
-    { name: 'হলুদ (Yellow)', hex: '#eab308' },
-    { name: 'কমলা (Orange)', hex: '#f97316' },
-    { name: 'বেগুনি (Purple)', hex: '#8b5cf6' },
-    { name: 'কালো (Black)', hex: '#0f172a' },
+    { name: 'Red', hex: '#ef4444' },
+    { name: 'Green', hex: '#10b981' },
+    { name: 'Blue', hex: '#2563eb' },
+    { name: 'Yellow', hex: '#eab308' },
+    { name: 'Orange', hex: '#f97316' },
+    { name: 'Purple', hex: '#8b5cf6' },
+    { name: 'Black', hex: '#0f172a' },
 ];
 
 const PRESET_SIZES = [
@@ -89,14 +89,14 @@ const PRESET_SIZES = [
 ];
 
 const QUICK_COMMENTS = [
-    'সঠিক উত্তর (+১)',
-    'অসাধারণ লিখেছো!',
-    'আংশিক সঠিক',
-    'ভুল সূত্র প্রয়োগ',
-    'ক্যালকুলেশনে ভুল',
-    'ব্যাখ্যা অসম্পূর্ণ',
-    '-১',
-    'হাতের লেখা পরিষ্কার করো'
+    'Correct Answer (+1)',
+    'Great work!',
+    'Partially correct',
+    'Incorrect formula applied',
+    'Calculation error',
+    'Incomplete explanation',
+    '-1',
+    'Improve handwriting clarity'
 ];
 
 export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProps> = ({
@@ -546,7 +546,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
     // Clear all marks
     const handleClearAll = () => {
         if (actions.length === 0) return;
-        if (window.confirm('আপনি কি এই পৃষ্ঠার সমস্ত দাগ ও মূল্যায়ন মুছে ফেলতে চান?')) {
+        if (window.confirm('Do you want to clear all markings and annotations on this page?')) {
             setActions([]);
             setRedoStack([]);
         }
@@ -568,7 +568,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
 
             canvas.toBlob(async (blob) => {
                 if (!blob) {
-                    alert('খাতা প্রসেস করতে ব্যর্থ হয়েছে।');
+                    alert('Failed to process paper image.');
                     setSaving(false);
                     return;
                 }
@@ -587,8 +587,8 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
             }, 'image/png', 0.95);
         } catch (err: any) {
             console.error('Failed to export annotated image', err);
-            const msg = err?.response?.data?.message || err?.message || 'খাতা সংরক্ষণ করতে সমস্যা হয়েছে।';
-            alert(`খাতা সংরক্ষণ করতে সমস্যা হয়েছে: ${msg}`);
+            const msg = err?.response?.data?.message || err?.message || 'Failed to save evaluated paper.';
+            alert(`Failed to save evaluated paper: ${msg}`);
             setSaving(false);
         }
     };
@@ -618,15 +618,15 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <div className="min-w-0">
                         <div className="flex items-center gap-2">
                             <h2 className="text-sm sm:text-base font-bold truncate">
-                                ডিজিটাল খাতা মূল্যায়ন {studentName ? `• ${studentName}` : ''}
+                                Digital Paper Evaluation {studentName ? `• ${studentName}` : ''}
                             </h2>
                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30">
-                                পৃষ্ঠা {pageNumber} / {totalPages}
+                                Page {pageNumber} / {totalPages}
                             </span>
                         </div>
                         {questionText && (
                             <p className="text-[11px] text-slate-400 truncate max-w-lg hidden sm:block">
-                                প্রশ্ন: {questionText.replace(/<[^>]*>/g, '')}
+                                Question: {questionText.replace(/<[^>]*>/g, '')}
                             </p>
                         )}
                     </div>
@@ -637,7 +637,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     {/* Quick Marks Input */}
                     <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 shadow-inner">
                         <label className="text-xs font-bold text-slate-300 whitespace-nowrap">
-                            নম্বর:
+                            Marks:
                         </label>
                         <input
                             type="number"
@@ -654,11 +654,11 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={handleDownload}
-                        title="দাগানো খাতা ডাউনলোড করুন"
+                        title="Download Annotated Paper"
                         className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                         <Download className="w-4 h-4 text-sky-400" />
-                        <span className="hidden md:inline">ডাউনলোড</span>
+                        <span className="hidden md:inline">Download</span>
                     </button>
 
                     <button
@@ -672,14 +672,14 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         ) : (
                             <Save className="w-4 h-4" />
                         )}
-                        <span>সংরক্ষণ করুন</span>
+                        <span>Save</span>
                     </button>
 
                     <button
                         type="button"
                         onClick={onClose}
                         className="p-2 rounded-xl bg-slate-800 hover:bg-rose-900/50 hover:text-rose-400 text-slate-400 border border-slate-700 transition-colors cursor-pointer"
-                        title="বন্ধ করুন"
+                        title="Close"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -693,7 +693,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('pen')}
-                        title="পেন (Pen)"
+                        title="Pen"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'pen'
                                 ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 scale-105'
@@ -706,7 +706,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('brush')}
-                        title="তুলি / ব্রাশ (Paint Brush)"
+                        title="Paint Brush"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'brush'
                                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 scale-105'
@@ -719,7 +719,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('highlighter')}
-                        title="হাইলাইটার (Highlighter)"
+                        title="Highlighter"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'highlighter'
                                 ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30 scale-105'
@@ -732,7 +732,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('eraser')}
-                        title="ইরেজার (Eraser)"
+                        title="Eraser"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'eraser'
                                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105'
@@ -745,7 +745,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('text')}
-                        title="টেক্সট / মন্তব্য লিখুন (Text Note)"
+                        title="Text Note"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'text'
                                 ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30 scale-105'
@@ -758,7 +758,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('rect')}
-                        title="বক্স / চারকোনা (Rectangle)"
+                        title="Rectangle"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'rect'
                                 ? 'bg-slate-700 text-white ring-1 ring-slate-500 scale-105'
@@ -771,7 +771,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('circle')}
-                        title="বৃত্ত / গোল দাগ (Circle)"
+                        title="Circle"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'circle'
                                 ? 'bg-slate-700 text-white ring-1 ring-slate-500 scale-105'
@@ -789,7 +789,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('stamp_tick')}
-                        title="টিক মার্ক (Tick ✔)"
+                        title="Tick (✔)"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'stamp_tick'
                                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/40 scale-105'
@@ -802,7 +802,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('stamp_cross')}
-                        title="ক্রস মার্ক (Cross ✖)"
+                        title="Cross (✖)"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'stamp_cross'
                                 ? 'bg-rose-600 text-white shadow-md shadow-rose-600/40 scale-105'
@@ -815,7 +815,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('stamp_doubt')}
-                        title="প্রশ্নবোধক (?)"
+                        title="Question Mark (?)"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'stamp_doubt'
                                 ? 'bg-amber-600 text-white scale-105 shadow-md'
@@ -828,7 +828,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => selectTool('stamp_star')}
-                        title="স্টার (★)"
+                        title="Star (★)"
                         className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                             activeTool === 'stamp_star'
                                 ? 'bg-yellow-500 text-slate-950 scale-105 shadow-md'
@@ -866,7 +866,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
 
                     {/* Custom Color Picker */}
                     <label
-                        title="কাস্টম রং নির্বাচন করুন"
+                        title="Choose Custom Color"
                         className="w-6 h-6 rounded-full border border-slate-600 bg-slate-800 flex items-center justify-center cursor-pointer hover:border-white transition-colors relative"
                     >
                         <Palette className="w-3.5 h-3.5 text-slate-300" />
@@ -915,7 +915,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={handleUndo}
                         disabled={actions.length === 0}
-                        title="পূর্বাবস্থায় ফেরান (Undo)"
+                        title="Undo"
                         className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 transition-colors cursor-pointer"
                     >
                         <Undo2 className="w-4 h-4" />
@@ -924,7 +924,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={handleRedo}
                         disabled={redoStack.length === 0}
-                        title="পুনরায় করুন (Redo)"
+                        title="Redo"
                         className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 transition-colors cursor-pointer"
                     >
                         <Redo2 className="w-4 h-4" />
@@ -933,7 +933,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={handleClearAll}
                         disabled={actions.length === 0}
-                        title="সব দাগ মুছুন (Clear All)"
+                        title="Clear All"
                         className="p-2 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-950/50 disabled:opacity-30 transition-colors cursor-pointer"
                     >
                         <Trash2 className="w-4 h-4" />
@@ -944,7 +944,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={handleRotate}
-                        title="খাতা ৯০° ঘোরান (Rotate 90°)"
+                        title="Rotate 90°"
                         className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
                     >
                         <RotateCw className="w-4 h-4" />
@@ -953,7 +953,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => setZoom(prev => Math.min(prev + 0.25, 3))}
-                        title="বড় করুন (Zoom In)"
+                        title="Zoom In"
                         className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
                     >
                         <ZoomIn className="w-4 h-4" />
@@ -964,7 +964,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => setZoom(prev => Math.max(prev - 0.25, 0.5))}
-                        title="ছোট করুন (Zoom Out)"
+                        title="Zoom Out"
                         className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
                     >
                         <ZoomOut className="w-4 h-4" />
@@ -972,7 +972,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                     <button
                         type="button"
                         onClick={() => setZoom(1)}
-                        title="আসল সাইজ (100%)"
+                        title="Actual Size (100%)"
                         className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
                     >
                         <Maximize2 className="w-4 h-4" />
@@ -989,13 +989,13 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                 {imgLoading ? (
                     <div className="flex flex-col items-center justify-center text-slate-400 space-y-3">
                         <Loader2 className="w-10 h-10 animate-spin text-rose-500" />
-                        <p className="text-sm font-semibold">শিক্ষার্থীর উত্তরপত্র লোড হচ্ছে...</p>
+                        <p className="text-sm font-semibold">Loading student answer sheet...</p>
                     </div>
                 ) : imgError ? (
                     <div className="text-center p-8 rounded-2xl bg-slate-900 border border-slate-800 text-rose-400 space-y-2">
                         <XCircle className="w-10 h-10 mx-auto" />
-                        <h4 className="font-bold text-base text-white">উত্তরপত্র ইমেজ লোড করা সম্ভব হয়নি</h4>
-                        <p className="text-xs text-slate-400">ইমেজ লিংকটি সক্রিয় আছে কিনা অথবা ফরম্যাট সঠিক কিনা যাচাই করুন।</p>
+                        <h4 className="font-bold text-base text-white">Unable to load answer sheet image</h4>
+                        <p className="text-xs text-slate-400">Please check if the image link is valid and accessible.</p>
                     </div>
                 ) : (
                     <div
@@ -1044,7 +1044,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                                 <div className="flex items-center justify-between text-xs font-bold border-b border-slate-800 pb-1.5">
                                     <span className="flex items-center gap-1.5 text-sky-400">
                                         <Type className="w-3.5 h-3.5" />
-                                        খাতায় মন্তব্য যুক্ত করুন
+                                        Add Comment to Sheet
                                     </span>
                                     <button
                                         type="button"
@@ -1079,7 +1079,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                                             if (e.key === 'Enter') handleConfirmText();
                                             if (e.key === 'Escape') setTextPromptPos(null);
                                         }}
-                                        placeholder="আপনার মন্তব্য লিখুন..."
+                                        placeholder="Enter your comment..."
                                         className="flex-1 px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
                                     />
                                     <button
@@ -1087,7 +1087,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                                         onClick={() => handleConfirmText()}
                                         className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs"
                                     >
-                                        যুক্ত
+                                        Add
                                     </button>
                                 </div>
                             </div>
@@ -1104,14 +1104,14 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="text"
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
-                        placeholder="এই প্রশ্নের জন্য শিক্ষার্থীর উদ্দেশ্যে পরামর্শ বা মূল্যায়ন নোট লিখুন..."
+                        placeholder="Write feedback or notes for this question..."
                         className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 placeholder:text-slate-500 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
                     />
                 </div>
 
                 <div className="flex items-center gap-3 text-slate-400 text-[11px] shrink-0">
                     <span className="hidden md:inline">
-                        টুল ও রং নির্বাচন করে খাতার উপরে দাগ দিন।
+                        Select a tool and color to annotate on the answer sheet.
                     </span>
                     <button
                         type="button"
@@ -1120,7 +1120,7 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm transition-all"
                     >
                         <Check className="w-3.5 h-3.5" />
-                        <span>মূল্যায়ন সম্পন্ন করুন</span>
+                        <span>Complete Evaluation</span>
                     </button>
                 </div>
             </footer>

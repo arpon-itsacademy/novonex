@@ -58,8 +58,8 @@ class AdminRoleController extends Controller
             'permissions' => ['required', 'array'],
             'permissions.*' => ['string'],
         ], [
-            'name.required' => 'রোলের নাম প্রদান করুন (যেমন: লাইব্রেরিয়ান, কোর্স ম্যানেজার)।',
-            'permissions.required' => 'অন্তত একটি পারমিশন নির্বাচন করুন।',
+            'name.required' => 'Please enter a role name (e.g. Librarian, Course Manager).',
+            'permissions.required' => 'Please select at least one permission.',
         ]);
 
         $slug = ! empty($validated['slug'])
@@ -89,7 +89,7 @@ class AdminRoleController extends Controller
         ]);
 
         return response()->json([
-            'message' => "কাস্টম রোল '{$role->name}' সফলভাবে তৈরি হয়েছে।",
+            'message' => "Custom role '{$role->name}' created successfully.",
             'role' => $role->loadCount('users'),
         ], 201);
     }
@@ -138,7 +138,7 @@ class AdminRoleController extends Controller
         ]);
 
         return response()->json([
-            'message' => "রোল '{$role->name}' সফলভাবে আপডেট করা হয়েছে।",
+            'message' => "Role '{$role->name}' updated successfully.",
             'role' => $role->fresh()->loadCount('users'),
         ]);
     }
@@ -152,7 +152,7 @@ class AdminRoleController extends Controller
 
         if ($assignedUsersCount > 0) {
             return response()->json([
-                'message' => "এই রোলে বর্তমানে {$assignedUsersCount} জন ইউজার নিয়োজিত রয়েছে। ডিলিট করার আগে তাদের রোল পরিবর্তন করুন।",
+                'message' => "There are {$assignedUsersCount} users assigned to this role. Please reassign their roles before deleting.",
             ], 422);
         }
 
@@ -162,7 +162,7 @@ class AdminRoleController extends Controller
         AuditLog::log('role_deleted', 'Role', $role->id, ['name' => $roleName], null);
 
         return response()->json([
-            'message' => "কাস্টম রোল '{$roleName}' সফলভাবে মুছে ফেলা হয়েছে।",
+            'message' => "Custom role '{$roleName}' deleted successfully.",
         ]);
     }
 }

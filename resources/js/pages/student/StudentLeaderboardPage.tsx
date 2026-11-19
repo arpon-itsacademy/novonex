@@ -44,10 +44,9 @@ interface CurrentUserRanking {
     is_current_user: boolean;
 }
 
-const toBengaliNumber = (num: number | string | null | undefined): string => {
+const formatNumber = (num: number | string | null | undefined): string => {
     if (num === null || num === undefined) return '-';
-    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return String(num).replace(/[0-9]/g, (w) => bengaliDigits[+w]);
+    return String(num);
 };
 
 const getAvatarGradient = (name: string) => {
@@ -102,7 +101,7 @@ export const StudentLeaderboardPage: React.FC = () => {
             }
         } catch (err: any) {
             console.error('Failed to load leaderboard', err);
-            setErrorMsg('লিডারবোর্ড তথ্য লোড করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+            setErrorMsg('Unable to load leaderboard data. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -122,14 +121,14 @@ export const StudentLeaderboardPage: React.FC = () => {
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
                             <Trophy className="w-7 h-7 text-amber-500" />
-                            <span>লিডারবোর্ড</span>
+                            <span>Leaderboard</span>
                         </h1>
                         <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                            পরীক্ষায় অংশগ্রহণকারী শিক্ষার্থীদের ফলাফল ও মেধা তালিকা
+                            Top student rankings and merit leaderboard based on exam performance
                         </p>
                     </div>
 
-                    {/* Time Filter Pills (এই সপ্তাহ, এই মাস, সব সময়) */}
+                    {/* Time Filter Pills */}
                     <div className="bg-slate-200/70 p-1.5 rounded-full inline-flex items-center text-xs font-bold self-start sm:self-auto shadow-2xs">
                         <button
                             type="button"
@@ -140,7 +139,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                                     : 'text-slate-600 hover:text-slate-900'
                             }`}
                         >
-                            এই সপ্তাহ
+                            This Week
                         </button>
                         <button
                             type="button"
@@ -151,7 +150,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                                     : 'text-slate-600 hover:text-slate-900'
                             }`}
                         >
-                            এই মাস
+                            This Month
                         </button>
                         <button
                             type="button"
@@ -162,7 +161,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                                     : 'text-slate-600 hover:text-slate-900'
                             }`}
                         >
-                            সব সময়
+                            All Time
                         </button>
                     </div>
                 </div>
@@ -172,7 +171,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                     <div className="bg-white rounded-2xl p-3 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-2 text-xs font-extrabold text-slate-700 shrink-0">
                             <BookOpen className="w-4 h-4 text-sky-600" />
-                            <span>কোর্স ফিল্টার:</span>
+                            <span>Filter by Course:</span>
                         </div>
 
                         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-1">
@@ -185,7 +184,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                 }`}
                             >
-                                আমার সকল কোর্স
+                                All My Courses
                             </button>
 
                             {enrolledCourses.map((c) => (
@@ -220,7 +219,7 @@ export const StudentLeaderboardPage: React.FC = () => {
             {loading ? (
                 <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400 bg-white rounded-3xl border border-slate-200/80 shadow-xs">
                     <Loader2 className="w-9 h-9 text-sky-600 animate-spin" />
-                    <span className="text-xs font-bold text-slate-500">লিডারবোর্ড লোড হচ্ছে...</span>
+                    <span className="text-xs font-bold text-slate-500">Loading leaderboard...</span>
                 </div>
             ) : leaderboard.length === 0 ? (
                 /* Empty State */
@@ -230,10 +229,10 @@ export const StudentLeaderboardPage: React.FC = () => {
                     </div>
                     <div className="max-w-md mx-auto space-y-1.5">
                         <h3 className="text-base sm:text-lg font-black text-slate-900">
-                            এখনও কোনো ফলাফল নেই
+                            No exam results found
                         </h3>
                         <p className="text-xs sm:text-sm text-slate-500">
-                            নির্বাচিত কোর্স ও সময়ের মধ্যে কোনো শিক্ষার্থী পরীক্ষায় অংশগ্রহণ করেনি। এখনই পরীক্ষায় অংশ নিয়ে সবার শীর্ষে জায়গা করে নিন!
+                            No students have taken exams for the selected course and timeframe yet. Take an exam now to claim the top spot!
                         </p>
                     </div>
                     <div className="pt-2">
@@ -242,7 +241,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-sky-600/25 hover:from-sky-700 hover:to-indigo-700 transition-all"
                         >
                             <FileText className="w-4 h-4" />
-                            <span>পরীক্ষাসমূহ দেখুন</span>
+                            <span>Browse Exams</span>
                         </Link>
                     </div>
                 </div>
@@ -267,7 +266,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                                         </div>
                                         {/* Rank Badge */}
                                         <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-slate-500 text-white font-black text-xs flex items-center justify-center border-2 border-white shadow-xs">
-                                            ২
+                                            2
                                         </span>
                                     </div>
 
@@ -276,12 +275,12 @@ export const StudentLeaderboardPage: React.FC = () => {
                                         {rank2.name}
                                     </h4>
                                     <p className="text-[11px] sm:text-xs font-bold text-amber-600 mt-0.5">
-                                        {toBengaliNumber(rank2.total_points)} পয়েন্ট
+                                        {formatNumber(rank2.total_points)} pts
                                     </p>
 
                                     {/* Silver Pedestal */}
                                     <div className="w-full h-28 sm:h-36 bg-gradient-to-b from-slate-200 to-slate-300/80 rounded-t-2xl mt-3 flex items-center justify-center border-t-2 border-slate-300 shadow-inner">
-                                        <span className="text-3xl sm:text-4xl font-black text-slate-500/80">২</span>
+                                        <span className="text-3xl sm:text-4xl font-black text-slate-500/80">2</span>
                                     </div>
                                 </div>
                             ) : (
@@ -307,7 +306,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                                         </div>
                                         {/* Rank 1 Badge */}
                                         <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-amber-500 text-white font-black text-xs sm:text-sm flex items-center justify-center border-2 border-white shadow-sm">
-                                            ১
+                                            1
                                         </span>
                                     </div>
 
@@ -316,12 +315,12 @@ export const StudentLeaderboardPage: React.FC = () => {
                                         {rank1.name}
                                     </h4>
                                     <p className="text-xs sm:text-sm font-black text-amber-600 mt-0.5">
-                                        {toBengaliNumber(rank1.total_points)} পয়েন্ট
+                                        {formatNumber(rank1.total_points)} pts
                                     </p>
 
                                     {/* Gold Pedestal */}
                                     <div className="w-full h-40 sm:h-48 bg-gradient-to-b from-amber-100 via-amber-200/90 to-amber-300/70 rounded-t-2xl mt-3 flex items-center justify-center border-t-2 border-amber-300 shadow-inner">
-                                        <span className="text-4xl sm:text-5xl font-black text-amber-600/90">১</span>
+                                        <span className="text-4xl sm:text-5xl font-black text-amber-600/90">1</span>
                                     </div>
                                 </div>
                             )}
@@ -342,7 +341,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                                         </div>
                                         {/* Rank 3 Badge */}
                                         <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-amber-700 text-white font-black text-xs flex items-center justify-center border-2 border-white shadow-xs">
-                                            ৩
+                                            3
                                         </span>
                                     </div>
 
@@ -351,12 +350,12 @@ export const StudentLeaderboardPage: React.FC = () => {
                                         {rank3.name}
                                     </h4>
                                     <p className="text-[11px] sm:text-xs font-bold text-amber-600 mt-0.5">
-                                        {toBengaliNumber(rank3.total_points)} পয়েন্ট
+                                        {formatNumber(rank3.total_points)} pts
                                     </p>
 
                                     {/* Bronze Pedestal */}
                                     <div className="w-full h-24 sm:h-28 bg-gradient-to-b from-stone-200 to-stone-300/80 rounded-t-2xl mt-3 flex items-center justify-center border-t-2 border-stone-300 shadow-inner">
-                                        <span className="text-3xl sm:text-4xl font-black text-stone-500/80">৩</span>
+                                        <span className="text-3xl sm:text-4xl font-black text-stone-500/80">3</span>
                                     </div>
                                 </div>
                             ) : (
@@ -380,7 +379,7 @@ export const StudentLeaderboardPage: React.FC = () => {
                                     <div className="flex items-center gap-3.5 sm:gap-4 truncate">
                                         {/* Rank Number */}
                                         <span className="w-6 text-center font-black text-xs sm:text-sm text-slate-400">
-                                            {toBengaliNumber(item.rank)}
+                                            {formatNumber(item.rank)}
                                         </span>
 
                                         {/* Avatar */}
@@ -400,12 +399,12 @@ export const StudentLeaderboardPage: React.FC = () => {
                                                 </h5>
                                                 {item.is_current_user && (
                                                     <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-sky-100 text-sky-700">
-                                                        তুমি
+                                                        You
                                                     </span>
                                                 )}
                                             </div>
                                             <p className="text-[11px] text-slate-400 mt-0.5">
-                                                {toBengaliNumber(item.exams_count)} টি পরীক্ষা সম্পন্ন
+                                                {formatNumber(item.exams_count)} exams completed
                                             </p>
                                         </div>
                                     </div>
@@ -413,9 +412,9 @@ export const StudentLeaderboardPage: React.FC = () => {
                                     {/* Points */}
                                     <div className="text-right shrink-0">
                                         <span className="text-sm sm:text-base font-black text-amber-600">
-                                            {toBengaliNumber(item.total_points)}
+                                            {formatNumber(item.total_points)}
                                         </span>
-                                        <span className="text-[10px] font-bold text-slate-400 ml-1">পয়েন্ট</span>
+                                        <span className="text-[10px] font-bold text-slate-400 ml-1">pts</span>
                                     </div>
                                 </div>
                             ))}
@@ -424,14 +423,14 @@ export const StudentLeaderboardPage: React.FC = () => {
                 </>
             )}
 
-            {/* FLOATING / STICKY BOTTOM CARD FOR CURRENT USER ("তুমি") */}
+            {/* FLOATING / STICKY BOTTOM CARD FOR CURRENT USER */}
             {currentUser && (
                 <div className="fixed bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:w-[calc(100%-20rem)] max-w-4xl z-40">
                     <div className="bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white rounded-2xl p-3 sm:p-4 shadow-2xl border border-emerald-600/40 flex items-center justify-between backdrop-blur-md">
                         <div className="flex items-center gap-3 sm:gap-4 truncate">
                             {/* User Rank */}
                             <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs font-black text-emerald-300 shrink-0">
-                                {toBengaliNumber(currentUser.rank)}
+                                {formatNumber(currentUser.rank)}
                             </div>
 
                             {/* User Avatar */}
@@ -442,17 +441,17 @@ export const StudentLeaderboardPage: React.FC = () => {
                             {/* Info */}
                             <div className="truncate">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xs sm:text-sm font-black text-white">তুমি</span>
+                                    <span className="text-xs sm:text-sm font-black text-white">You</span>
                                     {currentUser.rank && (
                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30">
-                                            {toBengaliNumber(currentUser.rank)}ম স্থান
+                                            Rank #{formatNumber(currentUser.rank)}
                                         </span>
                                     )}
                                 </div>
                                 <p className="text-[11px] text-emerald-200/80 truncate mt-0.5 font-medium">
                                     {currentUser.total_points > 0
-                                        ? `${toBengaliNumber(currentUser.exams_count)}টি পরীক্ষা সম্পন্ন`
-                                        : 'পরীক্ষা দিয়ে পয়েন্ট জেতো'}
+                                        ? `${formatNumber(currentUser.exams_count)} exams completed`
+                                        : 'Take exams to earn points'}
                                 </p>
                             </div>
                         </div>
@@ -460,9 +459,9 @@ export const StudentLeaderboardPage: React.FC = () => {
                         {/* Points */}
                         <div className="text-right shrink-0 pl-3">
                             <span className="text-lg sm:text-2xl font-black text-emerald-300">
-                                {toBengaliNumber(currentUser.total_points)}
+                                {formatNumber(currentUser.total_points)}
                             </span>
-                            <span className="text-[10px] font-bold text-emerald-200/70 ml-1">পয়েন্ট</span>
+                            <span className="text-[10px] font-bold text-emerald-200/70 ml-1">pts</span>
                         </div>
                     </div>
                 </div>

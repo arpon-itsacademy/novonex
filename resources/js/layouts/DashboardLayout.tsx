@@ -110,7 +110,7 @@ export const DashboardLayout: React.FC = () => {
         return (
             <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white space-y-3">
                 <Loader2 className="w-10 h-10 animate-spin text-sky-500" />
-                <p className="text-sm font-bold text-slate-300">অ্যাডমিন প্যানেল লোড হচ্ছে...</p>
+                <p className="text-sm font-bold text-slate-300">Loading admin panel...</p>
             </div>
         );
     }
@@ -162,7 +162,7 @@ export const DashboardLayout: React.FC = () => {
                     ]
                 },
                 { 
-                    title: 'Access Key (অ্যাক্সেস কি)', 
+                    title: 'Access Keys', 
                     path: '/admin/access-keys', 
                     icon: KeyRound,
                     permission: 'courses.view' 
@@ -272,7 +272,7 @@ export const DashboardLayout: React.FC = () => {
                     ]
                 },
                 { title: t.sidebar.settings, path: '/admin/settings', icon: Settings, permission: 'settings.manage' },
-                { title: 'Recycle Bin (ট্র্যাশ)', path: '/admin/trash', icon: Trash2, permission: 'courses.view' },
+                { title: 'Recycle Bin', path: '/admin/trash', icon: Trash2, permission: 'courses.view' },
             ];
 
             if (user.role === 'admin') {
@@ -396,7 +396,7 @@ export const DashboardLayout: React.FC = () => {
                                                 toggleSubmenu(item.path);
                                             }}
                                             className="p-1 rounded-lg hover:bg-slate-700/50 transition-colors"
-                                            title={isExpanded ? 'সংকোচন করুন' : 'প্রসারিত করুন'}
+                                            title={isExpanded ? 'Collapse' : 'Expand'}
                                         >
                                             {isExpanded ? (
                                                 <ChevronDown className="w-4 h-4 opacity-80 transition-transform duration-200" />
@@ -678,7 +678,7 @@ export const DashboardLayout: React.FC = () => {
                                                             toggleSubmenu(item.path);
                                                         }}
                                                         className="p-1 rounded-lg hover:bg-slate-700/50 transition-colors"
-                                                        title={isExpanded ? 'সংকোচন করুন' : 'প্রসারিত করুন'}
+                                                        title={isExpanded ? 'Collapse' : 'Expand'}
                                                     >
                                                         {isExpanded ? (
                                                             <ChevronDown className="w-4 h-4 opacity-80" />

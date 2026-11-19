@@ -1292,7 +1292,7 @@ export const AdminUsersPage: React.FC = () => {
                                                         </h4>
                                                         <div className="flex items-center gap-2 mt-1">
                                                             <span className="font-bold text-slate-900 dark:text-slate-200 text-xs">
-                                                                ৳{course.sale_price || course.price}
+                                                                Tk {course.sale_price || course.price}
                                                             </span>
                                                             <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
                                                                 {course.pivot?.status === 'active' ? 'Enrolled (Active)' : (course.pivot?.status || 'Active')}
@@ -1359,7 +1359,7 @@ export const AdminUsersPage: React.FC = () => {
                                                             {order.course?.title || 'Course'}
                                                         </td>
                                                         <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100">
-                                                            ৳{order.final_amount}
+                                                            Tk {order.final_amount}
                                                         </td>
                                                         <td className="py-2.5 px-3 uppercase text-[11px] font-semibold text-slate-600 dark:text-slate-400">
                                                             {order.payment_method}
@@ -1462,7 +1462,7 @@ export const AdminUsersPage: React.FC = () => {
                                                         <h4 className="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm line-clamp-1">
                                                             {course.title}
                                                         </h4>
-                                                        <span className="text-[11px] text-slate-400">Fee: ৳{course.price} • Status: {course.status}</span>
+                                                        <span className="text-[11px] text-slate-400">Fee: Tk {course.price} • Status: {course.status}</span>
                                                     </div>
                                                 </div>
                                                 <a

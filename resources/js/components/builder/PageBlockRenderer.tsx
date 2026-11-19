@@ -498,11 +498,11 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                                             {/* Discount Badge */}
                                             {course.discount_percent && course.discount_percent > 0 ? (
                                                 <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-rose-600 text-white rounded-xl shadow-md">
-                                                    {course.discount_percent}% ছাড়
+                                                    {course.discount_percent}% OFF
                                                 </span>
                                             ) : course.price === 0 ? (
                                                 <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-emerald-600 text-white rounded-xl shadow-md">
-                                                    ফ্রি কোর্স
+                                                    Free Course
                                                 </span>
                                             ) : null}
 
@@ -520,12 +520,12 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                                                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                                                     <span className="flex items-center gap-1">
                                                         <Video className="w-3.5 h-3.5 text-sky-500" />
-                                                        <span>{course.lessons_count || 0} টি ক্লাস</span>
+                                                        <span>{course.lessons_count || 0} Classes</span>
                                                     </span>
                                                     <span>•</span>
                                                     <span className="flex items-center gap-1">
                                                         <Users className="w-3.5 h-3.5 text-sky-500" />
-                                                        <span>{course.enrollments_count || 0} জন শিক্ষার্থী</span>
+                                                        <span>{course.enrollments_count || 0} Students</span>
                                                     </span>
                                                 </div>
 
@@ -543,9 +543,9 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                                                     {((course.features && Array.isArray(course.features) && course.features.length > 0)
                                                         ? course.features.filter((f: any) => typeof f === 'string' && f.trim().length > 0)
                                                         : [
-                                                            'লাইভ ও ফুল HD রেকর্ডেড ক্লাস আর্কাইভ',
-                                                            'চ্যাপ্টারভিত্তিক লেকচার শিট ও প্রশ্নব্যাংক',
-                                                            'NexPilot AI ২৪/৭ ইনস্ট্যান্ট ডাউট সলভার',
+                                                            'Live & Full HD Recorded Class Archive',
+                                                            'Chapter Lecture Notes & Question Bank',
+                                                            'NexPilot AI 24/7 Instant Doubt Solver',
                                                         ]
                                                     ).slice(0, 4).map((feat: string, fIdx: number) => (
                                                         <div key={fIdx} className="flex items-start gap-1.5">
@@ -560,16 +560,16 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                                             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-xs font-medium text-slate-500 truncate mr-2">
-                                                        ইন্সট্রাক্টর: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        Instructor: <span className="font-bold text-slate-800 dark:text-slate-200">
                                                             {course.instructors && course.instructors.length > 0 
                                                                 ? course.instructors[0].name 
-                                                                : (course.instructor?.name || 'অভিজ্ঞ মেন্টর')}
+                                                                : (course.instructor?.name || 'Expert Mentor')}
                                                         </span>
                                                     </div>
 
                                                     <div className="text-right shrink-0">
                                                         {course.price === 0 ? (
-                                                            <span className="text-lg font-black text-emerald-600">ফ্রি</span>
+                                                            <span className="text-lg font-black text-emerald-600">Free</span>
                                                         ) : (
                                                             <div className="flex items-baseline gap-1.5">
                                                                 <span className="text-xl font-black text-sky-600 dark:text-sky-400">
@@ -595,13 +595,13 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                                                         to={`/courses/${course.slug}`}
                                                         className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer"
                                                     >
-                                                        বিস্তারিত দেখুন
+                                                        View Details
                                                     </Link>
                                                     <Link
                                                         to={`/checkout/${course.slug}`}
                                                         className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 font-bold text-xs text-white text-center transition-all shadow-md shadow-sky-500/20 cursor-pointer"
                                                     >
-                                                        কোর্সটি কিনুন
+                                                        Enroll Now
                                                     </Link>
                                                 </div>
                                             </div>
@@ -869,9 +869,9 @@ const StatsCounterBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = (
 const TopAnnouncementBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ block }) => {
     const { language } = useLanguage();
     const s = block.settings || {};
-    const badge = getLocalizedText(s.badge, s.badge_en, language) || 'স্পেশাল অফার';
-    const text = getLocalizedText(s.text, s.text_en, language) || 'HSC একাডেমিক সাইকেল ও অ্যাডমিশন মাস্টার ব্যাচে স্পেশাল ছাড়ে ভর্তি চলছে!';
-    const linkText = getLocalizedText(s.linkText, s.linkText_en, language) || 'সকল কোর্স দেখুন →';
+    const badge = getLocalizedText(s.badge, s.badge_en, language) || 'Special Offer';
+    const text = getLocalizedText(s.text, s.text_en, language) || 'Special discount enrollment open for Academic & Admission Master Batches!';
+    const linkText = getLocalizedText(s.linkText, s.linkText_en, language) || 'Explore All Courses →';
     const linkUrl = s.linkUrl || '/courses';
     const bgGradient = s.bgColor || 'from-sky-700 via-sky-600 to-amber-500';
 
@@ -1034,9 +1034,9 @@ const SpacerBlock: React.FC<{ block: PageBlock }> = ({ block }) => {
 const BundleShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ block }) => {
     const { language } = useLanguage();
     const s = block.settings || {};
-    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'স্পেশাল প্যাকেজ';
-    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || 'জনপ্রিয় কোর্স বান্ডেল ও কম্বো';
-    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'একাধিক কোর্স একসাথে নিয়ে সেভ করুন সর্বোচ্চ ৫০% পর্যন্ত!';
+    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'Special Packages';
+    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || 'Popular Course Bundles & Combos';
+    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'Enroll in multiple courses together and save up to 50%!';
     const limit = Number(s.limit || 4);
 
     const [bundles, setBundles] = useState<any[]>([]);
@@ -1063,7 +1063,7 @@ const BundleShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> =
                             <span>{sectionTag}</span>
                         </div>
                     )}
-                    <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                    <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:white tracking-tight">
                         {sectionTitle}
                     </h2>
                     {sectionSub && (
@@ -1086,7 +1086,7 @@ const BundleShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> =
                             >
                                 {discount > 0 && (
                                     <div className="absolute top-4 right-4 bg-rose-600 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md">
-                                        {discount}% ছাড়
+                                        {discount}% OFF
                                     </div>
                                 )}
                                 <div>
@@ -1105,7 +1105,7 @@ const BundleShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> =
                                     {Array.isArray(bundle.courses) && bundle.courses.length > 0 && (
                                         <div className="space-y-1.5 mb-6 pt-3 border-t border-slate-100 dark:border-slate-800">
                                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                                                অন্তর্ভুক্ত কোর্সসমূহ ({bundle.courses.length}টি):
+                                                Included Courses ({bundle.courses.length}):
                                             </span>
                                             {bundle.courses.slice(0, 3).map((c: any) => (
                                                 <div key={c.id} className="text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2">
@@ -1115,7 +1115,7 @@ const BundleShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> =
                                             ))}
                                             {bundle.courses.length > 3 && (
                                                 <div className="text-[11px] text-amber-600 font-bold pl-5">
-                                                    + আরও {bundle.courses.length - 3}টি কোর্স
+                                                    + {bundle.courses.length - 3} more courses
                                                 </div>
                                             )}
                                         </div>
@@ -1135,7 +1135,7 @@ const BundleShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> =
                                         to={`/checkout/${bundle.slug}?type=bundle`}
                                         className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-md shadow-amber-500/30 flex items-center gap-1.5 transition-all"
                                     >
-                                        <span>বান্ডেল কিনুন</span>
+                                        <span>Get Bundle</span>
                                         <ArrowRight className="w-3.5 h-3.5" />
                                     </Link>
                                 </div>
@@ -1154,9 +1154,9 @@ const BundleShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> =
 const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ block }) => {
     const { language } = useLanguage();
     const s = block.settings || {};
-    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'মেন্টর প্যানেল';
-    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || 'দেশসেরা শিক্ষকদের সাথে তোমার প্রস্তুতি';
-    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'বছরজুড়ে যাদের সঠিক দিকনির্দেশনা হাজারো শিক্ষার্থীকে পৌঁছাতে সাহায্য করেছে তাদের স্বপ্নের ক্যাম্পাসে।';
+    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'Mentor Panel';
+    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || 'Prepare with Top Educators';
+    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'Guiding thousands of students across the nation to achieve their dream university admissions.';
     const limit = Number(s.limit || 8);
 
     const [teachers, setTeachers] = useState<any[]>([]);
@@ -1178,10 +1178,10 @@ const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }>
     const filtered = teachers.filter((t) => {
         if (filter === 'all') return true;
         const text = `${t.expertise || ''} ${t.designation || ''} ${t.bio || ''}`.toLowerCase();
-        if (filter === 'ssc') return text.includes('ssc') || text.includes('নবম') || text.includes('দশম');
-        if (filter === 'hsc') return text.includes('hsc') || text.includes('এইচএসসি');
-        if (filter === 'admission') return text.includes('admission') || text.includes('ভর্তি') || text.includes('বুয়েট') || text.includes('মেডিকেল');
-        if (filter === 'arts') return text.includes('arts') || text.includes('commerce') || text.includes('আর্টস');
+        if (filter === 'ssc') return text.includes('ssc');
+        if (filter === 'hsc') return text.includes('hsc');
+        if (filter === 'admission') return text.includes('admission');
+        if (filter === 'arts') return text.includes('arts') || text.includes('commerce');
         return true;
     });
 
@@ -1207,10 +1207,10 @@ const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }>
                     {/* Filter Pills */}
                     <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
                         {[
-                            { key: 'all', label: 'সকল মেন্টর' },
-                            { key: 'hsc', label: 'এইচএসসি (HSC)' },
-                            { key: 'admission', label: 'এডমিশন' },
-                            { key: 'ssc', label: 'এসএসসি (SSC)' },
+                            { key: 'all', label: 'All Mentors' },
+                            { key: 'hsc', label: 'HSC' },
+                            { key: 'admission', label: 'Admission' },
+                            { key: 'ssc', label: 'SSC' },
                         ].map((btn) => (
                             <button
                                 key={btn.key}
@@ -1247,7 +1247,7 @@ const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }>
                                 {t.name}
                             </h3>
                             <p className="text-xs font-semibold text-sky-600 dark:text-sky-400">
-                                {t.designation || 'শিক্ষক ও মেন্টর'}
+                                {t.designation || 'Instructor & Mentor'}
                             </p>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
                                 {t.institution || 'NovoNex'}
@@ -1257,7 +1257,7 @@ const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }>
                                     to={`/teachers/${t.id}`}
                                     className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center justify-center gap-1"
                                 >
-                                    <span>প্রোফাইল দেখুন</span>
+                                    <span>View Profile</span>
                                     <ArrowRight className="w-3.5 h-3.5" />
                                 </Link>
                             </div>
@@ -1275,15 +1275,15 @@ const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }>
 const LearningPathBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ block }) => {
     const { language } = useLanguage();
     const s = block.settings || {};
-    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'লার্নিং মেথডোলজি';
-    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || '৪ ধাপে শতভাগ প্রস্তুতি নিশ্চিত করার বৈজ্ঞানিক পদ্ধতি';
-    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'পরিকল্পিত উপায়ে কনসেপ্ট ক্লিয়ারিং থেকে পরীক্ষা জয়ের সম্পূর্ণ পথপ্রদর্শক।';
+    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'Learning Methodology';
+    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || '4-Step Scientific System for Guaranteed Preparation';
+    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'A structured blueprint from conceptual mastery to exam excellence.';
 
     const defaultSteps = [
-        { id: '1', num: '০১', title: 'বেসিক ও কনসেপ্ট ক্লিয়ারিং', desc: 'প্রতিটি থিওরি অ্যানিমেশন ও বাস্তব উদাহরণের সাহায্যে সুস্পষ্টভাবে ব্যাখ্যা।' },
-        { id: '2', num: '০২', title: 'টপিকভিত্তিক গাণিতিক প্র্যাকটিস', desc: 'বোর্ড ও শীর্ষ কলেজগুলোর বিগত বছরের প্রশ্নগুলোর পূর্ণাঙ্গ সমাধান।' },
-        { id: '3', num: '০৩', title: '২৪/৭ AI ডাউট সলভিং', desc: 'পড়ালেখার যেকোনো সময় আটকে গেলে তাৎক্ষণিক সমাধানের নিশ্চয়তা।' },
-        { id: '4', num: '০৪', title: 'লাইভ মডেল টেস্ট ও র‍্যাঙ্কিং', desc: 'টাইমারসহ রিয়েল এক্সাম এনভায়রনমেন্টে পরীক্ষা দিয়ে আত্মবিশ্বাস যাচাই।' },
+        { id: '1', num: '01', title: 'Conceptual Clarity & Fundamentals', desc: 'Every topic explained thoroughly with real-world applications.' },
+        { id: '2', num: '02', title: 'Topic-wise Problem Solving', desc: 'Comprehensive solutions and shortcuts for previous years exam questions.' },
+        { id: '3', num: '03', title: '24/7 AI Doubt Solving', desc: 'Instant support with NexPilot AI whenever you encounter a question.' },
+        { id: '4', num: '04', title: 'Live Model Tests & Analytics', desc: 'Real-time timed exams with instant scoring, solutions and rank.' },
     ];
     const steps = s.steps || defaultSteps;
 
@@ -1336,31 +1336,31 @@ const LearningPathBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = (
 const TestimonialsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ block }) => {
     const { language } = useLanguage();
     const s = block.settings || {};
-    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'শিক্ষার্থীদের মতামত';
-    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || 'সাফল্যের গল্পগুলো শুনুন শিক্ষার্থীদের মুখেই';
-    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'আমাদের শিক্ষার্থীদের সাফল্যের অনুভূতি ও বাস্তব অভিজ্ঞতা।';
+    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'Student Reviews';
+    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || 'Success Stories from Our Students';
+    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'Hear authentic experiences and achievements from NovoNex learners.';
 
     const defaultItems = [
         {
             id: '1',
-            name: 'তানভীর আহমেদ',
-            role: 'বুয়েট \'২৩ ব্যাচ',
+            name: 'Tanveer Ahmed',
+            role: 'BUET \'23 Batch',
             rating: 5,
-            quote: 'মনোলগ এডুর ফিজিক্স ও ম্যাথ ক্লাসগুলো আমার কনসেপ্ট পুরো পাল্টে দিয়েছে। বিশেষ করে ডাউট সলভিং সিস্টেম অতুলনীয়!'
+            quote: 'The Physics and Math classes completely transformed my understanding. The doubt solving system is simply outstanding!'
         },
         {
             id: '2',
-            name: 'সাদিয়া আফরিন',
-            role: 'ঢাকা মেডিকেল কলেজ',
+            name: 'Sadia Afrin',
+            role: 'Dhaka Medical College',
             rating: 5,
-            quote: 'অনলাইন এক্সাম সিস্টেমটা একদম রিয়েল পরীক্ষার ফিল দেয়। মেরিট পজিশন দেখে নিজের ভুলগুলো সহজে শুধরে নিয়েছি।'
+            quote: 'The online exam platform feels just like real exams. The ranking and detailed explanations helped me improve quickly.'
         },
         {
             id: '3',
-            name: 'ফারহান কবির',
-            role: 'নটর ডেম কলেজ, GPA 5',
+            name: 'Farhan Kabir',
+            role: 'Notre Dame College, GPA 5',
             rating: 5,
-            quote: 'লেকচার শিটগুলো এতটাই গোছানো যে বাড়তি কোনো বইয়ের সাহায্য ছাড়াই সম্পূর্ণ রিভিশন সম্ভব হয়েছে।'
+            quote: 'The lecture sheets and video explanations are so organized that I achieved full preparation without extra private tutors.'
         },
     ];
     const items = s.items || defaultItems;
@@ -1423,30 +1423,30 @@ const TestimonialsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = (
 const FaqAccordionBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ block }) => {
     const { language } = useLanguage();
     const s = block.settings || {};
-    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'সচরাচর জিজ্ঞাসা';
-    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || 'সাধারণ কিছু প্রশ্নের উত্তর';
-    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'কোর্স ভর্তি, ক্লাস ও পরীক্ষা সংক্রান্ত প্রয়োজনীয় তথ্য।';
+    const sectionTag = getLocalizedText(s.sectionTag, s.sectionTag_en, language) || 'Frequently Asked Questions';
+    const sectionTitle = getLocalizedText(s.sectionTitle, s.sectionTitle_en, language) || 'Common Inquiries Answered';
+    const sectionSub = getLocalizedText(s.sectionSub, s.sectionSub_en, language) || 'Everything you need to know about course enrollment, classes, and exams.';
 
     const defaultFaqs = [
         {
             id: '1',
-            q: 'নভয়নেক্স (NovoNex)-এ কোর্স কীভাবে কিনব বা ভর্তি হব?',
-            a: 'যেকোনো কোর্সের কার্ডে থাকা "কোর্সটি কিনুন" বাটনে ক্লিক করুন। এরপর বিকাশ, নগদ বা রকেটের মাধ্যমে পেমেন্ট করে TrxID সাবমিট করলেই খুব দ্রুত আপনার কোর্স এনরোলমেন্ট সক্রিয় হয়ে যাবে।'
+            q: 'How do I enroll in a course on NovoNex?',
+            a: 'Click the "Enroll Now" button on any course card, select your payment method (bKash, Nagad, Rocket, or Card), complete the payment, and your enrollment will be instantly activated.'
         },
         {
             id: '2',
-            q: 'লাইভ ক্লাস ছাড়াও কি রেকর্ডেড ক্লাস ও লেকচার শিট পাওয়া যাবে?',
-            a: 'হ্যাঁ, প্রতিটি লাইভ ক্লাসের পর তা স্বয়ংক্রিয়ভাবে ফুল HD রেকর্ডেড আর্কাইভে জমা হয় যা পরীক্ষার শেষ দিন পর্যন্ত যতবার ইচ্ছা রিভিশন দেওয়া যায়। সাথে চ্যাপ্টারভিত্তিক প্র্যাকটিস শিট ও লেকচার নোট দেওয়া হয়।'
+            q: 'Are recorded classes and lecture sheets provided with live classes?',
+            a: 'Yes, every live class is archived in full HD and accessible anytime until the final exam date, along with chapter lecture notes and question banks.'
         },
         {
             id: '3',
-            q: 'NexPilot AI ডাউট সলভার কীভাবে পড়ালেখায় সাহায্য করে?',
-            a: 'NexPilot হলো সম্পূর্ণ কারিকুলাম-সংযুক্ত ২৪/৭ এআই টিউটর। ক্লাসের পড়ালেখা, সূত্রের ব্যাখ্যা বা কোনো গাণিতিক সমস্যায় আটকে গেলে যেকোনো সময় চ্যাট করে সেকেন্ডের মধ্যে কনসেপ্ট ক্লিয়ার করা যায়।'
+            q: 'How does the NexPilot AI Doubt Solver assist learning?',
+            a: 'NexPilot is a 24/7 curriculum-aligned AI assistant. Whenever you are stuck on a problem or formula, chat instantly to clarify concepts in seconds.'
         },
         {
             id: '4',
-            q: 'অনলাইন মডেল টেস্ট ও মেরিট পজিশন কীভাবে কাজ করে?',
-            a: 'পরীক্ষাগুলো বাস্তব বোর্ড ও ভর্তি পরীক্ষার মতো নেগেটিভ মার্কিংসহ টাইমারভিত্তিক নেওয়া হয়। সাবমিট করার সাথে সাথে মূল্যায়ন, সঠিক উত্তরের ব্যাখ্যা এবং র‍্যাঙ্কিং দেখতে পাবেন।'
+            q: 'How do online model tests and rankings work?',
+            a: 'Exams are timed with negative marking mirroring board and admission standards. Immediately upon submission, you receive automated scores, answer explanations, and your merit ranking.'
         },
     ];
     const items = s.items || defaultFaqs;

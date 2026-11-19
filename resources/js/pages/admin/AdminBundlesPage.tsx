@@ -48,7 +48,7 @@ export const AdminBundlesPage: React.FC = () => {
     };
 
     const handleDelete = async (bundle: CourseBundle) => {
-        if (!confirm(`আপনি কি নিশ্চিতভাবে বান্ডেল "${bundle.title}" ট্র্যাশে পাঠাতে চান? পরবর্তীতে ট্র্যাশ থেকে এটি যেকোনো সময় পুনরুদ্ধার করা যাবে।`)) {
+        if (!confirm(`Are you sure you want to move bundle "${bundle.title}" to trash? You can restore it from trash anytime.`)) {
             return;
         }
 
@@ -67,14 +67,14 @@ export const AdminBundlesPage: React.FC = () => {
         try {
             await apiClient.post(`/admin/bundles/${bundle.id}/restore`);
             setBundles(prev => prev.filter(b => b.id !== bundle.id));
-            alert(`বান্ডেল "${bundle.title}" সফলভাবে পুনরুদ্ধার করা হয়েছে!`);
+            alert(`Bundle "${bundle.title}" restored successfully!`);
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to restore course bundle.');
         }
     };
 
     const handleForceDelete = async (bundle: CourseBundle) => {
-        if (!confirm(`সতর্কতা: আপনি কি নিশ্চিতভাবে বান্ডেল "${bundle.title}" স্থায়ীভাবে মুছে ফেলতে চান? এটি আর কখনোই পুনরুদ্ধার করা যাবে না!`)) {
+        if (!confirm(`Warning: Are you sure you want to permanently delete bundle "${bundle.title}"? This cannot be undone!`)) {
             return;
         }
 
@@ -129,10 +129,10 @@ export const AdminBundlesPage: React.FC = () => {
                             statusFilter === 'trashed' ? 'border-rose-300 text-rose-700 bg-rose-50' : 'border-slate-200 text-slate-700'
                         }`}
                     >
-                        <option value="">All Statuses (সকল স্ট্যাটাস)</option>
+                        <option value="">All Statuses</option>
                         <option value="published">Published</option>
                         <option value="draft">Draft</option>
-                        <option value="trashed">🗑️ ট্র্যাশ (Trash)</option>
+                        <option value="trashed">🗑️ Trash</option>
                     </select>
 
                     <button
@@ -143,10 +143,10 @@ export const AdminBundlesPage: React.FC = () => {
                                 ? 'bg-rose-100 text-rose-800 border border-rose-300'
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
                         }`}
-                        title="Trash / রিসাইকেল বিন"
+                        title="Trash / Recycle Bin"
                     >
                         <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                        <span>{statusFilter === 'trashed' ? 'সব বান্ডেলে ফিরুন' : 'ট্র্যাশ (Trash)'}</span>
+                        <span>{statusFilter === 'trashed' ? 'Back to All Bundles' : 'Trash'}</span>
                     </button>
                 </div>
             </div>
@@ -156,7 +156,7 @@ export const AdminBundlesPage: React.FC = () => {
                 <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-2 text-xs text-rose-800">
                     <Trash2 className="w-4 h-4 text-rose-600 shrink-0" />
                     <span className="font-semibold">
-                        ট্র্যাশ মোড (Trash Bin): এখানে মুছে ফেলা কোর্স বান্ডেল সংরক্ষিত আছে। আপনি বান্ডেল পুনরুদ্ধার (Restore) করতে পারেন অথবা ডাটাবেজ থেকে স্থায়ীভাবে মুছে ফেলতে পারেন।
+                        Trash Mode: Previously deleted course bundles are stored here. You can restore them or permanently delete them.
                     </span>
                 </div>
             )}
@@ -294,19 +294,19 @@ export const AdminBundlesPage: React.FC = () => {
                                                         <>
                                                             <button
                                                                 onClick={() => handleRestore(bundle)}
-                                                                title="পুনরুদ্ধার করুন (Restore)"
+                                                                title="Restore"
                                                                 className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg flex items-center gap-1 text-xs transition-colors cursor-pointer border border-emerald-200"
                                                             >
                                                                 <RotateCcw className="w-3.5 h-3.5" />
-                                                                <span>পুনরুদ্ধার</span>
+                                                                <span>Restore</span>
                                                             </button>
                                                             <button
                                                                 onClick={() => handleForceDelete(bundle)}
-                                                                title="স্থায়ীভাবে মুছুন (Permanent Delete)"
+                                                                title="Permanent Delete"
                                                                 className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg flex items-center gap-1 text-xs transition-colors cursor-pointer border border-rose-200"
                                                             >
                                                                 <Trash2 className="w-3.5 h-3.5" />
-                                                                <span>স্থায়ী মুছুন</span>
+                                                                <span>Delete Forever</span>
                                                             </button>
                                                         </>
                                                     ) : (

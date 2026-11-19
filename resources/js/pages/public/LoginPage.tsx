@@ -112,7 +112,7 @@ export const LoginPage: React.FC = () => {
                                 to="/forgot-password" 
                                 className="text-xs font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 hover:underline"
                             >
-                                পাসওয়ার্ড ভুলে গেছেন?
+                                Forgot Password?
                             </Link>
                         </div>
                         <div className="relative">
@@ -129,7 +129,7 @@ export const LoginPage: React.FC = () => {
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 absolute right-2.5 top-2.5 rounded-lg transition-colors cursor-pointer"
-                                title={showPassword ? 'পাসওয়ার্ড লুকান' : 'পাসওয়ার্ড দেখুন'}
+                                title={showPassword ? 'Hide password' : 'Show password'}
                             >
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>

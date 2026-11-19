@@ -212,7 +212,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
     const handleSaveRoutineItem = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!routineItemTitle.trim() || !routineItemStartTime) {
-            alert('দয়া করে শিরোনাম এবং তারিখ/সময় প্রদান করুন।');
+            alert('Please provide title and date/time.');
             return;
         }
 
@@ -243,21 +243,21 @@ export const AdminCourseBuilderPage: React.FC = () => {
             setRoutineModalOpen(false);
             fetchCourseRoutine();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'রুটিন সূচী সংরক্ষণ করতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to save routine schedule.');
         } finally {
             setSavingRoutineItem(false);
         }
     };
 
     const handleDeleteRoutineItem = async (itemId: number, title: string) => {
-        if (!window.confirm(`আপনি কি নিশ্চিত যে "${title}" রুটিন সূচীটি মুছে ফেলতে চান?`)) {
+        if (!window.confirm(`Are you sure you want to delete routine item "${title}"?`)) {
             return;
         }
         try {
             await apiClient.delete(`/builder/${id}/routine/items/${itemId}`);
             fetchCourseRoutine();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'রুটিন সূচী মোছা সম্ভব হয়নি।');
+            alert(err.response?.data?.message || 'Failed to delete routine item.');
         }
     };
 
@@ -312,7 +312,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
     const handleSaveLiveClass = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!liveClassTitle.trim() || !liveClassUrl.trim() || !liveClassStartTime) {
-            alert('অনুগ্রহ করে ক্লাসের শিরোনাম, ইউটিউব লিংক এবং শুরুর সময় দিন।');
+            alert('Please provide class title, YouTube live link, and start time.');
             return;
         }
 
@@ -337,17 +337,17 @@ export const AdminCourseBuilderPage: React.FC = () => {
             fetchLiveClasses();
             fetchCourseRoutine();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'লাইভ ক্লাস সংরক্ষণ করতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to save live class.');
         } finally {
             setSavingLiveClass(false);
         }
     };
 
     const handleDeleteLiveClass = async (lcId: number, title?: string) => {
-        if (title && !window.confirm(`আপনি কি নিশ্চিত যে "${title}" লাইভ ক্লাসটি মুছে ফেলতে চান?`)) {
+        if (title && !window.confirm(`Are you sure you want to delete live class "${title}"?`)) {
             return;
         }
-        if (!title && !window.confirm('আপনি কি নিশ্চিত যে এই লাইভ ক্লাসটি মুছে ফেলতে চান?')) {
+        if (!title && !window.confirm('Are you sure you want to delete this live class?')) {
             return;
         }
         try {
@@ -355,7 +355,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             setLiveClasses(prev => prev.filter(c => c.id !== lcId));
             fetchCourseRoutine();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'লাইভ ক্লাস ডিলিট করা যায়নি।');
+            alert(err.response?.data?.message || 'Failed to delete live class.');
         }
     };
 
@@ -365,7 +365,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             fetchLiveClasses();
             fetchCourseRoutine();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'স্ট্যাটাস পরিবর্তন করা যায়নি।');
+            alert(err.response?.data?.message || 'Failed to update status.');
         }
     };
 
@@ -482,16 +482,16 @@ export const AdminCourseBuilderPage: React.FC = () => {
     const handleSaveExam = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!examTitle.trim()) {
-            alert('পরীক্ষার শিরোনাম দেওয়া আবশ্যক।');
+            alert('Exam title is required.');
             return;
         }
         if (examModalType === 'live') {
             if (!examStartTime || !examEndTime) {
-                alert('লাইভ পরীক্ষার শুরুর সময় এবং শেষের সময় দেওয়া আবশ্যক।');
+                alert('Start time and end time are required for live exam.');
                 return;
             }
             if (new Date(examEndTime) <= new Date(examStartTime)) {
-                alert('লাইভ পরীক্ষার শেষের সময় অবশ্যই শুরুর সময়ের পরবর্তী হতে হবে।');
+                alert('End time must be later than start time for live exam.');
                 return;
             }
         }
@@ -521,7 +521,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             fetchCourseExams();
             fetchCourseRoutine();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'পরীক্ষা সংরক্ষণ করতে ব্যর্থ হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to save exam.');
         } finally {
             setSavingExam(false);
         }
@@ -533,11 +533,11 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
         if (attachExamType === 'live') {
             if (!attachStartTime || !attachEndTime) {
-                alert('লাইভ পরীক্ষার শুরুর সময় এবং শেষের সময় দেওয়া আবশ্যক।');
+                alert('Start time and end time are required for live exam.');
                 return;
             }
             if (new Date(attachEndTime) <= new Date(attachStartTime)) {
-                alert('লাইভ পরীক্ষার শেষের সময় অবশ্যই শুরুর সময়ের পরবর্তী হতে হবে।');
+                alert('End time must be later than start time for live exam.');
                 return;
             }
         }
@@ -741,7 +741,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
         e.preventDefault();
         if (!materialLesson) return;
         if (!materialLinkTitle.trim() || !materialLinkUrl.trim()) {
-            alert('অনুগ্রহ করে শিরোনাম এবং লিংক দুটিই প্রদান করুন।');
+            alert('Please provide both title and URL.');
             return;
         }
 
@@ -755,7 +755,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             setMaterialLinkUrl('');
             await fetchCurriculum();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'লিংক যুক্ত করতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to add link.');
         } finally {
             setSubmittingLink(false);
         }
@@ -845,7 +845,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl shadow-md shadow-rose-600/30 flex items-center gap-2 transition-all cursor-pointer"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>+ নতুন লাইভ ক্লাস</span>
+                            <span>+ New Live Class</span>
                         </button>
                     )}
 
@@ -856,14 +856,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 className="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm rounded-xl shadow-md shadow-sky-600/30 flex items-center gap-2 transition-all cursor-pointer"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>+ নতুন প্র্যাকটিস এক্সাম</span>
+                                <span>+ New Practice Exam</span>
                             </button>
                             <button
                                 onClick={() => openAttachModal('practice')}
                                 className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl flex items-center gap-2 transition-all cursor-pointer"
                             >
                                 <Paperclip className="w-4 h-4" />
-                                <span>+ পূর্বের এক্সাম যুক্ত করুন</span>
+                                <span>+ Attach Existing Exam</span>
                             </button>
                         </div>
                     )}
@@ -875,14 +875,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl shadow-md shadow-amber-600/30 flex items-center gap-2 transition-all cursor-pointer"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>+ নতুন লাইভ এক্সাম</span>
+                                <span>+ New Live Exam</span>
                             </button>
                             <button
                                 onClick={() => openAttachModal('live')}
                                 className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl flex items-center gap-2 transition-all cursor-pointer"
                             >
                                 <Paperclip className="w-4 h-4" />
-                                <span>+ পূর্বের এক্সাম লাইভ হিসেবে যুক্ত করুন</span>
+                                <span>+ Attach Exam as Live</span>
                             </button>
                         </div>
                     )}
@@ -894,21 +894,21 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
                             >
                                 <Radio className="w-3.5 h-3.5" />
-                                <span>+ লাইভ ক্লাস</span>
+                                <span>+ Live Class</span>
                             </button>
                             <button
                                 onClick={() => openAddExam('live')}
                                 className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
                             >
                                 <Clock className="w-3.5 h-3.5" />
-                                <span>+ লাইভ এক্সাম</span>
+                                <span>+ Live Exam</span>
                             </button>
                             <button
                                 onClick={() => openAddRoutineItem()}
                                 className="px-3.5 py-2 bg-[#0B4B34] hover:bg-[#083827] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
                             >
                                 <Plus className="w-3.5 h-3.5" />
-                                <span>+ নতুন সূচী (ক্লাস আপলোড / ম্যাটেরিয়াল / পার্সেল)</span>
+                                <span>+ New Schedule (Upload / Material / Parcel)</span>
                             </button>
                         </div>
                     )}
@@ -986,7 +986,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     }`}
                 >
                     <Calendar className="w-4 h-4" />
-                    <span>রুটিন (Routine)</span>
+                    <span>Routine</span>
                     <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-[#0B4B34]">
                         {routineItems.length}
                     </span>
@@ -1111,10 +1111,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                                 type="button"
                                                                 onClick={() => openMaterialModal(lesson)}
                                                                 className="flex items-center gap-1 text-sky-600 hover:text-sky-700 font-semibold cursor-pointer"
-                                                                title="স্টাডি ম্যাটেরিয়াল দেখুন বা নতুন যোগ করুন"
+                                                                title="View or add study materials"
                                                             >
                                                                 <Paperclip className="w-3 h-3" />
-                                                                <span>{lesson.attachments.length} টি ম্যাটেরিয়াল</span>
+                                                                <span>{lesson.attachments.length} Materials</span>
                                                             </button>
                                                         )}
                                                     </div>
@@ -1144,7 +1144,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     type="button"
                                                     onClick={() => openMaterialModal(lesson)}
                                                     className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 rounded-lg relative transition-colors cursor-pointer"
-                                                    title="স্টাডি ম্যাটেরিয়াল (আপলোড বা গুগল ড্রাইভ লিংক)"
+                                                    title="Study Materials (Upload or Google Drive link)"
                                                 >
                                                     <Paperclip className="w-4 h-4" />
                                                     {lesson.attachments && lesson.attachments.length > 0 && (
@@ -1202,10 +1202,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <div>
                             <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                                 <Radio className="w-5 h-5 text-rose-600 animate-pulse" />
-                                <span>কোর্স লাইভ ক্লাস ({liveClasses.length})</span>
+                                <span>Course Live Classes ({liveClasses.length})</span>
                             </h3>
                             <p className="text-xs text-slate-500 mt-0.5">
-                                ইউটিউবে Unlisted Live চালু করে লিংক ও ক্লাসের সময় সেট করুন। শিক্ষার্থীরা সরাসরি জয়েন করে লাইভ দেখতে ও কমেন্ট করতে পারবে।
+                                Start an Unlisted Live stream on YouTube, set the stream URL and scheduled time. Enrolled students can join live and participate in real-time chat.
                             </p>
                         </div>
                         <button
@@ -1213,14 +1213,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>+ নতুন লাইভ ক্লাস তৈরি করুন</span>
+                            <span>+ Create New Live Class</span>
                         </button>
                     </div>
 
                     {loadingLiveClasses ? (
                         <div className="bg-white p-12 rounded-3xl border border-slate-200/80 text-center">
                             <Loader2 className="w-8 h-8 animate-spin text-rose-500 mx-auto mb-3" />
-                            <p className="text-xs text-slate-400">লাইভ ক্লাস লোড হচ্ছে...</p>
+                            <p className="text-xs text-slate-400">Loading live classes...</p>
                         </div>
                     ) : liveClasses.length === 0 ? (
                         <div className="bg-white p-12 rounded-3xl border border-slate-200/80 shadow-xs text-center space-y-4">
@@ -1228,9 +1228,9 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 <Radio className="w-8 h-8" />
                             </div>
                             <div>
-                                <h3 className="text-base font-bold text-slate-800">কোনো লাইভ ক্লাস যুক্ত করা হয়নি</h3>
+                                <h3 className="text-base font-bold text-slate-800">No live classes added yet</h3>
                                 <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
-                                    শিক্ষার্থীদের সাথে লাইভ সেশন নিতে ইউটিউব আনলিস্টেড লাইভ লিংক দিয়ে এখনই একটি ক্লাস শিডিউল করুন।
+                                    Schedule a live class with YouTube unlisted live stream link to hold interactive sessions with your students.
                                 </p>
                             </div>
                             <div className="pt-2">
@@ -1239,7 +1239,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     className="px-5 py-2.5 bg-rose-600 text-white font-bold text-xs rounded-xl shadow-md hover:bg-rose-700 flex items-center gap-1.5 mx-auto cursor-pointer"
                                 >
                                     <Plus className="w-4 h-4" />
-                                    <span>প্রথম লাইভ ক্লাস তৈরি করুন</span>
+                                    <span>Create First Live Class</span>
                                 </button>
                             </div>
                         </div>
@@ -1272,15 +1272,15 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     {isLive ? (
                                                         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white animate-pulse">
                                                             <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                                                            <span>লাইভ চলছে</span>
+                                                            <span>Live Now</span>
                                                         </span>
                                                     ) : isCompleted ? (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
-                                                            সমাপ্ত
+                                                            Completed
                                                         </span>
                                                     ) : (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                                                            আসন্ন
+                                                            Upcoming
                                                         </span>
                                                     )}
                                                 </div>
@@ -1299,20 +1299,20 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     <button
                                                         onClick={() => handleToggleLiveStatus(lc, 'live')}
                                                         className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
-                                                        title="লাইভ শুরু করুন"
+                                                        title="Go Live"
                                                     >
                                                         <Radio className="w-3.5 h-3.5" />
-                                                        <span>লাইভ শুরু করুন</span>
+                                                        <span>Go Live</span>
                                                     </button>
                                                 )}
                                                 {isLive && (
                                                     <button
                                                         onClick={() => handleToggleLiveStatus(lc, 'completed')}
                                                         className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
-                                                        title="লাইভ সমাপ্ত করুন"
+                                                        title="End Live"
                                                     >
                                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                                                        <span>সমাপ্ত করুন</span>
+                                                        <span>End Class</span>
                                                     </button>
                                                 )}
 
@@ -1320,16 +1320,16 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     to={`/student/live-classes/${lc.id}`}
                                                     target="_blank"
                                                     className="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs rounded-lg flex items-center gap-1 transition-colors"
-                                                    title="লাইভ ক্লাসরুম দেখুন"
+                                                    title="Open Live Classroom"
                                                 >
                                                     <ExternalLink className="w-3.5 h-3.5" />
-                                                    <span>ক্লাসরুম</span>
+                                                    <span>Classroom</span>
                                                 </Link>
 
                                                 <button
                                                     onClick={() => openEditLiveClass(lc)}
                                                     className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
-                                                    title="এডিট করুন"
+                                                    title="Edit"
                                                 >
                                                     <Edit className="w-4 h-4" />
                                                 </button>
@@ -1337,7 +1337,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                 <button
                                                     onClick={() => handleDeleteLiveClass(lc.id, lc.title)}
                                                     className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                                                    title="ডিলিট করুন"
+                                                    title="Delete"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -1349,7 +1349,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                             <div className="flex items-center gap-1.5">
                                                 <Clock className="w-3.5 h-3.5 text-sky-600" />
                                                 <span>
-                                                    শুরু: <strong>{new Date(lc.start_time).toLocaleString('bn-BD', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong>
+                                                    Starts: <strong>{new Date(lc.start_time).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong>
                                                 </span>
                                             </div>
 
@@ -1367,7 +1367,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                                             <div className="flex items-center gap-1.5 ml-auto text-slate-500">
                                                 <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
-                                                <span>{lc.comments_count || 0} টি মন্তব্য</span>
+                                                <span>{lc.comments_count || 0} Comments</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1385,10 +1385,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <div>
                             <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                                 <BookOpen className="w-5 h-5 text-sky-600" />
-                                <span>প্র্যাকটিস এক্সাম (Practice Exams)</span>
+                                <span>Practice Exams</span>
                             </h3>
                             <p className="text-xs text-slate-500 mt-0.5">
-                                মোট {practiceExamsList.length} টি প্র্যাকটিস পরীক্ষা। লাইভ পরীক্ষার সময়সীমা শেষ হলেও তা স্বয়ংক্রিয়ভাবে এখানে চলে আসবে যেন শিক্ষার্থীরা যে কোনো সময় অনুশীলন করতে পারে।
+                                Total {practiceExamsList.length} practice exams. Live exams automatically convert here once their schedule ends, so students can practice anytime.
                             </p>
                         </div>
                         <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -1397,14 +1397,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>+ নতুন প্র্যাকটিস এক্সাম</span>
+                                <span>+ New Practice Exam</span>
                             </button>
                             <button
                                 onClick={() => openAttachModal('practice')}
                                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer"
                             >
                                 <Paperclip className="w-4 h-4" />
-                                <span>+ পূর্বের এক্সাম যুক্ত করুন</span>
+                                <span>+ Attach Existing Exam</span>
                             </button>
                         </div>
                     </div>
@@ -1420,9 +1420,9 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 <BookOpen className="w-8 h-8" />
                             </div>
                             <div>
-                                <h3 className="text-base font-bold text-slate-800">কোনো প্র্যাকটিস এক্সাম পাওয়া যায়নি</h3>
+                                <h3 className="text-base font-bold text-slate-800">No practice exams found</h3>
                                 <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
-                                    শিক্ষার্থীদের নিয়মিত অনুশীলনের জন্য নতুন প্র্যাকটিস পরীক্ষা তৈরি করুন অথবা পূর্বের তৈরি করা পরীক্ষা যুক্ত করুন।
+                                    Create a new practice exam or attach an existing exam for students to practice regularly.
                                 </p>
                             </div>
                             <div className="flex items-center justify-center gap-3 pt-2">
@@ -1431,14 +1431,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     className="px-5 py-2.5 bg-sky-600 text-white font-bold text-xs rounded-xl shadow-md hover:bg-sky-700 flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <Plus className="w-4 h-4" />
-                                    <span>নতুন প্র্যাকটিস এক্সাম তৈরি করুন</span>
+                                    <span>Create Practice Exam</span>
                                 </button>
                                 <button
                                     onClick={() => openAttachModal('practice')}
                                     className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <Paperclip className="w-4 h-4" />
-                                    <span>পূর্বের এক্সাম যুক্ত করুন</span>
+                                    <span>Attach Existing Exam</span>
                                 </button>
                             </div>
                         </div>
@@ -1463,11 +1463,11 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     {isFromLive ? (
                                                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 flex items-center gap-1">
                                                             <Sparkles className="w-3 h-3 text-purple-600" />
-                                                            <span>🔄 লাইভ সম্পন্ন • এখন প্র্যাকটিস মোডে উন্মুক্ত</span>
+                                                            <span>Live Completed • Available in Practice Mode</span>
                                                         </span>
                                                     ) : (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 uppercase">
-                                                            প্র্যাকটিস এক্সাম
+                                                            Practice Exam
                                                         </span>
                                                     )}
                                                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
@@ -1564,10 +1564,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <div>
                             <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                                 <Clock className="w-5 h-5 text-amber-600" />
-                                <span>লাইভ এক্সাম (Live Exams)</span>
+                                <span>Live Exams</span>
                             </h3>
                             <p className="text-xs text-slate-500 mt-0.5">
-                                মোট {liveExamsList.length} টি লাইভ পরীক্ষা। নির্ধারিত সময় (শুরু ও শেষ) অনুযায়ী শিক্ষার্থীরা লাইভ পরীক্ষায় অংশ নেয়। সময় শেষ হলে এটি স্বয়ংক্রিয়ভাবে প্র্যাকটিস এক্সামে চলে যায়।
+                                Total {liveExamsList.length} live exams. Students participate in live exams based on the scheduled start and end times. Once expired, it automatically moves to practice exams.
                             </p>
                         </div>
                         <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -1576,14 +1576,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>+ নতুন লাইভ এক্সাম</span>
+                                <span>+ New Live Exam</span>
                             </button>
                             <button
                                 onClick={() => openAttachModal('live')}
                                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer"
                             >
                                 <Paperclip className="w-4 h-4" />
-                                <span>+ পূর্বের এক্সাম লাইভ হিসেবে যুক্ত করুন</span>
+                                <span>+ Attach Existing Exam as Live</span>
                             </button>
                         </div>
                     </div>
@@ -1591,8 +1591,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/70 text-amber-900 text-xs flex items-start gap-2.5">
                         <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                         <div>
-                            <span className="font-bold">স্বয়ংক্রিয় প্র্যাকটিস রূপান্তর সিস্টেম: </span>
-                            লাইভ পরীক্ষার জন্য নির্ধারিত শেষের সময় (End Time) অতিক্রম করার সাথে সাথে পরীক্ষাটি স্বয়ংক্রিয়ভাবে <strong>প্র্যাকটিস এক্সাম</strong> ট্যাবে চলে যাবে এবং শিক্ষার্থীরা নিয়মিত যেকোনো সময় প্র্যাকটিস হিসেবে অংশ নিতে পারবে।
+                            <span className="font-bold">Automatic Practice Conversion: </span>
+                            As soon as the scheduled End Time passes, the exam automatically converts into a practice exam under the Practice Exams tab for regular practice.
                         </div>
                     </div>
 
@@ -1607,9 +1607,9 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 <Clock className="w-8 h-8" />
                             </div>
                             <div>
-                                <h3 className="text-base font-bold text-slate-800">কোনো লাইভ এক্সাম তৈরি করা হয়নি</h3>
+                                <h3 className="text-base font-bold text-slate-800">No live exams created yet</h3>
                                 <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
-                                    নির্দিষ্ট সময়সীমা নির্ধারণ করে একটি লাইভ এক্সাম তৈরি করুন। শিক্ষার্থীরা একই সময়ে পরীক্ষা দিয়ে মেধা তালিকায় প্রতিযোগিতা করতে পারবে।
+                                    Schedule a live exam with specific time boundaries. Students can participate simultaneously and compete on the leaderboard.
                                 </p>
                             </div>
                             <div className="flex items-center justify-center gap-3 pt-2">
@@ -1618,14 +1618,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     className="px-5 py-2.5 bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md hover:bg-amber-700 flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <Plus className="w-4 h-4" />
-                                    <span>নতুন লাইভ এক্সাম তৈরি করুন</span>
+                                    <span>Create Live Exam</span>
                                 </button>
                                 <button
                                     onClick={() => openAttachModal('live')}
                                     className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <Paperclip className="w-4 h-4" />
-                                    <span>পূর্বের এক্সাম লাইভ হিসেবে যুক্ত করুন</span>
+                                    <span>Attach Existing Exam as Live</span>
                                 </button>
                             </div>
                         </div>
@@ -1654,21 +1654,21 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     {isLiveNow && (
                                                         <span className="px-2.5 py-1 rounded-full text-xs font-black bg-rose-500 text-white flex items-center gap-1.5 animate-pulse shadow-sm">
                                                             <Radio className="w-3.5 h-3.5" />
-                                                            <span>🔴 লাইভ চলছে</span>
+                                                            <span>Live Now</span>
                                                         </span>
                                                     )}
 
                                                     {isUpcoming && (
                                                         <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 flex items-center gap-1">
                                                             <Clock className="w-3.5 h-3.5 text-amber-600" />
-                                                            <span>⏳ আসন্ন লাইভ</span>
+                                                            <span>Upcoming Live</span>
                                                         </span>
                                                     )}
 
                                                     {isExpired && (
                                                         <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1">
                                                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                                                            <span>🔄 সময় সমাপ্ত (প্র্যাকটিস এক্সামে সক্রিয়)</span>
+                                                            <span>Completed (Active in Practice)</span>
                                                         </span>
                                                     )}
 
@@ -1684,11 +1684,11 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     <div className="flex flex-wrap items-center gap-3 text-xs bg-amber-50/70 border border-amber-200/60 px-3 py-1.5 rounded-xl text-amber-900 font-medium">
                                                         <div className="flex items-center gap-1">
                                                             <Clock className="w-3.5 h-3.5 text-amber-600" />
-                                                            <span>শুরু: <strong>{formatExamDate(exam.start_time)}</strong></span>
+                                                            <span>Starts: <strong>{formatExamDate(exam.start_time)}</strong></span>
                                                         </div>
                                                         <span>—</span>
                                                         <div className="flex items-center gap-1">
-                                                            <span>শেষ: <strong>{formatExamDate(exam.end_time)}</strong></span>
+                                                            <span>Ends: <strong>{formatExamDate(exam.end_time)}</strong></span>
                                                         </div>
                                                     </div>
                                                 )}
@@ -1745,7 +1745,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                             </div>
                                             <div className="flex items-center gap-1.5 font-medium">
                                                 <Clock className="w-4 h-4 text-sky-500" />
-                                                <span>পরীক্ষার সময়সীমা: <strong className="text-slate-800">{exam.duration_minutes} mins</strong></span>
+                                                <span>Duration: <strong className="text-slate-800">{exam.duration_minutes} mins</strong></span>
                                             </div>
                                             <div className="flex items-center gap-1.5 font-medium">
                                                 <FileText className="w-4 h-4 text-violet-500" />
@@ -1782,10 +1782,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <div>
                             <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-[#0B4B34]" />
-                                <span>কোর্স রুটিন (Course Routine)</span>
+                                <span>Course Routine</span>
                             </h3>
                             <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
-                                এই কোর্সের সকল লাইভ ক্লাস, লাইভ পরীক্ষা, ক্লাস আপলোড, স্টাডি ম্যাটেরিয়াল এবং বই/পার্সেল ডেলিভারির পূর্ণাঙ্গ সময়সূচী। এখান থেকে যোগ করা যেকোনো সূচী স্বয়ংক্রিয়ভাবে শিক্ষার্থীদের রুটিনে ও ড্যাশবোর্ডে প্রদর্শিত হবে।
+                                Complete schedule of live classes, live exams, class uploads, study materials, and book/parcel deliveries. Any item added here appears automatically on students' routines and dashboards.
                             </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -1794,35 +1794,35 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
                             >
                                 <Radio className="w-3.5 h-3.5" />
-                                <span>+ লাইভ ক্লাস</span>
+                                <span>+ Live Class</span>
                             </button>
                             <button
                                 onClick={() => openAddExam('live')}
                                 className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
                             >
                                 <Clock className="w-3.5 h-3.5" />
-                                <span>+ লাইভ এক্সাম</span>
+                                <span>+ Live Exam</span>
                             </button>
                             <button
                                 onClick={() => openAddRoutineItem('class_upload')}
                                 className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
                             >
                                 <Video className="w-3.5 h-3.5" />
-                                <span>+ ক্লাস আপলোড</span>
+                                <span>+ Class Upload</span>
                             </button>
                             <button
                                 onClick={() => openAddRoutineItem('material')}
                                 className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
                             >
                                 <FileText className="w-3.5 h-3.5" />
-                                <span>+ ম্যাটেরিয়াল</span>
+                                <span>+ Material</span>
                             </button>
                             <button
                                 onClick={() => openAddRoutineItem('book_parcel')}
                                 className="px-3 py-1.5 bg-[#0B4B34] hover:bg-[#083827] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
                             >
                                 <Package className="w-3.5 h-3.5" />
-                                <span>+ বই/পার্সেল ডেলিভারি</span>
+                                <span>+ Book/Parcel Delivery</span>
                             </button>
                         </div>
                     </div>
@@ -1834,8 +1834,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 <Calendar className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
-                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">মোট ইভেন্ট</span>
-                                <span className="text-base font-black text-slate-800">{routineItems.length} টি</span>
+                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">Total Events</span>
+                                <span className="text-base font-black text-slate-800">{routineItems.length}</span>
                             </div>
                         </div>
 
@@ -1844,8 +1844,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 <Radio className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
-                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">লাইভ ক্লাস</span>
-                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'live_class').length} টি</span>
+                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">Live Classes</span>
+                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'live_class').length}</span>
                             </div>
                         </div>
 
@@ -1854,8 +1854,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 <Clock className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
-                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">লাইভ এক্সাম</span>
-                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'live_exam').length} টি</span>
+                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">Live Exams</span>
+                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'live_exam').length}</span>
                             </div>
                         </div>
 
@@ -1864,8 +1864,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 <Video className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
-                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">ক্লাস আপলোড</span>
-                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'class_upload').length} টি</span>
+                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">Class Uploads</span>
+                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'class_upload').length}</span>
                             </div>
                         </div>
 
@@ -1874,8 +1874,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 <FileText className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
-                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">ম্যাটেরিয়াল</span>
-                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'material').length} টি</span>
+                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">Materials</span>
+                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'material').length}</span>
                             </div>
                         </div>
 
@@ -1884,8 +1884,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 <Package className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
-                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">বই ও পার্সেল</span>
-                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'book_parcel').length} টি</span>
+                                <span className="text-[10px] font-bold text-slate-400 block uppercase truncate">Books & Parcels</span>
+                                <span className="text-base font-black text-slate-800">{routineItems.filter(i => i.type === 'book_parcel').length}</span>
                             </div>
                         </div>
                     </div>
@@ -1894,14 +1894,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     {loadingRoutine ? (
                         <div className="p-12 text-center bg-white rounded-3xl border border-slate-200/80 shadow-xs">
                             <Loader2 className="w-8 h-8 text-[#0B4B34] animate-spin mx-auto mb-2" />
-                            <p className="text-xs text-slate-500 font-bold">রুটিন ডাটা লোড হচ্ছে...</p>
+                            <p className="text-xs text-slate-500 font-bold">Loading routine data...</p>
                         </div>
                     ) : routineItems.length === 0 ? (
                         <div className="bg-white p-12 rounded-3xl border border-slate-200/80 shadow-xs text-center space-y-4">
                             <Calendar className="w-12 h-12 text-slate-300 mx-auto" />
-                            <h3 className="text-base font-bold text-slate-800">এখনও কোনো রুটিন সূচী যুক্ত করা হয়নি</h3>
+                            <h3 className="text-base font-bold text-slate-800">No routine schedules added yet</h3>
                             <p className="text-xs text-slate-500 max-w-md mx-auto">
-                                আপনার শিক্ষার্থীদের জন্য লাইভ ক্লাস, লাইভ পরীক্ষা, ক্লাস আপলোড, স্টাডি ম্যাটেরিয়াল কিংবা বই/পার্সেল ডেলিভারি সিডিউল করুন।
+                                Schedule live classes, live exams, class uploads, study materials, or parcel deliveries for your students.
                             </p>
                             <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
                                 <button
@@ -1909,21 +1909,21 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                                 >
                                     <Radio className="w-3.5 h-3.5" />
-                                    <span>লাইভ ক্লাস</span>
+                                    <span>Live Class</span>
                                 </button>
                                 <button
                                     onClick={() => openAddExam('live')}
                                     className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                                 >
                                     <Clock className="w-3.5 h-3.5" />
-                                    <span>লাইভ এক্সাম</span>
+                                    <span>Live Exam</span>
                                 </button>
                                 <button
                                     onClick={() => openAddRoutineItem()}
                                     className="px-3.5 py-2 bg-[#0B4B34] hover:bg-[#083827] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
-                                    <span>অন্যান্য রুটিন সূচী (ক্লাস আপলোড / ম্যাটেরিয়াল / পার্সেল)</span>
+                                    <span>Other Routine Items (Upload / Material / Parcel)</span>
                                 </button>
                             </div>
                         </div>
@@ -1949,13 +1949,13 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                             {/* Date / Time Card */}
                                             <div className="shrink-0 text-center w-28 p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                                 <div className="text-[11px] font-extrabold text-[#0B4B34] uppercase tracking-wider">
-                                                    {item.day_name || 'তারিখ'}
+                                                    {item.day_name || 'Date'}
                                                 </div>
                                                 <div className="text-sm font-black text-slate-800 my-0.5">
                                                     {item.date_formatted?.split(' ')?.[0] || ''} {item.date_formatted?.split(' ')?.[1] || ''}
                                                 </div>
                                                 <div className="text-[10px] font-bold text-slate-500">
-                                                    {item.time_display || 'সময় নির্ধারিত'}
+                                                    {item.time_display || 'Scheduled Time'}
                                                 </div>
                                             </div>
 
@@ -1965,37 +1965,37 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     {isClass && (
                                                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1">
                                                             <Radio className="w-3 h-3 text-rose-500 animate-pulse" />
-                                                            <span>লাইভ ক্লাস</span>
+                                                            <span>Live Class</span>
                                                         </span>
                                                     )}
                                                     {isExam && (
                                                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
                                                             <Clock className="w-3 h-3 text-amber-600" />
-                                                            <span>লাইভ এক্সাম</span>
+                                                            <span>Live Exam</span>
                                                         </span>
                                                     )}
                                                     {isClassUpload && (
                                                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-sky-50 text-sky-700 border border-sky-200 flex items-center gap-1">
                                                             <Video className="w-3 h-3 text-sky-600" />
-                                                            <span>ক্লাস আপলোড</span>
+                                                            <span>Class Upload</span>
                                                         </span>
                                                     )}
                                                     {isMaterial && (
                                                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-teal-50 text-teal-700 border border-teal-200 flex items-center gap-1">
                                                             <FileText className="w-3 h-3 text-teal-600" />
-                                                            <span>স্টাডি ম্যাটেরিয়াল</span>
+                                                            <span>Study Material</span>
                                                         </span>
                                                     )}
                                                     {isBookParcel && (
                                                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-orange-50 text-orange-700 border border-orange-200 flex items-center gap-1">
                                                             <Package className="w-3 h-3 text-orange-600" />
-                                                            <span>বই / পার্সেল ডেলিভারি</span>
+                                                            <span>Book / Parcel Delivery</span>
                                                         </span>
                                                     )}
                                                     {!isClass && !isExam && !isClassUpload && !isMaterial && !isBookParcel && (
                                                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
                                                             <Calendar className="w-3 h-3 text-slate-600" />
-                                                            <span>{item.type_label || 'সাধারণ সূচী'}</span>
+                                                            <span>{item.type_label || 'General Schedule'}</span>
                                                         </span>
                                                     )}
 
@@ -2003,24 +2003,24 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     {item.status === 'live' ? (
                                                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white flex items-center gap-1 shadow-xs animate-pulse">
                                                             <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                                                            <span>লাইভ চলছে</span>
+                                                            <span>Live Now</span>
                                                         </span>
                                                     ) : item.status === 'completed' || item.status === 'delivered' ? (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">
-                                                            {item.status === 'delivered' ? 'ডেলিভারি সম্পন্ন' : 'সম্পন্ন'}
+                                                            {item.status === 'delivered' ? 'Delivered' : 'Completed'}
                                                         </span>
                                                     ) : item.status === 'shipped' ? (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 flex items-center gap-1">
                                                             <Truck className="w-3 h-3" />
-                                                            <span>কুরিয়ারে পাঠানো হয়েছে</span>
+                                                            <span>Shipped</span>
                                                         </span>
                                                     ) : item.status === 'published' ? (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                                            প্রকাশিত
+                                                            Published
                                                         </span>
                                                     ) : (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700">
-                                                            আসন্ন
+                                                            Upcoming
                                                         </span>
                                                     )}
 
@@ -2045,26 +2045,26 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     {isBookParcel && item.meta?.courier_name && (
                                                         <span className="flex items-center gap-1 text-orange-700 font-semibold bg-orange-50 px-2 py-0.5 rounded-md text-[11px]">
                                                             <Truck className="w-3.5 h-3.5" />
-                                                            <span>কুরিয়ার: {item.meta.courier_name}</span>
-                                                            {item.meta.tracking_code && <span>(ট্র্যাকিং: {item.meta.tracking_code})</span>}
+                                                            <span>Courier: {item.meta.courier_name}</span>
+                                                            {item.meta.tracking_code && <span>(Tracking: {item.meta.tracking_code})</span>}
                                                         </span>
                                                     )}
                                                     {isClass && item.live_url && (
                                                         <span className="text-emerald-600 font-medium text-[11px] flex items-center gap-1">
                                                             <ExternalLink className="w-3 h-3" />
-                                                            <span>ইউটিউব লাইভ লিংক সংযুক্ত</span>
+                                                            <span>YouTube Live Attached</span>
                                                         </span>
                                                     )}
                                                     {isExam && matchingLiveExam && (
                                                         <span className="text-amber-700 font-medium text-[11px] flex items-center gap-1">
                                                             <Award className="w-3 h-3 text-amber-500" />
-                                                            <span>পূর্ণমান: {matchingLiveExam.total_marks} | প্রশ্ন: {matchingLiveExam.questions_count ?? 0}</span>
+                                                            <span>Total Marks: {matchingLiveExam.total_marks} | Questions: {matchingLiveExam.questions_count ?? 0}</span>
                                                         </span>
                                                     )}
                                                     {item.link_url && (
                                                         <span className="text-sky-600 font-medium text-[11px] flex items-center gap-1 truncate max-w-[200px]">
                                                             <Paperclip className="w-3 h-3 shrink-0" />
-                                                            <span className="truncate">{item.action_text || 'সংযুক্ত লিংক'}</span>
+                                                            <span className="truncate">{item.action_text || 'Attached Link'}</span>
                                                         </span>
                                                     )}
                                                 </div>
@@ -2080,17 +2080,17 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                         target="_blank"
                                                         rel="noreferrer"
                                                         className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-lg flex items-center gap-1.5 transition-colors"
-                                                        title="লাইভ ক্লাস ভিউ"
+                                                        title="View Live Class"
                                                     >
                                                         <Radio className="w-3.5 h-3.5 text-rose-600" />
-                                                        <span>ক্লাস রুম</span>
+                                                        <span>Classroom</span>
                                                     </Link>
 
                                                     {matchingLiveClass && (
                                                         <button
                                                             onClick={() => openEditLiveClass(matchingLiveClass)}
                                                             className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                                                            title="লাইভ ক্লাস সম্পাদনা"
+                                                            title="Edit Live Class"
                                                         >
                                                             <Edit className="w-4 h-4" />
                                                         </button>
@@ -2099,7 +2099,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     <button
                                                         onClick={() => handleDeleteLiveClass(item.id)}
                                                         className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                                                        title="লাইভ ক্লাস ডিলিট"
+                                                        title="Delete Live Class"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -2123,14 +2123,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                         title="Submissions"
                                                     >
                                                         <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                                                        <span>ফলাফল ({matchingLiveExam?.submissions_count ?? 0})</span>
+                                                        <span>Results ({matchingLiveExam?.submissions_count ?? 0})</span>
                                                     </Link>
 
                                                     {matchingLiveExam && (
                                                         <button
                                                             onClick={() => openEditExam(matchingLiveExam)}
                                                             className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
-                                                            title="লাইভ এক্সাম সম্পাদনা"
+                                                            title="Edit Live Exam"
                                                         >
                                                             <Edit className="w-4 h-4" />
                                                         </button>
@@ -2139,7 +2139,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     <button
                                                         onClick={() => handleDetachExam(item.id, item.title)}
                                                         className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                                                        title="কোর্স থেকে পরীক্ষা বাদ দিন"
+                                                        title="Detach Exam"
                                                     >
                                                         <Unlink className="w-4 h-4" />
                                                     </button>
@@ -2156,14 +2156,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                             className="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs rounded-lg flex items-center gap-1.5 transition-colors"
                                                         >
                                                             <ExternalLink className="w-3.5 h-3.5" />
-                                                            <span>{item.action_text || 'লিংক দেখুন'}</span>
+                                                            <span>{item.action_text || 'View Link'}</span>
                                                         </a>
                                                     )}
 
                                                     <button
                                                         onClick={() => openEditRoutineItem(item)}
                                                         className="p-1.5 text-slate-400 hover:text-[#0B4B34] hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                                                        title="সূচী সম্পাদনা"
+                                                        title="Edit Schedule"
                                                     >
                                                         <Edit className="w-4 h-4" />
                                                     </button>
@@ -2171,7 +2171,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     <button
                                                         onClick={() => handleDeleteRoutineItem(item.id, item.title)}
                                                         className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                                                        title="সূচী মুছে ফেলুন"
+                                                        title="Delete Schedule"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -2190,14 +2190,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
             <Modal
                 isOpen={routineModalOpen}
                 onClose={() => setRoutineModalOpen(false)}
-                title={editingRoutineItem ? 'রুটিন সূচী সম্পাদনা করুন' : 'নতুন রুটিন সূচী যুক্ত করুন'}
+                title={editingRoutineItem ? 'Edit Routine Schedule' : 'Add New Routine Schedule'}
                 maxWidth="lg"
             >
                 <form onSubmit={handleSaveRoutineItem} className="space-y-4">
                     {/* Routine Type Selector */}
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-2">
-                            সূচীর ধরন নির্বাচন করুন <span className="text-rose-500">*</span>
+                            Select Schedule Type <span className="text-rose-500">*</span>
                         </label>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                             <button
@@ -2210,7 +2210,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 }`}
                             >
                                 <Video className="w-5 h-5 text-sky-600" />
-                                <span>ক্লাস আপলোড</span>
+                                <span>Class Upload</span>
                             </button>
 
                             <button
@@ -2223,7 +2223,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 }`}
                             >
                                 <FileText className="w-5 h-5 text-teal-600" />
-                                <span>স্টাডি ম্যাটেরিয়াল</span>
+                                <span>Study Material</span>
                             </button>
 
                             <button
@@ -2236,7 +2236,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 }`}
                             >
                                 <Package className="w-5 h-5 text-orange-600" />
-                                <span>বই / পার্সেল ডেলিভারি</span>
+                                <span>Book / Parcel Delivery</span>
                             </button>
 
                             <button
@@ -2249,7 +2249,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 }`}
                             >
                                 <Calendar className="w-5 h-5 text-[#0B4B34]" />
-                                <span>সাধারণ নোটিশ</span>
+                                <span>General Notice</span>
                             </button>
                         </div>
                     </div>
@@ -2257,7 +2257,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     {/* Title */}
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
-                            শিরোনাম <span className="text-rose-500">*</span>
+                            Title <span className="text-rose-500">*</span>
                         </label>
                         <input
                             type="text"
@@ -2266,12 +2266,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             onChange={e => setRoutineItemTitle(e.target.value)}
                             placeholder={
                                 routineItemType === 'class_upload'
-                                    ? 'e.g. পদার্থবিজ্ঞান ১ম পত্র - গতিবিদ্যা লেকচার ০২ আপলোড'
+                                    ? 'e.g. Physics Paper 1 - Dynamics Lecture 02 Upload'
                                     : routineItemType === 'material'
-                                    ? 'e.g. রসায়ন ১ম অধ্যায়ের স্পেশাল শিট ও প্র্যাকটিস বুকলেট পিডিএফ'
+                                    ? 'e.g. Chemistry Chapter 1 Special Sheet & Practice Booklet PDF'
                                     : routineItemType === 'book_parcel'
-                                    ? 'e.g. পদার্থবিজ্ঞান প্রশ্নব্যাংক ও প্র্যাকটিস বুক কুরিয়ার ডেলিভারি'
-                                    : 'e.g. বিশেষ সেশন / নোটিশ'
+                                    ? 'e.g. Physics Question Bank & Practice Book Courier Delivery'
+                                    : 'e.g. Special Session / Important Notice'
                             }
                             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0B4B34]"
                         />
@@ -2281,13 +2281,13 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         {/* Subject */}
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                বিষয় / টপিক (ঐচ্ছিক)
+                                Subject / Topic (Optional)
                             </label>
                             <input
                                 type="text"
                                 value={routineItemSubject}
                                 onChange={e => setRoutineItemSubject(e.target.value)}
-                                placeholder="e.g. পদার্থবিজ্ঞান, রসায়ন, বাংলা, বই ডেলিভারি"
+                                placeholder="e.g. Physics, Chemistry, English, Book Delivery"
                                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0B4B34]"
                             />
                         </div>
@@ -2295,22 +2295,22 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         {/* Status */}
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                স্ট্যাটাস
+                                Status
                             </label>
                             <select
                                 value={routineItemStatus}
                                 onChange={e => setRoutineItemStatus(e.target.value)}
                                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0B4B34]"
                             >
-                                <option value="upcoming">আসন্ন (Upcoming)</option>
-                                <option value="published">প্রকাশিত (Published / Uploaded)</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="published">Published / Uploaded</option>
                                 {routineItemType === 'book_parcel' && (
                                     <>
-                                        <option value="shipped">কুরিয়ারে পাঠানো হয়েছে (Shipped)</option>
-                                        <option value="delivered">ডেলিভারি সম্পন্ন (Delivered)</option>
+                                        <option value="shipped">Shipped</option>
+                                        <option value="delivered">Delivered</option>
                                     </>
                                 )}
-                                <option value="completed">সম্পন্ন (Completed)</option>
+                                <option value="completed">Completed</option>
                             </select>
                         </div>
                     </div>
@@ -2319,7 +2319,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                তারিখ ও শুরুর সময় <span className="text-rose-500">*</span>
+                                Date & Start Time <span className="text-rose-500">*</span>
                             </label>
                             <input
                                 type="datetime-local"
@@ -2332,7 +2332,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                শেষ সময় / প্রত্যাশিত ডেলিভারি (ঐচ্ছিক)
+                                End Time / Expected Delivery (Optional)
                             </label>
                             <input
                                 type="datetime-local"
@@ -2348,12 +2348,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <div className="p-4 rounded-2xl bg-orange-50/70 border border-orange-200/80 space-y-3">
                             <h4 className="text-xs font-bold text-orange-900 flex items-center gap-1.5">
                                 <Truck className="w-4 h-4 text-orange-600" />
-                                <span>কুরিয়ার ও পার্সেল ট্র্যাকিং তথ্য</span>
+                                <span>Courier & Parcel Tracking Info</span>
                             </h4>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                                        কুরিয়ার সার্ভিস
+                                        Courier Service
                                     </label>
                                     <input
                                         type="text"
@@ -2365,13 +2365,13 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 </div>
                                 <div>
                                     <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                                        ট্র্যাকিং কোড বা চালান নম্বর
+                                        Tracking Code or Invoice No
                                     </label>
                                     <input
                                         type="text"
                                         value={routineItemTracking}
                                         onChange={e => setRoutineItemTracking(e.target.value)}
-                                        placeholder="e.g. TRK-982341 বা চালান #402"
+                                        placeholder="e.g. TRK-982341 or Invoice #402"
                                         className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-400"
                                     />
                                 </div>
@@ -2383,7 +2383,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                লিংক / ফাইল / ট্র্যাকিং ইউআরএল (ঐচ্ছিক)
+                                Link / File / Tracking URL (Optional)
                             </label>
                             <input
                                 type="url"
@@ -2396,7 +2396,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                বাটন টেক্সট (ঐচ্ছিক)
+                                Button Text (Optional)
                             </label>
                             <input
                                 type="text"
@@ -2404,12 +2404,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 onChange={e => setRoutineItemActionText(e.target.value)}
                                 placeholder={
                                     routineItemType === 'class_upload'
-                                        ? 'e.g. ক্লাস দেখুন'
+                                        ? 'e.g. Watch Class'
                                         : routineItemType === 'material'
-                                        ? 'e.g. নোট ডাউনলোড'
+                                        ? 'e.g. Download Note'
                                         : routineItemType === 'book_parcel'
-                                        ? 'e.g. পার্সেল ট্র্যাক'
-                                        : 'e.g. বিস্তারিত দেখুন'
+                                        ? 'e.g. Track Parcel'
+                                        : 'e.g. View Details'
                                 }
                                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0B4B34]"
                             />
@@ -2419,13 +2419,13 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     {/* Description */}
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
-                            বিস্তারিত বিবরণ / শিক্ষার্থী বার্তা (ঐচ্ছিক)
+                            Description / Note for Students (Optional)
                         </label>
                         <textarea
                             rows={3}
                             value={routineItemDesc}
                             onChange={e => setRoutineItemDesc(e.target.value)}
-                            placeholder="শিক্ষার্থীদের জন্য কোনো বিশেষ নির্দেশনা, অধ্যায় বা পার্সেল পাওয়ার সময়সীমা..."
+                            placeholder="Instructions, chapters or estimated delivery timeline for students..."
                             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0B4B34]"
                         />
                     </div>
@@ -2437,7 +2437,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             onClick={() => setRoutineModalOpen(false)}
                             className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer transition-colors"
                         >
-                            বাতিল
+                            Cancel
                         </button>
                         <button
                             type="submit"
@@ -2447,12 +2447,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             {savingRoutineItem ? (
                                 <>
                                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                    <span>সংরক্ষণ হচ্ছে...</span>
+                                    <span>Saving...</span>
                                 </>
                             ) : (
                                 <>
                                     <Save className="w-3.5 h-3.5" />
-                                    <span>{editingRoutineItem ? 'আপডেট করুন' : 'সংরক্ষণ করুন'}</span>
+                                    <span>{editingRoutineItem ? 'Update' : 'Save'}</span>
                                 </>
                             )}
                         </button>
@@ -2464,33 +2464,33 @@ export const AdminCourseBuilderPage: React.FC = () => {
             <Modal
                 isOpen={examModalOpen}
                 onClose={() => setExamModalOpen(false)}
-                title={editingExam ? 'পরীক্ষা সম্পাদনা করুন' : (examModalType === 'live' ? 'নতুন লাইভ এক্সাম তৈরি করুন' : 'নতুন প্র্যাকটিস এক্সাম তৈরি করুন')}
+                title={editingExam ? 'Edit Exam' : (examModalType === 'live' ? 'Create New Live Exam' : 'Create New Practice Exam')}
                 maxWidth="lg"
             >
                 <form onSubmit={handleSaveExam} className="space-y-4">
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
-                            পরীক্ষার নাম / শিরোনাম <span className="text-rose-500">*</span>
+                            Exam Title <span className="text-rose-500">*</span>
                         </label>
                         <input
                             type="text"
                             required
                             value={examTitle}
                             onChange={e => setExamTitle(e.target.value)}
-                            placeholder={examModalType === 'live' ? 'e.g. পদার্থবিজ্ঞান অধ্যায় ১ - লাইভ উইকলি টেস্ট' : 'e.g. রসায়ন ১ম পত্র মডেল টেস্ট - ০১'}
+                            placeholder={examModalType === 'live' ? 'e.g. Physics Chapter 1 - Live Weekly Test' : 'e.g. Chemistry Paper 1 Model Test - 01'}
                             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500"
                         />
                     </div>
 
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
-                            বিবরণ ও নির্দেশনা (ঐচ্ছিক)
+                            Description & Instructions (Optional)
                         </label>
                         <textarea
                             rows={3}
                             value={examDesc}
                             onChange={e => setExamDesc(e.target.value)}
-                            placeholder="পরীক্ষার নিয়মাবলী ও প্রয়োজনীয় নির্দেশনা..."
+                            placeholder="Exam guidelines and instructions..."
                             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500"
                         />
                     </div>
@@ -2500,12 +2500,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-3">
                             <div className="flex items-center gap-2 text-amber-900 text-xs font-bold">
                                 <Clock className="w-4 h-4 text-amber-600" />
-                                <span>লাইভ পরীক্ষার সময়সূচি (শুরু ও শেষ) <span className="text-rose-500">*</span></span>
+                                <span>Live Exam Schedule (Start & End) <span className="text-rose-500">*</span></span>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                                        কখন শুরু হবে (Start Time)
+                                        Start Time
                                     </label>
                                     <input
                                         type="datetime-local"
@@ -2517,7 +2517,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 </div>
                                 <div>
                                     <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                                        কখন শেষ হবে (End Time)
+                                        End Time
                                     </label>
                                     <input
                                         type="datetime-local"
@@ -2529,7 +2529,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 </div>
                             </div>
                             <p className="text-[11px] text-amber-800 leading-relaxed">
-                                💡 <strong>স্বয়ংক্রিয় প্র্যাকটিস রূপান্তর:</strong> এই নির্ধারিত সময় শেষ হওয়ার সাথে সাথেই পরীক্ষাটি স্বয়ংক্রিয়ভাবে <strong>প্র্যাকটিস এক্সামে</strong> চলে যাবে এবং শিক্ষার্থীরা নিয়মিত অনুশীলনের জন্য পরীক্ষাটি দিতে পারবে।
+                                💡 <strong>Automatic Practice Conversion:</strong> As soon as this scheduled end time passes, the exam automatically converts into a <strong>Practice Exam</strong> so students can practice anytime.
                             </p>
                         </div>
                     )}
@@ -2537,7 +2537,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                পরীক্ষার সময়সীমা (মিনিট) <span className="text-rose-500">*</span>
+                                Duration (Minutes) <span className="text-rose-500">*</span>
                             </label>
                             <input
                                 type="number"
@@ -2552,7 +2552,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                পাস মার্ক (ঐচ্ছিক)
+                                Pass Marks (Optional)
                             </label>
                             <input
                                 type="number"
@@ -2575,11 +2575,11 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 onChange={e => setExamHasNegativeMarking(e.target.checked)}
                                 className="rounded text-sky-600 focus:ring-sky-500"
                             />
-                            <span>নেগেটিভ মার্কিং চালু করুন</span>
+                            <span>Enable Negative Marking</span>
                         </label>
                         {examHasNegativeMarking && (
                             <div className="flex items-center gap-2 pl-6">
-                                <span className="text-xs text-slate-500">ভুল উত্তরের জন্য কাটা মার্ক:</span>
+                                <span className="text-xs text-slate-500">Marks deducted per wrong answer:</span>
                                 <input
                                     type="number"
                                     min="0"
@@ -2595,7 +2595,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                     {/* Status */}
                     <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">স্ট্যাটাস</label>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Status</label>
                         <div className="flex items-center gap-4 text-xs font-medium">
                             <label className="flex items-center gap-1.5 cursor-pointer">
                                 <input
@@ -2606,7 +2606,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     onChange={() => setExamStatus('published')}
                                     className="text-sky-600"
                                 />
-                                <span>Published (শিক্ষার্থীদের জন্য দৃশ্যমান)</span>
+                                <span>Published (Visible to students)</span>
                             </label>
                             <label className="flex items-center gap-1.5 cursor-pointer">
                                 <input
@@ -2617,7 +2617,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     onChange={() => setExamStatus('draft')}
                                     className="text-sky-600"
                                 />
-                                <span>Draft (খসড়া)</span>
+                                <span>Draft</span>
                             </label>
                         </div>
                     </div>
@@ -2628,7 +2628,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             onClick={() => setExamModalOpen(false)}
                             className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                         >
-                            বাতিল
+                            Cancel
                         </button>
                         <button
                             type="submit"
@@ -2640,12 +2640,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             {savingExam ? (
                                 <>
                                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                    <span>সংরক্ষণ হচ্ছে...</span>
+                                    <span>Saving...</span>
                                 </>
                             ) : (
                                 <>
                                     <CheckCircle2 className="w-3.5 h-3.5" />
-                                    <span>{editingExam ? 'আপডেট করুন' : 'তৈরি করুন'}</span>
+                                    <span>{editingExam ? 'Update' : 'Create'}</span>
                                 </>
                             )}
                         </button>
@@ -2657,7 +2657,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             <Modal
                 isOpen={attachModalOpen}
                 onClose={() => setAttachModalOpen(false)}
-                title={attachExamType === 'live' ? 'কোর্সে লাইভ এক্সাম হিসেবে যুক্ত করুন' : 'কোর্সে প্র্যাকটিস এক্সাম হিসেবে যুক্ত করুন'}
+                title={attachExamType === 'live' ? 'Attach Live Exam to Course' : 'Attach Practice Exam to Course'}
                 maxWidth="lg"
             >
                 <div className="space-y-4">
@@ -2672,7 +2672,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     : 'text-slate-600 hover:text-slate-900'
                             }`}
                         >
-                            📝 প্র্যাকটিস এক্সাম হিসেবে
+                            📝 As Practice Exam
                         </button>
                         <button
                             type="button"
@@ -2683,7 +2683,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     : 'text-slate-600 hover:text-slate-900'
                             }`}
                         >
-                            ⏰ লাইভ এক্সাম হিসেবে
+                            ⏰ As Live Exam
                         </button>
                     </div>
 
@@ -2691,11 +2691,11 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <div className="p-3 bg-amber-50 rounded-xl border border-amber-200/70 space-y-2.5">
                             <p className="text-xs font-bold text-amber-900 flex items-center gap-1">
                                 <Clock className="w-3.5 h-3.5 text-amber-600" />
-                                <span>লাইভ পরীক্ষার নির্ধারিত সময়সীমা (শুরু ও শেষ) দিন</span>
+                                <span>Set Live Exam Schedule (Start & End Time)</span>
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
-                                    <label className="block text-[10px] font-bold text-slate-700 mb-0.5">শুরুর সময়</label>
+                                    <label className="block text-[10px] font-bold text-slate-700 mb-0.5">Start Time</label>
                                     <input
                                         type="datetime-local"
                                         required
@@ -2705,7 +2705,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-bold text-slate-700 mb-0.5">শেষের সময়</label>
+                                    <label className="block text-[10px] font-bold text-slate-700 mb-0.5">End Time</label>
                                     <input
                                         type="datetime-local"
                                         required
@@ -2716,20 +2716,20 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 </div>
                             </div>
                             <p className="text-[10px] text-amber-700">
-                                💡 সময় শেষ হলে এই পরীক্ষাটি স্বয়ংক্রিয়ভাবে প্র্যাকটিস এক্সামে রূপান্তর হয়ে যাবে।
+                                💡 The exam automatically converts to practice mode once the end time passes.
                             </p>
                         </div>
                     )}
 
                     <p className="text-xs text-slate-500">
-                        নিচের তালিকা থেকে একটি পরীক্ষা নির্বাচন করুন:
+                        Select an exam from the list below:
                     </p>
 
                     {availableExams.length === 0 ? (
                         <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-3">
                             <AlertCircle className="w-8 h-8 text-slate-400 mx-auto" />
                             <p className="text-xs text-slate-600 font-medium">
-                                কোনো উন্মুক্ত পরীক্ষা পাওয়া যায়নি।
+                                No available exams found.
                             </p>
                             <button
                                 type="button"
@@ -2740,7 +2740,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer"
                             >
                                 <Plus className="w-3.5 h-3.5" />
-                                <span>নতুন পরীক্ষা তৈরি করুন</span>
+                                <span>Create New Exam</span>
                             </button>
                         </div>
                     ) : (
@@ -2751,7 +2751,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     type="text"
                                     value={examSearch}
                                     onChange={e => setExamSearch(e.target.value)}
-                                    placeholder="পরীক্ষার নাম দিয়ে খুঁজুন..."
+                                    placeholder="Search by exam name..."
                                     className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500"
                                 />
                             </div>
@@ -2799,7 +2799,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     onClick={() => setAttachModalOpen(false)}
                                     className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                                 >
-                                    বাতিল
+                                    Cancel
                                 </button>
                                 <button
                                     type="submit"
@@ -2809,12 +2809,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     {attaching ? (
                                         <>
                                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                            <span>যুক্ত হচ্ছে...</span>
+                                            <span>Attaching...</span>
                                         </>
                                     ) : (
                                         <>
                                             <CheckCircle2 className="w-3.5 h-3.5" />
-                                            <span>কোর্সে যুক্ত করুন</span>
+                                            <span>Attach to Course</span>
                                         </>
                                     )}
                                 </button>
@@ -2950,7 +2950,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <div className="space-y-2 border-t border-slate-100 dark:border-slate-800 pt-3">
                             <div className="flex items-center justify-between">
                                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    সংযুক্ত স্টাডি ম্যাটেরিয়াল ({editingLesson.attachments?.length || 0})
+                                    Attached Study Materials ({editingLesson.attachments?.length || 0})
                                 </label>
                                 <button
                                     type="button"
@@ -2958,7 +2958,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 cursor-pointer"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
-                                    <span>ম্যাটেরিয়াল যুক্ত করুন (আপলোড / ড্রাইভ লিংক)</span>
+                                    <span>Add Material (Upload / Drive Link)</span>
                                 </button>
                             </div>
                             {editingLesson.attachments && editingLesson.attachments.length > 0 && (
@@ -2987,7 +2987,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-slate-400 hover:text-sky-600 p-1"
-                                                        title="ভিউ / প্রিভিউ"
+                                                        title="View / Preview"
                                                     >
                                                         <ExternalLink className="w-3.5 h-3.5" />
                                                     </a>
@@ -2995,7 +2995,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                         type="button"
                                                         onClick={() => handleDeleteAttachment(att.id)}
                                                         className="text-rose-500 hover:text-rose-700 p-1 cursor-pointer"
-                                                        title="মুছুন"
+                                                        title="Delete"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
                                                     </button>
@@ -3021,12 +3021,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
             <Modal
                 isOpen={liveClassModalOpen}
                 onClose={() => setLiveClassModalOpen(false)}
-                title={editingLiveClass ? 'লাইভ ক্লাস সম্পাদনা করুন' : 'নতুন লাইভ ক্লাস তৈরি করুন'}
+                title={editingLiveClass ? 'Edit Live Class' : 'Create New Live Class'}
             >
                 <form onSubmit={handleSaveLiveClass} className="space-y-4">
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
-                            ক্লাসের শিরোনাম / বিষয় *
+                            Class Title / Topic *
                         </label>
                         <input
                             type="text"
@@ -3034,13 +3034,13 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             value={liveClassTitle}
                             onChange={(e) => setLiveClassTitle(e.target.value)}
                             className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium focus:border-sky-500 focus:outline-hidden"
-                            placeholder="যেমন: পদার্থবিজ্ঞান ১ম পত্র - গতিবিদ্যা লাইভ ক্লাস ০১"
+                            placeholder="e.g. Physics 1st Paper - Dynamics Live Class 01"
                         />
                     </div>
 
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
-                            ইউটিউব লাইভ লিংক (Unlisted Live Stream URL) *
+                            YouTube Live Link (Unlisted Live Stream URL) *
                         </label>
                         <input
                             type="text"
@@ -3048,17 +3048,17 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             value={liveClassUrl}
                             onChange={(e) => setLiveClassUrl(e.target.value)}
                             className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium focus:border-sky-500 focus:outline-hidden"
-                            placeholder="https://www.youtube.com/watch?v=... বা https://youtu.be/..."
+                            placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
                         />
                         <p className="text-[11px] text-slate-400 mt-1">
-                            ইউটিউব স্টুডিও থেকে Unlisted Live চালু করে তার লিংকটি এখানে পেস্ট করুন। ক্লাসের সময় শিক্ষার্থীরা সরাসরি এই স্ট্রিমে যুক্ত হয়ে কমেন্ট করতে পারবে।
+                            Start an Unlisted Live stream from YouTube Studio and paste its link here. Students will be able to join and comment directly during the class.
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                ক্লাসের শুরুর সময় *
+                                Class Start Time *
                             </label>
                             <input
                                 type="datetime-local"
@@ -3071,7 +3071,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                আনুমানিক সমাপ্তির সময় (ঐচ্ছিক)
+                                Estimated End Time (Optional)
                             </label>
                             <input
                                 type="datetime-local"
@@ -3084,30 +3084,30 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
-                            স্ট্যাটাস
+                            Status
                         </label>
                         <select
                             value={liveClassStatus}
                             onChange={(e: any) => setLiveClassStatus(e.target.value)}
                             className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-sky-500 focus:outline-hidden"
                         >
-                            <option value="upcoming">আসন্ন (Upcoming)</option>
-                            <option value="live">🔴 চলমান লাইভ (Live Now)</option>
-                            <option value="completed">সমাপ্ত (Completed)</option>
-                            <option value="cancelled">বাতিল (Cancelled)</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="live">🔴 Live Now</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
 
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
-                            বিবরণ বা সিলেবাস (ঐচ্ছিক)
+                            Description or Syllabus (Optional)
                         </label>
                         <textarea
                             rows={3}
                             value={liveClassDesc}
                             onChange={(e) => setLiveClassDesc(e.target.value)}
                             className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-sky-500 focus:outline-hidden"
-                            placeholder="এই লাইভ ক্লাসে কী কী টপিক নিয়ে আলোচনা করা হবে..."
+                            placeholder="Topics to be covered in this live class..."
                         />
                     </div>
 
@@ -3118,7 +3118,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 text-white font-bold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                         >
                             {savingLiveClass && <Loader2 className="w-4 h-4 animate-spin" />}
-                            <span>{savingLiveClass ? 'সংরক্ষণ হচ্ছে...' : editingLiveClass ? 'আপডেট করুন' : 'লাইভ ক্লাস তৈরি করুন'}</span>
+                            <span>{savingLiveClass ? 'Saving...' : editingLiveClass ? 'Update Live Class' : 'Create Live Class'}</span>
                         </button>
                     </div>
                 </form>
@@ -3131,7 +3131,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     setMaterialModalOpen(false);
                     setMaterialLesson(null);
                 }}
-                title="স্টাডি ম্যাটেরিয়াল ও রিসোর্স (Study Materials)"
+                title="Study Materials & Resources"
             >
                 {activeMaterialLesson && (
                     <div className="space-y-5">
@@ -3142,7 +3142,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             </div>
                             <div className="min-w-0">
                                 <div className="text-[10px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider">
-                                    লেসনের নাম
+                                    Lesson Title
                                 </div>
                                 <div className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate">
                                     {activeMaterialLesson.title}
@@ -3203,10 +3203,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                         </div>
                                         <div>
                                             <span className="text-xs font-bold text-sky-600 hover:underline">
-                                                কম্পিউটার থেকে ফাইল সিলেক্ট করুন
+                                                Select file from device
                                             </span>
                                             <p className="text-[11px] text-slate-400 mt-1">
-                                                PDF, DOC, DOCX, PPT, PPTX, ZIP ইত্যাদি (সর্বোচ্চ ৫০ মেগাবাইট)
+                                                PDF, DOC, DOCX, PPT, PPTX, ZIP, etc. (Max 50 MB)
                                             </p>
                                         </div>
                                     </label>
@@ -3219,28 +3219,28 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             <form onSubmit={handleSaveMaterialLink} className="space-y-4">
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        Title / নাম *
+                                        Title / Name *
                                     </label>
                                     <input
                                         type="text"
                                         required
                                         value={materialLinkTitle}
                                         onChange={(e) => setMaterialLinkTitle(e.target.value)}
-                                        placeholder="যেমন: লেকচার শিট (Google Drive বা Web Link)"
+                                        placeholder="e.g. Lecture Sheet (Google Drive or Web Link)"
                                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium focus:border-purple-500 focus:outline-hidden dark:bg-slate-800 dark:text-white"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        URL / লিংক *
+                                        URL / Link *
                                     </label>
                                     <input
                                         type="url"
                                         required
                                         value={materialLinkUrl}
                                         onChange={(e) => setMaterialLinkUrl(e.target.value)}
-                                        placeholder="https://drive.google.com/... বা https://..."
+                                        placeholder="https://drive.google.com/... or https://..."
                                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-mono focus:border-purple-500 focus:outline-hidden dark:bg-slate-800 dark:text-white"
                                     />
                                 </div>
@@ -3251,7 +3251,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-md shadow-purple-600/20 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     {submittingLink ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                                    <span>লিংক যুক্ত করুন (Save Link)</span>
+                                    <span>Save Link</span>
                                 </button>
                             </form>
                         )}
@@ -3259,13 +3259,13 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         {/* List of currently attached study materials */}
                         <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
                             <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
-                                <span>সংযুক্ত ম্যাটেরিয়ালসমূহ ({activeMaterialLesson.attachments?.length || 0})</span>
+                                <span>Attached Materials ({activeMaterialLesson.attachments?.length || 0})</span>
                             </div>
 
                             {(!activeMaterialLesson.attachments || activeMaterialLesson.attachments.length === 0) ? (
                                 <div className="p-6 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
                                     <Paperclip className="w-6 h-6 text-slate-400 mx-auto" />
-                                    <p className="text-xs text-slate-500">এখনো কোনো স্টাডি ম্যাটেরিয়াল যুক্ত করা হয়নি।</p>
+                                    <p className="text-xs text-slate-500">No study materials attached yet.</p>
                                 </div>
                             ) : (
                                 <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
@@ -3300,9 +3300,9 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                         </div>
                                                         <div className="text-[10px] text-slate-400 font-mono">
                                                             {isDrive ? (
-                                                                <span className="text-amber-600 font-semibold">Google Drive লিংক</span>
+                                                                <span className="text-amber-600 font-semibold">Google Drive Link</span>
                                                             ) : isLink ? (
-                                                                <span className="text-purple-600 font-semibold">ওয়েব লিংক</span>
+                                                                <span className="text-purple-600 font-semibold">Web Link</span>
                                                             ) : (
                                                                 <span>{att.file_type?.toUpperCase()} • {att.formatted_size || `${Math.round((att.file_size || 0) / 1024)} KB`}</span>
                                                             )}
@@ -3316,7 +3316,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition"
-                                                        title="ওপেন বা টেস্ট করুন"
+                                                        title="Open / Test Link"
                                                     >
                                                         <ExternalLink className="w-4 h-4" />
                                                     </a>
@@ -3324,7 +3324,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                         type="button"
                                                         onClick={() => handleDeleteAttachment(att.id)}
                                                         className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition cursor-pointer"
-                                                        title="মুছে ফেলুন"
+                                                        title="Delete"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>

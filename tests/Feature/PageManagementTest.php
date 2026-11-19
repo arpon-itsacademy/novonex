@@ -256,17 +256,17 @@ class PageManagementTest extends TestCase
 
         \App\Models\Category::firstOrCreate(
             ['slug' => 'hsc-physics'],
-            ['name' => 'এইচএসসি পদার্থবিজ্ঞান', 'description' => 'পদার্থবিজ্ঞান ১ম ও ২য় পত্র']
+            ['name' => 'HSC Physics', 'description' => 'Physics 1st & 2nd Paper']
         );
         \App\Models\Category::firstOrCreate(
             ['slug' => 'hsc-chemistry'],
-            ['name' => 'এইচএসসি রসায়ন', 'description' => 'রসায়ন ১ম ও ২য় পত্র']
+            ['name' => 'HSC Chemistry', 'description' => 'Chemistry 1st & 2nd Paper']
         );
 
         $response = $this->postJson('/api/admin/pages/sync-categories');
 
         $response->assertStatus(200)
-            ->assertJsonPath('message', 'সকল কোর্স ও ক্যাটাগরি পেজ সফলভাবে সিঙ্ক করা হয়েছে।');
+            ->assertJsonPath('message', 'All course and category pages synchronized successfully.');
 
         $this->assertDatabaseHas('pages', ['slug' => 'courses']);
         $this->assertDatabaseHas('pages', ['slug' => 'category-hsc-physics']);
@@ -279,15 +279,15 @@ class PageManagementTest extends TestCase
 
         \App\Models\Category::firstOrCreate(
             ['slug' => 'hsc-physics'],
-            ['name' => 'এইচএসসি পদার্থবিজ্ঞান']
+            ['name' => 'HSC Physics']
         );
         \App\Models\Category::firstOrCreate(
             ['slug' => 'hsc-chemistry'],
-            ['name' => 'এইচএসসি রসায়ন']
+            ['name' => 'HSC Chemistry']
         );
 
         $coursesPage = Page::create([
-            'title' => 'সকল কোর্সসমূহ',
+            'title' => 'All Courses',
             'slug' => 'courses',
             'status' => 'published',
             'is_system' => true,
@@ -295,7 +295,7 @@ class PageManagementTest extends TestCase
         ]);
 
         $response = $this->putJson("/api/admin/pages/{$coursesPage->id}", [
-            'title' => 'সকল কোর্সসমূহ',
+            'title' => 'All Courses',
             'slug' => 'courses',
             'status' => 'published',
             'selected_categories' => ['hsc-physics'],
@@ -317,6 +317,6 @@ class PageManagementTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonPath('page.slug', 'courses')
-            ->assertJsonPath('page.title', 'সকল কোর্সসমূহ');
+            ->assertJsonPath('page.title', 'All Courses');
     }
 }

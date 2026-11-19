@@ -66,7 +66,7 @@ export const ExamListPage: React.FC = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (!window.confirm('আপনি কি নিশ্চিতভাবে এই পরীক্ষাটি (Exam) ট্র্যাশে পাঠাতে চান? পরবর্তীতে ট্র্যাশ থেকে এটি যেকোনো সময় পুনরুদ্ধার করা যাবে।')) {
+        if (!window.confirm('Are you sure you want to move this exam to trash? You can restore it from trash anytime.')) {
             return;
         }
 
@@ -87,14 +87,14 @@ export const ExamListPage: React.FC = () => {
             await apiClient.post(`/exams/${id}/restore`);
             setExams(prev => prev.filter(e => e.id !== id));
             setTotalExams(prev => Math.max(0, prev - 1));
-            alert('পরীক্ষাটি সফলভাবে পুনরুদ্ধার করা হয়েছে!');
+            alert('Exam restored successfully!');
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to restore exam.');
         }
     };
 
     const handleForceDelete = async (id: number) => {
-        if (!window.confirm('সতর্কতা: আপনি কি নিশ্চিতভাবে এই পরীক্ষাটি স্থায়ীভাবে মুছে ফেলতে চান? এটি আর কখনোই পুনরুদ্ধার করা যাবে না!')) {
+        if (!window.confirm('Warning: Are you sure you want to permanently delete this exam? This action cannot be undone!')) {
             return;
         }
 
@@ -193,11 +193,11 @@ export const ExamListPage: React.FC = () => {
                                 : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white'
                         }`}
                     >
-                        <option value="">All Statuses (সকল স্ট্যাটাস)</option>
+                        <option value="">All Statuses</option>
                         <option value="published">Published</option>
                         <option value="draft">Draft</option>
                         <option value="archived">Archived</option>
-                        <option value="trashed">🗑️ ট্র্যাশ (Trash)</option>
+                        <option value="trashed">🗑️ Trash</option>
                     </select>
 
                     <button
@@ -208,10 +208,10 @@ export const ExamListPage: React.FC = () => {
                                 ? 'bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-200'
                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
                         }`}
-                        title="Trash / রিসাইকেল বিন"
+                        title="Trash / Recycle Bin"
                     >
                         <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                        <span>{statusFilter === 'trashed' ? 'সব পরীক্ষায় ফিরুন' : 'ট্র্যাশ (Trash)'}</span>
+                        <span>{statusFilter === 'trashed' ? 'Back to All Exams' : 'Trash'}</span>
                     </button>
                 </div>
             </div>
@@ -221,7 +221,7 @@ export const ExamListPage: React.FC = () => {
                 <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-2xl flex items-center gap-2 text-xs text-rose-800 dark:text-rose-200">
                     <Trash2 className="w-4 h-4 text-rose-600 shrink-0" />
                     <span className="font-semibold">
-                        ট্র্যাশ মোড (Trash Bin): এখানে পূর্বে মুছে ফেলা পরীক্ষাগুলো (Exams) সংরক্ষিত রয়েছে। আপনি পরীক্ষা পুনরুদ্ধার (Restore) করতে পারেন অথবা ডাটাবেজ থেকে স্থায়ীভাবে মুছে ফেলতে পারেন।
+                        Trash Mode: Previously deleted exams are stored here. You can restore them or permanently delete them from the database.
                     </span>
                 </div>
             )}
@@ -347,19 +347,19 @@ export const ExamListPage: React.FC = () => {
                                                     <>
                                                         <button
                                                             onClick={() => handleRestore(exam.id)}
-                                                            title="পুনরুদ্ধার করুন (Restore)"
+                                                            title="Restore"
                                                             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 font-bold text-xs transition-colors border border-emerald-200 dark:border-emerald-800 cursor-pointer"
                                                         >
                                                             <RotateCcw className="w-3.5 h-3.5" />
-                                                            <span>পুনরুদ্ধার</span>
+                                                            <span>Restore</span>
                                                         </button>
                                                         <button
                                                             onClick={() => handleForceDelete(exam.id)}
-                                                            title="স্থায়ীভাবে মুছুন (Permanent Delete)"
+                                                            title="Permanent Delete"
                                                             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 font-bold text-xs transition-colors border border-rose-200 dark:border-rose-800 cursor-pointer"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
-                                                            <span>স্থায়ী মুছুন</span>
+                                                            <span>Delete Forever</span>
                                                         </button>
                                                     </>
                                                 ) : (

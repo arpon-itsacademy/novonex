@@ -112,7 +112,7 @@ class AdminAccessKeyController extends Controller
         if (!$enrollment) {
             return response()->json([
                 'found' => false,
-                'message' => 'প্রদত্ত অ্যাক্সেস কি (Access Key) দিয়ে কোনো স্টুডেন্ট পাওয়া যায়নি।',
+                'message' => 'No student found with the provided Access Key.',
             ], 404);
         }
 
@@ -138,7 +138,7 @@ class AdminAccessKeyController extends Controller
         $enrollment->update(['access_key' => $newKey]);
 
         return response()->json([
-            'message' => 'অ্যাক্সেস কি সফলভাবে রি-জেনারেট করা হয়েছে!',
+            'message' => 'Access Key regenerated successfully!',
             'access_key' => $newKey,
         ]);
     }

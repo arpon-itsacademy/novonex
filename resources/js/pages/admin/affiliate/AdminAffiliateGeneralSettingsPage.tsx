@@ -127,7 +127,7 @@ export const AdminAffiliateGeneralSettingsPage: React.FC = () => {
                         </div>
                         <div>
                             <p className="text-xs text-slate-400 font-medium">Total Commission Paid</p>
-                            <h3 className="text-lg font-black text-slate-900 dark:text-white">৳{stats.total_commissions_paid}</h3>
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white">Tk {stats.total_commissions_paid}</h3>
                         </div>
                     </div>
 
@@ -137,7 +137,7 @@ export const AdminAffiliateGeneralSettingsPage: React.FC = () => {
                         </div>
                         <div>
                             <p className="text-xs text-slate-400 font-medium">Pending Payouts</p>
-                            <h3 className="text-lg font-black text-slate-900 dark:text-white">৳{stats.pending_payouts}</h3>
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white">Tk {stats.pending_payouts}</h3>
                         </div>
                     </div>
                 </div>
@@ -224,7 +224,7 @@ export const AdminAffiliateGeneralSettingsPage: React.FC = () => {
                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                             >
                                 <option value="percentage">Percentage (%)</option>
-                                <option value="fixed">Fixed Flat Amount (৳)</option>
+                                <option value="fixed">Fixed Flat Amount (Tk)</option>
                             </select>
                         </div>
 
@@ -268,7 +268,7 @@ export const AdminAffiliateGeneralSettingsPage: React.FC = () => {
                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                             >
                                 <option value="percentage">Percentage (%)</option>
-                                <option value="fixed">Fixed Flat Amount (৳)</option>
+                                <option value="fixed">Fixed Flat Amount (Tk)</option>
                             </select>
                         </div>
 
@@ -293,7 +293,7 @@ export const AdminAffiliateGeneralSettingsPage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                            Minimum Payout Amount (৳) <span className="text-rose-500">*</span>
+                            Minimum Payout Amount (Tk) <span className="text-rose-500">*</span>
                         </label>
                         <input
                             type="number"

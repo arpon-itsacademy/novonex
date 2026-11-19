@@ -51,9 +51,9 @@
                 <div class="mt-6">
                     @if ($course->price > 0)
                         <div class="flex items-end gap-2">
-                            <span class="text-3xl font-black text-slate-900">৳{{ number_format($course->sale_price ?? $course->price, 0) }}</span>
+                            <span class="text-3xl font-black text-slate-900">Tk {{ number_format($course->sale_price ?? $course->price, 0) }}</span>
                             @if ($course->sale_price && $course->sale_price < $course->price)
-                                <span class="text-lg text-slate-400 line-through">৳{{ number_format($course->price, 0) }}</span>
+                                <span class="text-lg text-slate-400 line-through">Tk {{ number_format($course->price, 0) }}</span>
                             @endif
                         </div>
                     @else

@@ -60,21 +60,16 @@ interface RoutineEvent {
     } | null;
 }
 
-const BENGALI_DIGITS: { [key: string]: string } = {
-    '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
-    '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'
-};
-
-const BENGALI_MONTHS = [
-    'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-    'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+const ENGLISH_MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const BENGALI_DAYS_SHORT = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি'];
-const BENGALI_DAYS_FULL = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+const ENGLISH_DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const ENGLISH_DAYS_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export const toBengaliNumber = (num: number | string): string => {
-    return String(num).replace(/[0-9]/g, (match) => BENGALI_DIGITS[match] || match);
+export const formatRoutineNumber = (num: number | string): string => {
+    return String(num);
 };
 
 export const StudentRoutinePage: React.FC = () => {
@@ -149,8 +144,7 @@ export const StudentRoutinePage: React.FC = () => {
             days.push({
                 dateStr,
                 dayNumber: day,
-                dayNumberBn: toBengaliNumber(day),
-                dayNameBn: BENGALI_DAYS_SHORT[dayOfWeek],
+                dayName: ENGLISH_DAYS_SHORT[dayOfWeek],
                 isToday: dateStr === todayStr,
                 hasEvents: datesWithEvents.includes(dateStr),
             });
@@ -192,17 +186,17 @@ export const StudentRoutinePage: React.FC = () => {
 
         const dateObj = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
         const isToday = selectedDateStr === todayStr;
-        const dayOfWeek = BENGALI_DAYS_FULL[dateObj.getDay()];
-        const dayBn = toBengaliNumber(dateObj.getDate());
-        const monthBn = BENGALI_MONTHS[dateObj.getMonth()];
+        const dayOfWeek = ENGLISH_DAYS_FULL[dateObj.getDay()];
+        const dayNumber = dateObj.getDate();
+        const monthName = ENGLISH_MONTHS[dateObj.getMonth()];
 
         const count = selectedDateEvents.length;
-        const countText = count > 0 ? `${toBengaliNumber(count)}টি ইভেন্ট` : 'কোনো ইভেন্ট নেই';
+        const countText = count > 0 ? `${count} ${count === 1 ? 'event' : 'events'}` : 'No events';
 
         if (isToday) {
-            return `আজ • ${dayOfWeek}, ${dayBn} ${monthBn} (${countText})`;
+            return `Today • ${dayOfWeek}, ${monthName} ${dayNumber} (${countText})`;
         }
-        return `${dayOfWeek}, ${dayBn} ${monthBn} • (${countText})`;
+        return `${dayOfWeek}, ${monthName} ${dayNumber} • (${countText})`;
     }, [selectedDateStr, todayStr, selectedDateEvents.length]);
 
     // Handle Reminder Click
@@ -211,13 +205,13 @@ export const StudentRoutinePage: React.FC = () => {
             const isCurrentlySet = Boolean(prev[eventKey]);
             const nextState = !isCurrentlySet;
             if (nextState) {
-                alert(`🔔 "${title}" এর জন্য রিমাইন্ডার সেট করা হয়েছে! সময় অনুযায়ী আপনাকে নোটিফিকেশন পাঠানো হবে।`);
+                alert(`🔔 Reminder set for "${title}"! You will receive a notification when it begins.`);
             }
             return { ...prev, [eventKey]: nextState };
         });
     };
 
-    const currentMonthLabel = `${BENGALI_MONTHS[currentMonthDate.getMonth()]} ${toBengaliNumber(currentMonthDate.getFullYear())}`;
+    const currentMonthLabel = `${ENGLISH_MONTHS[currentMonthDate.getMonth()]} ${currentMonthDate.getFullYear()}`;
 
     // Theme border & badge styling
     const getThemeStyles = (theme: string, type: string) => {
@@ -287,14 +281,14 @@ export const StudentRoutinePage: React.FC = () => {
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
                         <CalendarIcon className="w-7 h-7 text-[#0B4B34]" />
-                        <span>রুটিন (Routine)</span>
+                        <span>Class & Exam Routine</span>
                     </h1>
                     <div className="flex items-center gap-2 mt-1">
                         <button
                             type="button"
                             onClick={handlePrevMonth}
                             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                            title="পূর্ববর্তী মাস"
+                            title="Previous Month"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </button>
@@ -305,31 +299,31 @@ export const StudentRoutinePage: React.FC = () => {
                             type="button"
                             onClick={handleNextMonth}
                             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                            title="পরবর্তী মাস"
+                            title="Next Month"
                         >
                             <ChevronRight className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
 
-                {/* Right: 'আজ' (Today) Pill Button */}
+                {/* Right: 'Today' Pill Button */}
                 <div className="flex items-center gap-2 self-start sm:self-auto">
                     <button
                         type="button"
                         onClick={handleJumpToToday}
                         className="px-5 py-2 rounded-full bg-emerald-50 hover:bg-emerald-100 text-[#0B4B34] font-black text-xs transition-all shadow-2xs border border-emerald-200/80 cursor-pointer active:scale-95"
                     >
-                        আজ
+                        Today
                     </button>
                 </div>
             </div>
 
-            {/* Course Filter Tabs (For students enrolled in multiple courses) */}
+            {/* Course Filter Tabs */}
             {enrolledCourses.length > 0 && (
                 <div className="bg-white rounded-2xl p-3 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-2 text-xs font-extrabold text-slate-700 shrink-0">
                         <BookOpen className="w-4 h-4 text-[#0B4B34]" />
-                        <span>কোর্স ফিল্টার:</span>
+                        <span>Course Filter:</span>
                     </div>
 
                     <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-1">
@@ -342,7 +336,7 @@ export const StudentRoutinePage: React.FC = () => {
                                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                         >
-                            আমার সকল কোর্স (All)
+                            All My Courses
                         </button>
 
                         {enrolledCourses.map((c) => (
@@ -375,7 +369,7 @@ export const StudentRoutinePage: React.FC = () => {
                             : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
                     }`}
                 >
-                    সকল সূচী
+                    All Schedules
                 </button>
                 <button
                     type="button"
@@ -387,7 +381,7 @@ export const StudentRoutinePage: React.FC = () => {
                     }`}
                 >
                     <Radio className="w-3.5 h-3.5" />
-                    <span>লাইভ ক্লাস</span>
+                    <span>Live Classes</span>
                 </button>
                 <button
                     type="button"
@@ -399,7 +393,7 @@ export const StudentRoutinePage: React.FC = () => {
                     }`}
                 >
                     <Clock className="w-3.5 h-3.5" />
-                    <span>লাইভ এক্সাম</span>
+                    <span>Live Exams</span>
                 </button>
                 <button
                     type="button"
@@ -411,7 +405,7 @@ export const StudentRoutinePage: React.FC = () => {
                     }`}
                 >
                     <Video className="w-3.5 h-3.5" />
-                    <span>ক্লাস আপলোড</span>
+                    <span>Class Uploads</span>
                 </button>
                 <button
                     type="button"
@@ -423,7 +417,7 @@ export const StudentRoutinePage: React.FC = () => {
                     }`}
                 >
                     <FileText className="w-3.5 h-3.5" />
-                    <span>স্টাডি ম্যাটেরিয়াল</span>
+                    <span>Study Materials</span>
                 </button>
                 <button
                     type="button"
@@ -435,7 +429,7 @@ export const StudentRoutinePage: React.FC = () => {
                     }`}
                 >
                     <Package className="w-3.5 h-3.5" />
-                    <span>বই / পার্সেল ডেলিভারি</span>
+                    <span>Book / Parcel Delivery</span>
                 </button>
             </div>
 
@@ -463,10 +457,10 @@ export const StudentRoutinePage: React.FC = () => {
                                 <span className={`text-[11px] font-bold ${
                                     isSelected ? 'text-emerald-100' : 'text-slate-400'
                                 }`}>
-                                    {day.isToday ? 'আজ' : day.dayNameBn}
+                                    {day.isToday ? 'Today' : day.dayName}
                                 </span>
                                 <span className="text-base font-black tracking-tight mt-0.5">
-                                    {day.dayNumberBn}
+                                    {day.dayNumber}
                                 </span>
 
                                 {/* Event indicator dot below */}
@@ -496,7 +490,7 @@ export const StudentRoutinePage: React.FC = () => {
             {loading ? (
                 <div className="bg-white rounded-3xl p-16 border border-slate-200/80 text-center shadow-xs">
                     <Loader2 className="w-8 h-8 animate-spin text-[#0B4B34] mx-auto mb-3" />
-                    <p className="text-xs text-slate-500">রুটিন তথ্য লোড করা হচ্ছে...</p>
+                    <p className="text-xs text-slate-500">Loading routine schedule...</p>
                 </div>
             ) : selectedDateEvents.length === 0 ? (
                 <div className="bg-white rounded-3xl p-12 sm:p-16 border border-slate-200/80 shadow-xs text-center space-y-3">
@@ -504,23 +498,23 @@ export const StudentRoutinePage: React.FC = () => {
                         <CalendarIcon className="w-7 h-7" />
                     </div>
                     <h4 className="text-base font-bold text-slate-800">
-                        এই দিনে কোনো নির্ধারিত সূচী নেই
+                        No scheduled events on this day
                     </h4>
                     <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        আজকের দিনে নির্ধারিত কোনো ক্লাস, পরীক্ষা বা ডেলিভারি নেই। পূর্বের ক্লাসের নোট ও প্র্যাকটিস পরীক্ষাগুলো রিভিশন দিয়ে প্রস্তুতি সম্পন্ন রাখুন।
+                        There are no classes, exams, or deliveries scheduled for this day. Review previous class notes or practice exams to stay ahead.
                     </p>
                     <div className="pt-2 flex items-center justify-center gap-3">
                         <Link
                             to="/student/exams"
                             className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-[#0B4B34] font-bold text-xs rounded-xl transition-colors"
                         >
-                            প্র্যাকটিস এক্সাম দিন
+                            Take Practice Exam
                         </Link>
                         <Link
                             to="/student/my-courses"
                             className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
                         >
-                            কোর্স কনটেন্ট দেখুন
+                            Browse Course Content
                         </Link>
                     </div>
                 </div>
@@ -569,31 +563,31 @@ export const StudentRoutinePage: React.FC = () => {
                                         {isLiveClass && (
                                             <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1">
                                                 <Radio className="w-3 h-3 text-rose-500 animate-pulse" />
-                                                <span>লাইভ ক্লাস</span>
+                                                <span>Live Class</span>
                                             </span>
                                         )}
                                         {isLiveExam && (
                                             <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
                                                 <Clock className="w-3 h-3 text-amber-600" />
-                                                <span>লাইভ এক্সাম</span>
+                                                <span>Live Exam</span>
                                             </span>
                                         )}
                                         {isClassUpload && (
                                             <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 flex items-center gap-1">
                                                 <Video className="w-3 h-3 text-sky-600" />
-                                                <span>ক্লাস আপলোড</span>
+                                                <span>Class Upload</span>
                                             </span>
                                         )}
                                         {isMaterial && (
                                             <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200 flex items-center gap-1">
                                                 <FileText className="w-3 h-3 text-teal-600" />
-                                                <span>স্টাডি ম্যাটেরিয়াল</span>
+                                                <span>Study Material</span>
                                             </span>
                                         )}
                                         {isBookParcel && (
                                             <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-200 flex items-center gap-1">
                                                 <Package className="w-3 h-3 text-orange-600" />
-                                                <span>বই / পার্সেল</span>
+                                                <span>Book / Parcel</span>
                                             </span>
                                         )}
 
@@ -601,7 +595,7 @@ export const StudentRoutinePage: React.FC = () => {
                                         {evt.is_live && (
                                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white flex items-center gap-1 animate-pulse shadow-xs">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                                                <span>লাইভ চলছে</span>
+                                                <span>Live Now</span>
                                             </span>
                                         )}
 
@@ -609,13 +603,13 @@ export const StudentRoutinePage: React.FC = () => {
                                         {isBookParcel && evt.status === 'shipped' && (
                                             <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 flex items-center gap-1">
                                                 <Truck className="w-3 h-3" />
-                                                <span>কুরিয়ারে পাঠানো হয়েছে</span>
+                                                <span>Shipped via Courier</span>
                                             </span>
                                         )}
                                         {isBookParcel && evt.status === 'delivered' && (
                                             <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1">
                                                 <CheckCircle2 className="w-3 h-3" />
-                                                <span>ডেলিভারি সম্পন্ন</span>
+                                                <span>Delivered</span>
                                             </span>
                                         )}
                                     </div>
@@ -636,10 +630,10 @@ export const StudentRoutinePage: React.FC = () => {
                                     {isBookParcel && evt.meta?.courier_name && (
                                         <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-orange-800 font-semibold bg-orange-50/80 p-2 rounded-xl border border-orange-200/60">
                                             <Truck className="w-4 h-4 text-orange-600 shrink-0" />
-                                            <span>কুরিয়ার: {evt.meta.courier_name}</span>
+                                            <span>Courier: {evt.meta.courier_name}</span>
                                             {evt.meta.tracking_code && (
                                                 <span className="bg-white px-2 py-0.5 rounded-md border border-orange-200 text-orange-950 font-mono text-[11px]">
-                                                    ট্র্যাকিং কোড: {evt.meta.tracking_code}
+                                                    Tracking Code: {evt.meta.tracking_code}
                                                 </span>
                                             )}
                                         </div>
@@ -654,12 +648,12 @@ export const StudentRoutinePage: React.FC = () => {
                                         )}
                                         {isLiveExam && evt.duration_minutes && (
                                             <span className="text-slate-400">
-                                                • সময়: {toBengaliNumber(evt.duration_minutes)} মিনিট
+                                                • Duration: {formatRoutineNumber(evt.duration_minutes)} mins
                                             </span>
                                         )}
                                         {isLiveExam && evt.total_marks && (
                                             <span className="text-slate-400">
-                                                • পূর্ণমান: {toBengaliNumber(evt.total_marks)}
+                                                • Total Marks: {formatRoutineNumber(evt.total_marks)}
                                             </span>
                                         )}
                                     </div>
@@ -674,7 +668,7 @@ export const StudentRoutinePage: React.FC = () => {
                                         >
                                             <PlayCircle className="w-3.5 h-3.5" />
                                             <span>
-                                                {isLiveExam ? 'পরীক্ষায় অংশ নিন' : 'ক্লাসে যুক্ত হন'}
+                                                {isLiveExam ? 'Take Exam' : 'Join Class'}
                                             </span>
                                         </Link>
                                     ) : isClassUpload ? (
@@ -683,7 +677,7 @@ export const StudentRoutinePage: React.FC = () => {
                                             className="px-4 py-2 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs flex items-center gap-1.5 border border-sky-200 transition-colors"
                                         >
                                             <PlayCircle className="w-3.5 h-3.5 text-sky-600" />
-                                            <span>{evt.action_text || 'ক্লাস দেখুন'}</span>
+                                            <span>{evt.action_text || 'Watch Class'}</span>
                                         </a>
                                     ) : isMaterial ? (
                                         <a
@@ -691,7 +685,7 @@ export const StudentRoutinePage: React.FC = () => {
                                             className="px-4 py-2 rounded-full bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs flex items-center gap-1.5 border border-teal-200 transition-colors"
                                         >
                                             <FileText className="w-3.5 h-3.5 text-teal-600" />
-                                            <span>{evt.action_text || 'নোট ডাউনলোড'}</span>
+                                            <span>{evt.action_text || 'Download Notes'}</span>
                                         </a>
                                     ) : isBookParcel ? (
                                         evt.action_url && evt.action_url !== '#' ? (
@@ -702,16 +696,16 @@ export const StudentRoutinePage: React.FC = () => {
                                                 className="px-4 py-2 rounded-full bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold text-xs flex items-center gap-1.5 border border-orange-200 transition-colors"
                                             >
                                                 <ExternalLink className="w-3.5 h-3.5 text-orange-600" />
-                                                <span>{evt.action_text || 'পার্সেল ট্র্যাক'}</span>
+                                                <span>{evt.action_text || 'Track Parcel'}</span>
                                             </a>
                                         ) : (
                                             <button
                                                 type="button"
-                                                onClick={() => alert(`📦 পার্সেল তথ্য:\nকোর্স: ${evt.course_title}\nবিবরণ: ${evt.title}\nকুরিয়ার: ${evt.meta?.courier_name || 'শীঘ্রই পাঠানো হবে'}\nট্র্যাকিং নম্বর: ${evt.meta?.tracking_code || 'প্রক্রিয়াধীন'}`)}
+                                                onClick={() => alert(`📦 Parcel Information:\nCourse: ${evt.course_title}\nDetails: ${evt.title}\nCourier: ${evt.meta?.courier_name || 'Will be shipped soon'}\nTracking Number: ${evt.meta?.tracking_code || 'Processing'}`)}
                                                 className="px-4 py-2 rounded-full bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold text-xs flex items-center gap-1.5 border border-orange-200 cursor-pointer transition-colors"
                                             >
                                                 <Package className="w-3.5 h-3.5 text-orange-600" />
-                                                <span>{evt.action_text || 'পার্সেল বিবরণ'}</span>
+                                                <span>{evt.action_text || 'Parcel Details'}</span>
                                             </button>
                                         )
                                     ) : evt.is_completed ? (
@@ -719,7 +713,7 @@ export const StudentRoutinePage: React.FC = () => {
                                             to={evt.action_url}
                                             className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
                                         >
-                                            {isLiveExam ? 'ফলাফল দেখুন' : 'রেকর্ড দেখুন'}
+                                            {isLiveExam ? 'View Results' : 'View Recording'}
                                         </Link>
                                     ) : (
                                         <button
@@ -732,7 +726,7 @@ export const StudentRoutinePage: React.FC = () => {
                                             }`}
                                         >
                                             <Bell className={`w-3.5 h-3.5 ${isReminderSet ? 'fill-current text-[#0B4B34]' : 'text-slate-400'}`} />
-                                            <span>{isReminderSet ? 'রিমাইন্ডার সেট' : 'রিমাইন্ডার'}</span>
+                                            <span>{isReminderSet ? 'Reminder Set' : 'Set Reminder'}</span>
                                         </button>
                                     )}
                                 </div>

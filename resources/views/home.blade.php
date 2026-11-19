@@ -57,9 +57,9 @@
                     <div class="mt-5 flex items-center justify-between">
                         <div>
                             @if ($course->price > 0)
-                                <span class="text-lg font-bold text-indigo-600">৳{{ number_format($course->sale_price ?? $course->price, 0) }}</span>
+                                <span class="text-lg font-bold text-indigo-600">Tk {{ number_format($course->sale_price ?? $course->price, 0) }}</span>
                                 @if ($course->sale_price && $course->sale_price < $course->price)
-                                    <span class="ml-2 text-sm text-slate-400 line-through">৳{{ number_format($course->price, 0) }}</span>
+                                    <span class="ml-2 text-sm text-slate-400 line-through">Tk {{ number_format($course->price, 0) }}</span>
                                 @endif
                             @else
                                 <span class="text-lg font-bold text-indigo-600">Free</span>

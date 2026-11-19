@@ -94,16 +94,16 @@ class AdminUserController extends Controller
                 'custom_role_id' => $customRoleId,
             ]);
             $roleObj = \App\Models\Role::find($customRoleId);
-            $roleTitle = $roleObj ? $roleObj->name : 'কাস্টম রোল';
+            $roleTitle = $roleObj ? $roleObj->name : 'Custom Role';
             AuditLog::log('user_role_changed', 'User', $user->id, ['role' => $oldRole], ['role' => 'custom', 'custom_role_id' => $customRoleId]);
             return response()->json([
-                'message' => "ইউজারের রোল সফলভাবে '{$roleTitle}' এ পরিবর্তন করা হয়েছে।",
+                'message' => "User role updated to '{$roleTitle}' successfully.",
                 'user' => $user->fresh(['teacherProfile', 'customRole']),
             ]);
         }
 
         if ($oldRole === $newRole && ! $customRoleId) {
-            return response()->json(['message' => 'রোল অপরিবর্তিত রয়েছে।']);
+            return response()->json(['message' => 'Role remains unchanged.']);
         }
 
         // Prevent demoting the last active admin
@@ -115,7 +115,7 @@ class AdminUserController extends Controller
 
             if ($activeAdminCount === 0) {
                 return response()->json([
-                    'message' => 'সিস্টেমে অন্তত একজন সক্রিয় অ্যাডমিন থাকা আবশ্যক। এই অ্যাডমিনকে ডিমোট করা যাবে না।',
+                    'message' => 'At least one active admin is required. This admin cannot be demoted.',
                 ], 422);
             }
         }
@@ -132,7 +132,7 @@ class AdminUserController extends Controller
         AuditLog::log('user_role_changed', 'User', $user->id, ['role' => $oldRole], ['role' => $newRole]);
 
         return response()->json([
-            'message' => "ইউজারের রোল সফলভাবে {$newRole} এ পরিবর্তন করা হয়েছে।",
+            'message' => "User role updated to {$newRole} successfully.",
             'user' => $user->fresh(['teacherProfile', 'customRole']),
         ]);
     }
@@ -150,7 +150,7 @@ class AdminUserController extends Controller
 
             if ($otherActiveAdmins === 0) {
                 return response()->json([
-                    'message' => 'একমাত্র সক্রিয় অ্যাডমিন অ্যাকাউন্টটি নিষ্ক্রিয় করা যাবে না।',
+                    'message' => 'The only active admin account cannot be deactivated.',
                 ], 422);
             }
         }
@@ -161,7 +161,7 @@ class AdminUserController extends Controller
         AuditLog::log('user_status_changed', 'User', $user->id, ['status' => $oldStatus], ['status' => $newStatus]);
 
         return response()->json([
-            'message' => 'ইউজার স্ট্যাটাস পরিবর্তন করা হয়েছে।',
+            'message' => 'User status updated successfully.',
             'user' => $user->fresh(),
         ]);
     }
@@ -182,26 +182,26 @@ class AdminUserController extends Controller
             'custom_role_id' => ['nullable'],
             'status' => ['nullable', 'in:active,inactive'],
         ], [
-            'name.required' => 'ব্যবহারকারীর পুরো নাম আবশ্যক।',
-            'phone.required' => 'মোবাইল নম্বর আবশ্যক।',
-            'email.required' => 'ইমেইল এড্রেস আবশ্যক।',
-            'email.unique' => 'এই ইমেইলটি ইতিমধ্যে ব্যবহৃত হয়েছে।',
-            'password.required' => 'পাসওয়ার্ড প্রদান করুন।',
-            'password.min' => 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।',
-            'role.required' => 'ব্যবহারকারীর রোল নির্বাচন করুন।',
+            'name.required' => 'Full name is required.',
+            'phone.required' => 'Phone number is required.',
+            'email.required' => 'Email address is required.',
+            'email.unique' => 'This email is already in use.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 6 characters.',
+            'role.required' => 'User role is required.',
         ]);
 
         if (! $normalizedPhone || ! User::isValidPhoneNumber($normalizedPhone)) {
             return response()->json([
-                'message' => 'অনুগ্রহ করে সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন।',
-                'errors' => ['phone' => ['সঠিক বাংলাদেশি মোবাইল নম্বর প্রদান করুন।']],
+                'message' => 'Please provide a valid 11-digit Bangladeshi mobile number.',
+                'errors' => ['phone' => ['Please provide a valid Bangladeshi mobile number.']],
             ], 422);
         }
 
         if (User::where('phone', $normalizedPhone)->exists()) {
             return response()->json([
-                'message' => 'এই মোবাইল নম্বরটি দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট রয়েছে।',
-                'errors' => ['phone' => ['এই মোবাইল নম্বরটি ইতিমধ্যে ব্যবহৃত হয়েছে।']],
+                'message' => 'An account already exists with this mobile number.',
+                'errors' => ['phone' => ['This mobile number is already in use.']],
             ], 422);
         }
 
@@ -219,8 +219,8 @@ class AdminUserController extends Controller
             TeacherProfile::updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'designation' => $request->input('designation') ?: 'শিক্ষক (Instructor)',
-                    'institution' => $request->input('institution') ?: 'মনোলগ এডু ফ্যাকাল্টি',
+                    'designation' => $request->input('designation') ?: 'Instructor',
+                    'institution' => $request->input('institution') ?: 'NovoNex Faculty',
                     'photo_url' => $request->input('photo_url'),
                     'bio' => $request->input('bio'),
                     'is_featured' => true,
@@ -236,7 +236,7 @@ class AdminUserController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'নতুন ব্যবহারকারী সফলভাবে তৈরি করা হয়েছে।',
+            'message' => 'New user created successfully.',
             'user' => $user->load(['teacherProfile'])->loadCount(['enrollments', 'instructedCourses']),
         ], 201);
     }
@@ -249,7 +249,7 @@ class AdminUserController extends Controller
         // Prevent deleting self
         if ($request->user() && $request->user()->id === $user->id) {
             return response()->json([
-                'message' => 'আপনি নিজের অ্যাডমিন অ্যাকাউন্ট নিজে ডিলিট করতে পারবেন না।',
+                'message' => 'You cannot delete your own admin account.',
             ], 422);
         }
 
@@ -262,7 +262,7 @@ class AdminUserController extends Controller
 
             if ($otherActiveAdmins === 0) {
                 return response()->json([
-                    'message' => 'সিস্টেমে অন্তত একজন সক্রিয় অ্যাডমিন থাকা আবশ্যক। এই অ্যাডমিন অ্যাকাউন্ট ডিলিট করা যাবে না।',
+                    'message' => 'At least one active admin is required. This admin account cannot be deleted.',
                 ], 422);
             }
         }
@@ -291,7 +291,7 @@ class AdminUserController extends Controller
         ], null);
 
         return response()->json([
-            'message' => 'ব্যবহারকারী অ্যাকাউন্ট সফলভাবে ডিলিট করা হয়েছে।',
+            'message' => 'User account deleted successfully.',
         ]);
     }
 
@@ -301,7 +301,7 @@ class AdminUserController extends Controller
     public function updateTeacherProfile(Request $request, User $user): JsonResponse
     {
         if ($user->role !== User::ROLE_TEACHER) {
-            return response()->json(['message' => 'এই ব্যবহারকারী একজন শিক্ষক নন।'], 422);
+            return response()->json(['message' => 'This user is not an instructor.'], 422);
         }
 
         $validated = $request->validate([
@@ -319,7 +319,7 @@ class AdminUserController extends Controller
         );
 
         return response()->json([
-            'message' => 'শিক্ষকের প্রোফাইল তথ্য সফলভাবে সংরক্ষিত হয়েছে।',
+            'message' => 'Instructor profile saved successfully.',
             'profile' => $profile,
             'user' => $user->load('teacherProfile'),
         ]);

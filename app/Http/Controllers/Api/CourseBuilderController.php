@@ -18,7 +18,7 @@ class CourseBuilderController extends Controller
     {
         $user = auth()->user();
         if (! $user->isAdmin() && ! $course->isAssignedTeacher($user->id)) {
-            abort(403, 'এই কোর্সের কারিকুলাম পরিচালনার অনুমতি আপনার নেই।');
+            abort(403, 'You do not have permission to manage this course curriculum.');
         }
     }
 
@@ -62,7 +62,7 @@ class CourseBuilderController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'নতুন সেকশন যুক্ত করা হয়েছে।',
+            'message' => 'New section added successfully.',
             'section' => $section->load('lessons'),
         ], 201);
     }
@@ -79,7 +79,7 @@ class CourseBuilderController extends Controller
         $section->update($validated);
 
         return response()->json([
-            'message' => 'সেকশন আপডেট করা হয়েছে।',
+            'message' => 'Section updated successfully.',
             'section' => $section,
         ]);
     }
@@ -91,7 +91,7 @@ class CourseBuilderController extends Controller
         $section->delete();
 
         return response()->json([
-            'message' => 'সেকশন এবং এর ভেতরের সকল লেসন মুছে ফেলা হয়েছে।',
+            'message' => 'Section and all its lessons have been deleted.',
         ]);
     }
 
@@ -110,7 +110,7 @@ class CourseBuilderController extends Controller
                 ->update(['sort_order' => $index + 1]);
         }
 
-        return response()->json(['message' => 'সেকশনের ক্রম আপডেট করা হয়েছে।']);
+        return response()->json(['message' => 'Section order updated successfully.']);
     }
 
     public function storeLesson(Request $request, CourseSection $section): JsonResponse
@@ -142,7 +142,7 @@ class CourseBuilderController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'নতুন লেসন যুক্ত হয়েছে।',
+            'message' => 'New lesson added successfully.',
             'lesson' => $lesson->load('attachments'),
         ], 201);
     }
@@ -172,7 +172,7 @@ class CourseBuilderController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'লেসন সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'Lesson updated successfully.',
             'lesson' => $lesson->fresh('attachments'),
         ]);
     }
@@ -184,7 +184,7 @@ class CourseBuilderController extends Controller
         $lesson->delete();
 
         return response()->json([
-            'message' => 'লেসন মুছে ফেলা হয়েছে।',
+            'message' => 'Lesson deleted successfully.',
         ]);
     }
 
@@ -203,7 +203,7 @@ class CourseBuilderController extends Controller
                 ->update(['sort_order' => $index + 1]);
         }
 
-        return response()->json(['message' => 'লেসনের ক্রম পরিবর্তন সফল হয়েছে।']);
+        return response()->json(['message' => 'Lesson order updated successfully.']);
     }
 
     public function duplicateLesson(Lesson $lesson): JsonResponse
@@ -211,7 +211,7 @@ class CourseBuilderController extends Controller
         $this->authorizeCourseAccess($lesson->course);
 
         $clone = $lesson->replicate();
-        $clone->title = $lesson->title . ' (কপি)';
+        $clone->title = $lesson->title . ' (Copy)';
         $clone->slug = Str::slug($clone->title) . '-' . Str::random(4);
         $clone->sort_order = $lesson->sort_order + 1;
         $clone->save();
@@ -223,7 +223,7 @@ class CourseBuilderController extends Controller
         }
 
         return response()->json([
-            'message' => 'লেসন ক্লোন করা হয়েছে।',
+            'message' => 'Lesson cloned successfully.',
             'lesson' => $clone->load('attachments'),
         ]);
     }
@@ -311,10 +311,10 @@ class CourseBuilderController extends Controller
 
         if ($validated['exam_type'] === Exam::TYPE_LIVE) {
             if (empty($validated['start_time']) || empty($validated['end_time'])) {
-                return response()->json(['message' => 'লাইভ পরীক্ষার জন্য শুরুর সময় ও শেষের সময় দেওয়া আবশ্যক।'], 422);
+                return response()->json(['message' => 'Start time and end time are required for live exams.'], 422);
             }
             if (strtotime($validated['end_time']) < strtotime($validated['start_time'])) {
-                return response()->json(['message' => 'শেষের সময় অবশ্যই শুরুর সময়ের পরবর্তী হতে হবে।'], 422);
+                return response()->json(['message' => 'End time must be after start time.'], 422);
             }
         }
 
@@ -335,8 +335,8 @@ class CourseBuilderController extends Controller
 
         return response()->json([
             'message' => $exam->exam_type === Exam::TYPE_LIVE 
-                ? 'লাইভ পরীক্ষা সফলভাবে তৈরি করা হয়েছে।' 
-                : 'প্র্যাকটিস পরীক্ষা সফলভাবে তৈরি করা হয়েছে।',
+                ? 'Live exam created successfully.' 
+                : 'Practice exam created successfully.',
             'exam' => $exam->load(['creator:id,name,email'])->loadCount(['questions', 'submissions']),
         ], 201);
     }
@@ -362,10 +362,10 @@ class CourseBuilderController extends Controller
 
         if ($validated['exam_type'] === Exam::TYPE_LIVE) {
             if (empty($validated['start_time']) || empty($validated['end_time'])) {
-                return response()->json(['message' => 'লাইভ পরীক্ষার জন্য শুরুর সময় ও শেষের সময় দেওয়া আবশ্যক।'], 422);
+                return response()->json(['message' => 'Start time and end time are required for live exams.'], 422);
             }
             if (strtotime($validated['end_time']) < strtotime($validated['start_time'])) {
-                return response()->json(['message' => 'শেষের সময় অবশ্যই শুরুর সময়ের পরবর্তী হতে হবে।'], 422);
+                return response()->json(['message' => 'End time must be after start time.'], 422);
             }
         }
 
@@ -375,7 +375,7 @@ class CourseBuilderController extends Controller
         $exam->update($validated);
 
         return response()->json([
-            'message' => 'পরীক্ষা সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'Exam updated successfully.',
             'exam' => $exam->load(['creator:id,name,email'])->loadCount(['questions', 'submissions']),
         ]);
     }
@@ -413,7 +413,7 @@ class CourseBuilderController extends Controller
             }
 
             if (!$hasAccess) {
-                return response()->json(['message' => 'এই পরীক্ষাটি যুক্ত করার অনুমতি আপনার নেই।'], 403);
+                return response()->json(['message' => 'You do not have permission to add this exam.'], 403);
             }
         }
 
@@ -432,7 +432,7 @@ class CourseBuilderController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'কোর্সে পরীক্ষাটি সফলভাবে যুক্ত করা হয়েছে।',
+            'message' => 'Exam added to course successfully.',
             'attached_exams' => $course->exams()
                 ->with(['creator:id,name,email'])
                 ->withCount(['questions', 'submissions'])
@@ -447,7 +447,7 @@ class CourseBuilderController extends Controller
         $course->exams()->detach($exam->id);
 
         return response()->json([
-            'message' => 'কোর্স থেকে পরীক্ষাটি অপসারণ করা হয়েছে।',
+            'message' => 'Exam removed from course successfully.',
         ]);
     }
 }

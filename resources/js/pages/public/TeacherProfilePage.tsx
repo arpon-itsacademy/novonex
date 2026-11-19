@@ -56,11 +56,11 @@ export const TeacherProfilePage: React.FC = () => {
                 setTeacher(res.data.teacher);
                 setCourses(res.data.courses || []);
             } else {
-                setError('ইন্সট্রাক্টর প্রোফাইল খুঁজে পাওয়া যায়নি।');
+                setError('Instructor profile not found.');
             }
         } catch (err: any) {
             console.error('Failed to load teacher profile', err);
-            setError('ইন্সট্রাক্টর প্রোফাইল লোড করতে সমস্যা হয়েছে বা খুঁজে পাওয়া যায়নি।');
+            setError('Failed to load instructor profile or instructor not found.');
         } finally {
             setLoading(false);
         }
@@ -70,7 +70,7 @@ export const TeacherProfilePage: React.FC = () => {
         return (
             <div className="min-h-[60vh] flex flex-col items-center justify-center text-slate-400">
                 <Loader2 className="w-10 h-10 animate-spin text-sky-500 mb-3" />
-                <p className="text-sm font-semibold">শিক্ষকের প্রোফাইল লোড হচ্ছে...</p>
+                <p className="text-sm font-semibold">Loading instructor profile...</p>
             </div>
         );
     }
@@ -82,14 +82,14 @@ export const TeacherProfilePage: React.FC = () => {
                     <GraduationCap className="w-8 h-8" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">
-                    {error || 'শিক্ষকের প্রোফাইল পাওয়া যায়নি'}
+                    {error || 'Instructor profile not found'}
                 </h2>
-                <p className="text-sm text-slate-500">অনুগ্রহ করে ইউআরএল চেক করুন অথবা হোমপেজে ফিরে যান।</p>
+                <p className="text-sm text-slate-500">Please check the URL or return to the homepage.</p>
                 <Link
                     to="/"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sky-500 text-white font-bold text-xs hover:bg-sky-600 transition-colors shadow-md"
                 >
-                    হোমপেজে ফিরে যান
+                    Back to Home
                 </Link>
             </div>
         );
@@ -101,11 +101,11 @@ export const TeacherProfilePage: React.FC = () => {
             <div className="border-b border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md sticky top-16 z-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                     <Link to="/" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
-                        হোম
+                        Home
                     </Link>
                     <ChevronRight className="w-3.5 h-3.5" />
                     <Link to="/" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
-                        ইন্সট্রাক্টরবৃন্দ
+                        Instructors
                     </Link>
                     <ChevronRight className="w-3.5 h-3.5" />
                     <span className="font-semibold text-slate-800 dark:text-slate-200">{teacher.name}</span>
@@ -156,14 +156,14 @@ export const TeacherProfilePage: React.FC = () => {
                                             <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-xs border border-white/20 flex items-center justify-center text-3xl font-black mb-1">
                                                 {(teacher.name || 'T').charAt(0).toUpperCase()}
                                             </div>
-                                            <span className="text-xs font-bold text-sky-200">শিক্ষক মেন্টর</span>
+                                            <span className="text-xs font-bold text-sky-200">Instructor & Mentor</span>
                                         </div>
                                     )}
                                 </div>
                             </div>
 
                             {/* Verified check badge at bottom right */}
-                            <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2 rounded-2xl shadow-lg border-2 border-white dark:border-slate-800 flex items-center gap-1" title="ভেরিফাইড শিক্ষক">
+                            <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2 rounded-2xl shadow-lg border-2 border-white dark:border-slate-800 flex items-center gap-1" title="Verified Instructor">
                                 <CheckCircle2 className="w-4 h-4" />
                             </div>
                         </div>
@@ -173,7 +173,7 @@ export const TeacherProfilePage: React.FC = () => {
                             <div>
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-xs font-bold border border-sky-200/80 dark:border-sky-800/80 mb-2.5">
                                     <Sparkles className="w-3.5 h-3.5 text-sky-500" />
-                                    <span>মনোলগ এডু ফ্যাকাল্টি মেম্বার</span>
+                                    <span>NovoNex Faculty Member</span>
                                 </div>
 
                                 <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -189,36 +189,36 @@ export const TeacherProfilePage: React.FC = () => {
                             {teacher.institution && (
                                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700">
                                     <GraduationCap className="w-4 h-4 text-sky-500 shrink-0" />
-                                    <span>শিক্ষা প্রতিষ্ঠান: <strong>{teacher.institution}</strong></span>
+                                    <span>Institution: <strong>{teacher.institution}</strong></span>
                                 </div>
                             )}
 
                             {/* Bio */}
                             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
-                                {teacher.bio || 'মনোলগ এডুর অভিজ্ঞ ও নিবেদিতপ্রাণ শিক্ষক। শিক্ষার্থীদের জন্য জটিল বিষয়গুলো সহজ ও সাবলীলভাবে উপস্থাপন করে কনসেপচুয়াল মাস্টারি তৈরি করাই তাঁর প্রধান লক্ষ্য।'}
+                                {teacher.bio || 'Experienced and dedicated instructor at NovoNex. Helping students master complex topics with clarity and confidence.'}
                             </p>
 
                             {/* Quick Stats Bar */}
                             <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-3 text-xs font-semibold">
                                 <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
                                     <BookOpen className="w-4 h-4 text-sky-500" />
-                                    <span>কোর্স: <strong className="text-slate-900 dark:text-slate-100 font-bold">{teacher.courses_count || courses.length} টি</strong></span>
+                                    <span>Courses: <strong className="text-slate-900 dark:text-slate-100 font-bold">{teacher.courses_count || courses.length}</strong></span>
                                 </div>
 
                                 <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
                                     <Users className="w-4 h-4 text-emerald-500" />
-                                    <span>মোট শিক্ষার্থী: <strong className="text-slate-900 dark:text-slate-100 font-bold">{teacher.total_students ? teacher.total_students.toLocaleString('en-US') : '১২,৫০০'}+ জন</strong></span>
+                                    <span>Total Students: <strong className="text-slate-900 dark:text-slate-100 font-bold">{teacher.total_students ? teacher.total_students.toLocaleString('en-US') : '12,500'}+</strong></span>
                                 </div>
 
                                 <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
                                     <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
-                                    <span>শিক্ষক রেটিং: <strong className="text-slate-900 dark:text-slate-100 font-bold">৫.০ (টপ রেটেড)</strong></span>
+                                    <span>Rating: <strong className="text-slate-900 dark:text-slate-100 font-bold">5.0 (Top Rated)</strong></span>
                                 </div>
 
                                 {teacher.experience && (
                                     <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
                                         <Award className="w-4 h-4 text-sky-500" />
-                                        <span>অভিজ্ঞতা: <strong className="text-slate-900 dark:text-slate-100 font-bold">{teacher.experience}</strong></span>
+                                        <span>Experience: <strong className="text-slate-900 dark:text-slate-100 font-bold">{teacher.experience}</strong></span>
                                     </div>
                                 )}
                             </div>
@@ -227,34 +227,34 @@ export const TeacherProfilePage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Courses Section ("শিক্ষকের পরিচালিত কোর্সসমূহ") */}
+            {/* Courses Section ("Courses by Instructor") */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200/80 dark:border-slate-800 pb-4">
                     <div>
                         <h2 className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white flex items-center gap-2.5">
                             <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-sky-500" />
-                            <span>শিক্ষকের পরিচালিত কোর্সসমূহ</span>
+                            <span>Courses by Instructor</span>
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            {teacher.name} স্যারের তত্ত্বাবধানে অনুষ্ঠিত সকল চলমান ও স্পেশাল কোর্স
+                            All ongoing and specialized courses guided by {teacher.name}
                         </p>
                     </div>
 
                     <span className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 self-start sm:self-auto border border-sky-200 dark:border-sky-800">
-                        {courses.length} টি সক্রিয় কোর্স
+                        {courses.length} Active Courses
                     </span>
                 </div>
 
                 {courses.length === 0 ? (
                     <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200/80 dark:border-slate-800 space-y-3">
                         <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto" />
-                        <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">বর্তমানে কোনো কোর্স পাওয়া যায়নি</h3>
-                        <p className="text-xs text-slate-400">এই শিক্ষকের নতুন ব্যাচ খুব শীঘ্রই শুরু হবে।</p>
+                        <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No courses currently available</h3>
+                        <p className="text-xs text-slate-400">New batches from this instructor will be announced soon.</p>
                         <Link
                             to="/courses"
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-600 hover:underline pt-2"
                         >
-                            <span>সকল কোর্স দেখুন</span>
+                            <span>View All Courses</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                     </div>
@@ -287,11 +287,11 @@ export const TeacherProfilePage: React.FC = () => {
                                         {/* Discount Badge */}
                                         {course.discount_percent && course.discount_percent > 0 ? (
                                             <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-rose-600 text-white rounded-xl shadow-md">
-                                                {course.discount_percent}% ছাড়
+                                                {course.discount_percent}% OFF
                                             </span>
                                         ) : course.price === 0 ? (
                                             <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-emerald-600 text-white rounded-xl shadow-md">
-                                                ফ্রি কোর্স
+                                                Free Course
                                             </span>
                                         ) : null}
                                     </Link>
@@ -301,12 +301,12 @@ export const TeacherProfilePage: React.FC = () => {
                                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                                             <span className="flex items-center gap-1">
                                                 <Video className="w-3.5 h-3.5 text-sky-500" />
-                                                <span>{course.lessons_count || 0} টি ক্লাস</span>
+                                                <span>{course.lessons_count || 0} Lessons</span>
                                             </span>
                                             <span>•</span>
                                             <span className="flex items-center gap-1">
                                                 <Users className="w-3.5 h-3.5 text-emerald-500" />
-                                                <span>{course.enrollments_count || 0} জন শিক্ষার্থী</span>
+                                                <span>{course.enrollments_count || 0} Students</span>
                                             </span>
                                         </div>
 
@@ -324,9 +324,9 @@ export const TeacherProfilePage: React.FC = () => {
                                             {((course.features && Array.isArray(course.features) && course.features.length > 0)
                                                 ? course.features.filter((f: any) => typeof f === 'string' && f.trim().length > 0)
                                                 : [
-                                                    'লাইভ ও ফুল HD রেকর্ডেড ক্লাস আর্কাইভ',
-                                                    'চ্যাপ্টারভিত্তিক লেকচার শিট ও প্রশ্নব্যাংক',
-                                                    'NexPilot AI ২৪/৭ ইনস্ট্যান্ট ডাউট সলভার',
+                                                    'Live & Full HD Recorded Class Archive',
+                                                    'Chapter-wise Lecture Sheets & Question Bank',
+                                                    'NexPilot AI 24/7 Instant Doubt Solver',
                                                 ]
                                             ).slice(0, 4).map((feat: string, fIdx: number) => (
                                                 <div key={fIdx} className="flex items-start gap-1.5">
@@ -341,10 +341,10 @@ export const TeacherProfilePage: React.FC = () => {
                                 {/* Footer & Action */}
                                 <div className="p-5 sm:p-6 pt-0 space-y-3">
                                     <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                        <span className="text-xs text-slate-500 font-medium">কোর্স ফি:</span>
+                                        <span className="text-xs text-slate-500 font-medium">Course Fee:</span>
                                         <div className="text-right">
                                             {course.price === 0 ? (
-                                                <span className="text-lg font-black text-emerald-600">ফ্রি</span>
+                                                <span className="text-lg font-black text-emerald-600">Free</span>
                                             ) : (
                                                 <div className="flex items-baseline gap-1.5">
                                                     <span className="text-xl font-black text-sky-600 dark:text-sky-400">
@@ -370,13 +370,13 @@ export const TeacherProfilePage: React.FC = () => {
                                             to={`/courses/${course.slug}`}
                                             className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer"
                                         >
-                                            বিস্তারিত দেখুন
+                                            View Details
                                         </Link>
                                         <Link
                                             to={`/checkout/${course.slug}`}
                                             className="py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 font-bold text-xs text-white text-center transition-all shadow-sm cursor-pointer"
                                         >
-                                            কোর্সটি কিনুন
+                                            Enroll Now
                                         </Link>
                                     </div>
                                 </div>

@@ -35,10 +35,10 @@ interface PreviewRow {
 }
 
 export const SAMPLE_CSV_CONTENT = `\uFEFFquestion_text,question_type,mark,negative_mark,option_a,option_b,option_c,option_d,option_e,correct_answer,explanation
-"বাংলাদেশের রাজধানী কোথায়?",single_choice,1,0.25,"ঢাকা","চট্টগ্রাম","খুলনা","রাজশাহী",,"A","বাংলাদেশের রাজধানী হলো ঢাকা।"
-"নিচের কোনগুলো মৌলিক সংখ্যা (Prime Number)?",multiple_choice,2,0.5,"2","3","4","6",,"A,B","২ এবং ৩ হলো মৌলিক সংখ্যা।"
-"আলোর প্রতিসরণ কাকে বলে? ব্যাখ্যা করো।",written_paper,5,0,,,,,,,"আলো এক স্বচ্ছ মাধ্যম থেকে অন্য স্বচ্ছ মাধ্যমে প্রবেশের সময় দিক পরিবর্তনকে আলোর প্রতিসরণ বলে।"
-"সূর্য একটি _____।",fill_in_the_blank,1,0,,,,,,নক্ষত্র,"সূর্য একটি উজ্জ্বল মাঝারি আকারের নক্ষত্র।"`;
+"What is the capital of Bangladesh?",single_choice,1,0.25,"Dhaka","Chittagong","Khulna","Rajshahi",,"A","Dhaka is the capital of Bangladesh."
+"Which of the following are prime numbers?",multiple_choice,2,0.5,"2","3","4","6",,"A,B","2 and 3 are prime numbers."
+"Define refraction of light and explain briefly.",written_paper,5,0,,,,,,,"Refraction is the bending of light as it passes from one transparent medium to another."
+"The Sun is a _____.",fill_in_the_blank,1,0,,,,,,Star,"The Sun is a medium-sized star."`;
 
 export const downloadExamCsvTemplate = () => {
     try {
@@ -140,18 +140,18 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
             return -1;
         };
 
-        const colText = findCol(['question_text', 'question', 'title', 'text', 'প্রশ্ন']);
-        const colType = findCol(['question_type', 'type', 'ধরণ']);
-        const colMark = findCol(['mark', 'marks', 'point', 'নম্বর']);
-        const colNegMark = findCol(['negative_mark', 'negative_marks', 'নেগেটিভ_মার্ক']);
-        const colAns = findCol(['correct_answer', 'correct', 'answer', 'সঠিক_উত্তর']);
-        const colExp = findCol(['explanation', 'solution', 'ব্যাখ্যা']);
+        const colText = findCol(['question_text', 'question', 'title', 'text']);
+        const colType = findCol(['question_type', 'type']);
+        const colMark = findCol(['mark', 'marks', 'point']);
+        const colNegMark = findCol(['negative_mark', 'negative_marks']);
+        const colAns = findCol(['correct_answer', 'correct', 'answer']);
+        const colExp = findCol(['explanation', 'solution']);
 
-        const colA = findCol(['option_a', 'opt_a', 'a', 'অপশন_ক']);
-        const colB = findCol(['option_b', 'opt_b', 'b', 'অপশন_খ']);
-        const colC = findCol(['option_c', 'opt_c', 'c', 'অপশন_গ']);
-        const colD = findCol(['option_d', 'opt_d', 'd', 'অপশন_ঘ']);
-        const colE = findCol(['option_e', 'opt_e', 'e', 'অপশন_ঙ']);
+        const colA = findCol(['option_a', 'opt_a', 'a']);
+        const colB = findCol(['option_b', 'opt_b', 'b']);
+        const colC = findCol(['option_c', 'opt_c', 'c']);
+        const colD = findCol(['option_d', 'opt_d', 'd']);
+        const colE = findCol(['option_e', 'opt_e', 'e']);
 
         const dataRows = rows.slice(1);
         setTotalParsedRows(dataRows.length);
@@ -178,7 +178,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
 
     const handleFileChange = (file: File) => {
         if (!file.name.toLowerCase().endsWith('.csv')) {
-            setError('অনুগ্রহ করে একটি .csv ফাইল নির্বাচন করুন।');
+            setError('Please select a valid .csv file.');
             return;
         }
 
@@ -217,7 +217,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
     const handleSubmitUpload = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedFile) {
-            setError('অনুগ্রহ করে একটি CSV ফাইল আপলোড করুন।');
+            setError('Please upload a CSV file.');
             return;
         }
 
@@ -232,7 +232,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
-            setSuccessMessage(res.data.message || 'প্রশ্ন সফলভাবে ইম্পোর্ট করা হয়েছে!');
+            setSuccessMessage(res.data.message || 'Questions imported successfully!');
             if (res.data.questions) {
                 onSuccess(res.data.questions, res.data.exam_total_marks);
             }
@@ -241,7 +241,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                 onClose();
             }, 1800);
         } catch (err: any) {
-            setError(err.response?.data?.message || 'CSV ফাইল আপলোড করতে সমস্যা হয়েছে। ফাইলের ফরম্যাট ঠিক আছে কিনা যাচাই করুন।');
+            setError(err.response?.data?.message || 'Failed to upload CSV file. Please verify file format.');
         } finally {
             setUploading(false);
         }
@@ -257,9 +257,9 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                             <FileSpreadsheet className="w-6 h-6 text-emerald-200" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold tracking-tight">CSV ফাইল থেকে প্রশ্ন ইম্পোর্ট করুন</h2>
+                            <h2 className="text-xl font-bold tracking-tight">Import Questions from CSV File</h2>
                             <p className="text-xs text-emerald-100 mt-0.5">
-                                একসাথে অসংখ্য প্রশ্ন CSV ফাইলের মাধ্যমে কয়েক সেকেন্ডে আপলোড করুন
+                                Upload bulk exam questions quickly via CSV file
                             </p>
                         </div>
                     </div>
@@ -279,11 +279,11 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                             <div className="flex items-center gap-2">
                                 <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">1</span>
                                 <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
-                                    নমুনা CSV টেমপ্লেট ডাউনলোড করুন
+                                    Download Sample CSV Template
                                 </h3>
                             </div>
                             <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 pl-8">
-                                এই টেমপ্লেট ফাইলে প্রশ্ন, অপশন, মার্ক ও নেগেটিভ মার্ক সাজিয়ে নিয়ে সহজেই আপলোড করতে পারবেন।
+                                Download this template file to easily organize questions, options, marks, and negative marks before uploading.
                             </p>
                         </div>
                         <button
@@ -292,7 +292,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all cursor-pointer shrink-0"
                         >
                             <Download className="w-4 h-4" />
-                            <span>টেমপ্লেট ডাউনলোড (.csv)</span>
+                            <span>Download Template (.csv)</span>
                         </button>
                     </div>
 
@@ -305,7 +305,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                         >
                             <span className="flex items-center gap-2">
                                 <HelpCircle className="w-4 h-4 text-sky-500" />
-                                <span>CSV ফাইলের কলামের বিবরণ ও নিয়মাবলী (দেখুন)</span>
+                                <span>CSV Column Specification & Guidelines (View)</span>
                             </span>
                             {showGuide ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </button>
@@ -313,22 +313,22 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                             <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 space-y-2">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                        <strong className="text-slate-900 dark:text-white font-mono">question_text:</strong> প্রশ্নের বিবরণ (আবশ্যক)
+                                        <strong className="text-slate-900 dark:text-white font-mono">question_text:</strong> Question statement (Required)
                                     </div>
                                     <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                                         <strong className="text-slate-900 dark:text-white font-mono">question_type:</strong> single_choice / multiple_choice / written_paper / fill_in_the_blank
                                     </div>
                                     <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                        <strong className="text-slate-900 dark:text-white font-mono">mark:</strong> প্রশ্নের পূর্ণমান (যেমন: 1, 2, 5)
+                                        <strong className="text-slate-900 dark:text-white font-mono">mark:</strong> Full marks for question (e.g. 1, 2, 5)
                                     </div>
                                     <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                        <strong className="text-slate-900 dark:text-white font-mono">negative_mark:</strong> ভুল উত্তরের জন্য কাটা মার্ক (যেমন: 0.25, 0.5 বা 0)
+                                        <strong className="text-slate-900 dark:text-white font-mono">negative_mark:</strong> Negative mark penalty for wrong answers (e.g. 0.25, 0.5 or 0)
                                     </div>
                                     <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                        <strong className="text-slate-900 dark:text-white font-mono">option_a ... option_e:</strong> MCQ অপশনগুলো
+                                        <strong className="text-slate-900 dark:text-white font-mono">option_a ... option_e:</strong> Multiple choice options
                                     </div>
                                     <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                        <strong className="text-slate-900 dark:text-white font-mono">correct_answer:</strong> সঠিক উত্তর (যেমন: A অথবা B অথবা A,B অথবা টেক্সট)
+                                        <strong className="text-slate-900 dark:text-white font-mono">correct_answer:</strong> Correct answer (e.g. A, B, A,B, or text)
                                     </div>
                                 </div>
                             </div>
@@ -340,7 +340,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                         <div className="flex items-center gap-2">
                             <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center">2</span>
                             <label className="text-sm font-bold text-slate-800 dark:text-slate-100">
-                                আপনার তৈরি করা CSV ফাইলটি আপলোড করুন
+                                Upload Your Prepared CSV File
                             </label>
                         </div>
 
@@ -377,15 +377,15 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                                             <span>{selectedFile.name}</span>
                                         </div>
                                         <p className="text-xs text-slate-500 mt-0.5">
-                                            {(selectedFile.size / 1024).toFixed(1)} KB • মোট প্রশ্ন পাওয়া গেছে: <strong>{totalParsedRows}</strong> টি
+                                            {(selectedFile.size / 1024).toFixed(1)} KB • Total Questions Detected: <strong>{totalParsedRows}</strong>
                                         </p>
                                     </div>
                                 ) : (
                                     <div>
                                         <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                            এখানে ক্লিক করে ফাইল সিলেক্ট করুন অথবা ড্র্যাগ করে ড্রপ করুন
+                                            Click to select a file or drag and drop here
                                         </p>
-                                        <p className="text-xs text-slate-400 mt-1">শুধুমাত্র .csv ফরম্যাট সমর্থিত</p>
+                                        <p className="text-xs text-slate-400 mt-1">Only .csv format supported</p>
                                     </div>
                                 )}
                             </div>
@@ -397,21 +397,21 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                                 <div className="flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
                                     <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-bold">
                                         <Eye className="w-3.5 h-3.5 text-sky-500" />
-                                        <span>প্রশ্নের প্রিভিউ (প্রথম {previewRows.length} টি প্রশ্ন)</span>
+                                        <span>Question Preview (First {previewRows.length} questions)</span>
                                     </span>
-                                    <span>মোট প্রশ্ন: {totalParsedRows} টি</span>
+                                    <span>Total Questions: {totalParsedRows}</span>
                                 </div>
                                 <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto max-h-48">
                                     <table className="w-full text-left text-xs border-collapse">
                                         <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 sticky top-0">
                                             <tr>
                                                 <th className="p-2">#</th>
-                                                <th className="p-2">প্রশ্ন</th>
-                                                <th className="p-2">টাইপ</th>
-                                                <th className="p-2">মার্ক</th>
-                                                <th className="p-2">নেগেটিভ</th>
-                                                <th className="p-2">অপশন সংখ্যা</th>
-                                                <th className="p-2">সঠিক উত্তর</th>
+                                                <th className="p-2">Question</th>
+                                                <th className="p-2">Type</th>
+                                                <th className="p-2">Marks</th>
+                                                <th className="p-2">Negative</th>
+                                                <th className="p-2">Options</th>
+                                                <th className="p-2">Correct Answer</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -426,7 +426,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                                                     </td>
                                                     <td className="p-2 font-mono font-bold text-emerald-600">{row.mark}</td>
                                                     <td className="p-2 font-mono text-rose-500">{row.negative_mark}</td>
-                                                    <td className="p-2">{row.options.length} টি</td>
+                                                    <td className="p-2">{row.options.length} options</td>
                                                     <td className="p-2 font-bold text-slate-800 dark:text-slate-200">{row.correct_answer}</td>
                                                 </tr>
                                             ))}
@@ -460,7 +460,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                                 disabled={uploading}
                                 className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold transition-colors cursor-pointer"
                             >
-                                বাতিল
+                                Cancel
                             </button>
                             <button
                                 type="submit"
@@ -470,12 +470,12 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                                 {uploading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>প্রশ্ন ইম্পোর্ট হচ্ছে...</span>
+                                        <span>Importing Questions...</span>
                                     </>
                                 ) : (
                                     <>
                                         <Upload className="w-4 h-4" />
-                                        <span>প্রশ্ন ইম্পোর্ট সম্পন্ন করুন ({totalParsedRows} টি)</span>
+                                        <span>Complete Import ({totalParsedRows} Questions)</span>
                                     </>
                                 )}
                             </button>

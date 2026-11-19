@@ -30,13 +30,13 @@ class NotificationController extends Controller
             $notification->markAsRead();
         }
 
-        return response()->json(['message' => 'নোটিফিকেশন পঠিত হিসেবে চিহ্নিত করা হয়েছে।']);
+        return response()->json(['message' => 'Notification marked as read.']);
     }
 
     public function markAllAsRead(Request $request): JsonResponse
     {
         $request->user()->unreadNotifications->markAsRead();
 
-        return response()->json(['message' => 'সকল নোটিফিকেশন পঠিত করা হয়েছে।']);
+        return response()->json(['message' => 'All notifications marked as read.']);
     }
 }

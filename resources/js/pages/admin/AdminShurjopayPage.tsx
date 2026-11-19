@@ -85,10 +85,10 @@ export const AdminShurjopayPage: React.FC = () => {
             if (data.settings) {
                 setSettings(prev => ({ ...prev, ...data.settings }));
             }
-            setSuccessMessage(isBn ? 'shurjoPay সেটিংস সফলভাবে সংরক্ষণ করা হয়েছে!' : 'shurjoPay settings saved successfully!');
+            setSuccessMessage('shurjoPay settings saved successfully!');
             setTimeout(() => setSuccessMessage(null), 5000);
         } catch (err: any) {
-            setErrorMessage(err.response?.data?.message || (isBn ? 'সেটিংস সংরক্ষণ ব্যর্থ হয়েছে।' : 'Failed to save settings.'));
+            setErrorMessage(err.response?.data?.message || 'Failed to save settings.');
         } finally {
             setSaving(false);
         }
@@ -128,7 +128,7 @@ export const AdminShurjopayPage: React.FC = () => {
                 <div className="flex flex-col items-center gap-3">
                     <RefreshCw className="w-8 h-8 text-sky-500 animate-spin" />
                     <p className="text-sm font-semibold text-slate-500">
-                        {isBn ? 'shurjoPay কনফিগারেশন লোড হচ্ছে...' : 'Loading shurjoPay configuration...'}
+                        Loading shurjoPay configuration...
                     </p>
                 </div>
             </div>
@@ -147,22 +147,20 @@ export const AdminShurjopayPage: React.FC = () => {
                         <div>
                             <div className="flex items-center gap-2">
                                 <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                                    {isBn ? 'shurjoPay গেটওয়ে ইন্টিগ্রেশন' : 'shurjoPay Gateway Integration'}
+                                    shurjoPay Gateway Integration
                                 </h1>
                                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${settings.enabled
                                     ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
                                     : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                                     }`}>
-                                    {settings.enabled ? (isBn ? 'সক্রিয়' : 'Active') : (isBn ? 'নিষ্ক্রিয়' : 'Disabled')}
+                                    {settings.enabled ? 'Active' : 'Disabled'}
                                 </span>
                                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300">
                                     Live Production
                                 </span>
                             </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                {isBn
-                                    ? 'বিকাশ, নগদ, রকেট, কার্ড এবং ইন্টারনেট ব্যাংকিংয়ের মাধ্যমে স্বয়ংক্রিয় পেমেন্ট ও এনরোলমেন্ট কনফিগার করুন।'
-                                    : 'Configure dynamic shurjoPay online checkout with automatic payment verification and course enrollment.'}
+                                Configure dynamic shurjoPay online checkout with automatic payment verification and course enrollment.
                             </p>
                         </div>
                     </div>
@@ -176,7 +174,7 @@ export const AdminShurjopayPage: React.FC = () => {
                         className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-xs disabled:opacity-60 cursor-pointer"
                     >
                         {testing ? <RefreshCw className="w-4 h-4 animate-spin text-sky-500" /> : <Activity className="w-4 h-4 text-emerald-500" />}
-                        <span>{testing ? (isBn ? 'পরীক্ষা করা হচ্ছে...' : 'Testing...') : (isBn ? 'কানেকশন টেস্ট করুন' : 'Test Connection')}</span>
+                        <span>{testing ? 'Testing...' : 'Test Connection'}</span>
                     </button>
                     <button
                         type="button"
@@ -185,7 +183,7 @@ export const AdminShurjopayPage: React.FC = () => {
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition shadow-sm shadow-sky-600/30 disabled:opacity-60 cursor-pointer"
                     >
                         {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                        <span>{saving ? (isBn ? 'সংরক্ষণ হচ্ছে...' : 'Saving...') : (isBn ? 'সেটিংস সংরক্ষণ করুন' : 'Save Changes')}</span>
+                        <span>{saving ? 'Saving...' : 'Save Changes'}</span>
                     </button>
                 </div>
             </div>
@@ -233,17 +231,17 @@ export const AdminShurjopayPage: React.FC = () => {
             <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
                 <div className="flex items-center gap-2.5 text-slate-900 dark:text-white font-bold text-base pb-3 border-b border-slate-100 dark:border-slate-800">
                     <Zap className="w-5 h-5 text-sky-500" />
-                    <span>{isBn ? 'গেটওয়ে স্ট্যাটাস ও তথ্য' : 'Gateway Status & Information'}</span>
+                    <span>Gateway Status & Information</span>
                 </div>
 
                 {/* Enable Toggle */}
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between">
                     <div>
                         <span className="block text-sm font-bold text-slate-800 dark:text-slate-100">
-                            {isBn ? 'shurjoPay অনলাইন পেমেন্ট চালু রাখুন' : 'Enable shurjoPay Checkout'}
+                            Enable shurjoPay Checkout
                         </span>
                         <span className="text-xs text-slate-500 dark:text-slate-400">
-                            {isBn ? 'সক্রিয় থাকলে চেকআউটে অনলাইন পেমেন্ট অপশনটি প্রদর্শিত হবে (বিকাশ, নগদ, রকেট, কার্ড ইত্যাদি)' : 'Allow students to pay dynamically via bKash, Nagad, Rocket, Cards at checkout'}
+                            Allow students to pay dynamically via bKash, Nagad, Rocket, Cards at checkout
                         </span>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -261,25 +259,25 @@ export const AdminShurjopayPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
                     <div>
                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                            {isBn ? 'চেকআউটে প্রদর্শন নাম (Display Name)' : 'Display Name on Checkout'}
+                            Display Name on Checkout
                         </label>
                         <input
                             type="text"
                             value={settings.display_name || ''}
                             onChange={(e) => setSettings({ ...settings, display_name: e.target.value })}
-                            placeholder="অনলাইন পেমেন্ট"
+                            placeholder="Online Payment"
                             className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                         />
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                            {isBn ? 'নির্দেশনা / সাবটাইটেল (Description)' : 'Customer Description'}
+                            Customer Description
                         </label>
                         <input
                             type="text"
                             value={settings.description || ''}
                             onChange={(e) => setSettings({ ...settings, description: e.target.value })}
-                            placeholder="bKash, Nagad, Rocket, Cards বা Net Banking দিয়ে সাথে সাথে পেমেন্ট করুন"
+                            placeholder="Pay instantly via bKash, Nagad, Rocket, Cards or Net Banking"
                             className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                         />
                     </div>
@@ -296,14 +294,14 @@ export const AdminShurjopayPage: React.FC = () => {
                         <div>
                             <div className="flex items-center gap-2">
                                 <span className="font-bold text-slate-900 dark:text-white text-base">
-                                    {isBn ? 'লাইভ ক্রিডেনশিয়ালস (Live Production API)' : 'Live Credentials (Production API)'}
+                                    Live Credentials (Production API)
                                 </span>
                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-sky-100 dark:bg-sky-900/50 text-sky-800 dark:text-sky-300 uppercase">
                                     Live Mode
                                 </span>
                             </div>
                             <span className="text-[11px] text-slate-500">
-                                {isBn ? 'প্রোডাকশন পেমেন্ট গ্রহণের জন্য আপনার একাউন্টের লাইভ তথ্য' : 'Real payments and settlements processed with these credentials'}
+                                Real payments and settlements processed with these credentials
                             </span>
                         </div>
                     </div>
@@ -387,7 +385,7 @@ export const AdminShurjopayPage: React.FC = () => {
             <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
                 <div className="flex items-center gap-2.5 text-slate-900 dark:text-white font-bold text-base pb-3 border-b border-slate-100 dark:border-slate-800">
                     <Info className="w-5 h-5 text-indigo-500" />
-                    <span>{isBn ? 'রিটার্ন / কলব্যাক ইউআরএল তথ্য' : 'System Return & Callback URLs'}</span>
+                    <span>System Return & Callback URLs</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -451,7 +449,7 @@ export const AdminShurjopayPage: React.FC = () => {
                     className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-xs disabled:opacity-60 cursor-pointer"
                 >
                     {testing ? <RefreshCw className="w-4 h-4 animate-spin text-sky-500" /> : <Activity className="w-4 h-4 text-emerald-500" />}
-                    <span>{testing ? (isBn ? 'পরীক্ষা করা হচ্ছে...' : 'Testing...') : (isBn ? 'কানেকশন টেস্ট করুন' : 'Test Connection')}</span>
+                    <span>{testing ? 'Testing...' : 'Test Connection'}</span>
                 </button>
                 <button
                     type="button"
@@ -460,7 +458,7 @@ export const AdminShurjopayPage: React.FC = () => {
                     className="inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold transition shadow-md shadow-sky-600/30 disabled:opacity-60 cursor-pointer"
                 >
                     {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span>{saving ? (isBn ? 'সংরক্ষণ হচ্ছে...' : 'Saving Changes...') : (isBn ? 'সেটিংস সংরক্ষণ করুন' : 'Save Changes')}</span>
+                    <span>{saving ? 'Saving Changes...' : 'Save Changes'}</span>
                 </button>
             </div>
         </div>

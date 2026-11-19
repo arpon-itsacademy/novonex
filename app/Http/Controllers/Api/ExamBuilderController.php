@@ -206,10 +206,10 @@ class ExamBuilderController extends Controller
 
         $csv = "\xEF\xBB\xBF"
             . "question_text,question_type,mark,negative_mark,option_a,option_b,option_c,option_d,option_e,correct_answer,explanation\n"
-            . "\"বাংলাদেশের রাজধানী কোথায়?\",single_choice,1,0.25,\"ঢাকা\",\"চট্টগ্রাম\",\"খুলনা\",\"রাজশাহী\",,\"A\",\"বাংলাদেশের রাজধানী ও প্রধান প্রশাসনিক কেন্দ্র হলো ঢাকা।\"\n"
-            . "\"নিচের কোনগুলো মৌলিক সংখ্যা (Prime Number)?\",multiple_choice,2,0.5,\"2\",\"3\",\"4\",\"6\",,\"A,B\",\"২ এবং ৩ হলো মৌলিক সংখ্যা।\"\n"
-            . "\"আলোর প্রতিসরণ কাকে বলে? চিত্রসহ ব্যাখ্যা করো।\",written_paper,5,0,,,,,,,\"আলো এক স্বচ্ছ মাধ্যম থেকে অন্য স্বচ্ছ মাধ্যমে প্রবেশের সময় দিক পরিবর্তনকে আলোর প্রতিসরণ বলে।\"\n"
-            . "\"সূর্য একটি _____।\",fill_in_the_blank,1,0,,,,,,নক্ষত্র,\"সূর্য একটি মাঝারি আকারের উজ্জ্বল নক্ষত্র।\"\n";
+            . "\"What is the capital of Bangladesh?\",single_choice,1,0.25,\"Dhaka\",\"Chattogram\",\"Khulna\",\"Rajshahi\",,\"A\",\"Dhaka is the capital and administrative center of Bangladesh.\"\n"
+            . "\"Which of the following are prime numbers?\",multiple_choice,2,0.5,\"2\",\"3\",\"4\",\"6\",,\"A,B\",\"2 and 3 are prime numbers.\"\n"
+            . "\"What is refraction of light? Explain with diagram.\",written_paper,5,0,,,,,,,\"The change in direction of light when passing from one medium to another is called refraction.\"\n"
+            . "\"The sun is a _____.\",fill_in_the_blank,1,0,,,,,,star,\"The sun is a medium-sized star.\"\n";
 
         return response($csv, 200, $headers);
     }
@@ -229,19 +229,19 @@ class ExamBuilderController extends Controller
         $realPath = $file->getRealPath();
 
         if (!file_exists($realPath) || !is_readable($realPath)) {
-            return response()->json(['message' => 'ফাইলটি পড়তে সমস্যা হয়েছে। আবার চেষ্টা করুন।'], 422);
+            return response()->json(['message' => 'Failed to read file. Please try again.'], 422);
         }
 
         $handle = fopen($realPath, 'r');
         if (!$handle) {
-            return response()->json(['message' => 'CSV ফাইলটি ওপেন করা সম্ভব হয়নি।'], 422);
+            return response()->json(['message' => 'Could not open CSV file.'], 422);
         }
 
         // Read header
         $header = fgetcsv($handle);
         if (!$header || empty($header)) {
             fclose($handle);
-            return response()->json(['message' => 'CSV ফাইলটি খালি অথবা হেডার সঠিক নয়।'], 422);
+            return response()->json(['message' => 'CSV file is empty or headers are invalid.'], 422);
         }
 
         // Strip UTF-8 BOM from the first column if present
@@ -265,23 +265,23 @@ class ExamBuilderController extends Controller
             return null;
         };
 
-        $colQuestionText = $findCol(['question_text', 'question', 'title', 'prompt', 'text', 'প্রশ্ন']);
-        $colQuestionType = $findCol(['question_type', 'type', 'q_type', 'ধরণ']);
-        $colMark = $findCol(['mark', 'marks', 'point', 'points', 'মান', 'নম্বর']);
-        $colNegativeMark = $findCol(['negative_mark', 'negative_marks', 'neg_mark', 'negative', 'নেগেটিভ_মার্ক']);
-        $colExplanation = $findCol(['explanation', 'solution', 'note', 'ব্যাখ্যা']);
-        $colCorrectAnswer = $findCol(['correct_answer', 'correct_answers', 'correct', 'answer', 'সঠিক_উত্তর', 'উত্তর']);
+        $colQuestionText = $findCol(['question_text', 'question', 'title', 'prompt', 'text']);
+        $colQuestionType = $findCol(['question_type', 'type', 'q_type']);
+        $colMark = $findCol(['mark', 'marks', 'point', 'points']);
+        $colNegativeMark = $findCol(['negative_mark', 'negative_marks', 'neg_mark', 'negative']);
+        $colExplanation = $findCol(['explanation', 'solution', 'note']);
+        $colCorrectAnswer = $findCol(['correct_answer', 'correct_answers', 'correct', 'answer']);
 
-        $colOptA = $findCol(['option_a', 'opt_a', 'a', 'option_1', 'অপশন_ক', 'ক']);
-        $colOptB = $findCol(['option_b', 'opt_b', 'b', 'option_2', 'অপশন_খ', 'খ']);
-        $colOptC = $findCol(['option_c', 'opt_c', 'c', 'option_3', 'অপশন_গ', 'গ']);
-        $colOptD = $findCol(['option_d', 'opt_d', 'd', 'option_4', 'অপশন_ঘ', 'ঘ']);
-        $colOptE = $findCol(['option_e', 'opt_e', 'e', 'option_5', 'অপশন_ঙ', 'ঙ']);
+        $colOptA = $findCol(['option_a', 'opt_a', 'a', 'option_1']);
+        $colOptB = $findCol(['option_b', 'opt_b', 'b', 'option_2']);
+        $colOptC = $findCol(['option_c', 'opt_c', 'c', 'option_3']);
+        $colOptD = $findCol(['option_d', 'opt_d', 'd', 'option_4']);
+        $colOptE = $findCol(['option_e', 'opt_e', 'e', 'option_5']);
 
         if ($colQuestionText === null) {
             fclose($handle);
             return response()->json([
-                'message' => 'CSV ফাইলে "question_text" কলাম পাওয়া যায়নি। অনুগ্রহ করে টেমপ্লেট ফাইল অনুযায়ী হেডার দিন।'
+                'message' => 'The "question_text" column was not found in CSV file. Please use headers according to template.'
             ], 422);
         }
 
@@ -322,13 +322,13 @@ class ExamBuilderController extends Controller
             $qType = 'single_choice';
             if ($colQuestionType !== null && isset($row[$colQuestionType]) && trim((string)$row[$colQuestionType]) !== '') {
                 $rawType = strtolower(trim((string)$row[$colQuestionType]));
-                if (in_array($rawType, ['single_choice', 'single', 'mcq', 'single_mcq', 'এক_উত্তর'])) {
+                if (in_array($rawType, ['single_choice', 'single', 'mcq', 'single_mcq', 'single_mcq'])) {
                     $qType = 'single_choice';
-                } elseif (in_array($rawType, ['multiple_choice', 'multiple', 'multi', 'multi_mcq', 'বহু_উত্তর'])) {
+                } elseif (in_array($rawType, ['multiple_choice', 'multiple', 'multi', 'multi_mcq', 'multi_mcq'])) {
                     $qType = 'multiple_choice';
-                } elseif (in_array($rawType, ['written_paper', 'written', 'creative', 'রচনামূলক', 'লিখিত'])) {
+                } elseif (in_array($rawType, ['written_paper', 'written', 'creative', 'creative', 'written'])) {
                     $qType = 'written_paper';
-                } elseif (in_array($rawType, ['fill_in_the_blank', 'blank', 'fill_blanks', 'শূণ্যস্থান'])) {
+                } elseif (in_array($rawType, ['fill_in_the_blank', 'blank', 'fill_blanks', 'fill_blanks'])) {
                     $qType = 'fill_in_the_blank';
                 }
             } else {
@@ -416,8 +416,8 @@ class ExamBuilderController extends Controller
 
         return response()->json([
             'message' => count($imported) > 0 
-                ? "সফলভাবে " . count($imported) . " টি প্রশ্ন ইম্পোর্ট করা হয়েছে!" 
-                : "কোনো প্রশ্ন ইম্পোর্ট করা যায়নি। ফাইলটি চেক করুন।",
+                ? count($imported) . " questions imported successfully!" 
+                : "No questions imported. Please verify the file.",
             'imported_count' => count($imported),
             'skipped_count' => $skipped,
             'errors' => $errors,

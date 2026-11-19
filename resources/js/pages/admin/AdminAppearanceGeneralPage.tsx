@@ -371,7 +371,7 @@ export const AdminAppearanceGeneralPage: React.FC = () => {
                         </div>
                         <div>
                             <h3 className="text-base font-bold text-slate-900">
-                                Website & Dashboard Logo (ওয়েবসাইট ও মেনু লোগো)
+                                Website & Dashboard Logo
                             </h3>
                             <p className="text-xs text-slate-500">
                                 Upload or set the site logo used across header navbar, mobile drawer, and admin menu sidebar.

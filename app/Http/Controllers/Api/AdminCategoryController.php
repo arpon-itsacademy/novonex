@@ -65,7 +65,7 @@ class AdminCategoryController extends Controller
                     'layout_type' => 'category',
                     'is_system' => false,
                     'meta_title' => $category->name . ' - Novonex Academy',
-                    'meta_description' => $category->description ?? ($category->name . ' বিষয়ের সকল কোর্স।'),
+                    'meta_description' => $category->description ?? ($category->name . ' all courses.'),
                     'blocks' => Page::defaultCategoryBlocks($category),
                 ]
             );
@@ -74,7 +74,7 @@ class AdminCategoryController extends Controller
         $category->courses_count = 0;
 
         return response()->json([
-            'message' => 'ক্যাটাগরি সফলভাবে তৈরি হয়েছে।',
+            'message' => 'Category created successfully.',
             'category' => $category,
         ], 201);
     }
@@ -123,7 +123,7 @@ class AdminCategoryController extends Controller
         AuditLog::log('category_updated', 'Category', $category->id, $oldValues, $category->toArray());
 
         return response()->json([
-            'message' => 'ক্যাটাগরি সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'Category updated successfully.',
             'category' => $category->loadCount('courses'),
         ]);
     }
@@ -146,7 +146,7 @@ class AdminCategoryController extends Controller
         AuditLog::log('category_deleted', 'Category', $category->id, $oldValues, null);
 
         return response()->json([
-            'message' => 'ক্যাটাগরি সফলভাবে মুছে ফেলা হয়েছে।',
+            'message' => 'Category deleted successfully.',
         ]);
     }
 }

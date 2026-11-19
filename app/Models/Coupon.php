@@ -151,7 +151,7 @@ class Coupon extends Model
         if ($this->min_order_amount !== null && $this->min_order_amount > 0 && $coursePrice < $this->min_order_amount) {
             return [
                 'valid' => false,
-                'message' => "This coupon requires a minimum course value of ৳{$this->min_order_amount}."
+                'message' => "This coupon requires a minimum course value of Tk {$this->min_order_amount}."
             ];
         }
 

@@ -217,7 +217,7 @@ export const AdminAffiliateCourseSettingsPage: React.FC = () => {
                     <p className="text-2xl font-bold text-emerald-600 mt-2">
                         {generalSettings?.default_commission_type === 'percentage'
                             ? `${generalSettings?.default_commission_amount}%`
-                            : `৳${generalSettings?.default_commission_amount}`}
+                            : `Tk ${generalSettings?.default_commission_amount}`}
                     </p>
                     <p className="text-xs text-emerald-600 mt-1">Default rate for remaining courses</p>
                 </div>
@@ -312,11 +312,11 @@ export const AdminAffiliateCourseSettingsPage: React.FC = () => {
                                             <td className="px-6 py-4">
                                                 {course.sale_price !== null && course.sale_price !== undefined ? (
                                                     <div className="flex items-center gap-1.5">
-                                                        <span className="font-bold text-gray-900">৳{course.sale_price}</span>
-                                                        <span className="text-xs text-gray-400 line-through">৳{course.price}</span>
+                                                        <span className="font-bold text-gray-900">Tk {course.sale_price}</span>
+                                                        <span className="text-xs text-gray-400 line-through">Tk {course.price}</span>
                                                     </div>
                                                 ) : (
-                                                    <span className="font-bold text-gray-900">৳{course.price}</span>
+                                                    <span className="font-bold text-gray-900">Tk {course.price}</span>
                                                 )}
                                             </td>
                                             <td className="px-6 py-4">
@@ -333,13 +333,13 @@ export const AdminAffiliateCourseSettingsPage: React.FC = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`font-semibold ${custom ? 'text-indigo-600 font-bold' : 'text-gray-700'}`}>
-                                                    {commType === 'percentage' ? `${commAmount}%` : `৳${commAmount}`}
+                                                    {commType === 'percentage' ? `${commAmount}%` : `Tk ${commAmount}`}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 {discAmount > 0 ? (
                                                     <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
-                                                        {discType === 'percentage' ? `${discAmount}% Off` : `৳${discAmount} Off`}
+                                                        {discType === 'percentage' ? `${discAmount}% Off` : `Tk ${discAmount} Off`}
                                                     </span>
                                                 ) : (
                                                     <span className="text-gray-400 text-xs">No discount</span>
@@ -393,7 +393,7 @@ export const AdminAffiliateCourseSettingsPage: React.FC = () => {
                                 {selectedCourse.title}
                             </p>
                             <p className="text-xs text-gray-500 mt-0.5">
-                                Course Price: ৳{effectivePrice}
+                                Course Price: Tk {effectivePrice}
                             </p>
                         </div>
 
@@ -430,7 +430,7 @@ export const AdminAffiliateCourseSettingsPage: React.FC = () => {
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
                                         >
                                             <option value="percentage">Percentage (%)</option>
-                                            <option value="fixed">Fixed Amount (৳)</option>
+                                            <option value="fixed">Fixed Amount (Tk)</option>
                                         </select>
                                     </div>
                                     <div>
@@ -463,7 +463,7 @@ export const AdminAffiliateCourseSettingsPage: React.FC = () => {
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500"
                                         >
                                             <option value="percentage">Percentage (%)</option>
-                                            <option value="fixed">Fixed Amount (৳)</option>
+                                            <option value="fixed">Fixed Amount (Tk)</option>
                                         </select>
                                     </div>
                                     <div>
@@ -489,19 +489,19 @@ export const AdminAffiliateCourseSettingsPage: React.FC = () => {
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Course Price:</span>
-                                    <span>৳{effectivePrice}</span>
+                                    <span>Tk {effectivePrice}</span>
                                 </div>
                                 <div className="flex justify-between text-emerald-600 font-medium">
                                     <span>Student Discount:</span>
-                                    <span>- ৳{previewDiscount}</span>
+                                    <span>- Tk {previewDiscount}</span>
                                 </div>
                                 <div className="flex justify-between font-bold text-gray-900 border-t border-gray-200 pt-1">
                                     <span>Student Pays:</span>
-                                    <span>৳{previewPayable}</span>
+                                    <span>Tk {previewPayable}</span>
                                 </div>
                                 <div className="flex justify-between text-indigo-700 font-bold border-t border-dashed border-gray-200 pt-1">
                                     <span>Affiliate Receives:</span>
-                                    <span>৳{previewCommission}</span>
+                                    <span>Tk {previewCommission}</span>
                                 </div>
                             </div>
 

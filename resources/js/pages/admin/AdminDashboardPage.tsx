@@ -199,9 +199,9 @@ export const AdminDashboardPage: React.FC = () => {
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                             <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-                            <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} tickFormatter={(val) => `৳${val}`} />
+                            <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} tickFormatter={(val) => `Tk ${val}`} />
                             <Tooltip 
-                                formatter={(val: any) => [`৳${Number(val).toLocaleString()}`, 'Revenue']}
+                                formatter={(val: any) => [`Tk ${Number(val).toLocaleString()}`, 'Revenue']}
                                 labelFormatter={(label) => `Date: ${label}`}
                                 contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                             />

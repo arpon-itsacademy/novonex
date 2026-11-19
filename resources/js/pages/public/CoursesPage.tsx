@@ -273,11 +273,11 @@ export const CoursesPage: React.FC = () => {
                                     {/* Discount Badge */}
                                     {course.discount_percent && course.discount_percent > 0 ? (
                                         <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-rose-600 text-white rounded-xl shadow-md">
-                                            {course.discount_percent}% ছাড়
+                                            {course.discount_percent}% OFF
                                         </span>
                                     ) : course.price === 0 ? (
                                         <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-emerald-600 text-white rounded-xl shadow-md">
-                                            ফ্রি কোর্স
+                                            Free Course
                                         </span>
                                     ) : null}
 
@@ -295,12 +295,12 @@ export const CoursesPage: React.FC = () => {
                                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                                             <span className="flex items-center gap-1">
                                                 <Video className="w-3.5 h-3.5 text-sky-500" />
-                                                <span>{course.lessons_count || 0} টি ক্লাস</span>
+                                                <span>{course.lessons_count || 0} Lessons</span>
                                             </span>
                                             <span>•</span>
                                             <span className="flex items-center gap-1">
                                                 <Users className="w-3.5 h-3.5 text-sky-500" />
-                                                <span>{course.enrollments_count || 0} জন শিক্ষার্থী</span>
+                                                <span>{course.enrollments_count || 0} Students</span>
                                             </span>
                                         </div>
 
@@ -318,9 +318,9 @@ export const CoursesPage: React.FC = () => {
                                             {((course.features && Array.isArray(course.features) && course.features.length > 0)
                                                 ? course.features.filter((f: any) => typeof f === 'string' && f.trim().length > 0)
                                                 : [
-                                                    'লাইভ ও ফুল HD রেকর্ডেড ক্লাস আর্কাইভ',
-                                                    'চ্যাপ্টারভিত্তিক লেকচার শিট ও প্রশ্নব্যাংক',
-                                                    'NexPilot AI ২৪/৭ ইনস্ট্যান্ট ডাউট সলভার',
+                                                    'Live & Full HD Recorded Class Archive',
+                                                    'Chapter-wise Lecture Sheets & Question Bank',
+                                                    'NexPilot AI 24/7 Instant Doubt Solver',
                                                 ]
                                             ).slice(0, 4).map((feat: string, fIdx: number) => (
                                                 <div key={fIdx} className="flex items-start gap-1.5">
@@ -335,16 +335,16 @@ export const CoursesPage: React.FC = () => {
                                     <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
                                         <div className="flex items-center justify-between">
                                             <div className="text-xs font-medium text-slate-500 truncate mr-2">
-                                                ইন্সট্রাক্টর: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                Instructor: <span className="font-bold text-slate-800 dark:text-slate-200">
                                                     {course.instructors && course.instructors.length > 0 
                                                         ? course.instructors.map(i => i.name).join(', ') 
-                                                        : (course.instructor?.name || 'অভিজ্ঞ মেন্টর')}
+                                                        : (course.instructor?.name || 'Expert Mentor')}
                                                 </span>
                                             </div>
 
                                             <div className="text-right shrink-0">
                                                 {course.price === 0 ? (
-                                                    <span className="text-lg font-black text-emerald-600">ফ্রি</span>
+                                                    <span className="text-lg font-black text-emerald-600">Free</span>
                                                 ) : (
                                                     <div className="flex items-baseline gap-1.5">
                                                         <span className="text-xl font-black text-sky-600 dark:text-sky-400">
@@ -370,13 +370,13 @@ export const CoursesPage: React.FC = () => {
                                                 to={`/courses/${course.slug}`}
                                                 className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer"
                                             >
-                                                বিস্তারিত দেখুন
+                                                View Details
                                             </Link>
                                             <Link
                                                 to={`/checkout/${course.slug}`}
                                                 className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 font-bold text-xs text-white text-center transition-all shadow-md shadow-sky-500/20 cursor-pointer"
                                             >
-                                                কোর্সটি কিনুন
+                                                Enroll Now
                                             </Link>
                                         </div>
                                     </div>

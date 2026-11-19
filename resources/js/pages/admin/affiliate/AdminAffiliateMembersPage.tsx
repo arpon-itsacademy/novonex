@@ -380,10 +380,10 @@ export const AdminAffiliateMembersPage: React.FC = () => {
                                                     {aff.orders_count || 0}
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className="font-bold text-indigo-600">৳{Number(aff.balance).toFixed(2)}</span>
+                                                    <span className="font-bold text-indigo-600">Tk {Number(aff.balance).toFixed(2)}</span>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className="font-semibold text-gray-900">৳{Number(aff.total_earned).toFixed(2)}</span>
+                                                    <span className="font-semibold text-gray-900">Tk {Number(aff.total_earned).toFixed(2)}</span>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span
@@ -484,15 +484,15 @@ export const AdminAffiliateMembersPage: React.FC = () => {
                                                     <div className="font-medium text-gray-800 line-clamp-1">{comm.course?.title || 'Course'}</div>
                                                 </td>
                                                 <td className="px-6 py-4 font-medium text-gray-900">
-                                                    ৳{Number(comm.order_amount).toFixed(2)}
+                                                    Tk {Number(comm.order_amount).toFixed(2)}
                                                 </td>
                                                 <td className="px-6 py-4 text-xs text-gray-600 font-medium">
                                                     {comm.commission_type === 'percentage'
                                                         ? `${comm.commission_rate}%`
-                                                        : `৳${comm.commission_rate}`}
+                                                        : `Tk ${comm.commission_rate}`}
                                                 </td>
                                                 <td className="px-6 py-4 font-bold text-emerald-600">
-                                                    ৳{Number(comm.commission_amount).toFixed(2)}
+                                                    Tk {Number(comm.commission_amount).toFixed(2)}
                                                 </td>
                                                 <td className="px-6 py-4 text-xs">
                                                     <div className="font-medium text-gray-800">{comm.buyer?.name || 'Student'}</div>
@@ -600,7 +600,7 @@ export const AdminAffiliateMembersPage: React.FC = () => {
                                                     {p.account_number}
                                                 </td>
                                                 <td className="px-6 py-4 font-bold text-gray-900 text-base">
-                                                    ৳{Number(p.amount).toFixed(2)}
+                                                    Tk {Number(p.amount).toFixed(2)}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span
@@ -674,7 +674,7 @@ export const AdminAffiliateMembersPage: React.FC = () => {
                         <div className="bg-indigo-50/60 border border-indigo-100 rounded-xl p-3.5 mb-4 text-sm space-y-1.5">
                             <div className="flex justify-between">
                                 <span className="text-gray-600 text-xs">Withdrawal Amount:</span>
-                                <span className="font-bold text-indigo-900 text-base">৳{Number(selectedPayout.amount).toFixed(2)}</span>
+                                <span className="font-bold text-indigo-900 text-base">Tk {Number(selectedPayout.amount).toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-600 text-xs">Payment Method:</span>

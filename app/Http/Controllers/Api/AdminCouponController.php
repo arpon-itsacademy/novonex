@@ -282,7 +282,7 @@ class AdminCouponController extends Controller
         $coupon->delete();
 
         return response()->json([
-            'message' => 'কুপনটি ট্র্যাশে সরানো হয়েছে। প্রয়োজনে ট্র্যাশ থেকে পুনরুদ্ধার করা যাবে।',
+            'message' => 'Coupon moved to trash. You can restore it if needed.',
         ]);
     }
 
@@ -292,7 +292,7 @@ class AdminCouponController extends Controller
         $coupon->restore();
 
         return response()->json([
-            'message' => 'কুপনটি সফলভাবে পুনরুদ্ধার করা হয়েছে।',
+            'message' => 'Coupon restored successfully.',
             'coupon' => $coupon,
         ]);
     }
@@ -305,7 +305,7 @@ class AdminCouponController extends Controller
         $coupon->forceDelete();
 
         return response()->json([
-            'message' => 'কুপনটি স্থায়ীভাবে মুছে ফেলা হয়েছে।',
+            'message' => 'Coupon permanently deleted.',
         ]);
     }
 

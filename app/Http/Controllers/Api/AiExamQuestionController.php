@@ -92,8 +92,8 @@ class AiExamQuestionController extends Controller
         // Language requirement text
         $languageInstruction = match ($language) {
             'en' => "LANGUAGE REQUIREMENT: Strictly generate ALL question texts, options, fill-in blanks, and explanations in ENGLISH.",
-            'mixed' => "LANGUAGE REQUIREMENT: Generate in BILINGUAL format (বাংলা language question phrasing combined with standard English scientific/technical terms and formulas, as standard in HSC/Admission tests in Bangladesh).",
-            default => "LANGUAGE REQUIREMENT: Strictly generate ALL question texts, options, fill-in blanks, and explanations in BENGALI (বাংলা). Standard scientific formulas and symbols can use standard notation with LaTeX.",
+            'mixed' => "LANGUAGE REQUIREMENT: Generate in English with standard scientific/technical terms and formulas.",
+            default => "LANGUAGE REQUIREMENT: Strictly generate ALL question texts, options, fill-in blanks, and explanations in ENGLISH. Standard scientific formulas and symbols can use standard notation with LaTeX.",
         };
 
         // Extract text from media if available

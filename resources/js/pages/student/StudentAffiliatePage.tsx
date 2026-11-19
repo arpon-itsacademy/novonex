@@ -286,7 +286,7 @@ export const StudentAffiliatePage: React.FC = () => {
                                 <div className="text-lg font-bold">
                                     {settings?.default_commission_type === 'percentage'
                                         ? `Up to ${settings?.default_commission_amount}%`
-                                        : `৳${settings?.default_commission_amount} per sale`}
+                                        : `Tk ${settings?.default_commission_amount} per sale`}
                                 </div>
                             </div>
                             <div className="bg-white/10 rounded-xl p-3.5 backdrop-blur-xs">
@@ -325,9 +325,9 @@ export const StudentAffiliatePage: React.FC = () => {
                                 <span className="text-xs font-semibold uppercase tracking-wider">Available Balance</span>
                                 <DollarSign className="h-5 w-5 text-white/80" />
                             </div>
-                            <p className="text-3xl font-black mt-2">৳{Number(profile.balance).toFixed(2)}</p>
+                            <p className="text-3xl font-black mt-2">Tk {Number(profile.balance).toFixed(2)}</p>
                             <div className="mt-3 pt-3 border-t border-indigo-500/50 flex justify-between items-center">
-                                <span className="text-xs text-indigo-200">Min Payout: ৳{settings?.min_payout_amount || 500}</span>
+                                <span className="text-xs text-indigo-200">Min Payout: Tk {settings?.min_payout_amount || 500}</span>
                                 <button
                                     onClick={() => setPayoutModalOpen(true)}
                                     disabled={Number(profile.balance) < Number(settings?.min_payout_amount || 500)}
@@ -343,7 +343,7 @@ export const StudentAffiliatePage: React.FC = () => {
                                 <span className="text-xs font-semibold uppercase tracking-wider">Total Earned</span>
                                 <TrendingUp className="h-5 w-5 text-emerald-500" />
                             </div>
-                            <p className="text-2xl font-bold text-gray-900 mt-2">৳{Number(profile.total_earned).toFixed(2)}</p>
+                            <p className="text-2xl font-bold text-gray-900 mt-2">Tk {Number(profile.total_earned).toFixed(2)}</p>
                             <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1 font-medium">
                                 <CheckCircle2 className="h-3.5 w-3.5" />
                                 Commissions credited
@@ -355,7 +355,7 @@ export const StudentAffiliatePage: React.FC = () => {
                                 <span className="text-xs font-semibold uppercase tracking-wider">Total Withdrawn</span>
                                 <CreditCard className="h-5 w-5 text-indigo-500" />
                             </div>
-                            <p className="text-2xl font-bold text-gray-900 mt-2">৳{Number(profile.total_withdrawn).toFixed(2)}</p>
+                            <p className="text-2xl font-bold text-gray-900 mt-2">Tk {Number(profile.total_withdrawn).toFixed(2)}</p>
                             <div className="mt-2 text-xs text-gray-500 flex items-center justify-between">
                                 <span>Account: {profile.payout_method ? `${profile.payout_method.toUpperCase()} (${profile.payout_account})` : 'Not set'}</span>
                                 <button
@@ -467,7 +467,7 @@ export const StudentAffiliatePage: React.FC = () => {
                                 >
                                     {courses.map((course) => (
                                         <option key={course.id} value={course.id}>
-                                            {course.title} (Fee: ৳{course.sale_price || course.price})
+                                            {course.title} (Fee: Tk {course.sale_price || course.price})
                                         </option>
                                     ))}
                                 </select>
@@ -477,11 +477,11 @@ export const StudentAffiliatePage: React.FC = () => {
                                 <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 flex flex-col justify-center">
                                     <span className="text-xs text-indigo-700 font-semibold">Your Commission:</span>
                                     <span className="text-base font-extrabold text-indigo-950">
-                                        {currentCommType === 'percentage' ? `${currentCommAmount}%` : `৳${currentCommAmount}`}
+                                        {currentCommType === 'percentage' ? `${currentCommAmount}%` : `Tk ${currentCommAmount}`}
                                     </span>
                                     {currentDiscAmount > 0 && (
                                         <span className="text-xs text-emerald-700 font-medium mt-0.5">
-                                            Buyer gets: {currentDiscType === 'percentage' ? `${currentDiscAmount}% discount` : `৳${currentDiscAmount} discount`}
+                                            Buyer gets: {currentDiscType === 'percentage' ? `${currentDiscAmount}% discount` : `Tk ${currentDiscAmount} discount`}
                                         </span>
                                     )}
                                 </div>
@@ -546,7 +546,7 @@ export const StudentAffiliatePage: React.FC = () => {
                                                         {comm.order?.order_number || `#${comm.order_id}`}
                                                     </td>
                                                     <td className="px-4 py-3 font-bold text-emerald-600">
-                                                        ৳{Number(comm.commission_amount).toFixed(2)}
+                                                        Tk {Number(comm.commission_amount).toFixed(2)}
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         <span
@@ -610,7 +610,7 @@ export const StudentAffiliatePage: React.FC = () => {
                                             {payouts.map((p) => (
                                                 <tr key={p.id} className="hover:bg-gray-50/50">
                                                     <td className="px-4 py-3 font-bold text-gray-900">
-                                                        ৳{Number(p.amount).toFixed(2)}
+                                                        Tk {Number(p.amount).toFixed(2)}
                                                     </td>
                                                     <td className="px-4 py-3 uppercase font-semibold text-gray-700">
                                                         {p.payment_method}
@@ -672,11 +672,11 @@ export const StudentAffiliatePage: React.FC = () => {
                         <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3.5 mb-4 text-xs space-y-1">
                             <div className="flex justify-between text-gray-700">
                                 <span>Available Balance:</span>
-                                <strong className="text-indigo-900 text-sm">৳{Number(profile.balance).toFixed(2)}</strong>
+                                <strong className="text-indigo-900 text-sm">Tk {Number(profile.balance).toFixed(2)}</strong>
                             </div>
                             <div className="flex justify-between text-gray-500">
                                 <span>Minimum Payout Amount:</span>
-                                <span>৳{settings?.min_payout_amount || 500}</span>
+                                <span>Tk {settings?.min_payout_amount || 500}</span>
                             </div>
                         </div>
 
@@ -692,7 +692,7 @@ export const StudentAffiliatePage: React.FC = () => {
                                     step="1"
                                     value={payoutForm.amount}
                                     onChange={(e) => setPayoutForm({ ...payoutForm, amount: e.target.value })}
-                                    placeholder={`৳${settings?.min_payout_amount || 500} - ৳${profile.balance}`}
+                                    placeholder={`Tk ${settings?.min_payout_amount || 500} - Tk ${profile.balance}`}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500"
                                     required
                                 />

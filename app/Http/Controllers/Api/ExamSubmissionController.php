@@ -483,7 +483,7 @@ class ExamSubmissionController extends Controller
             $entry = [
                 'rank' => $rank,
                 'user_id' => $item->user_id,
-                'name' => $u ? $u->name : 'শিক্ষার্থী',
+                'name' => $u ? $u->name : 'Student',
                 'total_points' => (float) $item->total_points,
                 'exams_count' => (int) $item->exams_count,
                 'is_current_user' => $isMe,
@@ -612,7 +612,7 @@ class ExamSubmissionController extends Controller
 
         if ($exam->isLiveUpcoming()) {
             return response()->json([
-                'message' => 'এই লাইভ পরীক্ষাটি এখনো শুরু হয়নি। শুরুর সময়: ' . ($exam->start_time ? $exam->start_time->format('d M Y, h:i A') : ''),
+                'message' => 'This live exam has not started yet. Start time: ' . ($exam->start_time ? $exam->start_time->format('d M Y, h:i A') : ''),
             ], 400);
         }
 
@@ -899,7 +899,7 @@ class ExamSubmissionController extends Controller
             ]);
 
             return response()->json([
-                'message' => 'পরীক্ষার উত্তর সাবমিট করার সময় সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন। (' . $e->getMessage() . ')',
+                'message' => 'There was a problem submitting exam answers. Please try again. (' . $e->getMessage() . ')',
             ], 500);
         }
     }

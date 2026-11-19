@@ -53,7 +53,7 @@ class SmsMarketingTest extends TestCase
         ]);
 
         $this->course = Course::create([
-            'title' => 'এইচএসসি ফিজিক্স ১ম পত্র',
+            'title' => 'HSC Physics 1st Paper',
             'slug' => 'hsc-physics-1st',
             'price' => 2000,
             'status' => 'published',
@@ -98,8 +98,8 @@ class SmsMarketingTest extends TestCase
         $response = $this->postJson('/api/admin/sms-marketing/send', [
             'target_type' => 'course',
             'course_id' => $this->course->id,
-            'message' => 'প্রিয় {name}, আপনার {course_title} কোর্সের লাইভ ক্লাস শুরু হয়েছে।',
-            'title' => 'ক্লাস শুরু নোটিশ',
+            'message' => 'Dear {name}, live class for {course_title} has started.',
+            'title' => 'Class Start Notice',
         ]);
 
         $response->assertStatus(200)
@@ -123,7 +123,7 @@ class SmsMarketingTest extends TestCase
 
         $log = SmsLog::where('campaign_id', $campaignId)->first();
         $this->assertStringContainsString('Rahim Ahmed', $log->message);
-        $this->assertStringContainsString('এইচএসসি ফিজিক্স ১ম পত্র', $log->message);
+        $this->assertStringContainsString('HSC Physics 1st Paper', $log->message);
     }
 
     public function test_admin_can_fetch_campaign_history(): void
@@ -132,9 +132,9 @@ class SmsMarketingTest extends TestCase
 
         SmsCampaign::create([
             'user_id' => $this->admin->id,
-            'title' => 'টেস্ট ক্যাম্পেইন',
+            'title' => 'Test Campaign',
             'target_type' => 'all',
-            'message' => 'নোটিশ টেস্ট',
+            'message' => 'Notice Test',
             'total_recipients' => 5,
             'sent_count' => 5,
             'status' => 'completed',
@@ -143,7 +143,7 @@ class SmsMarketingTest extends TestCase
         $response = $this->getJson('/api/admin/sms-marketing/history');
 
         $response->assertStatus(200)
-            ->assertJsonPath('data.0.title', 'টেস্ট ক্যাম্পেইন');
+            ->assertJsonPath('data.0.title', 'Test Campaign');
     }
 
     public function test_student_cannot_send_marketing_sms(): void
@@ -152,7 +152,7 @@ class SmsMarketingTest extends TestCase
 
         $response = $this->postJson('/api/admin/sms-marketing/send', [
             'target_type' => 'all',
-            'message' => 'হ্যাকড',
+            'message' => 'Hacked',
         ]);
 
         $response->assertStatus(403);

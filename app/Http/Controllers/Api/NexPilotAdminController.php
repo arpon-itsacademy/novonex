@@ -100,7 +100,7 @@ class NexPilotAdminController extends Controller
             $pilot = NexPilot::create($validated);
 
             return response()->json([
-                'message' => 'NexPilot সফলভাবে তৈরি করা হয়েছে।',
+                'message' => 'NexPilot created successfully.',
                 'pilot' => $pilot->load('course:id,title,price'),
             ], 201);
         } catch (\Throwable $e) {
@@ -110,7 +110,7 @@ class NexPilotAdminController extends Controller
             ]);
 
             return response()->json([
-                'message' => 'পাইলট তৈরি করতে সমস্যা হয়েছে: ' . $e->getMessage(),
+                'message' => 'Failed to create pilot: ' . $e->getMessage(),
             ], 422);
         }
     }
@@ -165,7 +165,7 @@ class NexPilotAdminController extends Controller
             $pilot->update($validated);
 
             return response()->json([
-                'message' => 'NexPilot সফলভাবে আপডেট করা হয়েছে।',
+                'message' => 'NexPilot updated successfully.',
                 'pilot' => $pilot->fresh(['course:id,title,price']),
             ]);
         } catch (\Throwable $e) {
@@ -176,7 +176,7 @@ class NexPilotAdminController extends Controller
             ]);
 
             return response()->json([
-                'message' => 'পাইলট আপডেট করতে ত্রুটি হয়েছে: ' . $e->getMessage(),
+                'message' => 'Failed to update pilot: ' . $e->getMessage(),
             ], 422);
         }
     }
@@ -190,7 +190,7 @@ class NexPilotAdminController extends Controller
         $pilot->delete();
 
         return response()->json([
-            'message' => 'NexPilot সফলভাবে মুছে ফেলা হয়েছে।',
+            'message' => 'NexPilot deleted successfully.',
         ]);
     }
 
@@ -257,7 +257,7 @@ class NexPilotAdminController extends Controller
         $topic = $pilot->topics()->create($validated);
 
         return response()->json([
-            'message' => ($validated['type'] === 'theory' ? 'থিওরি' : 'প্র্যাকটিস') . ' টপিক সফলভাবে তৈরি হয়েছে।',
+            'message' => ($validated['type'] === 'theory' ? 'Theory' : 'Practice') . ' topic created successfully.',
             'topic' => $topic,
         ], 201);
     }
@@ -287,7 +287,7 @@ class NexPilotAdminController extends Controller
         $topic->update($validated);
 
         return response()->json([
-            'message' => 'টপিক সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'Topic updated successfully.',
             'topic' => $topic,
         ]);
     }
@@ -301,7 +301,7 @@ class NexPilotAdminController extends Controller
         $topic->delete();
 
         return response()->json([
-            'message' => 'টপিক সফলভাবে মুছে ফেলা হয়েছে।',
+            'message' => 'Topic deleted successfully.',
         ]);
     }
 
@@ -324,7 +324,7 @@ class NexPilotAdminController extends Controller
         }
 
         return response()->json([
-            'message' => 'টপিকের ক্রম সফলভাবে সংরক্ষণ করা হয়েছে।',
+            'message' => 'Topic order saved successfully.',
         ]);
     }
 
@@ -418,7 +418,7 @@ class NexPilotAdminController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'AI Model কনফিগারেশন সফলভাবে সংরক্ষণ করা হয়েছে।',
+            'message' => 'AI Model configuration saved successfully.',
             'settings' => $setting->fresh()->openai_settings,
         ]);
     }
@@ -437,7 +437,7 @@ class NexPilotAdminController extends Controller
         if (empty($apiKey)) {
             return response()->json([
                 'success' => false,
-                'message' => 'কোনো OpenAI API Key পাওয়া যায়নি। অনুগ্রহ করে কী লিখুন।',
+                'message' => 'No OpenAI API Key found. Please provide an API key.',
             ], 422);
         }
 
@@ -453,12 +453,12 @@ class NexPilotAdminController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'OpenAI API সংযোগ সফল হয়েছে! মডেল অ্যাক্সেস সচল রয়েছে।',
+                    'message' => 'OpenAI API connection successful! Model access active.',
                     'models' => $models,
                 ]);
             }
 
-            $errorMsg = $response->json('error.message') ?? 'OpenAI API সংযোগ ব্যর্থ হয়েছে (Status ' . $response->status() . ')';
+            $errorMsg = $response->json('error.message') ?? 'OpenAI API connection failed (Status ' . $response->status() . ')';
             return response()->json([
                 'success' => false,
                 'message' => $errorMsg,
@@ -467,7 +467,7 @@ class NexPilotAdminController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'সার্ভার সংযোগে ত্রুটি: ' . $e->getMessage(),
+                'message' => 'Server connection error: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -525,8 +525,8 @@ class NexPilotAdminController extends Controller
             'success' => true,
             'has_nexpilot' => $newStatus,
             'message' => $newStatus 
-                ? 'শিক্ষার্থীর জন্য NexPilot অ্যাক্সেস সফলভাবে দেওয়া হয়েছে।' 
-                : 'শিক্ষার্থীর NexPilot অ্যাক্সেস বন্ধ করা হয়েছে।',
+                ? 'NexPilot access granted to student successfully.' 
+                : 'Student NexPilot access revoked.',
         ]);
     }
 
@@ -546,7 +546,7 @@ class NexPilotAdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "এই কোর্সের মোট {$count} জন শিক্ষার্থীকে সফলভাবে NexPilot অ্যাক্সেস দেওয়া হয়েছে!",
+            'message' => "NexPilot access successfully granted to {$count} students of this course!",
         ]);
     }
 }

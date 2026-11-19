@@ -164,7 +164,7 @@ class OrderController extends Controller
                 'payment_status' => $isFree ? Order::PAYMENT_PAID : Order::PAYMENT_PENDING,
                 'order_status' => $isFree ? Order::ORDER_COMPLETED : Order::ORDER_PROCESSING,
                 'payment_method' => $isFree ? 'free' : $validated['payment_method'],
-                'notes' => $validated['notes'] ?? ($isFree ? '১০০% ডিসকাউন্ট / কুপন ফ্রি এনরোলমেন্ট' : null),
+                'notes' => $validated['notes'] ?? ($isFree ? '100% Discount / Free Coupon Enrollment' : null),
             ]);
 
             // Track coupon usage
@@ -214,7 +214,7 @@ class OrderController extends Controller
         });
 
         return response()->json([
-            'message' => $isFree ? '১০০% ডিসকাউন্টে কোর্সে সফলভাবে এনরোল সম্পন্ন হয়েছে!' : 'Order placed successfully. Enrollment will be activated upon payment verification.',
+            'message' => $isFree ? 'Enrolled in course with 100% discount successfully!' : 'Order placed successfully. Enrollment will be activated upon payment verification.',
             'is_free' => $isFree,
             'order' => $order->load(['course', 'latestPayment']),
         ], 201);

@@ -42,8 +42,8 @@ class CategoryManagementTest extends TestCase
 
     public function test_admin_can_list_categories(): void
     {
-        Category::create(['name' => 'ফ্রি কোর্স', 'slug' => 'free-courses']);
-        Category::create(['name' => 'পেইড কোর্স', 'slug' => 'paid-courses']);
+        Category::create(['name' => 'Free Courses', 'slug' => 'free-courses']);
+        Category::create(['name' => 'Paid Courses', 'slug' => 'paid-courses']);
 
         Sanctum::actingAs($this->admin);
 
@@ -62,7 +62,7 @@ class CategoryManagementTest extends TestCase
         $response = $this->getJson('/api/admin/categories');
         $response->assertStatus(403);
 
-        $response = $this->postJson('/api/admin/categories', ['name' => 'নতুন']);
+        $response = $this->postJson('/api/admin/categories', ['name' => 'New Category']);
         $response->assertStatus(403);
     }
 
@@ -71,17 +71,17 @@ class CategoryManagementTest extends TestCase
         Sanctum::actingAs($this->admin);
 
         $response = $this->postJson('/api/admin/categories', [
-            'name' => 'এইচএসসি পদার্থবিজ্ঞান',
+            'name' => 'HSC Physics',
             'slug' => 'hsc-physics',
-            'description' => 'এইচএসসি শিক্ষার্থীদের জন্য ফিজিক্স কোর্সসমূহ',
+            'description' => 'Physics courses for HSC students',
         ]);
 
         $response->assertStatus(201)
-            ->assertJsonFragment(['name' => 'এইচএসসি পদার্থবিজ্ঞান'])
+            ->assertJsonFragment(['name' => 'HSC Physics'])
             ->assertJsonFragment(['slug' => 'hsc-physics']);
 
         $this->assertDatabaseHas('categories', [
-            'name' => 'এইচএসসি পদার্থবিজ্ঞান',
+            'name' => 'HSC Physics',
             'slug' => 'hsc-physics',
         ]);
     }
@@ -89,25 +89,25 @@ class CategoryManagementTest extends TestCase
     public function test_admin_can_update_category(): void
     {
         $cat = Category::create([
-            'name' => 'পুরাতন নাম',
+            'name' => 'Old Name',
             'slug' => 'old-name',
         ]);
 
         Sanctum::actingAs($this->admin);
 
         $response = $this->putJson("/api/admin/categories/{$cat->id}", [
-            'name' => 'আপডেটেড ক্যাটাগরি',
+            'name' => 'Updated Category',
             'slug' => 'updated-category',
-            'description' => 'নতুন তথ্য',
+            'description' => 'New Info',
         ]);
 
         $response->assertStatus(200)
-            ->assertJsonFragment(['name' => 'আপডেটেড ক্যাটাগরি'])
+            ->assertJsonFragment(['name' => 'Updated Category'])
             ->assertJsonFragment(['slug' => 'updated-category']);
 
         $this->assertDatabaseHas('categories', [
             'id' => $cat->id,
-            'name' => 'আপডেটেড ক্যাটাগরি',
+            'name' => 'Updated Category',
             'slug' => 'updated-category',
         ]);
     }
@@ -115,12 +115,12 @@ class CategoryManagementTest extends TestCase
     public function test_admin_can_delete_category_and_courses_are_detached(): void
     {
         $cat = Category::create([
-            'name' => 'মুছে ফেলার ক্যাটাগরি',
+            'name' => 'Category to Delete',
             'slug' => 'to-delete',
         ]);
 
         $course = Course::create([
-            'title' => 'টেস্ট কোর্স',
+            'title' => 'Test Course',
             'slug' => 'test-course',
             'price' => 0,
             'status' => 'published',
@@ -142,13 +142,13 @@ class CategoryManagementTest extends TestCase
 
     public function test_courses_support_multiple_categories_and_public_filter(): void
     {
-        $freeCat = Category::create(['name' => 'ফ্রি কোর্স', 'slug' => 'free-courses']);
-        $physicsCat = Category::create(['name' => 'এইচএসসি পদার্থবিজ্ঞান', 'slug' => 'hsc-physics']);
-        $mathCat = Category::create(['name' => 'এইচএসসি গণিত', 'slug' => 'hsc-math']);
+        $freeCat = Category::create(['name' => 'Free Courses', 'slug' => 'free-courses']);
+        $physicsCat = Category::create(['name' => 'HSC Physics', 'slug' => 'hsc-physics']);
+        $mathCat = Category::create(['name' => 'HSC Math', 'slug' => 'hsc-math']);
 
         // Course with multiple categories (both free and physics)
         $course1 = Course::create([
-            'title' => 'ফ্রি ফিজিক্স মাস্টারক্লাস',
+            'title' => 'Free Physics Masterclass',
             'slug' => 'free-physics',
             'price' => 0,
             'status' => 'published',
@@ -157,7 +157,7 @@ class CategoryManagementTest extends TestCase
 
         // Course only in math
         $course2 = Course::create([
-            'title' => 'উচ্চতর গণিত কোর্স',
+            'title' => 'Higher Math Course',
             'slug' => 'hsc-math-course',
             'price' => 1500,
             'status' => 'published',

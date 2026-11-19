@@ -138,7 +138,7 @@ class AdminBundleController extends Controller
         $bundle->delete();
 
         return response()->json([
-            'message' => 'কোর্স বান্ডেলটি ট্র্যাশে সরানো হয়েছে। প্রয়োজনে ট্র্যাশ থেকে পুনরুদ্ধার করা যাবে।',
+            'message' => 'Course bundle moved to trash. You can restore it if needed.',
         ]);
     }
 
@@ -148,7 +148,7 @@ class AdminBundleController extends Controller
         $bundle->restore();
 
         return response()->json([
-            'message' => 'কোর্স বান্ডেলটি সফলভাবে পুনরুদ্ধার করা হয়েছে।',
+            'message' => 'Course bundle restored successfully.',
             'bundle' => $bundle,
         ]);
     }
@@ -160,7 +160,7 @@ class AdminBundleController extends Controller
         $bundle->forceDelete();
 
         return response()->json([
-            'message' => 'কোর্স বান্ডেলটি স্থায়ীভাবে মুছে ফেলা হয়েছে।',
+            'message' => 'Course bundle permanently deleted.',
         ]);
     }
 

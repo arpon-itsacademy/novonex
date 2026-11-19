@@ -622,9 +622,9 @@ export const AdminPageBuilderPage: React.FC = () => {
                     type: 'top_announcement',
                     title: 'Campaign Ribbon',
                     settings: {
-                        badge: 'স্পেশাল অফার',
-                        text: 'HSC একাডেমিক সাইকেল ও অ্যাডমিশন মাস্টার ব্যাচে স্পেশাল ছাড়ে ভর্তি চলছে!',
-                        linkText: 'সকল কোর্স দেখুন →',
+                        badge: 'Special Offer',
+                        text: 'Admission open with special discounts on academic and master batches!',
+                        linkText: 'Explore All Courses →',
                         linkUrl: '/courses',
                         bgColor: 'from-sky-700 via-sky-600 to-amber-500',
                     }
@@ -653,7 +653,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                     type: 'button',
                     title: 'Call to Action Button',
                     settings: {
-                        text: 'কোর্সগুলো দেখুন',
+                        text: 'Explore Courses',
                         link: '/courses',
                         variant: 'gradient',
                         size: 'md',
@@ -711,9 +711,9 @@ export const AdminPageBuilderPage: React.FC = () => {
                     type: 'bundle_showcase',
                     title: 'Course Bundles',
                     settings: {
-                        sectionTag: 'স্পেশাল প্যাকেজ',
-                        sectionTitle: 'জনপ্রিয় কোর্স বান্ডেল ও কম্বো',
-                        sectionSub: 'একাধিক কোর্স একসাথে নিয়ে সেভ করুন সর্বোচ্চ ৫০% পর্যন্ত!',
+                        sectionTag: 'Special Packages',
+                        sectionTitle: 'Popular Course Bundles & Combos',
+                        sectionSub: 'Bundle multiple courses together and save up to 50%!',
                         limit: 4,
                     }
                 };
@@ -725,9 +725,9 @@ export const AdminPageBuilderPage: React.FC = () => {
                     type: 'teachers_showcase',
                     title: 'Faculty Mentors',
                     settings: {
-                        sectionTag: 'মেন্টর প্যানেল',
-                        sectionTitle: 'দেশসেরা শিক্ষকদের সাথে তোমার প্রস্তুতি',
-                        sectionSub: 'বছরজুড়ে যাদের সঠিক দিকনির্দেশনা হাজারো শিক্ষার্থীকে পৌঁছাতে সাহায্য করেছে তাদের স্বপ্নের ক্যাম্পাসে।',
+                        sectionTag: 'Mentor Panel',
+                        sectionTitle: 'Prepare with Top Instructors',
+                        sectionSub: 'Guiding thousands of learners toward academic excellence and dream careers.',
                         limit: 8,
                     }
                 };
@@ -739,14 +739,14 @@ export const AdminPageBuilderPage: React.FC = () => {
                     type: 'learning_path',
                     title: 'Learning Path',
                     settings: {
-                        sectionTag: 'লার্নিং মেথডোলজি',
-                        sectionTitle: '৪ ধাপে শতভাগ প্রস্তুতি নিশ্চিত করার বৈজ্ঞানিক পদ্ধতি',
-                        sectionSub: 'পরিকল্পিত উপায়ে কনসেপ্ট ক্লিয়ারিং থেকে পরীক্ষা জয়ের সম্পূর্ণ পথপ্রদর্শক।',
+                        sectionTag: 'Learning Methodology',
+                        sectionTitle: 'A 4-Step Scientific System to Guarantee 100% Preparation',
+                        sectionSub: 'From clear concept building to exam mastery, every step of the journey is organized.',
                         steps: [
-                            { id: '1', num: '০১', title: 'বেসিক ও কনসেপ্ট ক্লিয়ারিং', desc: 'প্রতিটি থিওরি অ্যানিমেশন ও বাস্তব উদাহরণের সাহায্যে সুস্পষ্টভাবে ব্যাখ্যা।' },
-                            { id: '2', num: '০২', title: 'টপিকভিত্তিক গাণিতিক প্র্যাকটিস', desc: 'বোর্ড ও শীর্ষ কলেজগুলোর বিগত বছরের প্রশ্নগুলোর পূর্ণাঙ্গ সমাধান।' },
-                            { id: '3', num: '০৩', title: '২৪/৭ AI ডাউট সলভিং', desc: 'পড়ালেখার যেকোনো সময় আটকে গেলে তাৎক্ষণিক সমাধানের নিশ্চয়তা।' },
-                            { id: '4', num: '০৪', title: 'লাইভ মডেল টেস্ট ও র‍্যাঙ্কিং', desc: 'টাইমারসহ রিয়েল এক্সাম এনভায়রনমেন্টে পরীক্ষা দিয়ে আত্মবিশ্বাস যাচাই।' },
+                            { id: '1', num: '01', title: 'Concept & Basics Mastery', desc: 'Every topic thoroughly clarified using animated visuals and real examples.' },
+                            { id: '2', num: '02', title: 'Targeted Problem Solving', desc: 'Comprehensive practice and solutions of previous board and top exam problems.' },
+                            { id: '3', num: '03', title: '24/7 AI Doubt Solving', desc: 'Instant clarity whenever you are stuck with formulas or concepts.' },
+                            { id: '4', num: '04', title: 'Live Mock Tests & Rankings', desc: 'Real exam simulated environment with timers and detailed analytical reports.' },
                         ]
                     }
                 };
@@ -758,13 +758,13 @@ export const AdminPageBuilderPage: React.FC = () => {
                     type: 'testimonials',
                     title: 'Student Testimonials',
                     settings: {
-                        sectionTag: 'শিক্ষার্থীদের মতামত',
-                        sectionTitle: 'সাফল্যের গল্পগুলো শুনুন শিক্ষার্থীদের মুখেই',
-                        sectionSub: 'আমাদের শিক্ষার্থীদের সাফল্যের অনুভূতি ও বাস্তব অভিজ্ঞতা।',
+                        sectionTag: 'Student Reviews',
+                        sectionTitle: 'Hear Real Success Stories from Our Learners',
+                        sectionSub: 'Authentic feedback and experiences shared by our enrolled students.',
                         items: [
-                            { id: '1', name: 'তানভীর আহমেদ', role: 'বুয়েট \'২৩ ব্যাচ', rating: 5, quote: 'মনোলগ এডুর ফিজিক্স ও ম্যাথ ক্লাসগুলো আমার কনসেপ্ট পুরো পাল্টে দিয়েছে। বিশেষ করে ডাউট সলভিং সিস্টেম অতুলনীয়!' },
-                            { id: '2', name: 'সাদিয়া আফরিন', role: 'ঢাকা মেডিকেল কলেজ', rating: 5, quote: 'অনলাইন এক্সাম সিস্টেমটা একদম রিয়েল পরীক্ষার ফিল দেয়। মেরিট পজিশন দেখে নিজের ভুলগুলো সহজে শুধরে নিয়েছি।' },
-                            { id: '3', name: 'ফারহান কবির', role: 'নটর ডেম কলেজ, GPA 5', rating: 5, quote: 'লেকচার শিটগুলো এতটাই গোছানো যে বাড়তি কোনো বইয়ের সাহায্য ছাড়াই সম্পূর্ণ রিভিশন সম্ভব হয়েছে।' },
+                            { id: '1', name: 'Tanvir Ahmed', role: 'Engineering Batch \'23', rating: 5, quote: 'The interactive classes transformed my preparation. The instant AI doubt solver was a game changer!' },
+                            { id: '2', name: 'Sadia Afrin', role: 'Medical College \'24', rating: 5, quote: 'The mock test platform replicates real exams perfectly. Tracking merit rankings helped me improve consistently.' },
+                            { id: '3', name: 'Farhan Kabir', role: 'Top College GPA 5', rating: 5, quote: 'The lecture sheets and practice sets were so well structured that I could complete my entire revision smoothly.' },
                         ]
                     }
                 };
@@ -776,13 +776,13 @@ export const AdminPageBuilderPage: React.FC = () => {
                     type: 'faq_accordion',
                     title: 'FAQ Accordion',
                     settings: {
-                        sectionTag: 'সচরাচর জিজ্ঞাসা',
-                        sectionTitle: 'সাধারণ কিছু প্রশ্নের উত্তর',
-                        sectionSub: 'কোর্স ভর্তি, ক্লাস ও পরীক্ষা সংক্রান্ত প্রয়োজনীয় তথ্য।',
+                        sectionTag: 'Frequently Asked Questions',
+                        sectionTitle: 'Common Questions & Answers',
+                        sectionSub: 'Everything you need to know about enrollments, classes, and exams.',
                         items: [
-                            { id: '1', q: 'নভয়নেক্স (NovoNex)-এ কোর্স কীভাবে কিনব বা ভর্তি হব?', a: 'যেকোনো কোর্সের কার্ডে থাকা "কোর্সটি কিনুন" বাটনে ক্লিক করুন। এরপর বিকাশ, নগদ বা রকেটের মাধ্যমে পেমেন্ট করে TrxID সাবমিট করলেই কোর্স সক্রিয় হবে।' },
-                            { id: '2', q: 'লাইভ ক্লাস ছাড়াও কি রেকর্ডেড ক্লাস ও লেকচার শিট পাওয়া যাবে?', a: 'হ্যাঁ, প্রতিটি লাইভ ক্লাসের পর তা স্বয়ংক্রিয়ভাবে ফুল HD রেকর্ডেড আর্কাইভে জমা হয় যা পরীক্ষার শেষ দিন পর্যন্ত যতবার ইচ্ছা রিভিশন দেওয়া যায়।' },
-                            { id: '3', q: 'NexPilot AI ডাউট সলভার কীভাবে পড়ালেখায় সাহায্য করে?', a: 'NexPilot হলো সম্পূর্ণ কারিকুলাম-সংযুক্ত ২৪/৭ এআই টিউটর। ক্লাসের পড়ালেখা বা সূত্রে আটকে গেলে সেকেন্ডের মধ্যে সমাধান পাওয়া যায়।' },
+                            { id: '1', q: 'How do I enroll in a course on NovoNex?', a: 'Click the "Enroll Now" or "Get Course" button on any course card. Complete the checkout process to get immediate access.' },
+                            { id: '2', q: 'Can I access recorded classes and lecture sheets after live sessions?', a: 'Yes, every live session is saved to your student archive in Full HD and remains accessible throughout your course validity.' },
+                            { id: '3', q: 'How does the NexPilot AI Doubt Solver assist my learning?', a: 'NexPilot is an intelligent 24/7 tutor linked with your curriculum. Ask any study question to get instant step-by-step guidance.' },
                         ]
                     }
                 };
@@ -1898,9 +1898,9 @@ export const AdminPageBuilderPage: React.FC = () => {
                                                                         const steps = selectedBlock.settings.steps || [];
                                                                         const newStep = {
                                                                             id: String(Date.now()),
-                                                                            num: `০${steps.length + 1}`,
-                                                                            title: 'নতুন ধাপের শিরোনাম',
-                                                                            desc: 'ধাপের বিস্তারিত বিবরণ লিখুন।'
+                                                                            num: `0${steps.length + 1}`,
+                                                                            title: 'New Step Title',
+                                                                            desc: 'Enter step details and instructions.'
                                                                         };
                                                                         handleUpdateSelectedSettings('steps', [...steps, newStep]);
                                                                     }}
@@ -1922,7 +1922,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                                                                                     handleUpdateSelectedSettings('steps', steps);
                                                                                 }}
                                                                                 className="w-14 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-sky-400 font-bold text-center"
-                                                                                placeholder="০১"
+                                                                                placeholder="01"
                                                                             />
                                                                             <button
                                                                                 type="button"
@@ -2006,10 +2006,10 @@ export const AdminPageBuilderPage: React.FC = () => {
                                                                         const items = selectedBlock.settings.items || [];
                                                                         const newItem = {
                                                                             id: String(Date.now()),
-                                                                            name: 'শিক্ষার্থীর নাম',
-                                                                            role: 'ব্যাচ / কলেজ',
+                                                                            name: 'Student Name',
+                                                                            role: 'Batch / College',
                                                                             rating: 5,
-                                                                            quote: 'মনোলগ এডুর সাথে পড়ার অভিজ্ঞতা অসাধারণ!'
+                                                                            quote: 'Learning with NovoNex has been truly transformative and wonderful!'
                                                                         };
                                                                         handleUpdateSelectedSettings('items', [...items, newItem]);
                                                                     }}
@@ -2118,8 +2118,8 @@ export const AdminPageBuilderPage: React.FC = () => {
                                                                         const items = selectedBlock.settings.items || [];
                                                                         const newItem = {
                                                                             id: String(Date.now()),
-                                                                            q: 'আপনার নতুন প্রশ্ন লিখুন?',
-                                                                            a: 'এখানে প্রশ্নের উত্তর সুস্পষ্টভাবে লিখুন।'
+                                                                            q: 'Enter your new question here?',
+                                                                            a: 'Enter the clear, helpful answer here.'
                                                                         };
                                                                         handleUpdateSelectedSettings('items', [...items, newItem]);
                                                                     }}
@@ -2216,8 +2216,8 @@ export const AdminPageBuilderPage: React.FC = () => {
                                                                         const newItem = {
                                                                             id: String(Date.now()),
                                                                             icon: 'Award',
-                                                                            title: 'নতুন সুবিধা',
-                                                                            desc: 'সুবিধার বিস্তারিত বিবরণ লিখুন।'
+                                                                            title: 'New Feature Advantage',
+                                                                            desc: 'Enter detailed description of this feature.'
                                                                         };
                                                                         handleUpdateSelectedSettings('items', [...items, newItem]);
                                                                     }}
@@ -3107,7 +3107,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                                             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-600/30 transition-all cursor-pointer"
                                         >
                                             <Plus className="w-4 h-4" />
-                                            <span>Add New Widget (উইজেট যোগ করুন)</span>
+                                            <span>Add New Widget</span>
                                         </button>
                                         <button
                                             type="button"
@@ -3132,7 +3132,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                             type="button"
                             onClick={scrollToTop}
                             className="px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-1 text-xs font-bold"
-                            title="Scroll to Top (উপরে উঠুন)"
+                            title="Scroll to Top"
                         >
                             <ChevronUp className="w-4 h-4 text-sky-400" />
                             <span className="hidden sm:inline">Top</span>
@@ -3146,7 +3146,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                             type="button"
                             onClick={scrollToBottom}
                             className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold shadow-md shadow-sky-600/30"
-                            title="Scroll to Bottom (নিচে নামুন)"
+                            title="Scroll to Bottom"
                         >
                             <ChevronDown className="w-4 h-4 animate-bounce" />
                             <span>Bottom</span>

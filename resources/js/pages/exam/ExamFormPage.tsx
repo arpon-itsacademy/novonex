@@ -211,7 +211,7 @@ export const ExamFormPage: React.FC = () => {
                 {/* Exam Type Selector (Practice Exam vs Live Exam) */}
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
                     <label className="block text-sm font-bold text-slate-900 dark:text-white">
-                        পরীক্ষার ধরন (Exam Type)
+                        Exam Type
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <label className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
@@ -228,9 +228,9 @@ export const ExamFormPage: React.FC = () => {
                                 className="mt-1 text-sky-600 focus:ring-sky-500"
                             />
                             <div>
-                                <span className="text-sm font-bold block">📝 প্র্যাকটিস এক্সাম (Practice Exam)</span>
+                                <span className="text-sm font-bold block">📝 Practice Exam</span>
                                 <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 block">
-                                    শিক্ষার্থীরা যেকোনো সময় অনুশীলনের অংশ হিসেবে এই পরীক্ষা দিতে পারবে।
+                                    Students can take this exam anytime for self-paced practice.
                                 </span>
                             </div>
                         </label>
@@ -249,9 +249,9 @@ export const ExamFormPage: React.FC = () => {
                                 className="mt-1 text-amber-600 focus:ring-amber-500"
                             />
                             <div>
-                                <span className="text-sm font-bold block">⏰ লাইভ এক্সাম (Live Exam)</span>
+                                <span className="text-sm font-bold block">⏰ Live Exam</span>
                                 <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 block">
-                                    নির্দিষ্ট সময়সীমার মধ্যে লাইভ চলবে। সময় শেষ হলে স্বয়ংক্রিয়ভাবে প্র্যাকটিস এক্সামে চলে যাবে।
+                                    Runs strictly within a set window. Automatically converts to a practice exam once expired.
                                 </span>
                             </div>
                         </label>
@@ -262,7 +262,7 @@ export const ExamFormPage: React.FC = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        লাইভ শুরুর সময় (Start Time) <span className="text-rose-500">*</span>
+                                        Live Start Time <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         type="datetime-local"
@@ -274,7 +274,7 @@ export const ExamFormPage: React.FC = () => {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        লাইভ শেষের সময় (End Time) <span className="text-rose-500">*</span>
+                                        Live End Time <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         type="datetime-local"
@@ -286,7 +286,7 @@ export const ExamFormPage: React.FC = () => {
                                 </div>
                             </div>
                             <p className="text-[11px] text-amber-700 dark:text-amber-400">
-                                💡 নির্ধারিত শেষের সময় অতিক্রম করলে সিস্টেম স্বয়ংক্রিয়ভাবে এটিকে প্র্যাকটিস এক্সামে রূপান্তর করবে।
+                                💡 Once the scheduled end time passes, the system automatically transitions this into a practice exam.
                             </p>
                         </div>
                     )}

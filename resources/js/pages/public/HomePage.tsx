@@ -128,11 +128,11 @@ export const HomePage: React.FC = () => {
     const allFaculty: FeaturedTeacher[] = teachers.map((t) => {
         const combined = `${t.expertise || ''} ${t.designation || ''} ${t.bio || ''}`.toLowerCase();
         let cat: 'ssc' | 'hsc' | 'admission' | 'arts' | 'all' = 'all';
-        if (combined.includes('ssc') || combined.includes('নবম') || combined.includes('দশম')) {
+        if (combined.includes('ssc') || combined.includes('class 9') || combined.includes('class 10')) {
             cat = 'ssc';
-        } else if (combined.includes('admission') || combined.includes('এডমিশন') || combined.includes('মেডিকেল') || combined.includes('du') || combined.includes('bcs') || combined.includes('বিসিএস')) {
+        } else if (combined.includes('admission') || combined.includes('medical') || combined.includes('engineering') || combined.includes('du') || combined.includes('bcs')) {
             cat = 'admission';
-        } else if (combined.includes('commerce') || combined.includes('arts') || combined.includes('কমার্স') || combined.includes('আর্টস')) {
+        } else if (combined.includes('commerce') || combined.includes('arts')) {
             cat = 'arts';
         } else {
             cat = 'hsc';
@@ -140,13 +140,13 @@ export const HomePage: React.FC = () => {
 
         const tags = t.expertise 
             ? t.expertise.split(',').map((s: string) => s.trim()) 
-            : ['এইচএসসি', 'এডমিশন'];
+            : ['HSC', 'Admission'];
 
         return {
             ...t,
-            designation: t.designation || 'শিক্ষক মেন্টর',
+            designation: t.designation || 'Instructor & Mentor',
             institution: t.institution || 'NovoNex',
-            experience: t.bio ? (t.bio.length > 50 ? t.bio.substring(0, 50) + '...' : t.bio) : 'ফ্যাকাল্টি মেম্বার',
+            experience: t.bio ? (t.bio.length > 50 ? t.bio.substring(0, 50) + '...' : t.bio) : 'Faculty Member',
             tags,
             category: cat
         };
@@ -155,16 +155,16 @@ export const HomePage: React.FC = () => {
     const displayedFaculty = allFaculty.filter((t) => {
         if (teacherFilter === 'all') return true;
         if (teacherFilter === 'ssc') {
-            return t.category === 'ssc' || t.tags?.some(tag => tag.includes('দশম') || tag.includes('নবম') || tag.toLowerCase().includes('ssc'));
+            return t.category === 'ssc' || t.tags?.some(tag => tag.toLowerCase().includes('ssc') || tag.toLowerCase().includes('class 10') || tag.toLowerCase().includes('class 9'));
         }
         if (teacherFilter === 'hsc') {
-            return t.category === 'hsc' || t.tags?.some(tag => tag.includes('এইচএসসি') || tag.toLowerCase().includes('hsc'));
+            return t.category === 'hsc' || t.tags?.some(tag => tag.toLowerCase().includes('hsc'));
         }
         if (teacherFilter === 'admission') {
-            return t.category === 'admission' || t.tags?.some(tag => tag.includes('এডমিশন') || tag.toLowerCase().includes('admission'));
+            return t.category === 'admission' || t.tags?.some(tag => tag.toLowerCase().includes('admission') || tag.toLowerCase().includes('engineering') || tag.toLowerCase().includes('medical'));
         }
         if (teacherFilter === 'arts') {
-            return t.category === 'arts' || t.tags?.some(tag => tag.includes('আর্টস') || tag.includes('কমার্স') || tag.toLowerCase().includes('arts') || tag.toLowerCase().includes('commerce'));
+            return t.category === 'arts' || t.tags?.some(tag => tag.toLowerCase().includes('arts') || tag.toLowerCase().includes('commerce'));
         }
         return true;
     });
@@ -203,24 +203,24 @@ export const HomePage: React.FC = () => {
 
     const faqs = [
         {
-            q: 'নভয়নেক্স (NovoNex)-এ কোর্স কীভাবে কিনব বা ভর্তি হব?',
-            a: 'যেকোনো কোর্সের কার্ডে থাকা "কোর্সটি কিনুন" বাটনে ক্লিক করুন। এরপর বিকাশ (bKash), নগদ (Nagad) বা রকেটের মাধ্যমে সরাসরি পেমেন্ট করে ট্রানজেকশন আইডি (TrxID) দিয়ে সাবমিট করলেই খুব দ্রুত আপনার কোর্স এনরোলমেন্ট সক্রিয় হয়ে যাবে।',
+            q: 'How do I purchase or enroll in a course on NovoNex?',
+            a: 'Click the "Enroll Now" button on any course card. Complete payment via bKash, Nagad, Rocket, Cards or online payment gateway, and submit your transaction details to activate course access immediately.',
         },
         {
-            q: 'লাইভ ক্লাস ছাড়াও কি রেকর্ডেড ক্লাস ও লেকচার শিট পাওয়া যাবে?',
-            a: 'হ্যাঁ, প্রতিটি লাইভ ক্লাসের পর তা স্বয়ংক্রিয়ভাবে ফুল HD রেকর্ডেড আর্কাইভে জমা হয় যা পরীক্ষার শেষ দিন পর্যন্ত যতবার ইচ্ছা রিভিশন দেওয়া যায়। সাথে চ্যাপ্টারভিত্তিক প্র্যাকটিস শিট ও লেকচার নোটের পিডিএফ দেওয়া হয়।',
+            q: 'Will I have access to recorded classes and lecture sheets alongside live classes?',
+            a: 'Yes, every live class is automatically recorded in Full HD and stored in your course archive, available for unlimited revision until the exam concludes. You also receive chapter-wise practice sheets and PDF lecture notes.',
         },
         {
-            q: 'NexPilot AI ডাউট সলভার কীভাবে পড়ালেখায় সাহায্য করে?',
-            a: 'NexPilot হলো বাংলাদেশের প্রথম সম্পূর্ণ কারিকুলাম-সংযুক্ত ২৪/৭ এআই টিউটর। ক্লাসের পড়ালেখা, সূত্রের ব্যাখ্যা বা কোনো গাণিতিক সমস্যায় আটকে গেলে যেকোনো সময় চ্যাট করে সেকেন্ডের মধ্যে কনসেপ্ট ক্লিয়ার করা যায়।',
+            q: 'How does NexPilot AI Doubt Solver assist my learning?',
+            a: 'NexPilot is an intelligent 24/7 AI tutor connected directly to your curriculum. Whenever you encounter a doubt, formula question, or complex math problem, chat with NexPilot for instant step-by-step conceptual explanations.',
         },
         {
-            q: 'অনলাইন মডেল টেস্ট ও মেরিট পজিশন কীভাবে কাজ করে?',
-            a: 'পরীক্ষাগুলো বাস্তব বোর্ড ও ভর্তি পরীক্ষার মতো নেগেটিভ মার্কিংসহ টাইমারভিত্তিক নেওয়া হয়। পরীক্ষা জমা দেওয়ার সাথে সাথে স্বয়ংক্রিয় মূল্যায়ন, সঠিক উত্তরের ব্যাখ্যা এবং সকল পরীক্ষার্থীদের মধ্যে আপনার মেরিট পজিশন দেখতে পাবেন।',
+            q: 'How do online model tests and merit positions work?',
+            a: 'Exams are timed with realistic negative marking matching actual board and admission tests. Submitting an exam gives you instant evaluations, solution explanations, and your overall merit position among all candidates.',
         },
         {
-            q: 'কোর্স কিনলে কি মোবাইল ও কম্পিউটার উভয় ডিভাইসে করা যাবে?',
-            a: 'অবশ্যই! আমাদের প্ল্যাটফর্ম যেকোনো স্মার্টফোন, ট্যাবলেট এবং ল্যাপটপ/পিসিতে অত্যন্ত দ্রুত ও স্মুথলি কাজ করে।',
+            q: 'Can I access the courses on both mobile and desktop devices?',
+            a: 'Absolutely! Our platform is fully responsive and optimized for ultra-smooth performance on any smartphone, tablet, laptop, or desktop computer.',
         },
     ];
 
@@ -243,9 +243,9 @@ export const HomePage: React.FC = () => {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                 </span>
-                <span>🔥 HSC একাডেমিক সাইকেল ও অ্যাডমিশন মাস্টার ব্যাচে স্পেশাল ছাড়ে ভর্তি চলছে!</span>
+                <span>🔥 Special discount enrollment is open for HSC Academic Cycle & Admission Master Batch!</span>
                 <Link to="/courses" className="underline font-extrabold text-white hover:text-red-100 transition-colors ml-1 hidden sm:inline">
-                    সকল কোর্স দেখুন →
+                    View All Courses →
                 </Link>
             </div>
 
@@ -265,21 +265,21 @@ export const HomePage: React.FC = () => {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#CC1200] opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#CC1200]"></span>
                                 </span>
-                                <span>বাংলাদেশের আধুনিকতম অনলাইন লার্নিং প্ল্যাটফর্ম</span>
+                                <span>Bangladesh's Premier Online Learning Platform</span>
                             </div>
 
                             {/* Headline */}
                             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-[1.2] tracking-tight">
-                                স্বপ্ন যেখানে বাস্তব হয়, <br />
+                                Where Dreams Turn into Reality, <br />
                                 <span className="bg-gradient-to-r from-[#25a2ee] via-[#25a2ee] to-[#CC1200] bg-clip-text text-transparent">
-                                    কনসেপ্ট ক্লিয়ারিং থেকে
+                                    From Concept Clarity
                                 </span> <br />
-                                অ্যাডমিশন জয়!
+                                To Admission Success!
                             </h1>
 
                             {/* Subtitle */}
                             <p className="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                                অভিজ্ঞ মেন্টরদের লাইভ ও ফুল HD রেকর্ডেড ক্লাস, অধ্যায়ভিত্তিক লেকচার শিট, <strong className="text-[#25a2ee] font-bold">24/7 NexPilot AI ডাউট সলভিং</strong> এবং রিয়েল টাইম মডেল টেস্টের মাধ্যমে প্রস্তুতি নাও ১০০% আত্মবিশ্বাসে।
+                                Master every topic with 100% confidence through expert-led Live & Full HD recorded classes, chapter-wise lecture sheets, <strong className="text-[#25a2ee] font-bold">24/7 NexPilot AI Doubt Solving</strong>, and real-time model tests.
                             </p>
 
                             {/* Dual CTAs */}
@@ -288,7 +288,7 @@ export const HomePage: React.FC = () => {
                                     to="/courses"
                                     className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#CC1200] hover:bg-[#a80e00] text-white font-extrabold text-sm sm:text-base shadow-lg shadow-[#CC1200]/30 hover:shadow-xl hover:shadow-[#CC1200]/40 transition-all flex items-center justify-center gap-2 group cursor-pointer"
                                 >
-                                    <span>কোর্সগুলো ঘুরে দেখুন</span>
+                                    <span>Explore Courses</span>
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
                                 </Link>
 
@@ -297,27 +297,27 @@ export const HomePage: React.FC = () => {
                                     className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-slate-900 border-2 border-[#25a2ee] text-[#25a2ee] font-extrabold text-sm sm:text-base hover:bg-[#25a2ee] hover:text-white transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                                 >
                                     <ClipboardList className="w-5 h-5 text-current" />
-                                    <span>অনলাইন এক্সাম দিন</span>
+                                    <span>Take Online Exams</span>
                                 </Link>
                             </div>
 
                             {/* Metrics Counter Bar */}
                             <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-slate-200/80 dark:border-slate-800 text-left">
                                 <div className="space-y-0.5">
-                                    <div className="text-2xl sm:text-3xl font-black text-[#25a2ee]">৫০,০০০+</div>
-                                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">সক্রিয় শিক্ষার্থী</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-[#25a2ee]">50,000+</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Active Learners</div>
                                 </div>
                                 <div className="space-y-0.5">
-                                    <div className="text-2xl sm:text-3xl font-black text-[#CC1200]">১০০+</div>
-                                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">ফ্ল্যাগশিপ কোর্স</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-[#CC1200]">100+</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Flagship Courses</div>
                                 </div>
                                 <div className="space-y-0.5">
-                                    <div className="text-2xl sm:text-3xl font-black text-[#25a2ee]">৯৮%</div>
-                                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">পরীক্ষায় সাফল্য</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-[#25a2ee]">98%</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Success Rate</div>
                                 </div>
                                 <div className="space-y-0.5">
-                                    <div className="text-2xl sm:text-3xl font-black text-[#CC1200]">২৪/৭</div>
-                                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">এআই ডাউট সলভার</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-[#CC1200]">24/7</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">AI Doubt Solver</div>
                                 </div>
                             </div>
                         </div>
@@ -334,7 +334,7 @@ export const HomePage: React.FC = () => {
                                                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#CC1200]"></span>
                                             </span>
                                             <span className="text-xs font-bold text-[#CC1200] uppercase tracking-wide">
-                                                লাইভ ফ্ল্যাগশিপ প্রোগ্রাম
+                                                Live Flagship Program
                                             </span>
                                         </div>
                                         <span className="text-[11px] font-bold px-2 py-0.5 bg-[#25a2ee]/20 text-[#25a2ee] rounded-md">
@@ -348,7 +348,7 @@ export const HomePage: React.FC = () => {
                                             HSC Academic & Admission Complete Preparation Cycle
                                         </h3>
                                         <p className="text-xs text-slate-400 mt-1">
-                                            Physics, Chemistry, Higher Math ও Biology-র সম্পূর্ণ বোর্ড সিলেবাস ও অ্যাডমিশন প্রস্তুতি এক প্ল্যাটফর্মে।
+                                            Complete board syllabus and admission prep for Physics, Chemistry, Higher Math, and Biology on a single platform.
                                         </p>
                                     </div>
 
@@ -359,8 +359,8 @@ export const HomePage: React.FC = () => {
                                                 <Video className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <h4 className="text-xs font-bold text-white">লাইভ ও ফুল HD রেকর্ডেড ক্লাস</h4>
-                                                <p className="text-[11px] text-slate-400">পরীক্ষার আগ পর্যন্ত আনলিমিটেড রিভিশন আর্কাইভ</p>
+                                                <h4 className="text-xs font-bold text-white">Live & Full HD Recorded Classes</h4>
+                                                <p className="text-[11px] text-slate-400">Unlimited revision archive until exams conclude</p>
                                             </div>
                                         </div>
 
@@ -369,8 +369,8 @@ export const HomePage: React.FC = () => {
                                                 <Bot className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <h4 className="text-xs font-bold text-white">NexPilot AI ডাউট সলভার</h4>
-                                                <p className="text-[11px] text-slate-400">যে কোনো প্রশ্নে আটকে গেলে ইনস্ট্যান্ট এআই ব্যাখ্যা</p>
+                                                <h4 className="text-xs font-bold text-white">NexPilot AI Doubt Solver</h4>
+                                                <p className="text-[11px] text-slate-400">Instant conceptual explanation whenever you get stuck</p>
                                             </div>
                                         </div>
 
@@ -379,8 +379,8 @@ export const HomePage: React.FC = () => {
                                                 <ClipboardList className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <h4 className="text-xs font-bold text-white">বোর্ড ও অ্যাডমিশন স্ট্যান্ডার্ড মডেল টেস্ট</h4>
-                                                <p className="text-[11px] text-slate-400">নেগেটিভ মার্কিংসহ ইনস্ট্যান্ট মেরিট লিস্ট ও অ্যানালাইসিস</p>
+                                                <h4 className="text-xs font-bold text-white">Board & Admission Standard Model Tests</h4>
+                                                <p className="text-[11px] text-slate-400">Real-time merit position and analysis with negative marking</p>
                                             </div>
                                         </div>
                                     </div>
@@ -391,7 +391,7 @@ export const HomePage: React.FC = () => {
                                             to="/courses"
                                             className="block w-full py-3.5 bg-gradient-to-r from-[#25a2ee] to-[#CC1200] hover:opacity-95 text-white font-extrabold rounded-xl text-center text-sm shadow-md shadow-[#25a2ee]/25 transition-all cursor-pointer"
                                         >
-                                            এখনই ব্যাচে ভর্তি হোন
+                                            Enroll in Batch Now
                                         </Link>
                                     </div>
                                 </div>
@@ -405,13 +405,13 @@ export const HomePage: React.FC = () => {
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
                     <span className="text-xs font-bold text-sky-600 uppercase tracking-widest bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-full">
-                        একাডেমিক সেগমেন্টস
+                        Academic Segments
                     </span>
                     <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                        তুমি কোন ক্লাসের জন্য প্রস্তুতি নিচ্ছ?
+                        Which Exam are You Preparing For?
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                        তোমার লক্ষ্য অনুযায়ী কোর্স বেছে নাও এবং আজ থেকেই নিজের স্বপ্ন পূরণের যাত্রা শুরু করো।
+                        Choose your target program and begin your journey towards success today.
                     </p>
                 </div>
 
@@ -424,8 +424,8 @@ export const HomePage: React.FC = () => {
                         <div className="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                             <BookOpen className="w-6 h-6" />
                         </div>
-                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">HSC একাডেমিক</h3>
-                        <p className="text-[11px] text-slate-500 mt-1">১ম ও ২য় বর্ষ সাইকেল</p>
+                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">HSC Academic</h3>
+                        <p className="text-[11px] text-slate-500 mt-1">1st & 2nd Year Cycle</p>
                     </div>
 
                     {/* Engineering Admission */}
@@ -436,8 +436,8 @@ export const HomePage: React.FC = () => {
                         <div className="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                             <Zap className="w-6 h-6" />
                         </div>
-                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">ইঞ্জিনিয়ারিং ভর্তি</h3>
-                        <p className="text-[11px] text-slate-500 mt-1">BUET, CKRUET প্রস্তুতি</p>
+                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">Engineering Prep</h3>
+                        <p className="text-[11px] text-slate-500 mt-1">BUET & CKRUET Prep</p>
                     </div>
 
                     {/* Varsity Admission */}
@@ -448,8 +448,8 @@ export const HomePage: React.FC = () => {
                         <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                             <Award className="w-6 h-6" />
                         </div>
-                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">ভার্সিটি ‘ক’ ও ‘খ’</h3>
-                        <p className="text-[11px] text-slate-500 mt-1">ঢাকা বিশ্ববিদ্যালয় ও গুচ্ছ</p>
+                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">Varsity Admission</h3>
+                        <p className="text-[11px] text-slate-500 mt-1">DU & Combined University</p>
                     </div>
 
                     {/* Course Bundles */}
@@ -460,8 +460,8 @@ export const HomePage: React.FC = () => {
                         <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                             <Boxes className="w-6 h-6" />
                         </div>
-                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">কম্বো বান্ডেল</h3>
-                        <p className="text-[11px] text-slate-500 mt-1">একাধিক কোর্স একসাথে</p>
+                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">Combo Bundles</h3>
+                        <p className="text-[11px] text-slate-500 mt-1">All-in-One Programs</p>
                     </div>
 
                     {/* Online Model Tests */}
@@ -472,8 +472,8 @@ export const HomePage: React.FC = () => {
                         <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                             <ClipboardList className="w-6 h-6" />
                         </div>
-                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">অনলাইন এক্সাম</h3>
-                        <p className="text-[11px] text-slate-500 mt-1">রিয়েল টাইম টেস্ট হল</p>
+                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">Online Exams</h3>
+                        <p className="text-[11px] text-slate-500 mt-1">Real-Time Exam Hall</p>
                     </Link>
                 </div>
             </section>
@@ -484,17 +484,17 @@ export const HomePage: React.FC = () => {
                     <div>
                         <div className="flex items-center gap-2 text-xs font-bold text-sky-600 uppercase tracking-widest mb-1.5">
                             <Flame className="w-4 h-4 text-rose-500" />
-                            <span>জনপ্রিয় ও চলমান কোর্সসমূহ</span>
+                            <span>Popular & Ongoing Courses</span>
                         </div>
                         <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-                            আমাদের সেরা কোর্সসমূহ
+                            Featured Courses
                         </h2>
                     </div>
                     <Link
                         to="/courses"
                         className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300"
                     >
-                        <span>সকল কোর্স দেখুন</span>
+                        <span>View All Courses</span>
                         <ArrowRight className="w-4 h-4" />
                     </Link>
                 </div>
@@ -509,7 +509,7 @@ export const HomePage: React.FC = () => {
                                 : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800'
                         }`}
                     >
-                        সকল কোর্স
+                        All Courses
                     </button>
                     {categories.map((cat) => {
                         const isSelected = activeCategory === cat.slug;
@@ -549,8 +549,8 @@ export const HomePage: React.FC = () => {
                 ) : courses.length === 0 ? (
                     <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 text-slate-500 space-y-3">
                         <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto" />
-                        <h3 className="text-base font-bold text-slate-800 dark:text-white">বর্তমানে কোনো কোর্স পাওয়া যায়নি</h3>
-                        <p className="text-xs text-slate-500 max-w-sm mx-auto">খুব শীঘ্রই এই ক্যাটাগরিতে নতুন ব্যাচের কোর্স যুক্ত করা হবে।</p>
+                        <h3 className="text-base font-bold text-slate-800 dark:text-white">No courses found at this time</h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">New batches for this category will be available soon.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -580,11 +580,11 @@ export const HomePage: React.FC = () => {
                                     {/* Discount Badge */}
                                     {course.discount_percent && course.discount_percent > 0 ? (
                                         <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-rose-600 text-white rounded-xl shadow-md">
-                                            {course.discount_percent}% ছাড়
+                                            {course.discount_percent}% OFF
                                         </span>
                                     ) : course.price === 0 ? (
                                         <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-emerald-600 text-white rounded-xl shadow-md">
-                                            ফ্রি কোর্স
+                                            Free Course
                                         </span>
                                     ) : null}
 
@@ -602,12 +602,12 @@ export const HomePage: React.FC = () => {
                                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                                             <span className="flex items-center gap-1">
                                                 <Video className="w-3.5 h-3.5 text-sky-500" />
-                                                <span>{course.lessons_count || 0} টি ক্লাস</span>
+                                                <span>{course.lessons_count || 0} Lessons</span>
                                             </span>
                                             <span>•</span>
                                             <span className="flex items-center gap-1">
                                                 <Users className="w-3.5 h-3.5 text-sky-500" />
-                                                <span>{course.enrollments_count || 0} জন শিক্ষার্থী</span>
+                                                <span>{course.enrollments_count || 0} Students</span>
                                             </span>
                                         </div>
 
@@ -625,9 +625,9 @@ export const HomePage: React.FC = () => {
                                             {((course.features && Array.isArray(course.features) && course.features.length > 0)
                                                 ? course.features.filter((f: any) => typeof f === 'string' && f.trim().length > 0)
                                                 : [
-                                                    'লাইভ ও ফুল HD রেকর্ডেড ক্লাস আর্কাইভ',
-                                                    'চ্যাপ্টারভিত্তিক লেকচার শিট ও প্রশ্নব্যাংক',
-                                                    'NexPilot AI ২৪/৭ ইনস্ট্যান্ট ডাউট সলভার',
+                                                    'Live & Full HD Recorded Class Archive',
+                                                    'Chapter-wise Lecture Sheets & Question Bank',
+                                                    'NexPilot AI 24/7 Instant Doubt Solver',
                                                 ]
                                             ).slice(0, 4).map((feat: string, fIdx: number) => (
                                                 <div key={fIdx} className="flex items-start gap-1.5">
@@ -642,16 +642,16 @@ export const HomePage: React.FC = () => {
                                     <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
                                         <div className="flex items-center justify-between">
                                             <div className="text-xs font-medium text-slate-500 truncate mr-2">
-                                                ইন্সট্রাক্টর: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                Instructor: <span className="font-bold text-slate-800 dark:text-slate-200">
                                                     {course.instructors && course.instructors.length > 0 
                                                         ? course.instructors[0].name 
-                                                        : (course.instructor?.name || 'অভিজ্ঞ মেন্টর')}
+                                                        : (course.instructor?.name || 'Expert Mentor')}
                                                 </span>
                                             </div>
 
                                             <div className="text-right shrink-0">
                                                 {course.price === 0 ? (
-                                                    <span className="text-lg font-black text-emerald-600">ফ্রি</span>
+                                                    <span className="text-lg font-black text-emerald-600">Free</span>
                                                 ) : (
                                                     <div className="flex items-baseline gap-1.5">
                                                         <span className="text-xl font-black text-sky-600 dark:text-sky-400">
@@ -677,13 +677,13 @@ export const HomePage: React.FC = () => {
                                                 to={`/courses/${course.slug}`}
                                                 className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer"
                                             >
-                                                বিস্তারিত দেখুন
+                                                View Details
                                             </Link>
                                             <Link
                                                 to={`/checkout/${course.slug}`}
                                                 className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 font-bold text-xs text-white text-center transition-all shadow-md shadow-sky-500/20 cursor-pointer"
                                             >
-                                                কোর্সটি কিনুন
+                                                Enroll Now
                                             </Link>
                                         </div>
                                     </div>
@@ -705,20 +705,20 @@ export const HomePage: React.FC = () => {
                             <div>
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider mb-2">
                                     <Boxes className="w-3.5 h-3.5" />
-                                    <span>কম্বো বান্ডেল অফার</span>
+                                    <span>Combo Bundle Offer</span>
                                 </span>
                                 <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                                    স্পেশাল কোর্স বান্ডেলসমূহ
+                                    Special Course Bundles
                                 </h2>
                                 <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
-                                    একাধিক কোর্স একসাথে বান্ডেল আকারে নিয়ে সম্পূর্ণ প্রস্তুতি সম্পন্ন করো সর্বোচ্চ সাশ্রয়ী মূল্যে।
+                                    Get complete preparation by bundling multiple courses together at maximum savings.
                                 </p>
                             </div>
                             <Link
                                 to="/courses"
                                 className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-amber-300 hover:text-white transition-colors"
                             >
-                                <span>সবগুলো বান্ডেল দেখুন</span>
+                                <span>View All Bundles</span>
                                 <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
@@ -732,10 +732,10 @@ export const HomePage: React.FC = () => {
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
                                             <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-500/30 text-sky-200 border border-sky-400/30">
-                                                {bundle.courses_count || bundle.courses?.length || 0} টি কোর্স একসাথে
+                                                {bundle.courses_count || bundle.courses?.length || 0} Courses Included
                                             </span>
                                             <span className="text-xs font-bold text-emerald-400">
-                                                মেগা সেভিং প্যাক
+                                                Mega Saving Pack
                                             </span>
                                         </div>
 
@@ -753,7 +753,7 @@ export const HomePage: React.FC = () => {
                                         {bundle.courses && bundle.courses.length > 0 && (
                                             <div className="pt-2 space-y-1">
                                                 <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                                    অন্তর্ভুক্ত কোর্সসমূহ:
+                                                    Included Courses:
                                                 </div>
                                                 <div className="space-y-1">
                                                     {bundle.courses.slice(0, 3).map((c) => (
@@ -764,7 +764,7 @@ export const HomePage: React.FC = () => {
                                                     ))}
                                                     {bundle.courses.length > 3 && (
                                                         <div className="text-[10px] text-amber-300 font-bold">
-                                                            + আরও {bundle.courses.length - 3} টি কোর্স
+                                                            + {bundle.courses.length - 3} More Courses
                                                         </div>
                                                     )}
                                                 </div>
@@ -787,7 +787,7 @@ export const HomePage: React.FC = () => {
                                             to={`/courses`}
                                             className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition-colors shadow-md cursor-pointer"
                                         >
-                                            বান্ডেলটি নিন
+                                            Get Bundle
                                         </Link>
                                     </div>
                                 </div>
@@ -804,14 +804,14 @@ export const HomePage: React.FC = () => {
                         <div className="lg:col-span-8 space-y-4 text-center lg:text-left">
                             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold tracking-wide">
                                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                                <span>পরীক্ষার আগেই শতভাগ প্রস্তুতি যাচাই</span>
+                                <span>Verify 100% Exam Readiness</span>
                             </div>
                             <h2 className="text-2xl sm:text-4xl font-black leading-tight">
-                                লাইভ এক্সাম হলে পরীক্ষা দাও, <br />
-                                ইনস্ট্যান্ট মেরিট লিস্টে নিজের অবস্থান জানো!
+                                Test Yourself in the Live Exam Hall, <br />
+                                Know Your Real Position on the Instant Merit List!
                             </h2>
                             <p className="text-xs sm:text-sm text-sky-100 max-w-xl leading-relaxed">
-                                নেগেটিভ মার্কিংসহ বোর্ড ও ভর্তি পরীক্ষার অনুরূপ পরিবেশে চ্যাপ্টারভিত্তিক মডেল টেস্ট এবং সাথে প্রতিটি প্রশ্নের পূর্ণাঙ্গ সল্যুশন ও রিভিউ শিট।
+                                Experience chapter-wise model tests in authentic board & admission environments with negative marking, step-by-step solutions, and performance reviews.
                             </p>
                         </div>
 
@@ -820,13 +820,13 @@ export const HomePage: React.FC = () => {
                                 to="/student/exams"
                                 className="px-6 py-3.5 bg-white hover:bg-slate-100 text-sky-700 font-black rounded-2xl text-center text-sm shadow-md transition-all cursor-pointer"
                             >
-                                অনলাইন মডেল টেস্ট দিন
+                                Take Online Model Tests
                             </Link>
                             <Link
                                 to="/courses?type=free"
                                 className="px-6 py-3.5 bg-sky-900/60 hover:bg-sky-900 text-white border border-white/20 font-bold rounded-2xl text-center text-sm transition-all cursor-pointer"
                             >
-                                ফ্রি রিসোর্স ও ডেমো ক্লাস
+                                Free Resources & Demo Classes
                             </Link>
                         </div>
                     </div>
@@ -841,9 +841,9 @@ export const HomePage: React.FC = () => {
                         {/* Left: Section Title with Orange Swoosh Underline */}
                         <div>
                             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center flex-wrap gap-2">
-                                <span>আমাদের অভিজ্ঞ</span>
+                                <span>Meet Our Expert</span>
                                 <span className="relative inline-block text-sky-500 dark:text-sky-400">
-                                    শিক্ষকবৃন্দ
+                                    Instructors
                                     <svg
                                         className="absolute -bottom-2 left-0 w-full h-3 text-amber-500"
                                         viewBox="0 0 160 12"
@@ -860,18 +860,18 @@ export const HomePage: React.FC = () => {
                                 </span>
                             </h2>
                             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-2">
-                                অভিজ্ঞ ও দক্ষ শিক্ষকদের কাছ থেকে শেখা
+                                Learn from top faculty and experienced mentors
                             </p>
                         </div>
 
                         {/* Center: Category Filter Pills */}
                         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-none">
                             {[
-                                { id: 'all', label: 'সবাই' },
-                                { id: 'ssc', label: 'নবম-দশম শ্রেণী' },
-                                { id: 'hsc', label: 'এইচএসসি' },
-                                { id: 'admission', label: 'এডমিশন' },
-                                { id: 'arts', label: 'আর্টস ও কমার্স' }
+                                { id: 'all', label: 'All' },
+                                { id: 'ssc', label: 'Class 9-10' },
+                                { id: 'hsc', label: 'HSC' },
+                                { id: 'admission', label: 'Admission' },
+                                { id: 'arts', label: 'Arts & Commerce' }
                             ].map((tab) => {
                                 const isActive = teacherFilter === tab.id;
                                 return (
@@ -896,7 +896,7 @@ export const HomePage: React.FC = () => {
                                 to="/courses"
                                 className="px-5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
                             >
-                                <span>সব শিক্ষক দেখুন</span>
+                                <span>View All Instructors</span>
                                 <ArrowRight className="w-4 h-4" />
                             </Link>
 
@@ -936,7 +936,7 @@ export const HomePage: React.FC = () => {
                     ) : displayedFaculty.length === 0 ? (
                         <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 text-slate-500">
                             <GraduationCap className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                            <p className="text-sm font-semibold">এই বিভাগে বর্তমানে কোনো শিক্ষক তালিকাভুক্ত নেই</p>
+                            <p className="text-sm font-semibold">No instructors listed in this category</p>
                         </div>
                     ) : (
                         <div
@@ -996,7 +996,7 @@ export const HomePage: React.FC = () => {
                                                 <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-xs border border-white/20 flex items-center justify-center text-xl font-black mb-1">
                                                     {(teacher.name || 'T').charAt(0).toUpperCase()}
                                                 </div>
-                                                <span className="text-[10px] font-bold text-sky-200">শিক্ষক মেন্টর</span>
+                                                <span className="text-[10px] font-bold text-sky-200">Instructor & Mentor</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1033,10 +1033,10 @@ export const HomePage: React.FC = () => {
                                             ) : (
                                                 <>
                                                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tight border bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-300 border-sky-200 dark:border-sky-800">
-                                                        নবম-দশম শ্রেণী
+                                                        Class 9-10
                                                     </span>
                                                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tight border bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800">
-                                                        এইচএসসি
+                                                        HSC
                                                     </span>
                                                 </>
                                             )}
@@ -1054,13 +1054,13 @@ export const HomePage: React.FC = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
                         <span className="text-xs font-bold uppercase tracking-widest text-sky-400 bg-sky-950 px-3 py-1 rounded-full border border-sky-800">
-                            কেন নভয়নেক্স সেরা?
+                            Why Choose NovoNex?
                         </span>
                         <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-                            সঠিক দিকনির্দেশনা ও সর্বোচ্চ প্রস্তুতি
+                            Strategic Guidance & Ultimate Preparation
                         </h2>
                         <p className="text-slate-400 text-xs sm:text-sm">
-                            আমরা কেবল পড়াই না, শিক্ষার্থী যেন প্রতিটি বিষয়ে নিজেই মাস্টার হতে পারে সেই পথ তৈরি করি।
+                            We do not just teach; we empower every student to master concepts and achieve peak academic excellence.
                         </p>
                     </div>
 
@@ -1069,9 +1069,9 @@ export const HomePage: React.FC = () => {
                             <div className="w-12 h-12 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
                                 <Video className="w-6 h-6" />
                             </div>
-                            <h3 className="text-base font-bold text-white">কনসেপ্ট-ফার্স্ট শিখন</h3>
+                            <h3 className="text-base font-bold text-white">Concept-First Learning</h3>
                             <p className="text-xs text-slate-400 leading-relaxed">
-                                মুখস্থ নয়, প্রতিটি বিষয়ের গোড়া থেকে গভীর কনসেপ্ট বুঝিয়ে যেকোনো ধরনের প্রশ্ন সমাধানের কৌশল শেখানো হয়।
+                                No rote memorization. Master foundational principles deeply to solve any standard of problem with ease.
                             </p>
                         </div>
 
@@ -1079,9 +1079,9 @@ export const HomePage: React.FC = () => {
                             <div className="w-12 h-12 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
                                 <Bot className="w-6 h-6" />
                             </div>
-                            <h3 className="text-base font-bold text-white">NexPilot AI ডাউট সলভার</h3>
+                            <h3 className="text-base font-bold text-white">NexPilot AI Doubt Solver</h3>
                             <p className="text-xs text-slate-400 leading-relaxed">
-                                রাত ২টায় পড়লেও আর ডাউট জমে থাকবে না। আমাদের নিজস্ব এআই টিউটর সেকেন্ডের মধ্যে সমাধান করে দেবে।
+                                Studying late at night? Get instant conceptual explanations in seconds with our 24/7 dedicated AI tutor.
                             </p>
                         </div>
 
@@ -1089,9 +1089,9 @@ export const HomePage: React.FC = () => {
                             <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                                 <ClipboardList className="w-6 h-6" />
                             </div>
-                            <h3 className="text-base font-bold text-white">রিয়েল-টাইম মডেল টেস্ট</h3>
+                            <h3 className="text-base font-bold text-white">Real-Time Model Tests</h3>
                             <p className="text-xs text-slate-400 leading-relaxed">
-                                নিয়মিত চ্যাপ্টারওয়াইজ পরীক্ষা, নেগেটিভ মার্কিং ও মেরিট পজিশন যাচাইয়ের মাধ্যমে পরীক্ষার ভয় দূর হয়।
+                                Conquer exam anxiety through regular timed chapter tests, negative marking, and nationwide merit ranks.
                             </p>
                         </div>
 
@@ -1099,9 +1099,9 @@ export const HomePage: React.FC = () => {
                             <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
                                 <FileText className="w-6 h-6" />
                             </div>
-                            <h3 className="text-base font-bold text-white">পূর্ণাঙ্গ লেকচার শিট ও নোট</h3>
+                            <h3 className="text-base font-bold text-white">Comprehensive Lecture Sheets & Notes</h3>
                             <p className="text-xs text-slate-400 leading-relaxed">
-                                ক্লাসের সাথে সাথেই গোছানো বোর্ড-স্ট্যান্ডার্ড লেকচার শিট ও ফর্মুলা বুক যা রিভিশনকে করে দ্বিগুণ দ্রুত।
+                                Receive organized board-standard lecture sheets and formula books right alongside classes for rapid revision.
                             </p>
                         </div>
                     </div>
@@ -1112,13 +1112,13 @@ export const HomePage: React.FC = () => {
             <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-10 space-y-2">
                     <span className="text-xs font-bold text-sky-600 uppercase tracking-widest bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-full">
-                        সাধারণ জিজ্ঞাসা
+                        Questions & Answers
                     </span>
                     <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                        সচরাচর জিজ্ঞাসিত প্রশ্নাবলী (FAQ)
+                        Frequently Asked Questions (FAQ)
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-500">
-                        কোর্স ভর্তি ও প্ল্যাটফর্ম ব্যবহারের নিয়মকানুন সম্পর্কে জেনে নাও।
+                        Everything you need to know about enrollment, access, and our learning tools.
                     </p>
                 </div>
 
@@ -1158,15 +1158,15 @@ export const HomePage: React.FC = () => {
                 <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 text-center space-y-6 relative overflow-hidden border border-slate-800">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold tracking-wide">
                         <Users className="w-3.5 h-3.5" />
-                        <span>লার্নার্স কমিউনিটি</span>
+                        <span>Learners Community</span>
                     </div>
 
                     <h2 className="text-2xl sm:text-4xl font-black max-w-2xl mx-auto leading-tight">
-                        আজই যুক্ত হও ৫০,০০০+ শিক্ষার্থীদের সাথে তোমার স্বপ্নের যাত্রায়!
+                        Join 50,000+ Students on Your Journey to Academic Excellence Today!
                     </h2>
 
                     <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-                        যেকোনো কোর্স সংক্রান্ত পরামর্শ বা দিকনির্দেশনার জন্য আমাদের সাপোর্ট টিম সর্বদা প্রস্তুত রয়েছে।
+                        Our support team is always ready to guide you towards the right courses and career paths.
                     </p>
 
                     <div className="flex flex-wrap justify-center gap-4 pt-2">
@@ -1174,13 +1174,13 @@ export const HomePage: React.FC = () => {
                             to="/courses"
                             className="px-8 py-3.5 bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-extrabold rounded-2xl text-sm transition-all shadow-lg shadow-sky-600/30 cursor-pointer"
                         >
-                            কোর্সসমূহ দেখুন
+                            Explore Courses
                         </Link>
                         <Link
                             to="/register"
                             className="px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-extrabold rounded-2xl text-sm transition-all border border-slate-700 cursor-pointer"
                         >
-                            ফ্রি রেজিস্ট্রেশন করুন
+                            Register for Free
                         </Link>
                     </div>
                 </div>

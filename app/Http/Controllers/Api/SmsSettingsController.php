@@ -63,7 +63,7 @@ class SmsSettingsController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'এসএমএস কনফিগারেশন সফলভাবে সেভ করা হয়েছে।',
+            'message' => 'SMS configuration saved successfully.',
             'settings' => [
                 'provider' => $settings->provider,
                 'api_token_masked' => $settings->masked_token,
@@ -85,7 +85,7 @@ class SmsSettingsController extends Controller
 
         $result = $smsService->sendSms(
             $validated['phone'],
-            'Novonex LMS: এটি গ্রিনওয়েব এসএমএস গেটওয়ের একটি টেস্ট মেসেজ।'
+            'Novonex LMS: This is a test message from SMS gateway.'
         );
 
         return response()->json($result);

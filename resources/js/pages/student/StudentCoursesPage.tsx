@@ -291,7 +291,7 @@ export const StudentCoursesPage: React.FC = () => {
                                                     <div className="min-w-0 pr-1">
                                                         <div className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
                                                             <KeyRound className="w-3 h-3 text-indigo-600 shrink-0" />
-                                                            <span>অ্যাক্সেস কি (Access Key):</span>
+                                                            <span>Access Key:</span>
                                                         </div>
                                                         <div className="font-mono font-black text-xs sm:text-sm text-indigo-700 select-all truncate mt-0.5">
                                                             {item.access_key}
@@ -301,15 +301,15 @@ export const StudentCoursesPage: React.FC = () => {
                                                         type="button"
                                                         onClick={() => handleCopyAccessKey(item.access_key)}
                                                         className="px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer shrink-0 bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs"
-                                                        title="অ্যাক্সেস কি কপি করুন"
+                                                        title="Copy Access Key"
                                                     >
                                                         {copiedAccessKey === item.access_key ? (
                                                             <span className="flex items-center gap-1 text-emerald-600 font-bold">
-                                                                <Check className="w-3.5 h-3.5" /> কপি হয়েছে
+                                                                <Check className="w-3.5 h-3.5" /> Copied
                                                             </span>
                                                         ) : (
                                                             <span className="flex items-center gap-1">
-                                                                <Copy className="w-3.5 h-3.5" /> কপি করুন
+                                                                <Copy className="w-3.5 h-3.5" /> Copy
                                                             </span>
                                                         )}
                                                     </button>

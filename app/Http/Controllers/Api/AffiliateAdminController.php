@@ -56,7 +56,7 @@ class AffiliateAdminController extends Controller
         $settings->update($validated);
 
         return response()->json([
-            'message' => 'সাধারণ অ্যাফিলিয়েট সেটিংস সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'General affiliate settings updated successfully.',
             'settings' => $settings,
         ]);
     }
@@ -98,7 +98,7 @@ class AffiliateAdminController extends Controller
         );
 
         return response()->json([
-            'message' => 'কোর্সের অ্যাফিলিয়েট কমিশন ও ডিসকাউন্ট সফলভাবে সংরক্ষিত হয়েছে।',
+            'message' => 'Course affiliate commission and discount saved successfully.',
             'setting' => $setting,
         ]);
     }
@@ -113,7 +113,7 @@ class AffiliateAdminController extends Controller
         }
 
         return response()->json([
-            'message' => 'কোর্সের কাস্টম কমিশন মুছে ফেলা হয়েছে। এখন সাধারণ সেটিংস প্রযোজ্য হবে।',
+            'message' => 'Custom course commission removed. Default settings will now apply.',
         ]);
     }
 
@@ -225,7 +225,7 @@ class AffiliateAdminController extends Controller
         });
 
         return response()->json([
-            'message' => 'পেআউট রিকোয়েস্ট সফলভাবে আপডেট করা হয়েছে।',
+            'message' => 'Payout request updated successfully.',
             'payout' => $payout->fresh('affiliate.user'),
         ]);
     }

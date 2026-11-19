@@ -102,7 +102,7 @@ export const StudentLiveClassRoomPage: React.FC = () => {
             setLiveClass(data.live_class);
             setComments(data.live_class?.comments || []);
         } catch (err: any) {
-            setErrorMsg(err.response?.data?.message || 'লাইভ ক্লাসের বিবরণ লোড করা যায়নি।');
+            setErrorMsg(err.response?.data?.message || 'Unable to load live class details.');
         } finally {
             setLoading(false);
         }
@@ -137,7 +137,7 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                 }, 100);
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'মন্তব্য পাঠাতে সমস্যা হয়েছে।');
+            alert(err.response?.data?.message || 'Failed to send comment.');
         } finally {
             setSubmittingComment(false);
         }
@@ -147,7 +147,7 @@ export const StudentLiveClassRoomPage: React.FC = () => {
         if (!dateStr) return '';
         try {
             const d = new Date(dateStr);
-            return d.toLocaleString('bn-BD', {
+            return d.toLocaleString('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -163,7 +163,7 @@ export const StudentLiveClassRoomPage: React.FC = () => {
         if (!dateStr) return '';
         try {
             const d = new Date(dateStr);
-            return d.toLocaleTimeString('bn-BD', {
+            return d.toLocaleTimeString('en-US', {
                 hour: '2-digit',
                 minute: '2-digit',
             });
@@ -176,7 +176,7 @@ export const StudentLiveClassRoomPage: React.FC = () => {
         return (
             <div className="py-24 flex flex-col items-center justify-center gap-3">
                 <Loader2 className="w-9 h-9 text-sky-600 animate-spin" />
-                <span className="text-xs font-bold text-slate-500">লাইভ ক্লাসরুম লোড হচ্ছে...</span>
+                <span className="text-xs font-bold text-slate-500">Loading live classroom...</span>
             </div>
         );
     }
@@ -187,15 +187,15 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                 <div className="w-16 h-16 rounded-3xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto">
                     <AlertCircle className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900">ক্লাসটি লোড করা সম্ভব হয়নি</h3>
-                <p className="text-xs sm:text-sm text-slate-500">{errorMsg || 'লাইভ ক্লাসটি পাওয়া যায়নি।'}</p>
+                <h3 className="text-lg font-black text-slate-900">Failed to load class</h3>
+                <p className="text-xs sm:text-sm text-slate-500">{errorMsg || 'The requested live class was not found.'}</p>
                 <div className="pt-2">
                     <Link
                         to="/student/live-classes"
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 text-white font-bold text-xs"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        <span>লাইভ ক্লাস তালিকায় ফিরুন</span>
+                        <span>Back to Live Classes</span>
                     </Link>
                 </div>
             </div>
@@ -214,7 +214,7 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                     className="inline-flex items-center gap-2 text-xs font-extrabold text-slate-600 hover:text-sky-600 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    <span>সকল লাইভ ক্লাস</span>
+                    <span>All Live Classes</span>
                 </Link>
 
                 {liveClass.course && (
@@ -240,9 +240,9 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                 ) : (
                     <div className="w-full aspect-video flex flex-col items-center justify-center p-8 text-center space-y-3 bg-gradient-to-tr from-slate-950 via-slate-900 to-indigo-950 text-white">
                         <Radio className="w-12 h-12 text-rose-500 animate-pulse" />
-                        <h4 className="text-lg font-black">লাইভ স্ট্রিমিং প্রস্তুত হচ্ছে</h4>
+                        <h4 className="text-lg font-black">Live stream is being prepared</h4>
                         <p className="text-xs text-slate-400 max-w-md">
-                            শিক্ষক লাইভ লিংক যুক্ত করলেই স্ট্রিমটি স্বয়ংক্রিয়ভাবে এখানে শুরু হবে।
+                            The stream will start automatically once the instructor begins the live broadcast.
                         </p>
                     </div>
                 )}
@@ -258,19 +258,19 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                             {isLive && (
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-rose-500 text-white shadow-xs animate-pulse">
                                     <span className="w-2 h-2 rounded-full bg-white" />
-                                    <span>লাইভ চলছে</span>
+                                    <span>Live Now</span>
                                 </span>
                             )}
                             {!isLive && !isCompleted && (
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-sky-100 text-sky-800 border border-sky-200">
                                     <Clock className="w-3.5 h-3.5 text-sky-600" />
-                                    <span>আসন্ন লাইভ ক্লাস</span>
+                                    <span>Upcoming Live Class</span>
                                 </span>
                             )}
                             {isCompleted && (
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
                                     <CheckCircle2 className="w-3.5 h-3.5 text-slate-500" />
-                                    <span>ক্লাস সমাপ্ত হয়েছে (রেকর্ডেড)</span>
+                                    <span>Class Completed (Recorded)</span>
                                 </span>
                             )}
 
@@ -287,14 +287,14 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                             {liveClass.creator && (
                                 <p className="text-xs font-bold text-slate-500 mt-1 flex items-center gap-1.5">
                                     <User className="w-3.5 h-3.5 text-slate-400" />
-                                    <span>উপস্থাপক: {liveClass.creator.name}</span>
+                                    <span>Instructor: {liveClass.creator.name}</span>
                                 </p>
                             )}
                         </div>
 
                         {liveClass.description && (
                             <div className="pt-3 border-t border-slate-100">
-                                <h4 className="text-xs font-extrabold text-slate-800 mb-1">ক্লাসের বিবরণ ও বিষয়বস্তু:</h4>
+                                <h4 className="text-xs font-extrabold text-slate-800 mb-1">Class Overview & Curriculum:</h4>
                                 <p className="text-xs sm:text-sm text-slate-600 whitespace-pre-line leading-relaxed">
                                     {liveClass.description}
                                 </p>
@@ -311,13 +311,13 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                             <div className="flex items-center gap-2">
                                 <MessageSquare className="w-4 h-4 text-sky-600" />
                                 <h3 className="font-extrabold text-xs sm:text-sm text-slate-900">
-                                    লাইভ আলোচনা ও প্রশ্ন ({comments.length})
+                                    Live Discussion & Q&A ({comments.length})
                                 </h3>
                             </div>
                             <button
                                 type="button"
                                 onClick={fetchCommentsSilently}
-                                title="রিফ্রেশ"
+                                title="Refresh"
                                 className="p-1 rounded-lg text-slate-400 hover:text-sky-600 transition-colors"
                             >
                                 <RefreshCw className="w-3.5 h-3.5" />
@@ -330,7 +330,7 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                                 <div className="h-full flex flex-col items-center justify-center text-center p-4 text-slate-400 space-y-2">
                                     <MessageSquare className="w-8 h-8 opacity-40" />
                                     <p className="text-xs font-semibold">
-                                        এখনও কোনো মন্তব্য নেই। ক্লাসে আপনার যেকোনো প্রশ্ন বা মতামত এখানে লিখুন!
+                                        No comments yet. Feel free to ask your questions or share your thoughts during class!
                                     </p>
                                 </div>
                             ) : (
@@ -356,16 +356,16 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                                                                     isTeacher ? 'text-sky-700' : isMe ? 'text-indigo-700' : 'text-slate-800'
                                                                 }`}
                                                             >
-                                                                {c.user?.name || 'শিক্ষার্থী'}
+                                                                {c.user?.name || 'Student'}
                                                             </span>
                                                             {isTeacher && (
                                                                 <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-sky-100 text-sky-800">
-                                                                    শিক্ষক
+                                                                    Teacher
                                                                 </span>
                                                             )}
                                                             {isMe && !isTeacher && (
                                                                 <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600">
-                                                                    তুমি
+                                                                    You
                                                                 </span>
                                                             )}
                                                         </div>
@@ -393,7 +393,7 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                                     required
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
-                                    placeholder="আপনার প্রশ্ন বা মন্তব্য লিখুন..."
+                                    placeholder="Write your question or comment..."
                                     className="flex-1 px-3.5 py-2 bg-white rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                                 />
                                 <button
