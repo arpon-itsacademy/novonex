@@ -47,6 +47,11 @@ export const StudentDashboardLayout: React.FC = () => {
     const [logoError, setLogoError] = useState(false);
     const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
+    // Quick stats for student sidebar
+    const [activeCoursesCount, setActiveCoursesCount] = useState<number>(0);
+    const [completedCoursesCount, setCompletedCoursesCount] = useState<number>(0);
+    const [ordersCount, setOrdersCount] = useState<number>(0);
+
     const toggleSubmenu = (title: string, e?: React.MouseEvent) => {
         if (e) {
             e.preventDefault();
@@ -62,9 +67,30 @@ export const StudentDashboardLayout: React.FC = () => {
     useEffect(() => {
         if (!user) return;
         fetchNotifications();
+        fetchQuickStats();
         const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
     }, [user]);
+
+    const fetchQuickStats = async () => {
+        try {
+            const [coursesRes, ordersRes] = await Promise.allSettled([
+                apiClient.get('/student/my-courses'),
+                apiClient.get('/orders/my-orders'),
+            ]);
+            if (coursesRes.status === 'fulfilled') {
+                const list = coursesRes.value.data || [];
+                const completed = list.filter((c: any) => c.progress_percentage === 100).length;
+                setCompletedCoursesCount(completed);
+                setActiveCoursesCount(Math.max(0, list.length - completed));
+            }
+            if (ordersRes.status === 'fulfilled') {
+                const d = ordersRes.value.data;
+                const total = d?.total ?? (Array.isArray(d) ? d.length : d?.data?.length ?? 0);
+                setOrdersCount(total);
+            }
+        } catch { }
+    };
 
     // Close mobile sidebar on route change
     useEffect(() => {
@@ -240,9 +266,9 @@ export const StudentDashboardLayout: React.FC = () => {
                 className={`fixed lg:sticky top-0 h-screen z-50 transition-all duration-300 ease-in-out p-3 sm:p-4 shrink-0 ${sidebarOpen ? 'left-0' : '-left-80 lg:left-0'
                     }`}
             >
-                <div className="w-64 h-[calc(100vh-1.5rem)] sm:h-[calc(100vh-2rem)] bg-white rounded-3xl shadow-sm border border-slate-200/80 flex flex-col justify-between p-4 sm:p-5 overflow-y-auto">
-                    {/* Top: Logo & Nav items */}
-                    <div className="space-y-6">
+                <div className="w-68 sm:w-72 h-[calc(100vh-1.5rem)] sm:h-[calc(100vh-2rem)] bg-white rounded-3xl shadow-sm border border-slate-200/80 flex flex-col justify-between p-4 sm:p-5 overflow-y-auto">
+                    {/* Top: Logo, Profile Header & Nav items */}
+                    <div className="space-y-4">
                         {/* Brand Logo Header */}
                         <div className="flex items-center justify-between px-1">
                             <Link to="/" className="flex items-center gap-2 group">
@@ -273,8 +299,39 @@ export const StudentDashboardLayout: React.FC = () => {
                             </button>
                         </div>
 
+                        {/* Student Profile Card (Avatar, Name, Member Since, 3-Stat Box) */}
+                        <div className="pt-2 pb-3 px-1 border-b border-slate-100 space-y-3">
+                            <div className="flex flex-col items-center text-center">
+                                <div className="w-16 h-16 rounded-full bg-[#25a2ee] text-white font-black text-2xl flex items-center justify-center shadow-md shadow-[#25a2ee]/25 border-2 border-white ring-2 ring-[#25a2ee]/30">
+                                    {user.name ? user.name.charAt(0).toUpperCase() : 'S'}
+                                </div>
+                                <h3 className="text-sm font-bold text-slate-800 mt-2.5 truncate max-w-full">
+                                    {user.name}
+                                </h3>
+                                <p className="text-[11px] font-medium text-slate-400 mt-0.5">
+                                    Member since {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Recent'}
+                                </p>
+                            </div>
+
+                            {/* 3-stat box */}
+                            <div className="grid grid-cols-3 gap-1 p-2 bg-slate-50 border border-slate-200/80 rounded-2xl text-center">
+                                <div className="p-1">
+                                    <span className="block text-sm font-black text-slate-800">{activeCoursesCount}</span>
+                                    <span className="block text-[10px] font-semibold text-slate-500 leading-tight">Active<br />Courses</span>
+                                </div>
+                                <div className="p-1 border-x border-slate-200/80">
+                                    <span className="block text-sm font-black text-slate-800">{completedCoursesCount}</span>
+                                    <span className="block text-[10px] font-semibold text-slate-500 leading-tight">Completed</span>
+                                </div>
+                                <div className="p-1">
+                                    <span className="block text-sm font-black text-slate-800">{ordersCount}</span>
+                                    <span className="block text-[10px] font-semibold text-slate-500 leading-tight">Orders</span>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Navigation Menu */}
-                        <nav className="space-y-1.5 pt-2">
+                        <nav className="space-y-1.5 pt-1">
                             {menuItems.map((item) => {
                                 const active = isCurrentActive(item);
                                 const Icon = item.icon;

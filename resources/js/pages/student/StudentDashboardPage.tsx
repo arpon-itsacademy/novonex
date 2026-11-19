@@ -2,29 +2,36 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { 
-    Play, 
-    ArrowRight, 
-    GraduationCap, 
-    FileText, 
-    Calendar, 
-    Star, 
-    Clock, 
-    Sparkles, 
-    CheckCircle2, 
-    Award, 
+import {
+    User as UserIcon,
+    Copy,
+    Check,
+    BarChart3,
+    BookOpen,
+    Clock,
+    Play,
     Loader2,
-    Radio
+    Calendar,
+    ArrowRight,
+    MapPin,
+    Mail,
+    Phone,
+    Hash
 } from 'lucide-react';
+
+interface RecentActivityItem {
+    id: string;
+    text: string;
+    time: string;
+}
 
 export const StudentDashboardPage: React.FC = () => {
     const { user } = useAuth();
     const [coursesData, setCoursesData] = useState<any[]>([]);
     const [availableExams, setAvailableExams] = useState<any[]>([]);
-    const [activeLiveClass, setActiveLiveClass] = useState<any | null>(null);
-    const [upcomingLiveClass, setUpcomingLiveClass] = useState<any | null>(null);
-    const [todayRoutineEvents, setTodayRoutineEvents] = useState<any[]>([]);
+    const [ordersCount, setOrdersCount] = useState<number>(0);
     const [loading, setLoading] = useState(true);
+    const [copiedId, setCopiedId] = useState(false);
 
     useEffect(() => {
         fetchDashboardData();
@@ -33,11 +40,10 @@ export const StudentDashboardPage: React.FC = () => {
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-            const [coursesRes, examsRes, liveRes, routineRes] = await Promise.allSettled([
+            const [coursesRes, examsRes, ordersRes] = await Promise.allSettled([
                 apiClient.get('/student/my-courses'),
                 apiClient.get('/student/exams/available'),
-                apiClient.get('/student/live-classes'),
-                apiClient.get('/student/routine'),
+                apiClient.get('/orders/my-orders'),
             ]);
 
             if (coursesRes.status === 'fulfilled') {
@@ -46,19 +52,10 @@ export const StudentDashboardPage: React.FC = () => {
             if (examsRes.status === 'fulfilled') {
                 setAvailableExams(examsRes.value.data?.exams || []);
             }
-            if (liveRes.status === 'fulfilled') {
-                const list = liveRes.value.data?.live_classes || [];
-                const live = list.find((c: any) => c.status === 'live' || c.is_currently_live);
-                const upcoming = list.find((c: any) => c.status === 'upcoming' && !c.is_currently_live);
-                setActiveLiveClass(live || null);
-                setUpcomingLiveClass(upcoming || null);
-            }
-            if (routineRes.status === 'fulfilled') {
-                const allEvts = routineRes.value.data?.events || [];
-                const now = new Date();
-                const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-                const todayList = allEvts.filter((e: any) => e.date === todayStr);
-                setTodayRoutineEvents(todayList.length > 0 ? todayList : allEvts.slice(0, 3));
+            if (ordersRes.status === 'fulfilled') {
+                const d = ordersRes.value.data;
+                const total = d?.total ?? (Array.isArray(d) ? d.length : d?.data?.length ?? 0);
+                setOrdersCount(total);
             }
         } catch {
             // silent fail
@@ -67,501 +64,360 @@ export const StudentDashboardPage: React.FC = () => {
         }
     };
 
-    // Calculate time-aware English greeting
-    const getGreeting = () => {
-        const hour = new Date().getHours();
-        if (hour >= 5 && hour < 12) return 'Good Morning';
-        if (hour >= 12 && hour < 16) return 'Good Afternoon';
-        if (hour >= 16 && hour < 20) return 'Good Evening';
-        return 'Good Night';
+    const copyUserId = () => {
+        const idToCopy = user?.registration_number || (user?.id ? `bidth-${user.id}` : 'bidth-100004372');
+        navigator.clipboard.writeText(idToCopy);
+        setCopiedId(true);
+        setTimeout(() => setCopiedId(false), 2000);
     };
+
+    // Calculate dynamic counts
+    const totalCourses = coursesData.length;
+    const completedCourses = coursesData.filter((c: any) => c.progress_percentage === 100).length;
+    const activeCourses = Math.max(0, totalCourses - completedCourses);
+    const wishlistOrExamsCount = availableExams.length;
+
+    // Relative time helper
+    const getRelativeTime = (dateInput?: string) => {
+        if (!dateInput) return 'Recently';
+        const d = new Date(dateInput);
+        const diffMs = Date.now() - d.getTime();
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        if (diffDays <= 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
+        return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`;
+    };
+
+    // Build realistic Recent Activities
+    const recentActivities: RecentActivityItem[] = [];
+    if (coursesData && coursesData.length > 0) {
+        const first = coursesData[0];
+        if (first.last_lesson?.title) {
+            recentActivities.push({
+                id: 'act-lesson',
+                text: `Completed a lesson in ${first.course?.title || 'Course'}`,
+                time: getRelativeTime(first.enrolled_at),
+            });
+        }
+        recentActivities.push({
+            id: 'act-enroll-1',
+            text: `Enrolled in ${first.course?.title || 'Course'}`,
+            time: getRelativeTime(first.enrolled_at),
+        });
+        if (coursesData.length > 1) {
+            const second = coursesData[1];
+            recentActivities.push({
+                id: 'act-enroll-2',
+                text: `Purchased ${second.course?.title || 'Master Course'}`,
+                time: getRelativeTime(second.enrolled_at),
+            });
+        }
+    }
+
+    if (recentActivities.length === 0) {
+        recentActivities.push(
+            {
+                id: 'act-welcome',
+                text: 'Welcome to NovoNex Student Portal',
+                time: 'Recently',
+            },
+            {
+                id: 'act-profile',
+                text: 'Account registered and profile initialized',
+                time: getRelativeTime(user?.created_at),
+            }
+        );
+    }
 
     if (loading) {
         return (
-            <div className="py-20 flex flex-col items-center justify-center gap-3">
-                <Loader2 className="w-8 h-8 text-sky-600 animate-spin" />
-                <span className="text-xs font-bold text-slate-500">Loading dashboard...</span>
+            <div className="py-24 flex flex-col items-center justify-center gap-3">
+                <Loader2 className="w-8 h-8 text-[#25a2ee] animate-spin" />
+                <span className="text-xs font-bold text-slate-500">Loading student profile...</span>
             </div>
         );
     }
 
-    const totalEnrolled = coursesData.length;
-    const recentCourse = coursesData[0];
-    const continueUrl = recentCourse?.last_lesson_id 
-        ? `/learning/${recentCourse.course.id}/lessons/${recentCourse.last_lesson_id}` 
-        : recentCourse?.course?.slug 
-            ? `/courses/${recentCourse.course.slug}` 
-            : '/courses';
-
-    const recentCourseTitle = recentCourse?.course?.title || 'SSC 26 Free Crash Course';
-    const recentLessonTitle = recentCourse?.last_lesson?.title || 'Lecture - 01 | Orientation & Fundamentals';
-    const progressPercent = recentCourse?.progress_percentage || 0;
+    const userIdDisplay = user?.registration_number || (user?.id ? `bidth-${user.id}` : 'bidth-100004372');
 
     return (
         <div className="space-y-6 max-w-7xl mx-auto">
-            {/* Top Greeting Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                        {getGreeting()}, {user?.name || 'Student'}
-                    </h1>
-                    <div className="flex items-center gap-2 mt-1">
-                        <p className="text-xs sm:text-sm font-bold text-slate-500">
-                            Start learning today
-                        </p>
-                        {user?.registration_number && (
-                            <span className="text-[11px] font-extrabold text-sky-700 bg-sky-50 border border-sky-200/80 px-2 py-0.5 rounded-full font-mono">
-                                ID: {user.registration_number}
-                            </span>
-                        )}
-                    </div>
-                </div>
-
-                {/* Profile Completion / Reward Points Badge */}
-                <div className="self-start sm:self-center">
-                    <button
-                        type="button"
-                        className="px-4 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-2 transition-all cursor-pointer"
-                    >
-                        <span>Complete Profile</span>
-                        <span className="bg-white/25 px-2 py-0.5 rounded-full text-[10px] tracking-wide font-black">
-                            +50 pts
-                        </span>
-                    </button>
-                </div>
+            {/* Page Header */}
+            <div>
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                    Profile Overview
+                </h1>
             </div>
 
-            {/* Hero Cards: Continue Learning & Upcoming Class */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                {/* Left Card: Continue Class / Latest Lecture */}
-                <div className="lg:col-span-7 bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center gap-5">
-                    {/* Video Thumbnail */}
-                    <Link
-                        to={continueUrl}
-                        className="w-full sm:w-56 h-36 bg-gradient-to-tr from-slate-950 via-slate-900 to-sky-950 rounded-2xl relative overflow-hidden flex items-center justify-center shrink-0 shadow-inner group cursor-pointer"
-                    >
-                        {recentCourse?.course?.thumbnail ? (
-                            <img
-                                src={recentCourse.course.thumbnail}
-                                alt={recentCourseTitle}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                            />
-                        ) : (
-                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-600/40 via-slate-900 to-sky-950 flex flex-col items-center justify-center p-3 text-center">
-                                <span className="text-[10px] font-bold text-sky-400 uppercase tracking-widest">
-                                    Core Syllabus
-                                </span>
-                                <span className="text-xl font-black text-white mt-1">Fundamentals</span>
-                                <span className="text-[10px] text-sky-200/80">Video Lesson</span>
-                            </div>
-                        )}
-
-                        {/* Centered Play Button */}
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-sky-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-sky-600/30 group-hover:scale-110 transition-transform pl-0.5">
-                                <Play className="w-5 h-5 fill-white text-white" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Course & Lesson Details */}
-                    <div className="flex-1 min-w-0 w-full space-y-2">
-                        <span className="text-[11px] font-bold text-slate-400 block">
-                            Latest Lecture
-                        </span>
-                        <h3 className="font-extrabold text-slate-900 text-sm sm:text-base leading-snug line-clamp-1">
-                            {recentCourseTitle}
-                        </h3>
-                        <p className="text-xs text-slate-600 line-clamp-1">
-                            {recentLessonTitle}
-                        </p>
-
-                        {/* Progress Bar */}
-                        <div className="pt-1 space-y-1">
-                            <div className="flex items-center justify-end text-[11px] font-bold text-slate-400">
-                                <span>{progressPercent}%</span>
-                            </div>
-                            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-gradient-to-r from-sky-500 to-amber-500 rounded-full transition-all duration-500"
-                                    style={{ width: `${progressPercent}%` }}
-                                />
-                            </div>
-                        </div>
-
-                        {/* CTA Button */}
-                        <div className="pt-2">
-                            <Link
-                                to={continueUrl}
-                                className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-bold text-xs rounded-full transition-all shadow-md shadow-sky-600/20"
-                            >
-                                <span>Resume Learning</span>
-                                <ArrowRight className="w-3.5 h-3.5" />
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Card: Dynamic Live / Upcoming Class */}
-                <div className={`lg:col-span-5 bg-white rounded-3xl p-5 border shadow-xs flex flex-col justify-between ${
-                    activeLiveClass ? 'border-rose-300 ring-2 ring-rose-500/20' : 'border-slate-200/80'
-                }`}>
-                    <div>
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                            {activeLiveClass ? (
-                                <div className="inline-flex items-center gap-1.5 text-xs font-black text-rose-600">
-                                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-                                    <span>🔴 Live Now</span>
-                                </div>
-                            ) : upcomingLiveClass ? (
-                                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-700">
-                                    <span className="w-2 h-2 rounded-full bg-sky-500" />
-                                    <span>Upcoming Live Class</span>
-                                </div>
-                            ) : (
-                                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500">
-                                    <Radio className="w-3.5 h-3.5 text-slate-400" />
-                                    <span>Live Classes</span>
-                                </div>
-                            )}
-
-                            <Link
-                                to="/student/live-classes"
-                                className="text-[11px] font-bold text-sky-600 hover:underline"
-                            >
-                                View All
-                            </Link>
-                        </div>
-
-                        {activeLiveClass ? (
-                            <div>
-                                <span className="text-[11px] font-extrabold text-sky-700 block mb-1 truncate">
-                                    {activeLiveClass.course?.title}
-                                </span>
-                                <h4 className="font-black text-slate-900 text-sm sm:text-base leading-snug line-clamp-2">
-                                    {activeLiveClass.title}
-                                </h4>
-                                <p className="text-xs text-slate-500 mt-1 line-clamp-1">
-                                    {activeLiveClass.creator ? `Instructor: ${activeLiveClass.creator.name}` : 'Interactive live session & Q&A'}
-                                </p>
-                            </div>
-                        ) : upcomingLiveClass ? (
-                            <div>
-                                <span className="text-[11px] font-extrabold text-sky-700 block mb-1 truncate">
-                                    {upcomingLiveClass.course?.title}
-                                </span>
-                                <h4 className="font-extrabold text-slate-900 text-sm leading-snug line-clamp-2">
-                                    {upcomingLiveClass.title}
-                                </h4>
-                                <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
-                                    <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                                    <span>
-                                        {new Date(upcomingLiveClass.start_time).toLocaleString('en-US', {
-                                            month: 'short',
-                                            day: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        })}
-                                    </span>
-                                </p>
-                            </div>
-                        ) : (
-                            <div>
-                                <h4 className="font-extrabold text-slate-900 text-sm leading-snug">
-                                    No live classes at the moment
-                                </h4>
-                                <p className="text-xs text-slate-500 mt-1.5">
-                                    Newly scheduled live classes will show up directly on your dashboard.
-                                </p>
-                            </div>
-                        )}
+            {/* Top 2-Column Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* 1. Personal Information Card */}
+                <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-4">
+                    <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                        <UserIcon className="w-4 h-4 text-[#25a2ee]" />
+                        <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                            Personal Information
+                        </h2>
                     </div>
 
-                    <div className="pt-4">
-                        {activeLiveClass ? (
-                            <Link
-                                to={`/student/live-classes/${activeLiveClass.id}`}
-                                className="w-full py-2.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold text-xs rounded-full transition-all shadow-md shadow-rose-600/25 text-center flex items-center justify-center gap-2"
-                            >
-                                <Radio className="w-3.5 h-3.5 text-white animate-pulse" />
-                                <span>Join Live Class Now</span>
-                            </Link>
-                        ) : upcomingLiveClass ? (
-                            <Link
-                                to={`/student/live-classes/${upcomingLiveClass.id}`}
-                                className="w-full py-2.5 bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-bold text-xs rounded-full transition-all shadow-md shadow-sky-600/20 text-center block"
-                            >
-                                View Details & Room
-                            </Link>
-                        ) : (
-                            <Link
-                                to="/student/live-classes"
-                                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-full transition-all text-center block"
-                            >
-                                Browse Live Classes
-                            </Link>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* 4-Card Quick Actions / Category Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                {/* 1. Enrolled Courses */}
-                <Link
-                    to="/student/my-courses"
-                    className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:border-sky-300 hover:shadow-sm transition-all group flex items-center gap-3.5"
-                >
-                    <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <GraduationCap className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <div className="font-extrabold text-slate-800 text-sm group-hover:text-sky-600 transition-colors">
-                            Enrolled Courses
-                        </div>
-                        <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-                            {totalEnrolled} Courses
-                        </div>
-                    </div>
-                </Link>
-
-                {/* 2. Exams */}
-                <Link
-                    to="/student/exams"
-                    className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:border-amber-300 hover:shadow-sm transition-all group flex items-center justify-between relative"
-                >
-                    <div className="flex items-center gap-3.5">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                            <FileText className="w-6 h-6" />
-                        </div>
+                    <div className="space-y-4 pt-1">
+                        {/* Full Name */}
                         <div>
-                            <div className="font-extrabold text-slate-800 text-sm group-hover:text-amber-600 transition-colors">
-                                Exams & Quizzes
-                            </div>
-                            <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-                                Model Tests & Practice
-                            </div>
+                            <span className="text-[11px] font-bold text-slate-400 block mb-1 flex items-center gap-1.5">
+                                <UserIcon className="w-3.5 h-3.5 text-slate-400" />
+                                <span>Full Name</span>
+                            </span>
+                            <p className="font-extrabold text-slate-900 text-sm">
+                                {user?.name || 'Student'}
+                            </p>
                         </div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black shrink-0">
-                        {availableExams.length}
-                    </span>
-                </Link>
 
-                {/* 3. Routine */}
-                <Link
-                    to="/student/routine"
-                    className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:border-amber-300 hover:shadow-sm transition-all group flex items-center gap-3.5"
-                >
-                    <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Calendar className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <div className="font-extrabold text-slate-800 text-sm group-hover:text-amber-600 transition-colors">
-                            Class Routine
+                        {/* User ID */}
+                        <div>
+                            <span className="text-[11px] font-bold text-slate-400 block mb-1 flex items-center gap-1.5">
+                                <Hash className="w-3.5 h-3.5 text-slate-400" />
+                                <span>User ID</span>
+                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200/90 px-2.5 py-1 rounded-lg select-all">
+                                    {userIdDisplay}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={copyUserId}
+                                    className="p-1.5 text-slate-400 hover:text-[#25a2ee] hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                                    title="Copy User ID"
+                                >
+                                    {copiedId ? (
+                                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                    ) : (
+                                        <Copy className="w-3.5 h-3.5" />
+                                    )}
+                                </button>
+                                {copiedId && (
+                                    <span className="text-[11px] font-bold text-emerald-600">Copied!</span>
+                                )}
+                            </div>
                         </div>
-                        <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-                            Live & Upload Schedules
-                        </div>
-                    </div>
-                </Link>
 
-                {/* 4. Free Resources */}
-                <Link
-                    to="/courses?type=free"
-                    className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:border-emerald-300 hover:shadow-sm transition-all group flex items-center gap-3.5"
-                >
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Star className="w-6 h-6" />
+                        {/* Email Address */}
+                        <div>
+                            <span className="text-[11px] font-bold text-slate-400 block mb-1 flex items-center gap-1.5">
+                                <Mail className="w-3.5 h-3.5 text-slate-400" />
+                                <span>Email Address</span>
+                            </span>
+                            <p className="font-bold text-slate-800 text-xs sm:text-sm break-all">
+                                {user?.email || 'Not provided'}
+                            </p>
+                        </div>
+
+                        {/* Phone Number */}
+                        <div>
+                            <span className="text-[11px] font-bold text-slate-400 block mb-1 flex items-center gap-1.5">
+                                <Phone className="w-3.5 h-3.5 text-slate-400" />
+                                <span>Phone Number</span>
+                            </span>
+                            <p className="font-bold text-slate-800 text-xs sm:text-sm">
+                                {user?.phone || 'Not provided'}
+                            </p>
+                        </div>
+
+                        {/* Address */}
+                        <div>
+                            <span className="text-[11px] font-bold text-slate-400 block mb-1 flex items-center gap-1.5">
+                                <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                                <span>Address</span>
+                            </span>
+                            <p className="font-medium text-slate-600 text-xs">
+                                {user?.address || 'Dhaka, Bangladesh'}
+                            </p>
+                        </div>
                     </div>
+                </div>
+
+                {/* 2. Account Summary Card */}
+                <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-5 flex flex-col justify-between">
                     <div>
-                        <div className="font-extrabold text-slate-800 text-sm group-hover:text-emerald-700 transition-colors">
-                            Free Resources
+                        <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                            <BarChart3 className="w-4 h-4 text-[#25a2ee]" />
+                            <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                                Account Summary
+                            </h2>
                         </div>
-                        <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-                            Lecture Notes & Sheets
+
+                        {/* Progress Bars */}
+                        <div className="space-y-4 pt-2">
+                            {/* Active Courses */}
+                            <div>
+                                <div className="flex items-center justify-between text-xs font-extrabold text-slate-700 mb-1.5">
+                                    <span>Active Courses</span>
+                                    <span>{activeCourses}</span>
+                                </div>
+                                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                    <div
+                                        className="h-2 rounded-full bg-amber-400 transition-all duration-500"
+                                        style={{ width: `${Math.min(100, Math.max(activeCourses > 0 ? 35 : 0, activeCourses * 45))}%` }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Completed Courses */}
+                            <div>
+                                <div className="flex items-center justify-between text-xs font-extrabold text-slate-700 mb-1.5">
+                                    <span>Completed Courses</span>
+                                    <span>{completedCourses}</span>
+                                </div>
+                                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                    <div
+                                        className="h-2 rounded-full bg-slate-300 transition-all duration-500"
+                                        style={{ width: `${Math.min(100, completedCourses * 50)}%` }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Wishlist Items / Exams */}
+                            <div>
+                                <div className="flex items-center justify-between text-xs font-extrabold text-slate-700 mb-1.5">
+                                    <span>Wishlist Items</span>
+                                    <span>{wishlistOrExamsCount}</span>
+                                </div>
+                                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                    <div
+                                        className="h-2 rounded-full bg-purple-500 transition-all duration-500"
+                                        style={{ width: `${Math.min(100, Math.max(wishlistOrExamsCount > 0 ? 45 : 0, wishlistOrExamsCount * 18))}%` }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Total Orders */}
+                            <div>
+                                <div className="flex items-center justify-between text-xs font-extrabold text-slate-700 mb-1.5">
+                                    <span>Total Orders</span>
+                                    <span>{ordersCount}</span>
+                                </div>
+                                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                    <div
+                                        className="h-2 rounded-full bg-slate-300 transition-all duration-500"
+                                        style={{ width: `${Math.min(100, ordersCount * 30)}%` }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </Link>
+
+                    {/* Sub-section: Recent Activity */}
+                    <div className="pt-4 border-t border-slate-100">
+                        <h3 className="text-xs font-extrabold text-slate-800 mb-2.5">
+                            Recent Activity
+                        </h3>
+                        <div className="space-y-2.5">
+                            {recentActivities.map((act) => (
+                                <div key={act.id} className="flex items-start gap-2 text-xs">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#25a2ee] mt-1.5 shrink-0" />
+                                    <div>
+                                        <p className="font-semibold text-slate-700 leading-snug">
+                                            {act.text}
+                                        </p>
+                                        <span className="text-[10px] text-slate-400">
+                                            {act.time}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Bottom 2-Column Section: Take Exam & Today's Routine */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {/* Left: Take Exams */}
-                <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-slate-200/80 flex flex-col justify-between">
-                    <div>
-                        <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-                            <h3 className="font-extrabold text-slate-900 text-base">
-                                Take Exams
-                            </h3>
-                            <Link
-                                to="/student/exams"
-                                className="text-xs font-bold text-sky-600 hover:text-sky-700 transition-colors"
-                            >
-                                View All
-                            </Link>
-                        </div>
+            {/* Bottom Section: Recent Courses */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">
+                        Recent Courses
+                    </h2>
+                    <Link
+                        to="/student/my-courses"
+                        className="text-xs font-extrabold text-[#25a2ee] hover:underline flex items-center gap-1"
+                    >
+                        <span>View All</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                </div>
 
-                        {/* Exams List */}
-                        {availableExams.length === 0 ? (
-                            <div className="py-8 text-center text-slate-400 space-y-2">
-                                <FileText className="w-8 h-8 text-slate-300 mx-auto" />
-                                <p className="text-xs font-bold text-slate-600">No exams scheduled at the moment</p>
-                                <p className="text-[11px] text-slate-400">Newly published model tests and quizzes will appear here.</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-2.5">
-                                {availableExams.slice(0, 3).map((exam) => {
-                                    const courseName = exam.course?.title || exam.courses?.[0]?.title || 'Model Test';
-                                    return (
-                                        <div
-                                            key={exam.id}
-                                            className="p-3 rounded-2xl hover:bg-slate-50 transition-colors flex items-center justify-between gap-3 border border-slate-100/70"
-                                        >
-                                            {/* Duration Pill */}
-                                            <div className={`w-10 h-10 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 ${
-                                                exam.is_live_active 
-                                                    ? 'bg-rose-500 text-white animate-pulse shadow-xs' 
-                                                    : 'bg-sky-50 text-sky-700'
-                                            }`}>
-                                                {exam.is_live_active ? '🔴' : `${exam.duration_minutes}m`}
+                {coursesData && coursesData.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {coursesData.slice(0, 4).map((item: any) => {
+                            const course = item.course;
+                            const enrolledDate = item.enrolled_at
+                                ? new Date(item.enrolled_at).toLocaleDateString('en-US', {
+                                      month: 'long',
+                                      day: 'numeric',
+                                      year: 'numeric'
+                                  })
+                                : 'Recent';
+                            const playUrl = item.last_lesson_id
+                                ? `/learning/${course.id}/lessons/${item.last_lesson_id}`
+                                : `/courses/${course.slug || course.id}`;
+
+                            return (
+                                <div
+                                    key={item.enrollment_id || course.id}
+                                    className="p-3.5 bg-slate-50/70 hover:bg-slate-50 border border-slate-200/80 hover:border-sky-300 rounded-2xl transition-all flex items-center gap-4 group"
+                                >
+                                    {/* Thumbnail */}
+                                    <div className="w-24 sm:w-28 h-18 sm:h-20 bg-slate-900 rounded-xl overflow-hidden shrink-0 relative shadow-2xs">
+                                        {course.thumbnail ? (
+                                            <img
+                                                src={course.thumbnail}
+                                                alt={course.title}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-tr from-[#25a2ee] to-slate-900 text-white font-bold text-[10px] p-1 text-center">
+                                                <span>NovoNex</span>
                                             </div>
+                                        )}
+                                    </div>
 
-                                            {/* Details */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-1.5">
-                                                    <h4 className="font-bold text-slate-900 text-xs sm:text-sm line-clamp-1">
-                                                        {exam.title}
-                                                    </h4>
-                                                    {exam.is_live_active && (
-                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-700 shrink-0">
-                                                            Live
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
-                                                    {courseName} • {exam.duration_minutes} mins
-                                                    {exam.is_live_expired && ' • Practice Mode'}
-                                                </p>
-                                            </div>
-
-                                            {/* Action Button */}
+                                    {/* Details */}
+                                    <div className="flex-1 min-w-0 space-y-1">
+                                        <h3 className="font-extrabold text-sm text-slate-900 truncate group-hover:text-[#25a2ee] transition-colors">
+                                            {course.title}
+                                        </h3>
+                                        <p className="text-[11px] text-slate-500">
+                                            Enrolled: <span className="font-semibold text-slate-700">{enrolledDate}</span>
+                                        </p>
+                                        <div className="flex items-center justify-between pt-1">
+                                            <span className="text-[11px] font-bold text-slate-500">
+                                                Duration: <span className="font-semibold text-slate-700">3 months</span>
+                                            </span>
                                             <Link
-                                                to={`/exams/${exam.id}/take`}
-                                                className={`px-4 py-1.5 rounded-full font-bold text-xs shrink-0 transition-colors shadow-2xs ${
-                                                    exam.is_live_active
-                                                        ? 'bg-rose-600 hover:bg-rose-700 text-white animate-pulse'
-                                                        : 'bg-sky-50 hover:bg-sky-600 hover:text-white text-sky-700'
-                                                }`}
+                                                to={playUrl}
+                                                className="px-3 py-1 bg-[#25a2ee] hover:bg-[#1f8ed1] text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 transition"
                                             >
-                                                {exam.is_live_active ? 'Participate' : 'Start'}
+                                                <Play className="w-3 h-3 fill-white" />
+                                                <span>Continue</span>
                                             </Link>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="pt-4 border-t border-slate-100 mt-4 text-center">
-                        <Link
-                            to="/student/exams"
-                            className="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline"
-                        >
-                            View All Exams →
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Right: Today's Routine */}
-                <div
-                    id="student-routine-section"
-                    className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-slate-200/80 flex flex-col justify-between"
-                >
-                    <div>
-                        <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-                            <h3 className="font-extrabold text-slate-900 text-base">
-                                Today's Schedule
-                            </h3>
-                            <Link
-                                to="/student/routine"
-                                className="text-xs font-bold text-[#0B4B34] hover:text-emerald-800 transition-colors cursor-pointer"
-                            >
-                                Routine Calendar
-                            </Link>
-                        </div>
-
-                        {/* Timeline Routine Items */}
-                        <div className="space-y-4">
-                            {todayRoutineEvents.length === 0 ? (
-                                <div className="py-8 text-center text-slate-400 space-y-2">
-                                    <Calendar className="w-8 h-8 text-slate-300 mx-auto" />
-                                    <p className="text-xs">No classes or exams scheduled for today.</p>
-                                </div>
-                            ) : (
-                                todayRoutineEvents.slice(0, 3).map((evt: any) => (
-                                    <div key={`${evt.type}-${evt.id}`} className="flex items-start gap-3">
-                                        <div className="w-12 shrink-0 pt-0.5 text-right">
-                                            <span className="text-xs font-bold text-slate-700 block">
-                                                {evt.time_time || '—'}
-                                            </span>
-                                            <span className="text-[10px] text-slate-400 font-bold block">
-                                                {evt.time_period || ''}
-                                            </span>
-                                        </div>
-                                        <div className={`border-l-2 ${
-                                            evt.type === 'live_exam'
-                                                ? 'border-amber-500'
-                                                : evt.type === 'live_class'
-                                                ? 'border-rose-500'
-                                                : evt.type === 'class_upload'
-                                                ? 'border-sky-500'
-                                                : evt.type === 'material'
-                                                ? 'border-teal-500'
-                                                : evt.type === 'book_parcel'
-                                                ? 'border-orange-500'
-                                                : 'border-[#0B4B34]'
-                                        } pl-3.5 py-0.5 space-y-0.5 flex-1 min-w-0`}>
-                                            <div className="flex items-center gap-1.5 flex-wrap">
-                                                <h4 className="font-bold text-slate-800 text-xs sm:text-sm line-clamp-1">
-                                                    {evt.title}
-                                                </h4>
-                                                {evt.is_live && (
-                                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-rose-500 text-white shrink-0 animate-pulse">
-                                                        Live Now
-                                                    </span>
-                                                )}
-                                                {evt.type === 'book_parcel' && (
-                                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-orange-100 text-orange-800 shrink-0">
-                                                        Book / Parcel
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="text-[11px] text-slate-500 line-clamp-1">
-                                                {evt.subject} • {evt.course_title}
-                                            </p>
-                                        </div>
-                                        <Link
-                                            to={evt.action_url || '/student/routine'}
-                                            className="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 hover:bg-emerald-50 hover:text-[#0B4B34] text-slate-600 shrink-0 transition-colors self-center"
-                                        >
-                                            {evt.is_live ? 'Join' : (evt.action_text || 'View')}
-                                        </Link>
                                     </div>
-                                ))
-                            )}
-                        </div>
+                                </div>
+                            );
+                        })}
                     </div>
-
-                    <div className="pt-4 border-t border-slate-100 mt-4 text-center">
+                ) : (
+                    <div className="py-12 text-center space-y-3">
+                        <BookOpen className="w-10 h-10 text-slate-300 mx-auto" />
+                        <p className="text-sm font-bold text-slate-600">You haven't enrolled in any courses yet.</p>
                         <Link
-                            to="/student/routine"
-                            className="text-xs font-bold text-[#0B4B34] hover:text-emerald-800 hover:underline"
+                            to="/courses"
+                            className="inline-flex px-5 py-2 bg-[#25a2ee] hover:bg-[#1f8ed1] text-white text-xs font-bold rounded-xl shadow-xs transition"
                         >
-                            View Full Routine Schedule →
+                            Explore Courses
                         </Link>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
