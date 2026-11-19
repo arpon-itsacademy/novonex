@@ -24,6 +24,7 @@ import {
     ShoppingCart
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { PagePreloader } from '../../components/shared/PagePreloader';
 import { getStoredReferralCode, setStoredReferralCode, clearStoredReferralCode } from '../../utils/referralTracker';
 
 const DEFAULT_MANUAL_SETTINGS: ManualPaymentSettings = {
@@ -451,9 +452,10 @@ export const CheckoutPage: React.FC = () => {
 
     if (loading || (!course && !isCartMode) || (isCartMode && cartItems.length === 0)) {
         return (
-            <div className="max-w-4xl mx-auto px-4 py-20 text-center text-slate-400">
-                Loading checkout information...
-            </div>
+            <PagePreloader
+                title="Loading checkout..."
+                subtitle="Verifying course enrollment details"
+            />
         );
     }
 

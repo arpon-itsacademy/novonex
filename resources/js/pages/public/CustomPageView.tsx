@@ -3,6 +3,7 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import { apiClient } from '../../api/client';
 import { CustomPage } from '../../types';
 import { PageBlockRenderer } from '../../components/builder/PageBlockRenderer';
+import { PagePreloader } from '../../components/shared/PagePreloader';
 import { FileText, ArrowLeft, AlertCircle } from 'lucide-react';
 
 interface CustomPageViewProps {
@@ -48,9 +49,10 @@ export const CustomPageView: React.FC<CustomPageViewProps> = ({ slugOverride }) 
 
     if (loading) {
         return (
-            <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin" />
-            </div>
+            <PagePreloader
+                title="Loading page..."
+                subtitle="Preparing content layout"
+            />
         );
     }
 

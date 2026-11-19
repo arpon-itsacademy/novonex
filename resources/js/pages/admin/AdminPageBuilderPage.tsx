@@ -457,6 +457,11 @@ export const AdminPageBuilderPage: React.FC = () => {
                 meta_title: page.meta_title,
                 meta_description: page.meta_description,
             });
+            if (page.slug === 'home') {
+                try {
+                    sessionStorage.removeItem('novonex_home_custom_page');
+                } catch {}
+            }
             showToast('Design saved successfully!');
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to save design.');

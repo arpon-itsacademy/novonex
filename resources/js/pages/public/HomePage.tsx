@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { StudentReviewsMarquee } from '../../components/home/StudentReviewsMarquee';
+import { PagePreloader } from '../../components/shared/PagePreloader';
 
 interface FeaturedTeacher {
     id: number;
@@ -65,14 +66,36 @@ interface FeaturedBundle {
 export const HomePage: React.FC = () => {
     const { t, language } = useLanguage();
     const { addToCart, isInCart } = useCart();
-    const [customPage, setCustomPage] = useState<CustomPage | null>(null);
+    const [customPage, setCustomPage] = useState<CustomPage | null>(() => {
+        try {
+            const cached = sessionStorage.getItem('novonex_home_custom_page');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed && Array.isArray(parsed.blocks) && parsed.blocks.length > 0) {
+                    return parsed;
+                }
+            }
+        } catch {}
+        return null;
+    });
     const [courses, setCourses] = useState<Course[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [bundles, setBundles] = useState<FeaturedBundle[]>([]);
     const [activeCategory, setActiveCategory] = useState<string>('all');
     const [teachers, setTeachers] = useState<FeaturedTeacher[]>([]);
     const [teacherFilter, setTeacherFilter] = useState<'all' | 'ssc' | 'hsc' | 'admission' | 'arts'>('all');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(() => {
+        try {
+            const cached = sessionStorage.getItem('novonex_home_custom_page');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed && Array.isArray(parsed.blocks) && parsed.blocks.length > 0) {
+                    return false;
+                }
+            }
+        } catch {}
+        return true;
+    });
     const [coursesLoading, setCoursesLoading] = useState(false);
     const [teachersLoading, setTeachersLoading] = useState(true);
     const [isPaused, setIsPaused] = useState(false);
@@ -111,7 +134,11 @@ export const HomePage: React.FC = () => {
                     setCategories(catsRes.value.data || []);
                 }
                 if (pageRes.status === 'fulfilled' && pageRes.value.data?.page) {
-                    setCustomPage(pageRes.value.data.page);
+                    const fetchedPage = pageRes.value.data.page;
+                    setCustomPage(fetchedPage);
+                    try {
+                        sessionStorage.setItem('novonex_home_custom_page', JSON.stringify(fetchedPage));
+                    } catch {}
                 }
                 if (teachersRes.status === 'fulfilled') {
                     const teacherList = teachersRes.value.data?.data || teachersRes.value.data?.teachers || [];
@@ -230,6 +257,15 @@ export const HomePage: React.FC = () => {
             a: 'Absolutely! Our platform is fully responsive and optimized for ultra-smooth performance on any smartphone, tablet, laptop, or desktop computer.',
         },
     ];
+
+    if (loading) {
+        return (
+            <PagePreloader
+                title="Loading NovoNex..."
+                subtitle="Setting up courses, mentors, and learning materials"
+            />
+        );
+    }
 
     if (customPage && Array.isArray(customPage.blocks) && customPage.blocks.length > 0) {
         return (

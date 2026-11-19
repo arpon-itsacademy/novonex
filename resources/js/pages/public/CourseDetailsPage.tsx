@@ -28,6 +28,7 @@ import {
     ShoppingCart
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { PagePreloader } from '../../components/shared/PagePreloader';
 
 const DEFAULT_FEATURES = [
     'Full HD video lectures & live discussions',
@@ -152,14 +153,10 @@ export const CourseDetailsPage: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="max-w-7xl mx-auto px-4 py-20 animate-pulse space-y-8">
-                <div className="h-12 bg-slate-200 rounded-xl w-2/3" />
-                <div className="h-6 bg-slate-200 rounded w-1/3" />
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 h-96 bg-slate-200 rounded-2xl" />
-                    <div className="h-96 bg-slate-200 rounded-2xl" />
-                </div>
-            </div>
+            <PagePreloader
+                title="Loading course details..."
+                subtitle="Fetching curriculum, live class records, and syllabus"
+            />
         );
     }
 
