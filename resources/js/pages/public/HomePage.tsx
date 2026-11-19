@@ -81,13 +81,15 @@ export const HomePage: React.FC = () => {
 
     const scrollLeft = () => {
         if (carouselRef.current) {
-            carouselRef.current.scrollBy({ left: -270, behavior: 'smooth' });
+            const step = carouselRef.current.clientWidth > 640 ? 270 : carouselRef.current.clientWidth;
+            carouselRef.current.scrollBy({ left: -step, behavior: 'smooth' });
         }
     };
 
     const scrollRight = () => {
         if (carouselRef.current) {
-            carouselRef.current.scrollBy({ left: 270, behavior: 'smooth' });
+            const step = carouselRef.current.clientWidth > 640 ? 270 : carouselRef.current.clientWidth;
+            carouselRef.current.scrollBy({ left: step, behavior: 'smooth' });
         }
     };
 
@@ -182,7 +184,8 @@ export const HomePage: React.FC = () => {
             if (scrollLeft + clientWidth >= scrollWidth - 15) {
                 carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
             } else {
-                carouselRef.current.scrollBy({ left: 270, behavior: 'smooth' });
+                const step = clientWidth > 640 ? 270 : clientWidth;
+                carouselRef.current.scrollBy({ left: step, behavior: 'smooth' });
             }
         }, 4000);
         return () => clearInterval(interval);
@@ -935,14 +938,14 @@ export const HomePage: React.FC = () => {
 
                     {/* Carousel Scroll Container */}
                     {teachersLoading ? (
-                        <div className="flex gap-5 overflow-hidden py-2">
+                        <div className="flex gap-2.5 sm:gap-5 overflow-hidden py-2">
                             {[1, 2, 3, 4, 5].map((i) => (
                                 <div
                                     key={i}
-                                    className="w-[220px] sm:w-[245px] shrink-0 bg-white dark:bg-slate-900 rounded-[26px] border border-slate-100 dark:border-slate-800 p-3 animate-pulse space-y-3"
+                                    className="w-[calc(50%-5px)] sm:w-[220px] md:w-[245px] shrink-0 bg-white dark:bg-slate-900 rounded-[20px] sm:rounded-[26px] border border-slate-100 dark:border-slate-800 p-2 sm:p-3 animate-pulse space-y-2 sm:space-y-3"
                                 >
-                                    <div className="aspect-[3/3.8] rounded-2xl bg-slate-200 dark:bg-slate-800" />
-                                    <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4" />
+                                    <div className="aspect-[3/3.8] rounded-xl sm:rounded-2xl bg-slate-200 dark:bg-slate-800" />
+                                    <div className="h-3.5 sm:h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4" />
                                     <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/2" />
                                 </div>
                             ))}
@@ -957,7 +960,7 @@ export const HomePage: React.FC = () => {
                             ref={carouselRef}
                             onMouseEnter={() => setIsPaused(true)}
                             onMouseLeave={() => setIsPaused(false)}
-                            className="flex gap-4 sm:gap-5 overflow-x-auto pb-4 pt-1 scroll-smooth scrollbar-none"
+                            className="flex gap-2.5 sm:gap-5 overflow-x-auto pb-4 pt-1 scroll-smooth scrollbar-none"
                             style={{ scrollSnapType: 'x mandatory' }}
                         >
                             {displayedFaculty.map((teacher) => (
@@ -965,32 +968,32 @@ export const HomePage: React.FC = () => {
                                     to={`/instructors/${teacher.id}`}
                                     key={teacher.id}
                                     style={{ scrollSnapAlign: 'start' }}
-                                    className="w-[220px] sm:w-[245px] shrink-0 bg-white dark:bg-slate-900 rounded-[26px] border border-slate-200/90 dark:border-slate-800 p-2.5 sm:p-3 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group cursor-pointer relative"
+                                    className="w-[calc(50%-5px)] sm:w-[220px] md:w-[245px] shrink-0 bg-white dark:bg-slate-900 rounded-[20px] sm:rounded-[26px] border border-slate-200/90 dark:border-slate-800 p-2 sm:p-3 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group cursor-pointer relative"
                                 >
                                     {/* Arched Photo / Portrait Container */}
-                                    <div className="relative aspect-[3/3.8] rounded-2xl overflow-hidden bg-gradient-to-b from-sky-400 via-sky-600 to-slate-950 dark:from-sky-500 dark:via-sky-800 dark:to-slate-950 flex items-end justify-center">
+                                    <div className="relative aspect-[3/3.8] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-b from-sky-400 via-sky-600 to-slate-950 dark:from-sky-500 dark:via-sky-800 dark:to-slate-950 flex items-end justify-center">
                                         {/* Radial soft lighting */}
                                         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent pointer-events-none" />
 
                                         {/* Sparkle star accents */}
-                                        <div className="absolute top-4 right-5 text-sky-200/50 pointer-events-none animate-pulse">
-                                            <Sparkles className="w-4 h-4" />
+                                        <div className="absolute top-3 right-3 sm:top-4 sm:right-5 text-sky-200/50 pointer-events-none animate-pulse">
+                                            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                         </div>
-                                        <div className="absolute top-12 left-4 text-cyan-200/40 pointer-events-none">
-                                            <Sparkles className="w-3 h-3" />
+                                        <div className="absolute top-10 left-3 sm:top-12 sm:left-4 text-cyan-200/40 pointer-events-none">
+                                            <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                                         </div>
 
                                         {/* Arched border guide */}
                                         <div className="absolute inset-1.5 rounded-t-full border border-sky-300/25 pointer-events-none" />
 
                                         {/* Top Left Institution Badge */}
-                                        <div className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 text-[10px] font-black text-white flex items-center gap-1 shadow-xs">
+                                        <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 z-10 px-1.5 sm:px-2 py-0.5 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 text-[9px] sm:text-[10px] font-black text-white flex items-center gap-1 shadow-xs">
                                             <span>{teacher.institution || 'BUET'}</span>
                                         </div>
 
                                         {/* Top Right Golden Crest */}
-                                        <div className="absolute top-2.5 right-2.5 z-10 w-6 h-6 rounded-full bg-amber-400/25 backdrop-blur-md border border-amber-300/40 flex items-center justify-center text-amber-300 shadow-xs">
-                                            <Award className="w-3.5 h-3.5" />
+                                        <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400/25 backdrop-blur-md border border-amber-300/40 flex items-center justify-center text-amber-300 shadow-xs">
+                                            <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                         </div>
 
                                         {/* Teacher Photo */}
@@ -1007,35 +1010,35 @@ export const HomePage: React.FC = () => {
                                                 />
                                             ) : null}
                                             <div className={`w-full h-full flex flex-col items-center justify-center text-white ${teacher.photo_url ? 'hidden' : 'flex'}`}>
-                                                <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-xs border border-white/20 flex items-center justify-center text-xl font-black mb-1">
+                                                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xs border border-white/20 flex items-center justify-center text-base sm:text-xl font-black mb-1">
                                                     {(teacher.name || 'T').charAt(0).toUpperCase()}
                                                 </div>
-                                                <span className="text-[10px] font-bold text-sky-200">Instructor & Mentor</span>
+                                                <span className="text-[9px] sm:text-[10px] font-bold text-sky-200">Instructor & Mentor</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Bottom Info Details */}
-                                    <div className="pt-2.5 px-0.5 space-y-1 flex-1 flex flex-col justify-between">
+                                    <div className="pt-2 sm:pt-2.5 px-0.5 space-y-1 flex-1 flex flex-col justify-between">
                                         <div>
                                             {/* Teacher Name */}
-                                            <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-1">
+                                            <h3 className="font-extrabold text-xs sm:text-base text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-1">
                                                 {teacher.name}
                                             </h3>
 
                                             {/* Designation & Experience */}
-                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 font-medium">
+                                            <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 font-medium">
                                                 {teacher.designation} {teacher.experience ? `— ${teacher.experience}` : ''}
                                             </p>
                                         </div>
 
                                         {/* Category Pill Badges */}
-                                        <div className="flex items-center gap-1.5 flex-wrap pt-2">
+                                        <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap pt-1.5 sm:pt-2">
                                             {teacher.tags && teacher.tags.length > 0 ? (
                                                 teacher.tags.slice(0, 2).map((tag, idx) => (
                                                     <span
                                                         key={idx}
-                                                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tight border ${
+                                                        className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold tracking-tight border ${
                                                             idx === 0
                                                                 ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-300 border-sky-200 dark:border-sky-800'
                                                                 : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
@@ -1046,10 +1049,10 @@ export const HomePage: React.FC = () => {
                                                 ))
                                             ) : (
                                                 <>
-                                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tight border bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-300 border-sky-200 dark:border-sky-800">
+                                                    <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold tracking-tight border bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-300 border-sky-200 dark:border-sky-800">
                                                         Class 9-10
                                                     </span>
-                                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tight border bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800">
+                                                    <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold tracking-tight border bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800">
                                                         HSC
                                                     </span>
                                                 </>

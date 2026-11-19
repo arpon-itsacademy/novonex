@@ -1234,34 +1234,36 @@ const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                     {filtered.map((t) => (
                         <div
                             key={t.id}
-                            className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 text-center shadow-sm hover:shadow-lg hover:border-sky-300 transition-all group"
+                            className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-3 sm:p-5 text-center shadow-sm hover:shadow-lg hover:border-sky-300 transition-all group flex flex-col justify-between"
                         >
-                            <div className="relative w-28 h-28 mx-auto mb-4 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-sky-100 dark:border-sky-900/40">
-                                {t.photo_url ? (
-                                    <img src={getImageUrl(t.photo_url)} alt={t.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-sky-500 font-black text-2xl">
-                                        {t.name.charAt(0)}
-                                    </div>
-                                )}
+                            <div>
+                                <div className="relative w-20 h-20 sm:w-28 sm:h-28 mx-auto mb-3 sm:mb-4 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-sky-100 dark:border-sky-900/40">
+                                    {t.photo_url ? (
+                                        <img src={getImageUrl(t.photo_url)} alt={t.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-sky-500 font-black text-xl sm:text-2xl">
+                                            {t.name.charAt(0)}
+                                        </div>
+                                    )}
+                                </div>
+                                <h3 className="font-bold text-xs sm:text-base text-slate-900 dark:text-white mb-0.5 group-hover:text-sky-600 transition-colors line-clamp-1">
+                                    {t.name}
+                                </h3>
+                                <p className="text-[10px] sm:text-xs font-semibold text-sky-600 dark:text-sky-400 line-clamp-1">
+                                    {t.designation || 'Instructor & Mentor'}
+                                </p>
+                                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 line-clamp-1">
+                                    {t.institution || 'NovoNex'}
+                                </p>
                             </div>
-                            <h3 className="font-bold text-base text-slate-900 dark:text-white mb-0.5 group-hover:text-sky-600 transition-colors">
-                                {t.name}
-                            </h3>
-                            <p className="text-xs font-semibold text-sky-600 dark:text-sky-400">
-                                {t.designation || 'Instructor & Mentor'}
-                            </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
-                                {t.institution || 'NovoNex'}
-                            </p>
-                            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                            <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-slate-100 dark:border-slate-800">
                                 <Link
                                     to={`/teachers/${t.id}`}
-                                    className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center justify-center gap-1"
+                                    className="text-[11px] sm:text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center justify-center gap-1"
                                 >
                                     <span>View Profile</span>
                                     <ArrowRight className="w-3.5 h-3.5" />
