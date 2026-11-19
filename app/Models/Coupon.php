@@ -113,15 +113,15 @@ class Coupon extends Model
     public function calculateDiscount(float $basePrice): float
     {
         if ($this->discount_type === self::TYPE_PERCENTAGE) {
-            $discount = round(($basePrice * $this->discount_amount) / 100, 2);
+            $discount = floor(($basePrice * $this->discount_amount) / 100);
             if ($this->max_discount_amount !== null && $this->max_discount_amount > 0) {
                 $discount = min($discount, (float) $this->max_discount_amount);
             }
-            return min($basePrice, max(0, $discount));
+            return min($basePrice, max(0, (float) floor($discount)));
         }
 
         // Fixed / flat discount
-        return min($basePrice, max(0, (float) $this->discount_amount));
+        return min($basePrice, max(0, (float) floor((float) $this->discount_amount)));
     }
 
     /**

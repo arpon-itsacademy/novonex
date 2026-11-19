@@ -256,7 +256,7 @@ class ShurjopayController extends Controller
 
                 if ($bestOfferEval && $bestOfferModel) {
                     $dynamicOffer = $bestOfferModel;
-                    $dynamicOfferDiscount = min($courseFinalAmount, $maxOfferDiscount);
+                    $dynamicOfferDiscount = (float) floor(min($courseFinalAmount, $maxOfferDiscount));
                     $courseFinalAmount = max(0, $courseFinalAmount - $dynamicOfferDiscount);
                 }
             }
@@ -264,7 +264,7 @@ class ShurjopayController extends Controller
             Log::warning('Dynamic offer evaluation skipped in shurjoPay checkout: ' . $e->getMessage());
         }
 
-        $finalAmount = max(0, $courseFinalAmount + $nexpilotPrice);
+        $finalAmount = (float) floor(max(0, $courseFinalAmount + $nexpilotPrice));
 
         // If amount is 0 (100% coupon, 100% discount, or free course), do NOT call shurjoPay.
         // Immediately mark order as PAID and activate enrollment.

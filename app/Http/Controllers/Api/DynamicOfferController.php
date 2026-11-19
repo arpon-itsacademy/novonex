@@ -90,7 +90,7 @@ class DynamicOfferController extends Controller
                 return response()->json([
                     'has_offer' => true,
                     'applied' => true,
-                    'discount_amount' => (float) $bestEvaluation['discount_amount'],
+                    'discount_amount' => (float) floor($bestEvaluation['discount_amount']),
                     'offer' => $bestEvaluation,
                 ]);
             }

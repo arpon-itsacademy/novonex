@@ -215,10 +215,10 @@ export const CheckoutPage: React.FC = () => {
         ? cartOriginalPrice
         : (course ? Number(course.price || 0) : 0);
 
-    const referralDiscount = appliedReferral ? Number(appliedReferral.discount_amount || 0) : 0;
-    const couponDiscount = appliedCoupon ? Number(appliedCoupon.calculated_discount || 0) : 0;
-    const dynamicDiscount = isCartMode ? (dynamicOfferDiscount || 0) : 0;
-    const totalPayable = Math.max(0, courseBasePrice + pilotPrice - referralDiscount - couponDiscount - dynamicDiscount);
+    const referralDiscount = appliedReferral ? Math.floor(Number(appliedReferral.discount_amount || 0)) : 0;
+    const couponDiscount = appliedCoupon ? Math.floor(Number(appliedCoupon.calculated_discount || 0)) : 0;
+    const dynamicDiscount = isCartMode ? Math.floor(dynamicOfferDiscount || 0) : 0;
+    const totalPayable = Math.floor(Math.max(0, courseBasePrice + pilotPrice - referralDiscount - couponDiscount - dynamicDiscount));
 
     const validateCouponCode = async (codeToVerify: string, courseId: number) => {
         if (!codeToVerify || !codeToVerify.trim()) return;

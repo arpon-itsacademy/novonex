@@ -220,9 +220,9 @@ class DynamicOffer extends Model
             $discountAmount = 0.0;
 
             if ($discountType === 'percentage') {
-                $discountAmount = round(($qualifyingPrice * $discountValue) / 100, 2);
+                $discountAmount = floor(($qualifyingPrice * $discountValue) / 100);
             } else {
-                $discountAmount = min($qualifyingPrice, $discountValue);
+                $discountAmount = floor(min($qualifyingPrice, $discountValue));
             }
 
             return [
@@ -237,7 +237,7 @@ class DynamicOffer extends Model
                     'discount_type' => $discountType,
                     'discount_value' => $discountValue,
                 ],
-                'discount_amount' => $discountAmount,
+                'discount_amount' => (float) floor($discountAmount),
                 'next_tier' => $nextTier ? [
                     'min_qty' => (int) $nextTier['min_qty'],
                     'courses_needed' => (int) $nextTier['min_qty'] - $qualifyingCount,

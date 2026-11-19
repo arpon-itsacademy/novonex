@@ -177,7 +177,7 @@ class OrderController extends Controller
 
                 if ($bestOfferEval && $bestOfferModel) {
                     $dynamicOffer = $bestOfferModel;
-                    $dynamicOfferDiscount = min($courseFinalAmount, $maxOfferDiscount);
+                    $dynamicOfferDiscount = (float) floor(min($courseFinalAmount, $maxOfferDiscount));
                     $courseFinalAmount = max(0, $courseFinalAmount - $dynamicOfferDiscount);
                 }
             }
@@ -185,7 +185,7 @@ class OrderController extends Controller
             \Illuminate\Support\Facades\Log::warning('Dynamic offer evaluation skipped during checkout: ' . $e->getMessage());
         }
 
-        $finalAmount = max(0, $courseFinalAmount + $nexpilotPrice);
+        $finalAmount = (float) floor(max(0, $courseFinalAmount + $nexpilotPrice));
         $isFree = ($finalAmount <= 0);
 
         if (! $isFree) {

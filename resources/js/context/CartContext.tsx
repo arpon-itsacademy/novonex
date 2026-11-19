@@ -96,7 +96,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (data && data.offer) {
                 setAppliedOffer(data.offer);
-                setDynamicOfferDiscount(Number(data.discount_amount || 0));
+                setDynamicOfferDiscount(Math.floor(Number(data.discount_amount || 0)));
             } else {
                 setAppliedOffer(null);
                 setDynamicOfferDiscount(0);
@@ -171,10 +171,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const cartCount = items.length;
 
-    const subtotal = items.reduce((acc, item) => acc + (Number(item.effective_price) || 0), 0);
-    const totalOriginalPrice = items.reduce((acc, item) => acc + (Number(item.price) || Number(item.effective_price) || 0), 0);
-    const totalPayable = Math.max(0, subtotal - dynamicOfferDiscount);
-    const totalSavings = Math.max(0, totalOriginalPrice - totalPayable);
+    const subtotal = Math.floor(items.reduce((acc, item) => acc + (Number(item.effective_price) || 0), 0));
+    const totalOriginalPrice = Math.floor(items.reduce((acc, item) => acc + (Number(item.price) || Number(item.effective_price) || 0), 0));
+    const totalPayable = Math.floor(Math.max(0, subtotal - dynamicOfferDiscount));
+    const totalSavings = Math.floor(Math.max(0, totalOriginalPrice - totalPayable));
 
     const openCart = () => setIsCartOpen(true);
     const closeCart = () => setIsCartOpen(false);
