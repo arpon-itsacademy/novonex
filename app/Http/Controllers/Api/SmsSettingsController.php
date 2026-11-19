@@ -95,4 +95,50 @@ class SmsSettingsController extends Controller
 
         return response()->json($result);
     }
+
+    public function getGatewayCondition(GreenWebSmsService $smsService): JsonResponse
+    {
+        $settings = SmsSetting::current();
+        $balanceInfo = $smsService->checkBalance();
+
+        $totalSent = SmsLog::count();
+        $todaySent = SmsLog::whereDate('created_at', today())->count();
+        $thisMonthSent = SmsLog::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+        $successfulCount = SmsLog::where('status', 'sent')->count();
+        $failedCount = SmsLog::where('status', 'failed')->count();
+
+        $recentLogs = SmsLog::latest('created_at')->limit(20)->get();
+
+        return response()->json([
+            'gateway' => [
+                'provider' => 'greenweb',
+                'provider_name' => 'GreenWeb BD',
+                'api_endpoint' => 'https://api.greenweb.com.bd/api.php',
+                'has_token' => ! empty($settings->api_token),
+                'api_token_masked' => $settings->masked_token,
+                'sender_id' => $settings->sender_id ?: 'Default / Non-Masking',
+                'sms_enabled' => (bool) $settings->sms_enabled,
+                'otp_enabled' => (bool) $settings->otp_enabled,
+                'recharge_portal_url' => 'https://greenweb.com.bd',
+            ],
+            'balance_info' => $balanceInfo,
+            'statistics' => [
+                'total_sent' => $totalSent,
+                'today_sent' => $todaySent,
+                'this_month_sent' => $thisMonthSent,
+                'successful_count' => $successfulCount,
+                'failed_count' => $failedCount,
+                'success_rate' => $totalSent > 0 ? round(($successfulCount / $totalSent) * 100, 1) : 100,
+            ],
+            'recent_logs' => $recentLogs,
+        ]);
+    }
+
+    public function getBalance(GreenWebSmsService $smsService): JsonResponse
+    {
+        $balanceInfo = $smsService->checkBalance();
+        return response()->json($balanceInfo);
+    }
 }

@@ -258,6 +258,7 @@ export const DashboardLayout: React.FC = () => {
                     permission: 'sms.settings',
                     children: [
                         { title: t.sidebar.smsConfig, path: '/admin/sms', permission: 'sms.settings' },
+                        { title: 'Gateway Condition', path: '/admin/sms/gateway-condition', permission: 'sms.settings' },
                         { title: 'Auto SMS Push', path: '/admin/sms/auto-push', permission: 'sms.send' },
                     ]
                 },

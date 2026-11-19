@@ -359,6 +359,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('sms-settings', [SmsSettingsController::class, 'getSettings']);
         Route::put('sms-settings', [SmsSettingsController::class, 'updateSettings']);
         Route::post('sms-settings/test', [SmsSettingsController::class, 'testSms']);
+        Route::get('sms/gateway-condition', [SmsSettingsController::class, 'getGatewayCondition']);
+        Route::get('sms/balance', [SmsSettingsController::class, 'getBalance']);
 
         // Auto SMS Push on Course Purchase
         Route::get('sms/auto-push', [AutoSmsPushController::class, 'getSettings']);

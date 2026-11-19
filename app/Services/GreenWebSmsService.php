@@ -150,37 +150,86 @@ class GreenWebSmsService
         if (! $this->isConfigured()) {
             return [
                 'success' => false,
-                'message' => 'API token not configured.',
+                'message' => 'GreenWeb API token is not configured in SMS Settings.',
                 'balance' => null,
+                'raw_response' => null,
             ];
         }
 
         try {
             $token = trim((string) $this->token);
+            $response = null;
+
+            // 1. Try with &balance&json via HTTPS
             try {
                 $response = Http::timeout(10)
                     ->withoutVerifying()
                     ->get('https://api.greenweb.com.bd/g_api.php', [
                         'token' => $token,
                         'balance' => 'true',
+                        'json' => '',
                     ]);
             } catch (\Throwable $e) {
-                $response = Http::timeout(10)->get('http://api.greenweb.com.bd/g_api.php', [
-                    'token' => $token,
-                    'balance' => 'true',
-                ]);
+                // Fallback to HTTP
+                try {
+                    $response = Http::timeout(10)->get('http://api.greenweb.com.bd/g_api.php', [
+                        'token' => $token,
+                        'balance' => 'true',
+                        'json' => '',
+                    ]);
+                } catch (\Throwable $e2) {
+                    $response = Http::timeout(10)->get('https://api.greenweb.com.bd/g_api.php', [
+                        'token' => $token,
+                        'balance' => 'true',
+                    ]);
+                }
+            }
+
+            if (! $response || ! $response->successful()) {
+                return [
+                    'success' => false,
+                    'message' => $response ? 'GreenWeb responded with HTTP ' . $response->status() : 'Connection failed',
+                    'balance' => null,
+                    'raw_response' => $response ? $response->body() : null,
+                ];
+            }
+
+            $body = trim($response->body());
+            $parsedBalance = null;
+
+            // Attempt JSON decode
+            $jsonData = json_decode($body, true);
+            if (is_array($jsonData)) {
+                if (isset($jsonData[0]['balance'])) {
+                    $parsedBalance = $jsonData[0]['balance'];
+                } elseif (isset($jsonData['balance'])) {
+                    $parsedBalance = $jsonData['balance'];
+                }
+            }
+
+            // If not found in JSON, parse string (e.g. "1250" or "Balance: 1250")
+            if ($parsedBalance === null) {
+                if (is_numeric($body)) {
+                    $parsedBalance = (float) $body;
+                } elseif (preg_match('/(\d+(?:\.\d+)?)/', $body, $matches)) {
+                    $parsedBalance = $matches[1];
+                } else {
+                    $parsedBalance = $body;
+                }
             }
 
             return [
-                'success' => $response->successful(),
-                'message' => trim($response->body()),
-                'balance' => trim($response->body()),
+                'success' => true,
+                'message' => 'Balance fetched successfully.',
+                'balance' => $parsedBalance,
+                'raw_response' => $body,
             ];
         } catch (\Throwable $e) {
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
                 'balance' => null,
+                'raw_response' => null,
             ];
         }
     }

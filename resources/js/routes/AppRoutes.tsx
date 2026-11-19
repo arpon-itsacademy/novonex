@@ -30,6 +30,7 @@ import { AdminRolesPage } from '../pages/admin/roles/AdminRolesPage';
 import { AdminOrdersPage } from '../pages/admin/AdminOrdersPage';
 import { AdminAnalyticsPage } from '../pages/admin/AdminAnalyticsPage';
 import { AdminSmsPage } from '../pages/admin/AdminSmsPage';
+import { AdminSmsGatewayConditionPage } from '../pages/admin/AdminSmsGatewayConditionPage';
 import { AdminAutoSmsPushPage } from '../pages/admin/AdminAutoSmsPushPage';
 import { AdminSmsMarketingPage } from '../pages/admin/AdminSmsMarketingPage';
 import { AdminBundlesPage } from '../pages/admin/AdminBundlesPage';
@@ -173,6 +174,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="affiliate/members" element={<AdminAffiliateMembersPage />} />
                 <Route path="analytics" element={<AdminAnalyticsPage />} />
                 <Route path="sms" element={<AdminSmsPage />} />
+                <Route path="sms/gateway-condition" element={<AdminSmsGatewayConditionPage />} />
                 <Route path="sms/auto-push" element={<AdminAutoSmsPushPage />} />
                 <Route path="sms-marketing" element={<AdminSmsMarketingPage />} />
                 <Route path="settings" element={<AdminSettingsPage />} />
