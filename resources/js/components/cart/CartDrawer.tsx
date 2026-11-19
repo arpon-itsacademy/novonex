@@ -10,7 +10,9 @@ import {
     BookOpen,
     ShieldCheck,
     Sparkles,
-    ShoppingBag
+    ShoppingBag,
+    Tag,
+    Flame
 } from 'lucide-react';
 
 export const CartDrawer: React.FC = () => {
@@ -23,6 +25,9 @@ export const CartDrawer: React.FC = () => {
         subtotal,
         totalOriginalPrice,
         totalSavings,
+        dynamicOfferDiscount,
+        appliedOffer,
+        totalPayable,
         cartCount
     } = useCart();
 
@@ -105,6 +110,43 @@ export const CartDrawer: React.FC = () => {
                             </button>
                         </div>
                     </div>
+
+                    {/* Dynamic Offer Notification Banner */}
+                    {cartCount > 0 && appliedOffer && (
+                        <div className="px-4 pt-3 pb-1">
+                            {appliedOffer.applied ? (
+                                <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-sky-500/10 border border-emerald-500/30 flex items-start gap-2.5">
+                                    <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                                    <div className="text-xs">
+                                        <p className="font-bold text-emerald-800 dark:text-emerald-300">
+                                            {appliedOffer.offer_title || 'Special Bundle Offer Applied!'}
+                                        </p>
+                                        <p className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80 mt-0.5">
+                                            {appliedOffer.banner_text || `You saved ${formatBDT(dynamicOfferDiscount)} on this order.`}
+                                        </p>
+                                        {appliedOffer.next_tier && (
+                                            <p className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold mt-1 flex items-center gap-1">
+                                                <Flame className="w-3 h-3 text-amber-500" />
+                                                <span>Add {appliedOffer.next_tier.courses_needed} more to get {appliedOffer.next_tier.discount_type === 'percentage' ? `${appliedOffer.next_tier.discount_value}%` : formatBDT(appliedOffer.next_tier.discount_value)} OFF!</span>
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : appliedOffer.next_tier ? (
+                                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-2.5">
+                                    <Flame className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                                    <div className="text-xs">
+                                        <p className="font-bold text-amber-800 dark:text-amber-300">
+                                            {appliedOffer.offer_title || 'Unlock Special Discount'}
+                                        </p>
+                                        <p className="text-[11px] text-amber-700/90 dark:text-amber-400/90 mt-0.5">
+                                            Add {appliedOffer.next_tier.courses_needed} more {appliedOffer.next_tier.courses_needed === 1 ? 'course' : 'courses'} to your cart to get {appliedOffer.next_tier.discount_type === 'percentage' ? `${appliedOffer.next_tier.discount_value}%` : formatBDT(appliedOffer.next_tier.discount_value)} OFF!
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : null}
+                        </div>
+                    )}
 
                     {/* Cart Items List */}
                     <div className="flex-1 overflow-y-auto p-4 sm:p-5 divide-y divide-slate-100 dark:divide-slate-800">
@@ -216,10 +258,25 @@ export const CartDrawer: React.FC = () => {
                         <div className="p-4 sm:p-5 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-850/80 space-y-3">
                             {/* Summary info */}
                             <div className="space-y-1.5 text-xs">
-                                {totalSavings > 0 && (
+                                {totalOriginalPrice > subtotal && (
                                     <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
                                         <span>Regular Total</span>
                                         <span className="line-through">{formatBDT(totalOriginalPrice)}</span>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                                    <span>Courses Subtotal</span>
+                                    <span>{formatBDT(subtotal)}</span>
+                                </div>
+
+                                {dynamicOfferDiscount > 0 && (
+                                    <div className="flex items-center justify-between font-semibold text-emerald-600 dark:text-emerald-400">
+                                        <span className="flex items-center gap-1">
+                                            <Tag className="w-3.5 h-3.5" />
+                                            <span>Dynamic Bundle Offer</span>
+                                        </span>
+                                        <span>-{formatBDT(dynamicOfferDiscount)}</span>
                                     </div>
                                 )}
 
@@ -227,7 +284,7 @@ export const CartDrawer: React.FC = () => {
                                     <div className="flex items-center justify-between font-semibold text-emerald-600 dark:text-emerald-400">
                                         <span className="flex items-center gap-1">
                                             <Sparkles className="w-3.5 h-3.5" />
-                                            <span>Your Savings</span>
+                                            <span>Total Savings</span>
                                         </span>
                                         <span>-{formatBDT(totalSavings)}</span>
                                     </div>
@@ -236,7 +293,7 @@ export const CartDrawer: React.FC = () => {
                                 <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
                                     <span className="font-extrabold text-sm text-slate-800 dark:text-slate-200">Total Payable</span>
                                     <span className="font-black text-lg text-[#25a2ee]">
-                                        {formatBDT(subtotal)}
+                                        {formatBDT(totalPayable)}
                                     </span>
                                 </div>
                             </div>

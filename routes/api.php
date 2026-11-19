@@ -33,6 +33,8 @@ use App\Http\Controllers\Api\AdminBundleController;
 use App\Http\Controllers\Api\AiExamQuestionController;
 use App\Http\Controllers\Api\AdminCouponController;
 use App\Http\Controllers\Api\CouponValidationController;
+use App\Http\Controllers\Api\AdminDynamicOfferController;
+use App\Http\Controllers\Api\DynamicOfferController;
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\RoutineController;
 use App\Http\Controllers\Api\LiveClassController;
@@ -115,6 +117,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('orders/shurjopay/checkout', [ShurjopayController::class, 'initiate']);
     Route::get('orders/my-orders', [OrderController::class, 'myOrders']);
     Route::post('coupons/validate', [CouponValidationController::class, 'validateCoupon']);
+    Route::get('dynamic-offers/active', [DynamicOfferController::class, 'getActiveOffers']);
+    Route::post('dynamic-offers/evaluate', [DynamicOfferController::class, 'evaluate']);
 
     // NexPilot Student Learning Room & Chatbot
     Route::prefix('student/nexpilot')->group(function () {
@@ -386,6 +390,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('coupons/{id}/restore', [AdminCouponController::class, 'restore']);
         Route::delete('coupons/{id}/force-delete', [AdminCouponController::class, 'forceDelete']);
         Route::post('coupons/{id}/toggle-status', [AdminCouponController::class, 'toggleStatus']);
+
+        // Marketing: Dynamic Offer Builder
+        Route::get('admin/dynamic-offers', [AdminDynamicOfferController::class, 'index']);
+        Route::post('admin/dynamic-offers', [AdminDynamicOfferController::class, 'store']);
+        Route::get('admin/dynamic-offers/courses-and-categories', [AdminDynamicOfferController::class, 'getCoursesAndCategories']);
+        Route::get('admin/dynamic-offers/{id}', [AdminDynamicOfferController::class, 'show']);
+        Route::put('admin/dynamic-offers/{id}', [AdminDynamicOfferController::class, 'update']);
+        Route::delete('admin/dynamic-offers/{id}', [AdminDynamicOfferController::class, 'destroy']);
+        Route::post('admin/dynamic-offers/{id}/toggle-status', [AdminDynamicOfferController::class, 'toggleStatus']);
 
         // Website Settings & Appearance (Header / Footer Builder / Manual Payment)
         Route::put('website-settings', [WebsiteSettingsController::class, 'updateSettings']);

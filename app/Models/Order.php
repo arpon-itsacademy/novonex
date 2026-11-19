@@ -33,6 +33,9 @@ class Order extends Model
         'coupon_id',
         'coupon_code',
         'coupon_discount',
+        'dynamic_offer_id',
+        'dynamic_offer_title',
+        'dynamic_offer_discount',
         'final_amount',
         'has_nexpilot',
         'nexpilot_id',
@@ -48,6 +51,7 @@ class Order extends Model
         'discount_amount' => 'float',
         'affiliate_discount' => 'float',
         'coupon_discount' => 'float',
+        'dynamic_offer_discount' => 'float',
         'final_amount' => 'float',
         'has_nexpilot' => 'boolean',
         'nexpilot_price' => 'float',
@@ -76,6 +80,11 @@ class Order extends Model
     public function coupon(): BelongsTo
     {
         return $this->belongsTo(Coupon::class);
+    }
+
+    public function dynamicOffer(): BelongsTo
+    {
+        return $this->belongsTo(DynamicOffer::class, 'dynamic_offer_id');
     }
 
     public function items(): HasMany

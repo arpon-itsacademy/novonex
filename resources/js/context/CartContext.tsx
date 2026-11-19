@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Course } from '../types';
+import { apiClient } from '../api/client';
 
 export interface CartItem {
     id: number;
@@ -15,6 +16,25 @@ export interface CartItem {
     instructor?: { id: number; name: string } | null;
 }
 
+export interface AppliedOfferTier {
+    min_qty: number;
+    discount_type: 'percentage' | 'fixed';
+    discount_value: number;
+    courses_needed?: number;
+}
+
+export interface DynamicOfferEvaluation {
+    applied: boolean;
+    offer_id?: number;
+    offer_title?: string;
+    banner_text?: string | null;
+    scope_type?: string;
+    qualifying_count?: number;
+    matched_tier?: AppliedOfferTier | null;
+    discount_amount: number;
+    next_tier?: AppliedOfferTier | null;
+}
+
 interface CartContextType {
     items: CartItem[];
     addToCart: (course: Course | CartItem) => void;
@@ -25,6 +45,11 @@ interface CartContextType {
     subtotal: number;
     totalOriginalPrice: number;
     totalSavings: number;
+    dynamicOfferDiscount: number;
+    appliedOffer: DynamicOfferEvaluation | null;
+    totalPayable: number;
+    isEvaluatingOffer: boolean;
+    refreshDynamicOffer: () => Promise<void>;
     isCartOpen: boolean;
     openCart: () => void;
     closeCart: () => void;
@@ -46,12 +71,52 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [dynamicOfferDiscount, setDynamicOfferDiscount] = useState<number>(0);
+    const [appliedOffer, setAppliedOffer] = useState<DynamicOfferEvaluation | null>(null);
+    const [isEvaluatingOffer, setIsEvaluatingOffer] = useState(false);
 
     useEffect(() => {
         try {
             localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
         } catch {}
     }, [items]);
+
+    const evaluateCartOffers = useCallback(async (currentItems: CartItem[]) => {
+        if (!currentItems || currentItems.length === 0) {
+            setDynamicOfferDiscount(0);
+            setAppliedOffer(null);
+            return;
+        }
+
+        try {
+            setIsEvaluatingOffer(true);
+            const { data } = await apiClient.post('/dynamic-offers/evaluate', {
+                course_ids: currentItems.map((item) => item.id),
+            });
+
+            if (data && data.offer) {
+                setAppliedOffer(data.offer);
+                setDynamicOfferDiscount(Number(data.discount_amount || 0));
+            } else {
+                setAppliedOffer(null);
+                setDynamicOfferDiscount(0);
+            }
+        } catch {
+            // Fail safely without disrupting the cart
+            setAppliedOffer(null);
+            setDynamicOfferDiscount(0);
+        } finally {
+            setIsEvaluatingOffer(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        evaluateCartOffers(items);
+    }, [items, evaluateCartOffers]);
+
+    const refreshDynamicOffer = useCallback(async () => {
+        await evaluateCartOffers(items);
+    }, [items, evaluateCartOffers]);
 
     const addToCart = (course: Course | CartItem) => {
         setItems((prev) => {
@@ -93,6 +158,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const clearCart = () => {
         setItems([]);
+        setAppliedOffer(null);
+        setDynamicOfferDiscount(0);
         try {
             localStorage.removeItem(CART_STORAGE_KEY);
         } catch {}
@@ -106,7 +173,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const subtotal = items.reduce((acc, item) => acc + (Number(item.effective_price) || 0), 0);
     const totalOriginalPrice = items.reduce((acc, item) => acc + (Number(item.price) || Number(item.effective_price) || 0), 0);
-    const totalSavings = Math.max(0, totalOriginalPrice - subtotal);
+    const totalPayable = Math.max(0, subtotal - dynamicOfferDiscount);
+    const totalSavings = Math.max(0, totalOriginalPrice - totalPayable);
 
     const openCart = () => setIsCartOpen(true);
     const closeCart = () => setIsCartOpen(false);
@@ -124,6 +192,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 subtotal,
                 totalOriginalPrice,
                 totalSavings,
+                dynamicOfferDiscount,
+                appliedOffer,
+                totalPayable,
+                isEvaluatingOffer,
+                refreshDynamicOffer,
                 isCartOpen,
                 openCart,
                 closeCart,

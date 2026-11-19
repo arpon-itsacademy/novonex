@@ -51,6 +51,7 @@ import { AdminNexPilotEditPage } from '../pages/admin/AdminNexPilotEditPage';
 import { AdminNexPilotBuilderPage } from '../pages/admin/AdminNexPilotBuilderPage';
 import { AdminNexPilotAiConfigPage } from '../pages/admin/AdminNexPilotAiConfigPage';
 import { AdminCouponsPage } from '../pages/admin/AdminCouponsPage';
+import { AdminDynamicOffersPage } from '../pages/admin/AdminDynamicOffersPage';
 import { AdminTrashPage } from '../pages/admin/AdminTrashPage';
 import { NotifyStudentPage } from '../pages/shared/NotifyStudentPage';
 import { CustomPageView } from '../pages/public/CustomPageView';
@@ -154,8 +155,9 @@ export const AppRoutes: React.FC = () => {
                 <Route path="users/create" element={<AdminUserCreatePage />} />
                 <Route path="users/roles" element={<AdminRolesPage />} />
                 <Route path="orders" element={<AdminOrdersPage />} />
-                {/* Marketing & Coupons */}
-                <Route path="marketing" element={<Navigate to="/admin/marketing/coupons" replace />} />
+                {/* Marketing & Coupons & Dynamic Offers */}
+                <Route path="marketing" element={<Navigate to="/admin/marketing/offers" replace />} />
+                <Route path="marketing/offers" element={<AdminDynamicOffersPage />} />
                 <Route path="marketing/coupons" element={<AdminCouponsPage />} />
                 <Route path="marketing/coupons/create" element={<AdminCouponsPage autoOpenCreate={true} />} />
                 {/* Announcements & Notifications */}

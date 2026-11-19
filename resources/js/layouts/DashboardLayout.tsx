@@ -215,6 +215,7 @@ export const DashboardLayout: React.FC = () => {
                     icon: TicketPercent,
                     permission: 'marketing.coupons',
                     children: [
+                        { title: 'Dynamic Offer Builder', path: '/admin/marketing/offers', permission: 'marketing.coupons' },
                         { title: 'Coupon Generator', path: '/admin/marketing/coupons/create', permission: 'marketing.coupons' },
                         { title: 'All Coupons', path: '/admin/marketing/coupons', permission: 'marketing.coupons' },
                     ]

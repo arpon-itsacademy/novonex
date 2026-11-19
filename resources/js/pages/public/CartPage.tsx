@@ -11,7 +11,9 @@ import {
     Sparkles,
     ShoppingBag,
     ArrowLeft,
-    CheckCircle2
+    CheckCircle2,
+    Tag,
+    Flame
 } from 'lucide-react';
 
 export const CartPage: React.FC = () => {
@@ -22,6 +24,9 @@ export const CartPage: React.FC = () => {
         subtotal,
         totalOriginalPrice,
         totalSavings,
+        dynamicOfferDiscount,
+        appliedOffer,
+        totalPayable,
         cartCount
     } = useCart();
 
@@ -98,6 +103,52 @@ export const CartPage: React.FC = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                         {/* Course Items List */}
                         <div className="lg:col-span-8 space-y-4">
+                            {/* Dynamic Offer Notification Banner */}
+                            {appliedOffer && (
+                                <div className="rounded-2xl overflow-hidden shadow-xs border">
+                                    {appliedOffer.applied ? (
+                                        <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-sky-500/10 border-emerald-500/30 flex items-start gap-3">
+                                            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                                <Sparkles className="w-5 h-5" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span className="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base">
+                                                        {appliedOffer.offer_title || 'Dynamic Bundle Offer Applied!'}
+                                                    </span>
+                                                    <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                                                        Saved {formatBDT(dynamicOfferDiscount)}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
+                                                    {appliedOffer.banner_text || `You have unlocked special bundle pricing on ${appliedOffer.qualifying_count || items.length} qualifying courses.`}
+                                                </p>
+                                                {appliedOffer.next_tier && (
+                                                    <div className="mt-2 text-xs font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                                                        <Flame className="w-4 h-4 text-amber-500" />
+                                                        <span>Add {appliedOffer.next_tier.courses_needed} more course to get {appliedOffer.next_tier.discount_type === 'percentage' ? `${appliedOffer.next_tier.discount_value}%` : formatBDT(appliedOffer.next_tier.discount_value)} OFF!</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : appliedOffer.next_tier ? (
+                                        <div className="p-4 sm:p-5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30 flex items-start gap-3">
+                                            <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                                <Flame className="w-5 h-5" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">
+                                                    {appliedOffer.offer_title || 'Special Bundle Offer Available'}
+                                                </p>
+                                                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
+                                                    Add {appliedOffer.next_tier.courses_needed} more {appliedOffer.next_tier.courses_needed === 1 ? 'course' : 'courses'} to your cart to instantly get {appliedOffer.next_tier.discount_type === 'percentage' ? `${appliedOffer.next_tier.discount_value}%` : formatBDT(appliedOffer.next_tier.discount_value)} OFF!
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : null}
+                                </div>
+                            )}
+
                             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800 shadow-sm overflow-hidden">
                                 {items.map((item) => {
                                     const thumbSrc = getImageUrl(item.thumbnail || item.thumbnail_url);
@@ -200,10 +251,25 @@ export const CartPage: React.FC = () => {
                                         <span className="font-semibold text-slate-900 dark:text-white">{cartCount}</span>
                                     </div>
 
-                                    {totalSavings > 0 && (
+                                    {totalOriginalPrice > subtotal && (
                                         <div className="flex justify-between text-slate-600 dark:text-slate-400">
                                             <span>Original Price:</span>
                                             <span className="line-through">{formatBDT(totalOriginalPrice)}</span>
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                                        <span>Items Subtotal:</span>
+                                        <span className="font-semibold text-slate-900 dark:text-white">{formatBDT(subtotal)}</span>
+                                    </div>
+
+                                    {dynamicOfferDiscount > 0 && (
+                                        <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
+                                            <span className="flex items-center gap-1">
+                                                <Tag className="w-3.5 h-3.5" />
+                                                <span>Dynamic Bundle:</span>
+                                            </span>
+                                            <span>- {formatBDT(dynamicOfferDiscount)}</span>
                                         </div>
                                     )}
 
@@ -211,7 +277,7 @@ export const CartPage: React.FC = () => {
                                         <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
                                             <span className="flex items-center gap-1">
                                                 <Sparkles className="w-3.5 h-3.5" />
-                                                Total Discount:
+                                                Total Savings:
                                             </span>
                                             <span>- {formatBDT(totalSavings)}</span>
                                         </div>
@@ -220,7 +286,7 @@ export const CartPage: React.FC = () => {
                                     <div className="border-t border-slate-100 dark:border-slate-800 pt-3 flex justify-between items-baseline">
                                         <span className="text-base font-bold text-slate-900 dark:text-white">Total Payable:</span>
                                         <span className="text-2xl font-black text-[#25a2ee]">
-                                            {formatBDT(subtotal)}
+                                            {formatBDT(totalPayable)}
                                         </span>
                                     </div>
                                 </div>

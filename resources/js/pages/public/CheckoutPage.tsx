@@ -60,7 +60,7 @@ export const CheckoutPage: React.FC = () => {
     const { user } = useAuth();
     const { language } = useLanguage();
     const { settings } = useSettings();
-    const { items: cartItems, clearCart, subtotal: cartSubtotal, totalOriginalPrice: cartOriginalPrice } = useCart();
+    const { items: cartItems, clearCart, subtotal: cartSubtotal, totalOriginalPrice: cartOriginalPrice, dynamicOfferDiscount, appliedOffer } = useCart();
     const isCartMode = !slug;
 
     const [course, setCourse] = useState<Course | null>(null);
@@ -217,7 +217,8 @@ export const CheckoutPage: React.FC = () => {
 
     const referralDiscount = appliedReferral ? Number(appliedReferral.discount_amount || 0) : 0;
     const couponDiscount = appliedCoupon ? Number(appliedCoupon.calculated_discount || 0) : 0;
-    const totalPayable = Math.max(0, courseBasePrice + pilotPrice - referralDiscount - couponDiscount);
+    const dynamicDiscount = isCartMode ? (dynamicOfferDiscount || 0) : 0;
+    const totalPayable = Math.max(0, courseBasePrice + pilotPrice - referralDiscount - couponDiscount - dynamicDiscount);
 
     const validateCouponCode = async (codeToVerify: string, courseId: number) => {
         if (!codeToVerify || !codeToVerify.trim()) return;
@@ -338,6 +339,7 @@ export const CheckoutPage: React.FC = () => {
                 include_nexpilot: hasActivePilot && includeNexPilot,
                 affiliate_code: appliedReferral?.code || (referralInput.trim() ? referralInput.trim() : undefined),
                 coupon_code: appliedCoupon?.code || (couponInput.trim() ? couponInput.trim() : undefined),
+                dynamic_offer_id: appliedOffer?.offer_id || undefined,
             };
 
             if (isCartMode) {
@@ -384,6 +386,7 @@ export const CheckoutPage: React.FC = () => {
                 include_nexpilot: hasActivePilot && includeNexPilot,
                 affiliate_code: appliedReferral?.code || (referralInput.trim() ? referralInput.trim() : undefined),
                 coupon_code: appliedCoupon?.code || (couponInput.trim() ? couponInput.trim() : undefined),
+                dynamic_offer_id: appliedOffer?.offer_id || undefined,
             };
 
             if (isCartMode) {
@@ -777,6 +780,22 @@ export const CheckoutPage: React.FC = () => {
                         </h3>
 
                         {/* Course Card Preview (Single Course or Cart Items) */}
+                        {isCartMode && appliedOffer?.applied && (
+                            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50 to-sky-50 border border-emerald-200/80 flex items-start gap-2.5">
+                                <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                <div className="text-xs">
+                                    <span className="font-bold text-emerald-900">
+                                        {appliedOffer.offer_title || 'Dynamic Offer Applied'}
+                                    </span>
+                                    <span className="ml-1.5 font-bold text-emerald-700">
+                                        (-{formatBDT(dynamicDiscount)})
+                                    </span>
+                                    {appliedOffer.banner_text && (
+                                        <p className="text-[11px] text-emerald-800/80 mt-0.5">{appliedOffer.banner_text}</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                         {isCartMode ? (
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -1025,6 +1044,16 @@ export const CheckoutPage: React.FC = () => {
                                         <span>Coupon Discount ({appliedCoupon?.code})</span>
                                     </span>
                                     <span className="font-semibold">- {formatBDT(couponDiscount)}</span>
+                                </div>
+                            )}
+
+                            {dynamicDiscount > 0 && (
+                                <div className="flex justify-between text-emerald-600 font-medium">
+                                    <span className="flex items-center gap-1.5">
+                                        <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                                        <span>Dynamic Bundle Offer ({appliedOffer?.offer_title || 'Applied'})</span>
+                                    </span>
+                                    <span className="font-semibold">- {formatBDT(dynamicDiscount)}</span>
                                 </div>
                             )}
 

@@ -155,6 +155,31 @@ class OrderController extends Controller
             $courseFinalAmount = max(0, $courseFinalAmount - $couponDiscount);
         }
 
+        // Check and apply active dynamic offer discount
+        $dynamicOffer = null;
+        $dynamicOfferDiscount = 0.0;
+        if (class_exists(\App\Models\DynamicOffer::class) && \Illuminate\Support\Facades\Schema::hasTable('dynamic_offers')) {
+            $activeOffers = \App\Models\DynamicOffer::active()->get();
+            $bestOfferEval = null;
+            $bestOfferModel = null;
+            $maxOfferDiscount = 0.0;
+
+            foreach ($activeOffers as $offer) {
+                $eval = $offer->evaluateForCourses($courses, $courseFinalAmount);
+                if (!empty($eval['applied']) && (float) $eval['discount_amount'] > $maxOfferDiscount) {
+                    $maxOfferDiscount = (float) $eval['discount_amount'];
+                    $bestOfferEval = $eval;
+                    $bestOfferModel = $offer;
+                }
+            }
+
+            if ($bestOfferEval && $bestOfferModel) {
+                $dynamicOffer = $bestOfferModel;
+                $dynamicOfferDiscount = min($courseFinalAmount, $maxOfferDiscount);
+                $courseFinalAmount = max(0, $courseFinalAmount - $dynamicOfferDiscount);
+            }
+        }
+
         $finalAmount = max(0, $courseFinalAmount + $nexpilotPrice);
         $isFree = ($finalAmount <= 0);
 
@@ -179,7 +204,7 @@ class OrderController extends Controller
             }
         }
 
-        $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice, $isFree) {
+        $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice, $isFree) {
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => $user->id,
@@ -192,6 +217,9 @@ class OrderController extends Controller
                 'coupon_id' => $coupon ? $coupon->id : null,
                 'coupon_code' => $coupon ? $coupon->code : null,
                 'coupon_discount' => $couponDiscount,
+                'dynamic_offer_id' => $dynamicOffer ? $dynamicOffer->id : null,
+                'dynamic_offer_title' => $dynamicOffer ? $dynamicOffer->title : null,
+                'dynamic_offer_discount' => $dynamicOfferDiscount,
                 'final_amount' => $finalAmount,
                 'has_nexpilot' => $nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId),
                 'nexpilot_id' => $nexpilotId,
