@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../../api/client';
 import { CoursePurchaseSmsSetting, CourseSmsTemplate } from '../../types';
-import { 
-    MessageSquare, 
-    Send, 
-    Save, 
-    Trash2, 
-    Edit3, 
-    CheckCircle2, 
-    AlertCircle, 
-    Smartphone, 
-    Layers, 
-    Sparkles, 
+import {
+    MessageSquare,
+    Send,
+    Save,
+    Trash2,
+    Edit3,
+    CheckCircle2,
+    AlertCircle,
+    Smartphone,
+    Layers,
+    Sparkles,
     RefreshCw,
     BookOpen,
     ChevronDown,
@@ -89,9 +89,8 @@ const SearchableCourseSelect: React.FC<{
             {/* Trigger Button */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full px-3.5 py-2.5 bg-white border rounded-xl text-xs flex items-center justify-between gap-2 cursor-pointer transition shadow-2xs ${
-                    isOpen ? 'border-sky-500 ring-2 ring-sky-100' : 'border-slate-200 hover:border-slate-300'
-                }`}
+                className={`w-full px-3.5 py-2.5 bg-white border rounded-xl text-xs flex items-center justify-between gap-2 cursor-pointer transition shadow-2xs ${isOpen ? 'border-sky-500 ring-2 ring-sky-100' : 'border-slate-200 hover:border-slate-300'
+                    }`}
             >
                 <div className="flex items-center gap-2 min-w-0">
                     <BookOpen className="w-4 h-4 text-sky-600 shrink-0" />
@@ -178,9 +177,8 @@ const SearchableCourseSelect: React.FC<{
                                             setIsOpen(false);
                                             setSearchQuery('');
                                         }}
-                                        className={`px-3 py-2.5 rounded-xl flex items-center justify-between gap-2.5 cursor-pointer transition ${
-                                            isSelected ? 'bg-sky-50 text-sky-950 font-bold' : 'hover:bg-slate-50 text-slate-800'
-                                        }`}
+                                        className={`px-3 py-2.5 rounded-xl flex items-center justify-between gap-2.5 cursor-pointer transition ${isSelected ? 'bg-sky-50 text-sky-950 font-bold' : 'hover:bg-slate-50 text-slate-800'
+                                            }`}
                                     >
                                         <div className="flex items-center gap-2 min-w-0">
                                             <span className="text-xs truncate">{course.title}</span>
@@ -247,9 +245,8 @@ const SearchableBundleSelect: React.FC<{
             {/* Trigger Button */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full px-3.5 py-2.5 bg-white border rounded-xl text-xs flex items-center justify-between gap-2 cursor-pointer transition shadow-2xs ${
-                    isOpen ? 'border-purple-500 ring-2 ring-purple-100' : 'border-slate-200 hover:border-slate-300'
-                }`}
+                className={`w-full px-3.5 py-2.5 bg-white border rounded-xl text-xs flex items-center justify-between gap-2 cursor-pointer transition shadow-2xs ${isOpen ? 'border-purple-500 ring-2 ring-purple-100' : 'border-slate-200 hover:border-slate-300'
+                    }`}
             >
                 <div className="flex items-center gap-2 min-w-0">
                     <Package className="w-4 h-4 text-purple-600 shrink-0" />
@@ -341,9 +338,8 @@ const SearchableBundleSelect: React.FC<{
                                             setIsOpen(false);
                                             setSearchQuery('');
                                         }}
-                                        className={`px-3 py-2.5 rounded-xl flex items-center justify-between gap-2.5 cursor-pointer transition ${
-                                            isSelected ? 'bg-purple-50 text-purple-950 font-bold' : 'hover:bg-slate-50 text-slate-800'
-                                        }`}
+                                        className={`px-3 py-2.5 rounded-xl flex items-center justify-between gap-2.5 cursor-pointer transition ${isSelected ? 'bg-purple-50 text-purple-950 font-bold' : 'hover:bg-slate-50 text-slate-800'
+                                            }`}
                                     >
                                         <div className="flex items-center gap-2 min-w-0">
                                             <Package className="w-3.5 h-3.5 text-purple-500 shrink-0" />
@@ -511,13 +507,13 @@ export const AdminAutoSmsPushPage: React.FC = () => {
 
             const { data } = await apiClient.post('/admin/sms/auto-push/courses', payload);
             setFeedback({ type: 'success', message: data.message || `${targetType === 'bundle' ? 'Bundle' : 'Course'} override saved successfully.` });
-            
+
             // Reset form
             setSelectedCourseId('');
             setSelectedBundleId('');
             setTemplateText('');
             setEditingTemplateId(null);
-            
+
             // Refresh list
             fetchData();
         } catch (err: any) {
@@ -647,11 +643,10 @@ export const AdminAutoSmsPushPage: React.FC = () => {
             </div>
 
             {feedback && (
-                <div className={`p-4 rounded-2xl border flex items-center gap-3 text-xs font-semibold animate-in fade-in ${
-                    feedback.type === 'success' 
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-                        : 'bg-rose-50 border-rose-200 text-rose-800'
-                }`}>
+                <div className={`p-4 rounded-2xl border flex items-center gap-3 text-xs font-semibold animate-in fade-in ${feedback.type === 'success'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                    : 'bg-rose-50 border-rose-200 text-rose-800'
+                    }`}>
                     {feedback.type === 'success' ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                     ) : (
@@ -784,8 +779,8 @@ export const AdminAutoSmsPushPage: React.FC = () => {
                 <form onSubmit={handleSaveOverride} className="p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                            {editingTemplateId 
-                                ? `Edit ${targetType === 'bundle' ? 'Bundle' : 'Course'} SMS Override` 
+                            {editingTemplateId
+                                ? `Edit ${targetType === 'bundle' ? 'Bundle' : 'Course'} SMS Override`
                                 : `Create New ${targetType === 'bundle' ? 'Bundle' : 'Course'} SMS Override`}
                         </h4>
 
@@ -797,11 +792,10 @@ export const AdminAutoSmsPushPage: React.FC = () => {
                                     setTargetType('course');
                                     setSelectedBundleId('');
                                 }}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
-                                    targetType === 'course'
-                                        ? 'bg-sky-600 text-white shadow-xs'
-                                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                                }`}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${targetType === 'course'
+                                    ? 'bg-sky-600 text-white shadow-xs'
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                                    }`}
                             >
                                 <BookOpen className="w-3.5 h-3.5" />
                                 <span>Single Course</span>
@@ -813,11 +807,10 @@ export const AdminAutoSmsPushPage: React.FC = () => {
                                     setTargetType('bundle');
                                     setSelectedCourseId('');
                                 }}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
-                                    targetType === 'bundle'
-                                        ? 'bg-purple-600 text-white shadow-xs'
-                                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                                }`}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${targetType === 'bundle'
+                                    ? 'bg-purple-600 text-white shadow-xs'
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                                    }`}
                             >
                                 <Package className="w-3.5 h-3.5" />
                                 <span>Course Bundle</span>
@@ -901,18 +894,17 @@ export const AdminAutoSmsPushPage: React.FC = () => {
                         <button
                             type="submit"
                             disabled={savingOverride}
-                            className={`px-5 py-2.5 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 transition disabled:opacity-50 cursor-pointer ${
-                                targetType === 'bundle'
-                                    ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/30'
-                                    : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/30'
-                            }`}
+                            className={`px-5 py-2.5 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 transition disabled:opacity-50 cursor-pointer ${targetType === 'bundle'
+                                ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/30'
+                                : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/30'
+                                }`}
                         >
                             <Save className="w-3.5 h-3.5" />
                             <span>
-                                {savingOverride 
-                                    ? 'Saving...' 
-                                    : editingTemplateId 
-                                        ? `Update ${targetType === 'bundle' ? 'Bundle' : 'Course'} Override` 
+                                {savingOverride
+                                    ? 'Saving...'
+                                    : editingTemplateId
+                                        ? `Update ${targetType === 'bundle' ? 'Bundle' : 'Course'} Override`
                                         : `Save ${targetType === 'bundle' ? 'Bundle' : 'Course'} Override`}
                             </span>
                         </button>
@@ -948,7 +940,7 @@ export const AdminAutoSmsPushPage: React.FC = () => {
                         <div className="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden bg-white">
                             {courseTemplates.map((item) => {
                                 const isBundle = item.type === 'bundle' || Boolean(item.bundle_id);
-                                const itemTitle = isBundle 
+                                const itemTitle = isBundle
                                     ? (item.bundle?.title || `Bundle ID #${item.bundle_id}`)
                                     : (item.course?.title || `Course ID #${item.course_id}`);
                                 const itemPrice = isBundle
@@ -1040,11 +1032,10 @@ export const AdminAutoSmsPushPage: React.FC = () => {
                 </div>
 
                 {testResult && (
-                    <div className={`p-4 rounded-xl border text-xs space-y-1 ${
-                        testResult.success 
-                            ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-                            : 'bg-rose-50 border-rose-200 text-rose-800'
-                    }`}>
+                    <div className={`p-4 rounded-xl border text-xs space-y-1 ${testResult.success
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                        : 'bg-rose-50 border-rose-200 text-rose-800'
+                        }`}>
                         <div className="font-bold flex items-center gap-1.5">
                             {testResult.success ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                             <span>Result: {testResult.message}</span>

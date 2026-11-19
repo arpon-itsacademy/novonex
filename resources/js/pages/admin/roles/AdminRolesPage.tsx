@@ -249,11 +249,10 @@ export const AdminRolesPage: React.FC = () => {
 
             {/* Alert Notification */}
             {alertMessage && (
-                <div className={`p-4 rounded-2xl text-xs font-medium flex items-center justify-between gap-3 animate-fadeIn ${
-                    alertMessage.type === 'success'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
-                        : 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
-                }`}>
+                <div className={`p-4 rounded-2xl text-xs font-medium flex items-center justify-between gap-3 animate-fadeIn ${alertMessage.type === 'success'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                    : 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                    }`}>
                     <div className="flex items-center gap-2.5">
                         {alertMessage.type === 'success' ? (
                             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -596,11 +595,10 @@ export const AdminRolesPage: React.FC = () => {
                                                     return (
                                                         <label
                                                             key={perm.key}
-                                                            className={`flex items-start gap-2.5 p-2.5 rounded-xl border text-xs cursor-pointer transition select-none ${
-                                                                isChecked
-                                                                    ? 'bg-sky-50 dark:bg-sky-950/40 border-sky-300 dark:border-sky-800 text-sky-900 dark:text-sky-200'
-                                                                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
-                                                            }`}
+                                                            className={`flex items-start gap-2.5 p-2.5 rounded-xl border text-xs cursor-pointer transition select-none ${isChecked
+                                                                ? 'bg-sky-50 dark:bg-sky-950/40 border-sky-300 dark:border-sky-800 text-sky-900 dark:text-sky-200'
+                                                                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                                                                }`}
                                                         >
                                                             <input
                                                                 type="checkbox"

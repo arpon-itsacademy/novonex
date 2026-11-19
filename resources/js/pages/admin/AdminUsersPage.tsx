@@ -2,14 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { apiClient } from '../../api/client';
 import { User, UserRole, Role } from '../../types';
-import { 
-    Users, 
-    Search, 
-    Shield, 
-    GraduationCap, 
-    UserCheck, 
-    UserX, 
-    AlertCircle, 
+import {
+    Users,
+    Search,
+    Shield,
+    GraduationCap,
+    UserCheck,
+    UserX,
+    AlertCircle,
     Filter,
     RefreshCw,
     ChevronLeft,
@@ -115,7 +115,7 @@ export const AdminUsersPage: React.FC = () => {
         try {
             const { data } = await apiClient.get('/admin/roles');
             setCustomRoles(data.roles || []);
-        } catch {}
+        } catch { }
     };
 
     const fetchUsers = useCallback(async () => {
@@ -403,41 +403,37 @@ export const AdminUsersPage: React.FC = () => {
             <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
                 <button
                     onClick={() => handleTabChange('')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                        activeRoleTab === ''
-                            ? 'bg-sky-600 text-white shadow-xs'
-                            : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${activeRoleTab === ''
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
                 >
                     All Users
                 </button>
                 <button
                     onClick={() => handleTabChange('student')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                        activeRoleTab === 'student'
-                            ? 'bg-sky-600 text-white shadow-xs'
-                            : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${activeRoleTab === 'student'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
                 >
                     Students
                 </button>
                 <button
                     onClick={() => handleTabChange('teacher')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                        activeRoleTab === 'teacher'
-                            ? 'bg-purple-600 text-white shadow-xs'
-                            : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${activeRoleTab === 'teacher'
+                        ? 'bg-purple-600 text-white shadow-xs'
+                        : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
                 >
                     Instructors
                 </button>
                 <button
                     onClick={() => handleTabChange('admin')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                        activeRoleTab === 'admin'
-                            ? 'bg-amber-600 text-white shadow-xs'
-                            : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${activeRoleTab === 'admin'
+                        ? 'bg-amber-600 text-white shadow-xs'
+                        : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
                 >
                     Admins
                 </button>
@@ -669,11 +665,10 @@ export const AdminUsersPage: React.FC = () => {
                                                     </button>
                                                     <button
                                                         onClick={() => handleToggleStatus(u)}
-                                                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                                            u.status === 'active'
-                                                                ? 'hover:bg-rose-50 dark:hover:bg-rose-950/50 text-rose-600 dark:text-rose-400'
-                                                                : 'hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400'
-                                                        }`}
+                                                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${u.status === 'active'
+                                                            ? 'hover:bg-rose-50 dark:hover:bg-rose-950/50 text-rose-600 dark:text-rose-400'
+                                                            : 'hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400'
+                                                            }`}
                                                         title={u.status === 'active' ? 'Deactivate Account' : 'Activate Account'}
                                                     >
                                                         {u.status === 'active' ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
@@ -820,11 +815,10 @@ export const AdminUsersPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setCreateForm({ ...createForm, role: 'student' })}
-                                className={`p-3 rounded-xl border-2 text-center transition-all cursor-pointer ${
-                                    createForm.role === 'student'
-                                        ? 'border-sky-500 bg-sky-50/70 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 shadow-xs'
-                                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400'
-                                }`}
+                                className={`p-3 rounded-xl border-2 text-center transition-all cursor-pointer ${createForm.role === 'student'
+                                    ? 'border-sky-500 bg-sky-50/70 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 shadow-xs'
+                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400'
+                                    }`}
                             >
                                 <span className="block font-bold text-xs">Student</span>
                                 <span className="text-[10px] text-slate-400 block mt-0.5">Learner</span>
@@ -832,11 +826,10 @@ export const AdminUsersPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setCreateForm({ ...createForm, role: 'teacher' })}
-                                className={`p-3 rounded-xl border-2 text-center transition-all cursor-pointer ${
-                                    createForm.role === 'teacher'
-                                        ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 shadow-xs'
-                                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400'
-                                }`}
+                                className={`p-3 rounded-xl border-2 text-center transition-all cursor-pointer ${createForm.role === 'teacher'
+                                    ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 shadow-xs'
+                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400'
+                                    }`}
                             >
                                 <span className="block font-bold text-xs">Instructor</span>
                                 <span className="text-[10px] text-slate-400 block mt-0.5">Teacher</span>
@@ -844,11 +837,10 @@ export const AdminUsersPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setCreateForm({ ...createForm, role: 'admin' })}
-                                className={`p-3 rounded-xl border-2 text-center transition-all cursor-pointer ${
-                                    createForm.role === 'admin'
-                                        ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 shadow-xs'
-                                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400'
-                                }`}
+                                className={`p-3 rounded-xl border-2 text-center transition-all cursor-pointer ${createForm.role === 'admin'
+                                    ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 shadow-xs'
+                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400'
+                                    }`}
                             >
                                 <span className="block font-bold text-xs">Admin</span>
                                 <span className="text-[10px] text-slate-400 block mt-0.5">Manager</span>
@@ -1170,51 +1162,45 @@ export const AdminUsersPage: React.FC = () => {
                         <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-2 overflow-x-auto scrollbar-none">
                             <button
                                 onClick={() => setActiveDetailTab('courses')}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                                    activeDetailTab === 'courses'
-                                        ? 'bg-sky-600 text-white shadow-xs'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeDetailTab === 'courses'
+                                    ? 'bg-sky-600 text-white shadow-xs'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                    }`}
                             >
                                 <BookOpen className="w-3.5 h-3.5" />
                                 <span>Enrolled Courses</span>
-                                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                                    activeDetailTab === 'courses' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700'
-                                }`}>
+                                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeDetailTab === 'courses' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700'
+                                    }`}>
                                     {userDetails.enrolled_courses?.length ?? userDetails.enrollments_count ?? 0}
                                 </span>
                             </button>
 
                             <button
                                 onClick={() => setActiveDetailTab('orders')}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                                    activeDetailTab === 'orders'
-                                        ? 'bg-sky-600 text-white shadow-xs'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeDetailTab === 'orders'
+                                    ? 'bg-sky-600 text-white shadow-xs'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                    }`}
                             >
                                 <ShoppingCart className="w-3.5 h-3.5" />
                                 <span>Orders & Payments</span>
-                                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                                    activeDetailTab === 'orders' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700'
-                                }`}>
+                                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeDetailTab === 'orders' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700'
+                                    }`}>
                                     {userDetails.orders?.length ?? userDetails.orders_count ?? 0}
                                 </span>
                             </button>
 
                             <button
                                 onClick={() => setActiveDetailTab('exams')}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                                    activeDetailTab === 'exams'
-                                        ? 'bg-sky-600 text-white shadow-xs'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeDetailTab === 'exams'
+                                    ? 'bg-sky-600 text-white shadow-xs'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                    }`}
                             >
                                 <ClipboardList className="w-3.5 h-3.5" />
                                 <span>Exam Results</span>
-                                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                                    activeDetailTab === 'exams' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700'
-                                }`}>
+                                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeDetailTab === 'exams' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700'
+                                    }`}>
                                     {userDetails.exam_submissions?.length ?? userDetails.exam_submissions_count ?? 0}
                                 </span>
                             </button>
@@ -1223,11 +1209,10 @@ export const AdminUsersPage: React.FC = () => {
                                 <>
                                     <button
                                         onClick={() => setActiveDetailTab('instructed')}
-                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                                            activeDetailTab === 'instructed'
-                                                ? 'bg-purple-600 text-white shadow-xs'
-                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                        }`}
+                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeDetailTab === 'instructed'
+                                            ? 'bg-purple-600 text-white shadow-xs'
+                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                            }`}
                                     >
                                         <GraduationCap className="w-3.5 h-3.5" />
                                         <span>Teaching Courses</span>
@@ -1238,11 +1223,10 @@ export const AdminUsersPage: React.FC = () => {
 
                                     <button
                                         onClick={() => setActiveDetailTab('teacher_profile')}
-                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                                            activeDetailTab === 'teacher_profile'
-                                                ? 'bg-purple-600 text-white shadow-xs'
-                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                        }`}
+                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeDetailTab === 'teacher_profile'
+                                            ? 'bg-purple-600 text-white shadow-xs'
+                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                            }`}
                                     >
                                         <Shield className="w-3.5 h-3.5" />
                                         <span>Teacher Profile Info</span>
@@ -1365,11 +1349,10 @@ export const AdminUsersPage: React.FC = () => {
                                                             {order.payment_method}
                                                         </td>
                                                         <td className="py-2.5 px-3">
-                                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                                                order.payment_status === 'paid'
-                                                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                                                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
-                                                            }`}>
+                                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${order.payment_status === 'paid'
+                                                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                                                : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                                                                }`}>
                                                                 {order.payment_status === 'paid' ? 'Paid' : (order.payment_status || 'Pending')}
                                                             </span>
                                                         </td>

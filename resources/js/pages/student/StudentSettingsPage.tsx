@@ -282,7 +282,7 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                     Device Security Policy: Maximum 2 Active Devices
                                 </h2>
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    To ensure account security and copyright protection of course content, an account can be logged in on 
+                                    To ensure account security and copyright protection of course content, an account can be logged in on
                                     <strong> a maximum of 2 devices simultaneously</strong>. Logging in on a 3rd device will automatically log out your oldest active session.
                                 </p>
                                 <div className="pt-2 flex flex-wrap items-center gap-2">
@@ -367,20 +367,18 @@ export const StudentSettingsPage: React.FC<StudentSettingsPageProps> = ({ defaul
                                     return (
                                         <div
                                             key={device.id}
-                                            className={`rounded-2xl p-5 border transition-all ${
-                                                device.is_current
-                                                    ? 'bg-sky-50/40 border-sky-200 ring-2 ring-sky-500/10'
-                                                    : 'bg-white border-slate-200 hover:border-slate-300'
-                                            }`}
+                                            className={`rounded-2xl p-5 border transition-all ${device.is_current
+                                                ? 'bg-sky-50/40 border-sky-200 ring-2 ring-sky-500/10'
+                                                : 'bg-white border-slate-200 hover:border-slate-300'
+                                                }`}
                                         >
                                             <div className="flex items-start justify-between gap-3">
                                                 <div className="flex items-center gap-3.5">
                                                     <div
-                                                        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-                                                            device.is_current
-                                                                ? 'bg-sky-600 text-white shadow-xs'
-                                                                : 'bg-slate-100 text-slate-600'
-                                                        }`}
+                                                        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${device.is_current
+                                                            ? 'bg-sky-600 text-white shadow-xs'
+                                                            : 'bg-slate-100 text-slate-600'
+                                                            }`}
                                                     >
                                                         {isMobile ? (
                                                             <Smartphone className="w-5 h-5" />

@@ -133,33 +133,30 @@ export const StudentLeaderboardPage: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setSelectedPeriod('week')}
-                            className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                                selectedPeriod === 'week'
-                                    ? 'bg-white text-slate-800 shadow-xs'
-                                    : 'text-slate-600 hover:text-slate-900'
-                            }`}
+                            className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${selectedPeriod === 'week'
+                                ? 'bg-white text-slate-800 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                                }`}
                         >
                             This Week
                         </button>
                         <button
                             type="button"
                             onClick={() => setSelectedPeriod('month')}
-                            className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                                selectedPeriod === 'month'
-                                    ? 'bg-white text-slate-800 shadow-xs'
-                                    : 'text-slate-600 hover:text-slate-900'
-                            }`}
+                            className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${selectedPeriod === 'month'
+                                ? 'bg-white text-slate-800 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                                }`}
                         >
                             This Month
                         </button>
                         <button
                             type="button"
                             onClick={() => setSelectedPeriod('all')}
-                            className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                                selectedPeriod === 'all'
-                                    ? 'bg-white text-slate-800 shadow-xs'
-                                    : 'text-slate-600 hover:text-slate-900'
-                            }`}
+                            className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${selectedPeriod === 'all'
+                                ? 'bg-white text-slate-800 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                                }`}
                         >
                             All Time
                         </button>
@@ -178,11 +175,10 @@ export const StudentLeaderboardPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setSelectedCourseId('all')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
-                                    selectedCourseId === 'all'
-                                        ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-xs'
-                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                }`}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${selectedCourseId === 'all'
+                                    ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-xs'
+                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                    }`}
                             >
                                 All My Courses
                             </button>
@@ -192,11 +188,10 @@ export const StudentLeaderboardPage: React.FC = () => {
                                     key={c.id}
                                     type="button"
                                     onClick={() => setSelectedCourseId(c.id)}
-                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 truncate max-w-[200px] transition-all cursor-pointer ${
-                                        selectedCourseId === c.id
-                                            ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-xs'
-                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                    }`}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 truncate max-w-[200px] transition-all cursor-pointer ${selectedCourseId === c.id
+                                        ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-xs'
+                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                        }`}
                                     title={c.title}
                                 >
                                     {c.title}
@@ -370,11 +365,10 @@ export const StudentLeaderboardPage: React.FC = () => {
                             {restList.map((item) => (
                                 <div
                                     key={item.user_id}
-                                    className={`flex items-center justify-between p-3 sm:p-4 rounded-2xl transition-colors ${
-                                        item.is_current_user
-                                            ? 'bg-sky-50/70 border border-sky-200'
-                                            : 'hover:bg-slate-50'
-                                    }`}
+                                    className={`flex items-center justify-between p-3 sm:p-4 rounded-2xl transition-colors ${item.is_current_user
+                                        ? 'bg-sky-50/70 border border-sky-200'
+                                        : 'hover:bg-slate-50'
+                                        }`}
                                 >
                                     <div className="flex items-center gap-3.5 sm:gap-4 truncate">
                                         {/* Rank Number */}

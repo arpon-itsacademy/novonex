@@ -273,11 +273,10 @@ export const AdminUserCreatePage: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         {/* Student */}
                         <label
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition select-none flex flex-col justify-between space-y-2 ${
-                                roleType === 'student'
-                                    ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-950/30 text-sky-950 dark:text-sky-100 ring-2 ring-sky-500/20'
-                                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition select-none flex flex-col justify-between space-y-2 ${roleType === 'student'
+                                ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-950/30 text-sky-950 dark:text-sky-100 ring-2 ring-sky-500/20'
+                                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-800/40'
+                                }`}
                         >
                             <div className="flex items-center justify-between">
                                 <div className="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-900/40 text-sky-600 flex items-center justify-center font-bold">
@@ -299,11 +298,10 @@ export const AdminUserCreatePage: React.FC = () => {
 
                         {/* Teacher */}
                         <label
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition select-none flex flex-col justify-between space-y-2 ${
-                                roleType === 'teacher'
-                                    ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/30 text-indigo-950 dark:text-indigo-100 ring-2 ring-indigo-500/20'
-                                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition select-none flex flex-col justify-between space-y-2 ${roleType === 'teacher'
+                                ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/30 text-indigo-950 dark:text-indigo-100 ring-2 ring-indigo-500/20'
+                                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-800/40'
+                                }`}
                         >
                             <div className="flex items-center justify-between">
                                 <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 flex items-center justify-center font-bold">
@@ -325,11 +323,10 @@ export const AdminUserCreatePage: React.FC = () => {
 
                         {/* Custom Role */}
                         <label
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition select-none flex flex-col justify-between space-y-2 ${
-                                roleType === 'custom'
-                                    ? 'border-purple-500 bg-purple-50/60 dark:bg-purple-950/30 text-purple-950 dark:text-purple-100 ring-2 ring-purple-500/20'
-                                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition select-none flex flex-col justify-between space-y-2 ${roleType === 'custom'
+                                ? 'border-purple-500 bg-purple-50/60 dark:bg-purple-950/30 text-purple-950 dark:text-purple-100 ring-2 ring-purple-500/20'
+                                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-800/40'
+                                }`}
                         >
                             <div className="flex items-center justify-between">
                                 <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 flex items-center justify-center font-bold">
@@ -351,11 +348,10 @@ export const AdminUserCreatePage: React.FC = () => {
 
                         {/* Super Admin */}
                         <label
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition select-none flex flex-col justify-between space-y-2 ${
-                                roleType === 'admin'
-                                    ? 'border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 text-amber-950 dark:text-amber-100 ring-2 ring-amber-500/20'
-                                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-800/40'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 cursor-pointer transition select-none flex flex-col justify-between space-y-2 ${roleType === 'admin'
+                                ? 'border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 text-amber-950 dark:text-amber-100 ring-2 ring-amber-500/20'
+                                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-800/40'
+                                }`}
                         >
                             <div className="flex items-center justify-between">
                                 <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 flex items-center justify-center font-bold">
@@ -416,11 +412,10 @@ export const AdminUserCreatePage: React.FC = () => {
                                             <div
                                                 key={r.id}
                                                 onClick={() => setSelectedCustomRoleId(r.id)}
-                                                className={`p-3 rounded-xl border text-xs cursor-pointer transition flex items-center justify-between ${
-                                                    isSelected
-                                                        ? 'bg-white dark:bg-slate-900 border-purple-500 shadow-xs ring-2 ring-purple-500/20'
-                                                        : 'bg-white/80 dark:bg-slate-900/60 border-purple-200/80 hover:border-purple-300'
-                                                }`}
+                                                className={`p-3 rounded-xl border text-xs cursor-pointer transition flex items-center justify-between ${isSelected
+                                                    ? 'bg-white dark:bg-slate-900 border-purple-500 shadow-xs ring-2 ring-purple-500/20'
+                                                    : 'bg-white/80 dark:bg-slate-900/60 border-purple-200/80 hover:border-purple-300'
+                                                    }`}
                                             >
                                                 <div>
                                                     <span className="font-extrabold text-slate-900 dark:text-white block">

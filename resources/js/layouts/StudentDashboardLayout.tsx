@@ -368,8 +368,8 @@ export const StudentDashboardLayout: React.FC = () => {
 
             {/* Middle Container */}
             <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
-                {/* Mobile Student Bar & Scrollable Tabs (lg:hidden) */}
-                <div className="lg:hidden mb-5 space-y-3">
+                {/* Mobile Student Bar & Drawer Trigger (lg:hidden) */}
+                <div className="lg:hidden mb-5">
                     {/* User Quick Strip + Menu Toggle Button */}
                     <div className="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-2xs flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0">
@@ -389,33 +389,11 @@ export const StudentDashboardLayout: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setSidebarOpen(true)}
-                            className="px-3 py-1.5 bg-[#25a2ee]/10 hover:bg-[#25a2ee]/20 text-[#25a2ee] text-xs font-bold rounded-xl flex items-center gap-1.5 transition shrink-0 cursor-pointer"
+                            className="px-3.5 py-2 bg-[#25a2ee]/10 hover:bg-[#25a2ee]/20 text-[#25a2ee] text-xs font-bold rounded-xl flex items-center gap-1.5 transition shrink-0 cursor-pointer"
                         >
                             <SlidersHorizontal className="w-3.5 h-3.5" />
                             <span>Student Menu</span>
                         </button>
-                    </div>
-
-                    {/* Horizontal Scrollable Menu Chips */}
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-                        {menuItems.slice(0, 8).map((item) => {
-                            const active = isCurrentActive(item);
-                            const Icon = item.icon;
-                            return (
-                                <Link
-                                    key={item.title}
-                                    to={item.path}
-                                    className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                                        active
-                                            ? 'bg-[#25a2ee] text-white shadow-2xs'
-                                            : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
-                                    }`}
-                                >
-                                    <Icon className="w-3.5 h-3.5" />
-                                    <span>{item.title}</span>
-                                </Link>
-                            );
-                        })}
                     </div>
                 </div>
 
