@@ -29,8 +29,10 @@ import {
     ShieldCheck,
     Video,
     Check,
-    Tag
+    Tag,
+    ShoppingCart
 } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
 
 interface FeaturedTeacher {
     id: number;
@@ -61,6 +63,7 @@ interface FeaturedBundle {
 
 export const HomePage: React.FC = () => {
     const { t, language } = useLanguage();
+    const { addToCart, isInCart } = useCart();
     const [customPage, setCustomPage] = useState<CustomPage | null>(null);
     const [courses, setCourses] = useState<Course[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -204,7 +207,7 @@ export const HomePage: React.FC = () => {
     const faqs = [
         {
             q: 'How do I purchase or enroll in a course on NovoNex?',
-            a: 'Click the "Enroll Now" button on any course card. Complete payment via bKash, Nagad, Rocket, Cards or online payment gateway, and submit your transaction details to activate course access immediately.',
+            a: 'Click the "Add to Cart" button on any course card and proceed to checkout from your cart. Complete payment via bKash, Nagad, Rocket, Cards or online payment gateway, and submit your transaction details to activate course access immediately.',
         },
         {
             q: 'Will I have access to recorded classes and lecture sheets alongside live classes?',
@@ -675,16 +678,22 @@ export const HomePage: React.FC = () => {
                                         <div className="grid grid-cols-2 gap-2 pt-1">
                                             <Link
                                                 to={`/courses/${course.slug}`}
-                                                className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer"
+                                                className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer flex items-center justify-center"
                                             >
                                                 View Details
                                             </Link>
-                                            <Link
-                                                to={`/checkout/${course.slug}`}
-                                                className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 font-bold text-xs text-white text-center transition-all shadow-md shadow-sky-500/20 cursor-pointer"
+                                            <button
+                                                type="button"
+                                                onClick={() => addToCart(course)}
+                                                className={`py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                                                    isInCart(course.id)
+                                                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
+                                                        : 'bg-[#25a2ee] hover:bg-[#1f8ed1] text-white shadow-sky-500/20'
+                                                }`}
                                             >
-                                                Enroll Now
-                                            </Link>
+                                                <ShoppingCart className="w-3.5 h-3.5" />
+                                                <span>{isInCart(course.id) ? 'In Cart' : 'Add to Cart'}</span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

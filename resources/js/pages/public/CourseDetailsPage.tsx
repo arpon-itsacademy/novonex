@@ -187,7 +187,7 @@ export const CourseDetailsPage: React.FC = () => {
         }
         setCopiedCoupon(true);
         setTimeout(() => setCopiedCoupon(false), 2500);
-        navigate(`/checkout/${course.slug}?coupon=${promoCoupon}`);
+        addToCart(course);
     };
 
     return (
@@ -602,26 +602,18 @@ export const CourseDetailsPage: React.FC = () => {
                                         <span>{enrollingFree ? 'Enrolling...' : 'Start Learning for Free'}</span>
                                     </button>
                                 ) : (
-                                    <>
-                                        <Link
-                                            to={`/checkout/${course.slug}${promoCoupon ? `?coupon=${promoCoupon}` : ''}`}
-                                            className="w-full py-4 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/35 transition-all text-center"
-                                        >
-                                            <span>Enroll Now</span>
-                                        </Link>
-                                        <button
-                                            type="button"
-                                            onClick={() => addToCart(course)}
-                                            className={`w-full py-3.5 px-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 border transition-all cursor-pointer ${
-                                                isInCart(course.id)
-                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800'
-                                                    : 'bg-sky-50 text-[#25a2ee] border-sky-200 dark:bg-sky-950/40 dark:border-sky-800 hover:bg-sky-100 dark:hover:bg-sky-900/50'
-                                            }`}
-                                        >
-                                            <ShoppingCart className="w-5 h-5" />
-                                            <span>{isInCart(course.id) ? 'Course in Cart (Open Cart)' : 'Add to Cart'}</span>
-                                        </button>
-                                    </>
+                                    <button
+                                        type="button"
+                                        onClick={() => addToCart(course)}
+                                        className={`w-full py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-lg ${
+                                            isInCart(course.id)
+                                                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700'
+                                                : 'bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/35'
+                                        }`}
+                                    >
+                                        <ShoppingCart className="w-5 h-5" />
+                                        <span>{isInCart(course.id) ? 'Course in Cart (Open Cart)' : 'Add to Cart'}</span>
+                                    </button>
                                 )}
 
                                 {/* Secondary: 'How to Enroll' button */}
@@ -720,7 +712,7 @@ export const CourseDetailsPage: React.FC = () => {
                             <div className="space-y-2.5 py-1">
                                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
                                     <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
-                                    <p className="text-xs text-slate-700 font-medium">Click the <strong className="text-sky-700">"Enroll Now"</strong> button below or in the sidebar to go to the checkout page.</p>
+                                    <p className="text-xs text-slate-700 font-medium">Click the <strong className="text-sky-700">"Add to Cart"</strong> button in the sidebar to add this course to your cart, then proceed to checkout.</p>
                                 </div>
                                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
                                     <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
@@ -738,14 +730,17 @@ export const CourseDetailsPage: React.FC = () => {
                         )}
 
                         <div className="pt-2">
-                            <Link
-                                to={`/checkout/${course.slug}${promoCoupon ? `?coupon=${promoCoupon}` : ''}`}
-                                onClick={() => setShowHowToBuyModal(false)}
-                                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md transition"
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowHowToBuyModal(false);
+                                    addToCart(course);
+                                }}
+                                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md transition cursor-pointer"
                             >
-                                <span>Enroll Now</span>
-                                <ArrowRight className="w-4 h-4" />
-                            </Link>
+                                <ShoppingCart className="w-4 h-4" />
+                                <span>{isInCart(course.id) ? 'Course in Cart (Open Cart)' : 'Add to Cart'}</span>
+                            </button>
                         </div>
                     </div>
                 </div>

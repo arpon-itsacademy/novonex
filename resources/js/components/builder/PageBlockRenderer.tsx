@@ -589,34 +589,25 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                                                 </div>
 
                                                 {/* Action buttons */}
-                                                <div className="flex flex-col gap-2 pt-1">
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <Link
-                                                            to={`/courses/${course.slug}`}
-                                                            className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer"
-                                                        >
-                                                            View Details
-                                                        </Link>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => addToCart(course)}
-                                                            className={`py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                                                                isInCart(course.id)
-                                                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800'
-                                                                    : 'bg-sky-50 dark:bg-sky-950/40 text-[#25a2ee] hover:bg-sky-100 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800'
-                                                            }`}
-                                                        >
-                                                            <ShoppingCart className="w-3.5 h-3.5" />
-                                                            <span>{isInCart(course.id) ? 'In Cart' : 'Add to Cart'}</span>
-                                                        </button>
-                                                    </div>
+                                                <div className="grid grid-cols-2 gap-2 pt-1">
                                                     <Link
-                                                        to={`/checkout/${course.slug}`}
-                                                        className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 font-bold text-xs text-white text-center transition-all shadow-md shadow-sky-500/20 cursor-pointer flex items-center justify-center gap-1"
+                                                        to={`/courses/${course.slug}`}
+                                                        className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer flex items-center justify-center"
                                                     >
-                                                        <span>Enroll Now</span>
-                                                        <ArrowRight className="w-3.5 h-3.5" />
+                                                        View Details
                                                     </Link>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => addToCart(course)}
+                                                        className={`py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                                                            isInCart(course.id)
+                                                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
+                                                                : 'bg-[#25a2ee] hover:bg-[#1f8ed1] text-white shadow-sky-500/20'
+                                                        }`}
+                                                    >
+                                                        <ShoppingCart className="w-3.5 h-3.5" />
+                                                        <span>{isInCart(course.id) ? 'In Cart' : 'Add to Cart'}</span>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
