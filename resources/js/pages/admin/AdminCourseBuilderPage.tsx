@@ -778,13 +778,40 @@ export const AdminCourseBuilderPage: React.FC = () => {
             const uploadSizeMb = (fileToUpload.size / (1024 * 1024)).toFixed(1);
             setVdoUploadStatus(`Uploading to VdoCipher cloud (${uploadSizeMb} MB)...`);
 
+            // AWS S3 POST Policy requires fields in strict order BEFORE the file
+            // S3 policy explicitly enforces success_action_status=201
+            const s3OrderedKeys = [
+                'key',
+                'policy',
+                'x-amz-algorithm',
+                'x-amz-credential',
+                'x-amz-date',
+                'x-amz-signature',
+                'success_action_status',
+                'success_action_redirect'
+            ];
+
             const formData = new FormData();
-            Object.keys(clientPayload).forEach((key) => {
-                if (key !== 'uploadLink') {
-                    formData.append(key, clientPayload[key]);
+            s3OrderedKeys.forEach((k) => {
+                if (clientPayload[k] !== undefined && clientPayload[k] !== null) {
+                    formData.append(k, String(clientPayload[k]));
+                } else if (k === 'success_action_status') {
+                    formData.append('success_action_status', '201');
+                } else if (k === 'success_action_redirect') {
+                    formData.append('success_action_redirect', '');
                 }
             });
-            formData.append('file', fileToUpload, vdoSelectedFile.name.replace(/\.[^/.]+$/, '') + '.mp4');
+
+            // Append any additional keys from clientPayload
+            Object.keys(clientPayload).forEach((k) => {
+                if (k !== 'uploadLink' && k !== 'file' && !s3OrderedKeys.includes(k)) {
+                    formData.append(k, String(clientPayload[k]));
+                }
+            });
+
+            // The binary file parameter MUST strictly be appended last
+            const cleanFilename = (vdoSelectedFile.name || 'video.mp4').replace(/[^a-zA-Z0-9._-]/g, '_');
+            formData.append('file', fileToUpload, cleanFilename);
 
             await new Promise<void>((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
@@ -804,7 +831,23 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve();
                     } else {
-                        reject(new Error(`VdoCipher S3 upload failed with HTTP status ${xhr.status}: ${xhr.statusText || 'Upload rejected'}`));
+                        let detailedMsg = '';
+                        if (xhr.responseText) {
+                            try {
+                                const parser = new DOMParser();
+                                const xmlDoc = parser.parseFromString(xhr.responseText, 'text/xml');
+                                const errorNode = xmlDoc.getElementsByTagName('Message')[0];
+                                const codeNode = xmlDoc.getElementsByTagName('Code')[0];
+                                if (errorNode?.textContent) {
+                                    detailedMsg = `${codeNode?.textContent ? codeNode.textContent + ': ' : ''}${errorNode.textContent}`;
+                                }
+                            } catch (_) {}
+                        }
+                        reject(new Error(
+                            detailedMsg
+                                ? `VdoCipher S3 upload rejected (${xhr.status}): ${detailedMsg}`
+                                : `VdoCipher S3 upload failed with HTTP status ${xhr.status}: ${xhr.statusText || 'Upload rejected'}`
+                        ));
                     }
                 };
 
@@ -822,6 +865,41 @@ export const AdminCourseBuilderPage: React.FC = () => {
             setVdoSelectedFile(null);
         } catch (err: any) {
             console.error('VdoCipher direct upload error:', err);
+
+            // Automatic resilient fallback: if direct S3 upload failed and file size is <= 250MB, retry via secure server proxy
+            if (fileToUpload.size <= 250 * 1024 * 1024) {
+                try {
+                    setVdoUploadStatus('Direct S3 blocked. Retrying via secure server proxy...');
+                    const cleanFilename = (vdoSelectedFile.name || 'video.mp4').replace(/[^a-zA-Z0-9._-]/g, '_');
+                    const proxyFormData = new FormData();
+                    proxyFormData.append('file', fileToUpload, cleanFilename);
+                    proxyFormData.append('title', lessonTitle.trim() || cleanFilename);
+
+                    const proxyRes = await apiClient.post('/vdocipher/upload-proxy', proxyFormData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                        onUploadProgress: (progressEvent) => {
+                            if (progressEvent.total) {
+                                const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                                setVdoUploadProgress(percent);
+                                setVdoUploadStatus(`Uploading via secure server proxy: ${percent}%`);
+                            }
+                        }
+                    });
+
+                    if (proxyRes.data?.videoId) {
+                        const fallbackVideoId = proxyRes.data.videoId;
+                        setVdoUploadProgress(100);
+                        setVdoUploadStatus('Video uploaded successfully via secure proxy! Video ID: ' + fallbackVideoId);
+                        setVdoUploadedVideoId(fallbackVideoId);
+                        setLessonVideoUrl(fallbackVideoId);
+                        setVdoSelectedFile(null);
+                        return;
+                    }
+                } catch (proxyErr: any) {
+                    console.error('Proxy upload error:', proxyErr);
+                }
+            }
+
             const msg = err.response?.data?.message || err.message || 'Failed to upload video to VdoCipher.';
             setVdoUploadError(msg);
             setVdoUploadStatus('');

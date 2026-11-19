@@ -167,6 +167,14 @@ class VdoCipherController extends Controller
                 ], 502);
             }
 
+            // Ensure S3 POST policy fields required by AWS S3 are explicitly attached
+            if (!isset($clientPayload['success_action_status'])) {
+                $clientPayload['success_action_status'] = '201';
+            }
+            if (!isset($clientPayload['success_action_redirect'])) {
+                $clientPayload['success_action_redirect'] = '';
+            }
+
             return response()->json([
                 'clientPayload' => $clientPayload,
                 'videoId' => $videoId,
@@ -176,6 +184,111 @@ class VdoCipherController extends Controller
             Log::error('VdoCipher upload credentials error: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to communicate with VdoCipher: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Server-side upload proxy to VdoCipher S3 for situations where client direct S3 POST is blocked.
+     */
+    public function uploadProxy(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if (!$user || (!$user->isAdmin() && !$user->isTeacher())) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        $request->validate([
+            'file' => ['required', 'file'],
+            'title' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $settings = WebsiteSetting::current();
+        $apiKey = $settings->vdocipher_settings['api_secret_key'] ?? '';
+        if (empty($apiKey)) {
+            return response()->json(['message' => 'VdoCipher API Secret Key is not configured.'], 422);
+        }
+
+        $uploadedFile = $request->file('file');
+        $title = trim($request->input('title') ?? $uploadedFile->getClientOriginalName());
+        $folderId = trim($settings->vdocipher_settings['folder_id'] ?? '');
+
+        $query = ['title' => $title];
+        if (!empty($folderId)) {
+            $query['folderId'] = $folderId;
+        }
+
+        try {
+            $credsRes = Http::withHeaders([
+                'Authorization' => 'Apisecret ' . $apiKey,
+                'Accept' => 'application/json',
+            ])->timeout(20)->put('https://dev.vdocipher.com/api/videos?' . http_build_query($query));
+
+            if (!$credsRes->successful()) {
+                return response()->json([
+                    'message' => 'Failed to obtain upload link from VdoCipher: ' . ($credsRes->json('message') ?? $credsRes->body()),
+                ], 400);
+            }
+
+            $data = $credsRes->json();
+            $clientPayload = $data['clientPayload'] ?? [];
+            $videoId = $data['videoId'] ?? $data['video']['id'] ?? $data['id'] ?? null;
+            $uploadLink = $clientPayload['uploadLink'] ?? null;
+
+            if (!$uploadLink || !$videoId) {
+                return response()->json(['message' => 'Invalid upload payload from VdoCipher.'], 502);
+            }
+
+            // S3 POST policy requires fields in specific order before the file
+            $orderedKeys = [
+                'key',
+                'policy',
+                'x-amz-algorithm',
+                'x-amz-credential',
+                'x-amz-date',
+                'x-amz-signature',
+                'success_action_status',
+                'success_action_redirect',
+            ];
+
+            $multipart = [];
+            foreach ($orderedKeys as $k) {
+                $val = $clientPayload[$k] ?? ($k === 'success_action_status' ? '201' : ($k === 'success_action_redirect' ? '' : null));
+                if ($val !== null) {
+                    $multipart[] = ['name' => $k, 'contents' => (string) $val];
+                }
+            }
+
+            foreach ($clientPayload as $k => $val) {
+                if ($k !== 'uploadLink' && !in_array($k, $orderedKeys, true)) {
+                    $multipart[] = ['name' => $k, 'contents' => (string) $val];
+                }
+            }
+
+            $multipart[] = [
+                'name' => 'file',
+                'contents' => fopen($uploadedFile->getRealPath(), 'r'),
+                'filename' => $uploadedFile->getClientOriginalName(),
+            ];
+
+            $s3Res = Http::timeout(600)->asMultipart()->post($uploadLink, $multipart);
+
+            if ($s3Res->status() < 200 || $s3Res->status() >= 300) {
+                Log::error('VdoCipher S3 proxy upload rejected: ' . $s3Res->body());
+                return response()->json([
+                    'message' => 'S3 upload rejected with status ' . $s3Res->status() . ': ' . $s3Res->body(),
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'videoId' => $videoId,
+                'message' => 'Video uploaded successfully to VdoCipher.',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('VdoCipher proxy upload error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Server error uploading to VdoCipher S3: ' . $e->getMessage(),
             ], 500);
         }
     }

@@ -246,6 +246,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Direct VdoCipher upload credentials for Course Builder (admin & teacher)
     Route::post('vdocipher/upload-credentials', [VdoCipherController::class, 'getUploadCredentials']);
     Route::post('admin/vdocipher/upload-credentials', [VdoCipherController::class, 'getUploadCredentials']);
+    Route::post('vdocipher/upload-proxy', [VdoCipherController::class, 'uploadProxy']);
 
     // VdoCipher settings aliases (both /api/settings/vdocipher and /api/admin/settings/vdocipher)
     Route::prefix('settings/vdocipher')->middleware('role:admin')->group(function () {
