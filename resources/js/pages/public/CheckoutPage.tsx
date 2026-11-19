@@ -60,7 +60,7 @@ export const CheckoutPage: React.FC = () => {
     const { user } = useAuth();
     const { language } = useLanguage();
     const { settings } = useSettings();
-    const { items: cartItems, clearCart, subtotal: cartSubtotal, totalOriginalPrice: cartOriginalPrice, dynamicOfferDiscount, appliedOffer } = useCart();
+    const { items: cartItems, clearCart, subtotal: cartSubtotal, totalOriginalPrice: cartOriginalPrice, dynamicOfferDiscount, appliedOffer, appliedCoupon: cartAppliedCoupon, removeCoupon: removeCartCoupon } = useCart();
     const isCartMode = !slug;
 
     const [course, setCourse] = useState<Course | null>(null);
@@ -220,15 +220,38 @@ export const CheckoutPage: React.FC = () => {
     const dynamicDiscount = isCartMode ? Math.floor(dynamicOfferDiscount || 0) : 0;
     const totalPayable = Math.floor(Math.max(0, courseBasePrice + pilotPrice - referralDiscount - couponDiscount - dynamicDiscount));
 
-    const validateCouponCode = async (codeToVerify: string, courseId: number) => {
+    // Auto sync coupon from cart if present
+    useEffect(() => {
+        if (isCartMode && cartAppliedCoupon && !appliedCoupon) {
+            setAppliedCoupon({
+                coupon_id: cartAppliedCoupon.coupon_id,
+                code: cartAppliedCoupon.code,
+                title: cartAppliedCoupon.title,
+                discount_type: cartAppliedCoupon.discount_type,
+                discount_amount: cartAppliedCoupon.discount_amount,
+                calculated_discount: cartAppliedCoupon.calculated_discount,
+                final_price: cartAppliedCoupon.final_price,
+                message: cartAppliedCoupon.message || 'Coupon applied from cart!',
+            });
+            setCouponInput(cartAppliedCoupon.code);
+            setCouponMessage({ type: 'success', text: cartAppliedCoupon.message || 'Coupon applied from cart!' });
+        }
+    }, [isCartMode, cartAppliedCoupon]);
+
+    const validateCouponCode = async (codeToVerify: string, courseId?: number) => {
         if (!codeToVerify || !codeToVerify.trim()) return;
         try {
             setCheckingCoupon(true);
             setCouponMessage(null);
-            const res = await apiClient.post('/coupons/validate', {
+            const payload: any = {
                 code: codeToVerify.trim().toUpperCase(),
-                course_id: courseId,
-            });
+            };
+            if (isCartMode) {
+                payload.course_ids = cartItems.map((i) => i.id);
+            } else if (courseId) {
+                payload.course_id = courseId;
+            }
+            const res = await apiClient.post('/coupons/validate', payload);
 
             if (res.data.valid) {
                 setAppliedCoupon(res.data);
@@ -247,6 +270,9 @@ export const CheckoutPage: React.FC = () => {
         setAppliedCoupon(null);
         setCouponInput('');
         setCouponMessage(null);
+        if (isCartMode) {
+            removeCartCoupon();
+        }
     };
 
     const validateReferralCode = async (codeToVerify: string, courseId: number) => {

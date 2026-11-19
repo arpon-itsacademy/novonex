@@ -79,6 +79,11 @@ Route::match(['get', 'post'], 'payment/shurjopay/cancel', [ShurjopayController::
 Route::get('exams/csv-template', [ExamBuilderController::class, 'downloadCsvTemplate']);
 Route::get('learning/attachments/{attachment}/download', [LessonAttachmentController::class, 'download']);
 
+// Cart & Public Coupon / Dynamic Offer Validation (Guest & Student Friendly)
+Route::post('coupons/validate', [CouponValidationController::class, 'validateCoupon']);
+Route::get('dynamic-offers/active', [DynamicOfferController::class, 'getActiveOffers']);
+Route::post('dynamic-offers/evaluate', [DynamicOfferController::class, 'evaluate']);
+
 /*
 |--------------------------------------------------------------------------
 | Protected Routes (Authenticated via Sanctum)

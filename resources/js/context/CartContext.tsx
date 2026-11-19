@@ -35,6 +35,17 @@ export interface DynamicOfferEvaluation {
     next_tier?: AppliedOfferTier | null;
 }
 
+export interface AppliedCartCoupon {
+    coupon_id: number;
+    code: string;
+    title: string;
+    discount_type: 'fixed' | 'percentage';
+    discount_amount: number;
+    calculated_discount: number;
+    final_price: number;
+    message?: string;
+}
+
 interface CartContextType {
     items: CartItem[];
     addToCart: (course: Course | CartItem) => void;
@@ -47,6 +58,12 @@ interface CartContextType {
     totalSavings: number;
     dynamicOfferDiscount: number;
     appliedOffer: DynamicOfferEvaluation | null;
+    appliedCoupon: AppliedCartCoupon | null;
+    couponDiscount: number;
+    isApplyingCoupon: boolean;
+    couponError: string | null;
+    applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
+    removeCoupon: () => void;
     totalPayable: number;
     isEvaluatingOffer: boolean;
     refreshDynamicOffer: () => Promise<void>;
@@ -59,6 +76,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = 'novonex_cart_items';
+const COUPON_STORAGE_KEY = 'novonex_cart_coupon';
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [items, setItems] = useState<CartItem[]>(() => {
@@ -74,6 +92,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [dynamicOfferDiscount, setDynamicOfferDiscount] = useState<number>(0);
     const [appliedOffer, setAppliedOffer] = useState<DynamicOfferEvaluation | null>(null);
     const [isEvaluatingOffer, setIsEvaluatingOffer] = useState(false);
+
+    // Coupon state
+    const [appliedCoupon, setAppliedCoupon] = useState<AppliedCartCoupon | null>(() => {
+        try {
+            const saved = localStorage.getItem(COUPON_STORAGE_KEY);
+            return saved ? JSON.parse(saved) : null;
+        } catch {
+            return null;
+        }
+    });
+    const [couponDiscount, setCouponDiscount] = useState<number>(() => {
+        try {
+            const saved = localStorage.getItem(COUPON_STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                return Math.floor(Number(parsed.calculated_discount || 0));
+            }
+        } catch {}
+        return 0;
+    });
+    const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+    const [couponError, setCouponError] = useState<string | null>(null);
 
     useEffect(() => {
         try {
@@ -152,6 +192,100 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsCartOpen(true);
     };
 
+    const applyCoupon = async (code: string): Promise<{ success: boolean; message: string }> => {
+        const cleanCode = code ? code.trim().toUpperCase() : '';
+        if (!cleanCode) {
+            setCouponError('Please enter a coupon code.');
+            return { success: false, message: 'Please enter a coupon code.' };
+        }
+
+        if (items.length === 0) {
+            setCouponError('Your cart is empty.');
+            return { success: false, message: 'Your cart is empty.' };
+        }
+
+        setIsApplyingCoupon(true);
+        setCouponError(null);
+
+        try {
+            const { data } = await apiClient.post('/coupons/validate', {
+                code: cleanCode,
+                course_ids: items.map((i) => i.id),
+            });
+
+            if (data && data.valid) {
+                const discount = Math.floor(Number(data.calculated_discount || 0));
+                const couponData: AppliedCartCoupon = {
+                    coupon_id: data.coupon_id,
+                    code: data.code,
+                    title: data.title,
+                    discount_type: data.discount_type,
+                    discount_amount: Number(data.discount_amount),
+                    calculated_discount: discount,
+                    final_price: Number(data.final_price),
+                    message: data.message,
+                };
+
+                setAppliedCoupon(couponData);
+                setCouponDiscount(discount);
+                setCouponError(null);
+                try {
+                    localStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify(couponData));
+                } catch {}
+
+                return { success: true, message: data.message || 'Coupon applied successfully!' };
+            } else {
+                const msg = data.message || 'Invalid coupon code.';
+                setCouponError(msg);
+                return { success: false, message: msg };
+            }
+        } catch (err: any) {
+            const msg = err.response?.data?.message || 'Failed to apply coupon. Please check the code and try again.';
+            setCouponError(msg);
+            return { success: false, message: msg };
+        } finally {
+            setIsApplyingCoupon(false);
+        }
+    };
+
+    const removeCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponDiscount(0);
+        setCouponError(null);
+        try {
+            localStorage.removeItem(COUPON_STORAGE_KEY);
+        } catch {}
+    };
+
+    // Re-validate applied coupon whenever cart items change
+    useEffect(() => {
+        if (!appliedCoupon) return;
+
+        if (items.length === 0) {
+            removeCoupon();
+            return;
+        }
+
+        apiClient.post('/coupons/validate', {
+            code: appliedCoupon.code,
+            course_ids: items.map((i) => i.id),
+        }).then(({ data }) => {
+            if (data && data.valid) {
+                const discount = Math.floor(Number(data.calculated_discount || 0));
+                setCouponDiscount(discount);
+                setAppliedCoupon((prev) => prev ? {
+                    ...prev,
+                    calculated_discount: discount,
+                    final_price: Number(data.final_price),
+                } : null);
+            } else {
+                removeCoupon();
+            }
+        }).catch(() => {
+            // Keep current or silently wait
+        });
+    }, [items]);
+
     const removeFromCart = (courseId: number) => {
         setItems((prev) => prev.filter((item) => item.id !== courseId));
     };
@@ -160,6 +294,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setItems([]);
         setAppliedOffer(null);
         setDynamicOfferDiscount(0);
+        removeCoupon();
         try {
             localStorage.removeItem(CART_STORAGE_KEY);
         } catch {}
@@ -173,7 +308,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const subtotal = Math.floor(items.reduce((acc, item) => acc + (Number(item.effective_price) || 0), 0));
     const totalOriginalPrice = Math.floor(items.reduce((acc, item) => acc + (Number(item.price) || Number(item.effective_price) || 0), 0));
-    const totalPayable = Math.floor(Math.max(0, subtotal - dynamicOfferDiscount));
+    const totalPayable = Math.floor(Math.max(0, subtotal - dynamicOfferDiscount - couponDiscount));
     const totalSavings = Math.floor(Math.max(0, totalOriginalPrice - totalPayable));
 
     const openCart = () => setIsCartOpen(true);
@@ -194,6 +329,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 totalSavings,
                 dynamicOfferDiscount,
                 appliedOffer,
+                appliedCoupon,
+                couponDiscount,
+                isApplyingCoupon,
+                couponError,
+                applyCoupon,
+                removeCoupon,
                 totalPayable,
                 isEvaluatingOffer,
                 refreshDynamicOffer,

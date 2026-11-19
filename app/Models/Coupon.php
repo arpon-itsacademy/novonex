@@ -307,5 +307,114 @@ class Coupon extends Model
             'message' => 'Coupon applied successfully!',
         ];
     }
+
+    /**
+     * Fully validate coupon for a collection of cart courses.
+     *
+     * @param User|null $user
+     * @param mixed $courses
+     * @param float $subtotal
+     * @return array
+     */
+    public function validateForCart(?User $user, $courses, float $subtotal): array
+    {
+        if (!$this->is_active) {
+            return ['valid' => false, 'message' => 'This coupon is no longer active.'];
+        }
+
+        $now = Carbon::now();
+
+        if ($this->start_date && $this->start_date->isFuture()) {
+            return ['valid' => false, 'message' => 'This coupon offer has not started yet.'];
+        }
+
+        if ($this->expiry_date && $this->expiry_date->isPast()) {
+            return ['valid' => false, 'message' => 'This coupon has expired.'];
+        }
+
+        if ($this->usage_limit !== null && $this->times_used >= $this->usage_limit) {
+            return ['valid' => false, 'message' => 'This coupon has reached its total usage limit.'];
+        }
+
+        // Minimum order amount check against cart subtotal
+        if ($this->min_order_amount !== null && $this->min_order_amount > 0 && $subtotal < $this->min_order_amount) {
+            return [
+                'valid' => false,
+                'message' => "This coupon requires a minimum cart subtotal of Tk {$this->min_order_amount}."
+            ];
+        }
+
+        // User restriction check
+        if ($this->user_restriction_type === self::USER_SPECIFIC) {
+            if (!$user) {
+                return ['valid' => false, 'message' => 'Please log in to your account to use this coupon.'];
+            }
+            if ($user->id !== $this->restricted_user_id) {
+                return ['valid' => false, 'message' => 'This coupon is restricted to a specific user account.'];
+            }
+        }
+
+        // Per-user usage limit check
+        if ($user && $this->usage_limit_per_user > 0) {
+            $userUsageCount = $this->usages()->where('user_id', $user->id)->count();
+            if ($userUsageCount >= $this->usage_limit_per_user) {
+                return ['valid' => false, 'message' => 'You have already reached the maximum usage limit for this coupon.'];
+            }
+        }
+
+        $courseCollection = $courses instanceof \Illuminate\Support\Collection ? $courses : collect($courses);
+
+        if ($courseCollection->isEmpty()) {
+            return ['valid' => false, 'message' => 'Your cart is empty.'];
+        }
+
+        // Scope check: all, specific courses, or specific categories
+        $qualifyingCourses = $courseCollection->filter(function ($course) {
+            if ($this->scope_type === self::SCOPE_ALL) {
+                return true;
+            }
+
+            if ($this->scope_type === self::SCOPE_COURSE) {
+                return $this->courses()->where('courses.id', $course->id)->exists();
+            }
+
+            if ($this->scope_type === self::SCOPE_CATEGORY) {
+                $categoryIds = $course->relationLoaded('categories')
+                    ? $course->categories->pluck('id')->toArray()
+                    : (method_exists($course, 'categories') ? $course->categories()->pluck('categories.id')->toArray() : []);
+                return $this->categories()->whereIn('categories.id', $categoryIds)->exists();
+            }
+
+            return false;
+        });
+
+        if ($qualifyingCourses->isEmpty()) {
+            if ($this->scope_type === self::SCOPE_COURSE) {
+                return ['valid' => false, 'message' => 'This coupon is not valid for any course currently in your cart.'];
+            }
+            if ($this->scope_type === self::SCOPE_CATEGORY) {
+                return ['valid' => false, 'message' => 'This coupon is only valid for selected categories. None of your cart items match.'];
+            }
+            return ['valid' => false, 'message' => 'No qualifying items found in cart for this coupon.'];
+        }
+
+        $qualifyingTotal = $qualifyingCourses->sum(function ($c) {
+            return (float) ($c->effective_price ?? $c->price ?? 0);
+        });
+
+        $discount = $this->calculateDiscount($qualifyingTotal);
+
+        return [
+            'valid' => true,
+            'coupon_id' => $this->id,
+            'code' => $this->code,
+            'title' => $this->title,
+            'discount_type' => $this->discount_type,
+            'discount_amount' => (float) $this->discount_amount,
+            'calculated_discount' => (float) floor($discount),
+            'final_price' => (float) floor(max(0, $subtotal - $discount)),
+            'message' => 'Coupon applied successfully!',
+        ];
+    }
 }
 

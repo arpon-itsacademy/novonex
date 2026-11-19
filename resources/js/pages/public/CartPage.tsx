@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { formatBDT, getImageUrl } from '../../api/client';
@@ -13,7 +13,10 @@ import {
     ArrowLeft,
     CheckCircle2,
     Tag,
-    Flame
+    Flame,
+    Ticket,
+    X,
+    Loader2
 } from 'lucide-react';
 
 export const CartPage: React.FC = () => {
@@ -26,11 +29,36 @@ export const CartPage: React.FC = () => {
         totalSavings,
         dynamicOfferDiscount,
         appliedOffer,
+        appliedCoupon,
+        couponDiscount,
+        isApplyingCoupon,
+        couponError,
+        applyCoupon,
+        removeCoupon,
         totalPayable,
         cartCount
     } = useCart();
 
     const navigate = useNavigate();
+    const [couponCodeInput, setCouponCodeInput] = useState('');
+    const [couponSuccessMessage, setCouponSuccessMessage] = useState<string | null>(null);
+
+    const handleApplyCoupon = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!couponCodeInput.trim()) return;
+        setCouponSuccessMessage(null);
+        const res = await applyCoupon(couponCodeInput.trim());
+        if (res.success) {
+            setCouponCodeInput('');
+            setCouponSuccessMessage(res.message);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        removeCoupon();
+        setCouponCodeInput('');
+        setCouponSuccessMessage(null);
+    };
 
     const handleCheckout = () => {
         navigate('/checkout');
@@ -245,6 +273,84 @@ export const CartPage: React.FC = () => {
                                     Order Summary
                                 </h3>
 
+                                {/* Coupon Section */}
+                                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2.5">
+                                    <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200">
+                                        <span className="flex items-center gap-1.5">
+                                            <Ticket className="w-4 h-4 text-[#25a2ee]" />
+                                            <span>Apply Coupon</span>
+                                        </span>
+                                    </div>
+
+                                    {appliedCoupon ? (
+                                        <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                                                <div className="min-w-0">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="font-extrabold text-xs text-emerald-800 dark:text-emerald-200 tracking-wider">
+                                                            {appliedCoupon.code}
+                                                        </span>
+                                                        <span className="text-[10px] px-1.5 py-0.5 rounded font-bold bg-emerald-200 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
+                                                            Applied
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[11px] text-emerald-700 dark:text-emerald-300 truncate">
+                                                        {appliedCoupon.title || `You saved ${formatBDT(couponDiscount)}`}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveCoupon}
+                                                className="p-1 text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
+                                                title="Remove coupon"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <form onSubmit={handleApplyCoupon} className="space-y-1.5">
+                                            <div className="flex items-center gap-2">
+                                                <div className="relative flex-1">
+                                                    <input
+                                                        type="text"
+                                                        value={couponCodeInput}
+                                                        onChange={(e) => {
+                                                            setCouponCodeInput(e.target.value.toUpperCase());
+                                                            setCouponSuccessMessage(null);
+                                                        }}
+                                                        placeholder="Enter coupon code"
+                                                        disabled={isApplyingCoupon}
+                                                        className="w-full px-3 py-2 text-xs font-semibold uppercase tracking-wider bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 placeholder:normal-case focus:outline-none focus:border-[#25a2ee] focus:ring-1 focus:ring-[#25a2ee]"
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="submit"
+                                                    disabled={isApplyingCoupon || !couponCodeInput.trim()}
+                                                    className="px-4 py-2 bg-[#25a2ee] hover:bg-[#1a8ed2] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shrink-0 flex items-center gap-1.5"
+                                                >
+                                                    {isApplyingCoupon ? (
+                                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                    ) : (
+                                                        'Apply'
+                                                    )}
+                                                </button>
+                                            </div>
+                                            {couponError && (
+                                                <p className="text-xs text-rose-500 font-medium pl-0.5">
+                                                    {couponError}
+                                                </p>
+                                            )}
+                                            {couponSuccessMessage && !couponError && (
+                                                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium pl-0.5">
+                                                    {couponSuccessMessage}
+                                                </p>
+                                            )}
+                                        </form>
+                                    )}
+                                </div>
+
                                 <div className="space-y-3 text-sm">
                                     <div className="flex justify-between text-slate-600 dark:text-slate-400">
                                         <span>Total Items:</span>
@@ -270,6 +376,16 @@ export const CartPage: React.FC = () => {
                                                 <span>Dynamic Bundle:</span>
                                             </span>
                                             <span>- {formatBDT(dynamicOfferDiscount)}</span>
+                                        </div>
+                                    )}
+
+                                    {couponDiscount > 0 && appliedCoupon && (
+                                        <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
+                                            <span className="flex items-center gap-1">
+                                                <Ticket className="w-3.5 h-3.5" />
+                                                <span>Coupon ({appliedCoupon.code}):</span>
+                                            </span>
+                                            <span>- {formatBDT(couponDiscount)}</span>
                                         </div>
                                     )}
 

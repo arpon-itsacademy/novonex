@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { formatBDT, getImageUrl } from '../../api/client';
@@ -12,7 +12,10 @@ import {
     Sparkles,
     ShoppingBag,
     Tag,
-    Flame
+    Flame,
+    Ticket,
+    Loader2,
+    CheckCircle2
 } from 'lucide-react';
 
 export const CartDrawer: React.FC = () => {
@@ -27,11 +30,36 @@ export const CartDrawer: React.FC = () => {
         totalSavings,
         dynamicOfferDiscount,
         appliedOffer,
+        appliedCoupon,
+        couponDiscount,
+        isApplyingCoupon,
+        couponError,
+        applyCoupon,
+        removeCoupon,
         totalPayable,
         cartCount
     } = useCart();
 
     const navigate = useNavigate();
+    const [couponCodeInput, setCouponCodeInput] = useState('');
+    const [couponSuccessMessage, setCouponSuccessMessage] = useState<string | null>(null);
+
+    const handleApplyCoupon = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!couponCodeInput.trim()) return;
+        setCouponSuccessMessage(null);
+        const res = await applyCoupon(couponCodeInput.trim());
+        if (res.success) {
+            setCouponCodeInput('');
+            setCouponSuccessMessage(res.message);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        removeCoupon();
+        setCouponCodeInput('');
+        setCouponSuccessMessage(null);
+    };
 
     // Prevent body scroll when drawer is open
     useEffect(() => {
@@ -256,6 +284,82 @@ export const CartDrawer: React.FC = () => {
                     {/* Footer / Summary & Actions */}
                     {cartCount > 0 && (
                         <div className="p-4 sm:p-5 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-850/80 space-y-3">
+                            {/* Coupon Code Section */}
+                            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-700/80 shadow-2xs">
+                                {appliedCoupon ? (
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                                <Ticket className="w-4 h-4" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="font-extrabold text-xs text-slate-800 dark:text-slate-100 tracking-wider">
+                                                        {appliedCoupon.code}
+                                                    </span>
+                                                    <span className="text-[10px] px-1.5 py-0.5 rounded font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300">
+                                                        Applied
+                                                    </span>
+                                                </div>
+                                                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium truncate">
+                                                    {appliedCoupon.title || `Saved ${formatBDT(couponDiscount)}`}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveCoupon}
+                                            className="p-1 text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
+                                            title="Remove coupon"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleApplyCoupon} className="space-y-1.5">
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="relative flex-1">
+                                                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                                                    <Ticket className="w-3.5 h-3.5" />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    value={couponCodeInput}
+                                                    onChange={(e) => {
+                                                        setCouponCodeInput(e.target.value.toUpperCase());
+                                                        setCouponSuccessMessage(null);
+                                                    }}
+                                                    placeholder="Coupon Code"
+                                                    disabled={isApplyingCoupon}
+                                                    className="w-full pl-8 pr-2 py-1.5 text-xs font-semibold uppercase tracking-wider bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 placeholder:normal-case focus:outline-none focus:border-[#25a2ee] focus:ring-1 focus:ring-[#25a2ee]"
+                                                />
+                                            </div>
+                                            <button
+                                                type="submit"
+                                                disabled={isApplyingCoupon || !couponCodeInput.trim()}
+                                                className="px-3 py-1.5 bg-[#25a2ee] hover:bg-[#1a8ed2] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shrink-0 flex items-center gap-1"
+                                            >
+                                                {isApplyingCoupon ? (
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                ) : (
+                                                    'Apply'
+                                                )}
+                                            </button>
+                                        </div>
+                                        {couponError && (
+                                            <p className="text-[11px] text-rose-500 font-medium pl-1 leading-tight">
+                                                {couponError}
+                                            </p>
+                                        )}
+                                        {couponSuccessMessage && !couponError && (
+                                            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pl-1 leading-tight">
+                                                {couponSuccessMessage}
+                                            </p>
+                                        )}
+                                    </form>
+                                )}
+                            </div>
+
                             {/* Summary info */}
                             <div className="space-y-1.5 text-xs">
                                 {totalOriginalPrice > subtotal && (
@@ -277,6 +381,16 @@ export const CartDrawer: React.FC = () => {
                                             <span>Dynamic Bundle Offer</span>
                                         </span>
                                         <span>-{formatBDT(dynamicOfferDiscount)}</span>
+                                    </div>
+                                )}
+
+                                {couponDiscount > 0 && appliedCoupon && (
+                                    <div className="flex items-center justify-between font-semibold text-emerald-600 dark:text-emerald-400">
+                                        <span className="flex items-center gap-1">
+                                            <Ticket className="w-3.5 h-3.5" />
+                                            <span>Coupon ({appliedCoupon.code})</span>
+                                        </span>
+                                        <span>-{formatBDT(couponDiscount)}</span>
                                     </div>
                                 )}
 

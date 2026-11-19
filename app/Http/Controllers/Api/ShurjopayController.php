@@ -223,7 +223,11 @@ class ShurjopayController extends Controller
                 ], 422);
             }
 
-            $validation = $coupon->validateForCheckout($user, $primaryCourse, $courseFinalAmount);
+            if ($request->filled('course_ids') || count($courses) > 1) {
+                $validation = $coupon->validateForCart($user, $courses, $courseFinalAmount);
+            } else {
+                $validation = $coupon->validateForCheckout($user, $primaryCourse, $courseFinalAmount);
+            }
             if (!$validation['valid']) {
                 return response()->json([
                     'message' => $validation['message'],
