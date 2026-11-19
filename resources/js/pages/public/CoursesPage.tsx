@@ -4,7 +4,30 @@ import { apiClient, formatBDT, getImageUrl } from '../../api/client';
 import { Course, Category, CustomPage } from '../../types';
 import { PageBlockRenderer } from '../../components/builder/PageBlockRenderer';
 import { useLanguage } from '../../context/LanguageContext';
-import { Search, BookOpen, Layers, Sparkles, X, ChevronRight, CheckCircle2, Video, Users } from 'lucide-react';
+import { 
+    Search, 
+    BookOpen, 
+    Layers, 
+    Sparkles, 
+    X, 
+    ChevronRight, 
+    ChevronLeft,
+    ChevronsLeft,
+    ChevronsRight,
+    CheckCircle2, 
+    Video, 
+    Users,
+    Loader2 
+} from 'lucide-react';
+
+interface PaginationMeta {
+    current_page: number;
+    last_page: number;
+    total: number;
+    from: number;
+    to: number;
+    per_page: number;
+}
 
 export const CoursesPage: React.FC = () => {
     const { t, language } = useLanguage();
@@ -16,6 +39,20 @@ export const CoursesPage: React.FC = () => {
 
     const activeCategory = searchParams.get('category') || '';
     const activeSearch = searchParams.get('search') || '';
+
+    const [currentPage, setCurrentPage] = useState<number>(() => {
+        const p = parseInt(searchParams.get('page') || '1', 10);
+        return isNaN(p) || p < 1 ? 1 : p;
+    });
+    const [perPage, setPerPage] = useState<number>(12);
+    const [pagination, setPagination] = useState<PaginationMeta>({
+        current_page: 1,
+        last_page: 1,
+        total: 0,
+        from: 0,
+        to: 0,
+        per_page: 12,
+    });
 
     // Fetch page settings from visual page builder/admin page edit
     useEffect(() => {
@@ -58,18 +95,37 @@ export const CoursesPage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        fetchCourses();
-    }, [activeCategory, activeSearch]);
+        const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
+        const validPage = isNaN(pageFromUrl) || pageFromUrl < 1 ? 1 : pageFromUrl;
+        setCurrentPage(validPage);
+        fetchCourses(validPage, perPage, activeCategory, activeSearch);
+    }, [activeCategory, activeSearch, searchParams.get('page')]);
 
-    const fetchCourses = async () => {
+    const fetchCourses = async (
+        page = currentPage,
+        pageSize = perPage,
+        cat = activeCategory,
+        q = activeSearch
+    ) => {
         setLoading(true);
         try {
             const params = new URLSearchParams();
-            if (activeCategory) params.append('category', activeCategory);
-            if (activeSearch) params.append('search', activeSearch);
+            params.append('page', String(page));
+            params.append('per_page', String(pageSize));
+            if (cat) params.append('category', cat);
+            if (q) params.append('search', q);
 
             const { data } = await apiClient.get(`/courses?${params.toString()}`);
             setCourses(data.data || []);
+            setPagination({
+                current_page: data.current_page || 1,
+                last_page: data.last_page || 1,
+                total: data.total || 0,
+                from: data.from || 0,
+                to: data.to || 0,
+                per_page: data.per_page || pageSize,
+            });
+            setCurrentPage(data.current_page || 1);
         } catch {
             // handle error
         } finally {
@@ -77,13 +133,36 @@ export const CoursesPage: React.FC = () => {
         }
     };
 
+    const handlePageChange = (newPage: number) => {
+        if (newPage < 1 || newPage > pagination.last_page || newPage === currentPage) return;
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('page', String(newPage));
+        setSearchParams(newParams);
+        setCurrentPage(newPage);
+        fetchCourses(newPage, perPage, activeCategory, activeSearch);
+        window.scrollTo({ top: 180, behavior: 'smooth' });
+    };
+
+    const handlePerPageChange = (newSize: number) => {
+        setPerPage(newSize);
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('page', '1');
+        setSearchParams(newParams);
+        setCurrentPage(1);
+        fetchCourses(1, newSize, activeCategory, activeSearch);
+    };
+
     const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const q = formData.get('q') as string;
         const newParams = new URLSearchParams(searchParams);
-        if (q) newParams.set('search', q);
-        else newParams.delete('search');
+        if (q && q.trim()) {
+            newParams.set('search', q.trim());
+        } else {
+            newParams.delete('search');
+        }
+        newParams.delete('page');
         setSearchParams(newParams);
     };
 
@@ -94,7 +173,22 @@ export const CoursesPage: React.FC = () => {
         } else {
             newParams.set('category', categorySlug);
         }
+        newParams.delete('page');
         setSearchParams(newParams);
+    };
+
+    // Calculate smart page number array with ellipses
+    const getPageNumbers = (current: number, total: number): (number | string)[] => {
+        if (total <= 7) {
+            return Array.from({ length: total }, (_, i) => i + 1);
+        }
+        if (current <= 4) {
+            return [1, 2, 3, 4, 5, '...', total];
+        }
+        if (current >= total - 3) {
+            return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+        }
+        return [1, '...', current - 1, current, current + 1, '...', total];
     };
 
     // If page is fully customized with custom blocks (beyond standard grid), render builder view
@@ -117,16 +211,16 @@ export const CoursesPage: React.FC = () => {
     const currentCategoryObj = categories.find(c => c.slug === activeCategory);
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 space-y-10">
             {/* Header & Search */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200/80 dark:border-slate-800 pb-8">
                 <div>
-                    <div className="inline-flex items-center gap-2 text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-widest mb-2">
+                    <div className="inline-flex items-center gap-2 text-xs font-bold text-[#25a2ee] uppercase tracking-widest mb-2">
                         <Sparkles className="w-4 h-4" />
                         <span>Course Catalog</span>
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                        {currentCategoryObj ? currentCategoryObj.name : t.courses.allTab}
+                        {currentCategoryObj ? currentCategoryObj.name : 'All Courses'}
                     </h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                         {currentCategoryObj?.description || 'Choose the right course to achieve your goals. Comprehensive preparation with top instructors.'}
@@ -139,8 +233,8 @@ export const CoursesPage: React.FC = () => {
                         type="text"
                         name="q"
                         defaultValue={activeSearch}
-                        placeholder={t.courses.searchPlaceholder}
-                        className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500 text-sm shadow-2xs placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        placeholder={t.courses?.searchPlaceholder || 'Search courses by name or subject...'}
+                        className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee] text-sm shadow-2xs placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                     <Search className="w-5 h-5 text-slate-400 dark:text-slate-500 absolute left-3.5 top-3.5" />
                 </form>
@@ -150,8 +244,8 @@ export const CoursesPage: React.FC = () => {
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Layers className="w-3.5 h-3.5 text-sky-500" />
-                        <span>{t.courses.filterByCategory}</span>
+                        <Layers className="w-3.5 h-3.5 text-[#25a2ee]" />
+                        <span>Filter by Category</span>
                     </span>
                     {activeCategory && (
                         <button
@@ -173,11 +267,16 @@ export const CoursesPage: React.FC = () => {
                         onClick={() => handleSelectCategory('all')}
                         className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer flex items-center gap-2 ${
                             activeCategory === ''
-                                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30 ring-2 ring-sky-500/20'
+                                ? 'bg-[#25a2ee] text-white shadow-md shadow-[#25a2ee]/30 ring-2 ring-[#25a2ee]/20'
                                 : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-2xs'
                         }`}
                     >
-                        <span>{t.courses.allTab}</span>
+                        <span>All Courses</span>
+                        {pagination.total > 0 && activeCategory === '' && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-white/20 text-white">
+                                {pagination.total}
+                            </span>
+                        )}
                     </button>
 
                     {/* Educational Categories Selected in Builder/Page Edit */}
@@ -190,7 +289,7 @@ export const CoursesPage: React.FC = () => {
                                 onClick={() => handleSelectCategory(cat.slug)}
                                 className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer flex items-center gap-2 ${
                                     isSelected
-                                        ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30 ring-2 ring-sky-500/20'
+                                        ? 'bg-[#25a2ee] text-white shadow-md shadow-[#25a2ee]/30 ring-2 ring-[#25a2ee]/20'
                                         : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-2xs'
                                 }`}
                             >
@@ -236,9 +335,9 @@ export const CoursesPage: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => handleSelectCategory('all')}
-                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-sky-600 text-white font-bold text-xs rounded-xl shadow-xs hover:bg-sky-700 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#25a2ee] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#1f8ed1] transition-colors cursor-pointer"
                         >
-                            <span>{t.courses.viewAll}</span>
+                            <span>View All Courses</span>
                             <ChevronRight className="w-3.5 h-3.5" />
                         </button>
                     )}
@@ -250,79 +349,78 @@ export const CoursesPage: React.FC = () => {
                         return (
                             <div
                                 key={course.id}
-                                className="group bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs hover:shadow-2xl hover:border-sky-400 dark:hover:border-sky-500 transition-all flex flex-col overflow-hidden relative"
+                                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-2xs hover:shadow-xl transition-all duration-300 flex flex-col group hover:-translate-y-1"
                             >
                                 {/* Thumbnail Header */}
-                                <Link to={`/courses/${course.slug}`} className="block relative aspect-video bg-slate-900 overflow-hidden cursor-pointer group/thumb">
+                                <Link
+                                    to={`/courses/${course.slug}`}
+                                    className="aspect-video relative overflow-hidden bg-slate-100 dark:bg-slate-800 block cursor-pointer"
+                                >
                                     {thumbUrl ? (
                                         <img
                                             src={thumbUrl}
                                             alt={course.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 group-hover/thumb:scale-105 transition-transform duration-500"
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             onError={(e) => {
-                                                (e.currentTarget as HTMLElement).style.display = 'none';
-                                                const fallback = (e.currentTarget.parentElement?.querySelector('.fallback-thumb') as HTMLElement);
-                                                if (fallback) fallback.style.display = 'flex';
+                                                (e.target as HTMLElement).style.display = 'none';
                                             }}
                                         />
-                                    ) : null}
-                                    <div className={`fallback-thumb w-full h-full ${thumbUrl ? 'hidden' : 'flex'} items-center justify-center bg-gradient-to-tr from-slate-800 to-sky-950 text-white`}>
-                                        <BookOpen className="w-12 h-12 text-sky-400 opacity-60" />
-                                    </div>
-
-                                    {/* Discount Badge */}
-                                    {course.discount_percent && course.discount_percent > 0 ? (
-                                        <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-rose-600 text-white rounded-xl shadow-md">
-                                            {course.discount_percent}% OFF
-                                        </span>
-                                    ) : course.price === 0 ? (
-                                        <span className="absolute top-3 right-3 px-3 py-1 text-xs font-black bg-emerald-600 text-white rounded-xl shadow-md">
-                                            Free Course
-                                        </span>
-                                    ) : null}
-
-                                    {/* Category Pill on image */}
-                                    {course.categories && course.categories.length > 0 && (
-                                        <span className="absolute bottom-3 left-3 px-2.5 py-1 text-[11px] font-bold bg-black/70 backdrop-blur-xs text-white rounded-lg">
-                                            {course.categories[0].name}
-                                        </span>
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-tr from-[#25a2ee]/20 to-slate-100 dark:to-slate-800 p-4 text-center">
+                                            <BookOpen className="w-10 h-10 text-[#25a2ee] mb-1" />
+                                            <span className="text-xs font-bold text-slate-500 line-clamp-1">{course.title}</span>
+                                        </div>
                                     )}
+
+                                    {/* Overlay badges */}
+                                    <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
+                                        {course.categories && course.categories.length > 0 && (
+                                            <span className="px-2.5 py-1 rounded-full text-[10px] font-black tracking-wide uppercase bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-100 shadow-sm backdrop-blur-xs">
+                                                {course.categories[0].name}
+                                            </span>
+                                        )}
+                                        {course.is_featured && (
+                                            <span className="px-2.5 py-1 rounded-full text-[10px] font-black tracking-wide uppercase bg-amber-500 text-white shadow-sm flex items-center gap-1">
+                                                <Sparkles className="w-3 h-3" />
+                                                <span>Featured</span>
+                                            </span>
+                                        )}
+                                    </div>
                                 </Link>
 
-                                {/* Content Body */}
-                                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+                                {/* Course Body */}
+                                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                                    <div className="space-y-2.5">
+                                        {/* Quick stats pills */}
+                                        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium">
                                             <span className="flex items-center gap-1">
-                                                <Video className="w-3.5 h-3.5 text-sky-500" />
+                                                <Video className="w-3.5 h-3.5 text-[#25a2ee]" />
                                                 <span>{course.lessons_count || 0} Lessons</span>
                                             </span>
                                             <span>•</span>
                                             <span className="flex items-center gap-1">
-                                                <Users className="w-3.5 h-3.5 text-sky-500" />
+                                                <Users className="w-3.5 h-3.5 text-amber-500" />
                                                 <span>{course.enrollments_count || 0} Students</span>
                                             </span>
                                         </div>
 
-                                        <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 transition-colors line-clamp-2">
-                                            <Link
-                                                to={`/courses/${course.slug}`}
-                                                className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer"
-                                            >
+                                        {/* Title */}
+                                        <Link to={`/courses/${course.slug}`} className="block group-hover:text-[#25a2ee] transition-colors">
+                                            <h3 className="font-extrabold text-base text-slate-900 dark:text-white line-clamp-2 leading-snug">
                                                 {course.title}
-                                            </Link>
-                                        </h3>
+                                            </h3>
+                                        </Link>
 
-                                        {/* Course feature checklist */}
-                                        <div className="space-y-1.5 pt-1 text-xs text-slate-600 dark:text-slate-300">
-                                            {((course.features && Array.isArray(course.features) && course.features.length > 0)
-                                                ? course.features.filter((f: any) => typeof f === 'string' && f.trim().length > 0)
+                                        {/* Highlights / Features */}
+                                        <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 pt-1">
+                                            {(course.features && course.features.length > 0
+                                                ? course.features
                                                 : [
                                                     'Live & Full HD Recorded Class Archive',
                                                     'Chapter-wise Lecture Sheets & Question Bank',
-                                                    'NexPilot AI 24/7 Instant Doubt Solver',
+                                                    'Dedicated WhatsApp & Q&A Doubt Solving Support',
                                                 ]
-                                            ).slice(0, 4).map((feat: string, fIdx: number) => (
+                                            ).slice(0, 3).map((feat: string, fIdx: number) => (
                                                 <div key={fIdx} className="flex items-start gap-1.5">
                                                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                                                     <span className="line-clamp-1 leading-tight">{feat}</span>
@@ -347,7 +445,7 @@ export const CoursesPage: React.FC = () => {
                                                     <span className="text-lg font-black text-emerald-600">Free</span>
                                                 ) : (
                                                     <div className="flex items-baseline gap-1.5">
-                                                        <span className="text-xl font-black text-sky-600 dark:text-sky-400">
+                                                        <span className="text-xl font-black text-[#25a2ee]">
                                                             {formatBDT(
                                                                 course.sale_price !== null && course.sale_price !== undefined && Number(course.sale_price) < Number(course.price)
                                                                     ? Number(course.sale_price)
@@ -374,7 +472,7 @@ export const CoursesPage: React.FC = () => {
                                             </Link>
                                             <Link
                                                 to={`/checkout/${course.slug}`}
-                                                className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 font-bold text-xs text-white text-center transition-all shadow-md shadow-sky-500/20 cursor-pointer"
+                                                className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25a2ee] via-sky-600 to-[#1f8ed1] hover:from-sky-600 hover:to-sky-800 font-bold text-xs text-white text-center transition-all shadow-md shadow-sky-500/20 cursor-pointer"
                                             >
                                                 Enroll Now
                                             </Link>
@@ -384,6 +482,115 @@ export const CoursesPage: React.FC = () => {
                             </div>
                         );
                     })}
+                </div>
+            )}
+
+            {/* Pagination Controls */}
+            {!loading && courses.length > 0 && (
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    {/* Left: Stats & Per-Page Selector */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        <span>
+                            Showing <strong className="text-slate-900 dark:text-white">{pagination.from || 0}</strong> to{' '}
+                            <strong className="text-slate-900 dark:text-white">{pagination.to || 0}</strong> of{' '}
+                            <strong className="text-slate-900 dark:text-white">{pagination.total}</strong> published courses
+                        </span>
+
+                        <div className="flex items-center gap-1.5 pl-3 border-l border-slate-200 dark:border-slate-800">
+                            <span className="text-slate-400">Per page:</span>
+                            <select
+                                value={perPage}
+                                onChange={(e) => handlePerPageChange(Number(e.target.value))}
+                                className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer focus:ring-2 focus:ring-[#25a2ee]"
+                            >
+                                <option value={12}>12</option>
+                                <option value={24}>24</option>
+                                <option value={48}>48</option>
+                                <option value={96}>96</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Right: Page Navigation Controls */}
+                    {pagination.last_page > 1 && (
+                        <div className="flex flex-wrap items-center gap-1 self-center md:self-auto">
+                            {/* First Page */}
+                            <button
+                                type="button"
+                                disabled={currentPage <= 1 || loading}
+                                onClick={() => handlePageChange(1)}
+                                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
+                                title="First Page"
+                            >
+                                <ChevronsLeft className="w-4 h-4" />
+                            </button>
+
+                            {/* Previous Page */}
+                            <button
+                                type="button"
+                                disabled={currentPage <= 1 || loading}
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer flex items-center gap-1"
+                                title="Previous Page"
+                            >
+                                <ChevronLeft className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Prev</span>
+                            </button>
+
+                            {/* Page Numbers */}
+                            <div className="flex items-center gap-1 mx-1">
+                                {getPageNumbers(currentPage, pagination.last_page).map((p, idx) => {
+                                    if (p === '...') {
+                                        return (
+                                            <span key={`ellipsis-${idx}`} className="px-2 text-slate-400 select-none">
+                                                ...
+                                            </span>
+                                        );
+                                    }
+                                    const pageNum = Number(p);
+                                    const isActive = pageNum === currentPage;
+                                    return (
+                                        <button
+                                            key={pageNum}
+                                            type="button"
+                                            disabled={loading}
+                                            onClick={() => handlePageChange(pageNum)}
+                                            className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg font-bold text-xs transition cursor-pointer ${
+                                                isActive
+                                                    ? 'bg-[#25a2ee] text-white shadow-xs'
+                                                    : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                            }`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Next Page */}
+                            <button
+                                type="button"
+                                disabled={currentPage >= pagination.last_page || loading}
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer flex items-center gap-1"
+                                title="Next Page"
+                            >
+                                <span className="hidden sm:inline">Next</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Last Page */}
+                            <button
+                                type="button"
+                                disabled={currentPage >= pagination.last_page || loading}
+                                onClick={() => handlePageChange(pagination.last_page)}
+                                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
+                                title="Last Page"
+                            >
+                                <ChevronsRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

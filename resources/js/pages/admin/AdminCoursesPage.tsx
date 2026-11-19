@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient, formatBDT } from '../../api/client';
 import { Course } from '../../types';
-import { 
-    Plus, 
-    Search, 
-    Edit, 
-    Layers, 
-    Trash2, 
-    BookOpen, 
-    Users, 
-    CheckCircle2, 
-    Clock, 
+import {
+    Plus,
+    Search,
+    Edit,
+    Layers,
+    Trash2,
+    BookOpen,
+    Users,
+    CheckCircle2,
+    Clock,
     ExternalLink,
     RotateCcw,
     ChevronLeft,
@@ -199,9 +199,8 @@ export const AdminCoursesPage: React.FC = () => {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className={`w-full sm:w-auto bg-slate-50 border rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold cursor-pointer ${
-                            statusFilter === 'trashed' ? 'border-rose-300 text-rose-700 bg-rose-50' : 'border-slate-200 text-slate-700'
-                        }`}
+                        className={`w-full sm:w-auto bg-slate-50 border rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold cursor-pointer ${statusFilter === 'trashed' ? 'border-rose-300 text-rose-700 bg-rose-50' : 'border-slate-200 text-slate-700'
+                            }`}
                     >
                         <option value="">All Statuses ({pagination.total})</option>
                         <option value="published">Published</option>
@@ -213,11 +212,10 @@ export const AdminCoursesPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setStatusFilter(prev => prev === 'trashed' ? '' : 'trashed')}
-                        className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
-                            statusFilter === 'trashed'
-                                ? 'bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
-                        }`}
+                        className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${statusFilter === 'trashed'
+                            ? 'bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                            }`}
                         title="Trash / Recycle Bin"
                     >
                         <Trash2 className="w-3.5 h-3.5 text-rose-500" />
@@ -499,11 +497,10 @@ export const AdminCoursesPage: React.FC = () => {
                                             type="button"
                                             disabled={loading}
                                             onClick={() => handlePageChange(pageNum)}
-                                            className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg font-bold text-xs transition cursor-pointer ${
-                                                isActive
-                                                    ? 'bg-[#25a2ee] text-white shadow-xs'
-                                                    : 'bg-white border border-slate-200 hover:bg-slate-100 text-slate-700'
-                                            }`}
+                                            className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg font-bold text-xs transition cursor-pointer ${isActive
+                                                ? 'bg-[#25a2ee] text-white shadow-xs'
+                                                : 'bg-white border border-slate-200 hover:bg-slate-100 text-slate-700'
+                                                }`}
                                         >
                                             {pageNum}
                                         </button>

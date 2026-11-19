@@ -352,9 +352,8 @@ export const StudentLiveClassRoomPage: React.FC = () => {
                                                     <div className="flex items-center justify-between gap-2">
                                                         <div className="flex items-center gap-1.5 truncate">
                                                             <span
-                                                                className={`text-xs font-bold truncate ${
-                                                                    isTeacher ? 'text-sky-700' : isMe ? 'text-indigo-700' : 'text-slate-800'
-                                                                }`}
+                                                                className={`text-xs font-bold truncate ${isTeacher ? 'text-sky-700' : isMe ? 'text-indigo-700' : 'text-slate-800'
+                                                                    }`}
                                                             >
                                                                 {c.user?.name || 'Student'}
                                                             </span>

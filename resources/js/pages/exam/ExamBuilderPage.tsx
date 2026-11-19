@@ -548,11 +548,10 @@ export const ExamBuilderPage: React.FC = () => {
                                         return (
                                             <div
                                                 key={opt.id}
-                                                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium border transition-colors ${
-                                                    isCorrect
-                                                        ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
-                                                        : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300'
-                                                }`}
+                                                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium border transition-colors ${isCorrect
+                                                    ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
+                                                    : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300'
+                                                    }`}
                                             >
                                                 {isCorrect ? (
                                                     <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -632,11 +631,10 @@ export const ExamBuilderPage: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setQuestionForm({ ...questionForm, question_type: 'single_choice', correct_answers: [questionForm.options[0]?.id || '1'] })}
-                                        className={`p-3 rounded-xl text-left border text-xs font-medium transition-all ${
-                                            questionForm.question_type === 'single_choice'
-                                                ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-500 text-sky-800 dark:text-sky-200 ring-2 ring-sky-500/20'
-                                                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
-                                        }`}
+                                        className={`p-3 rounded-xl text-left border text-xs font-medium transition-all ${questionForm.question_type === 'single_choice'
+                                            ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-500 text-sky-800 dark:text-sky-200 ring-2 ring-sky-500/20'
+                                            : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+                                            }`}
                                     >
                                         <div className="font-bold flex items-center gap-1.5">
                                             <Circle className="w-3.5 h-3.5 text-sky-500" />
@@ -648,11 +646,10 @@ export const ExamBuilderPage: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setQuestionForm({ ...questionForm, question_type: 'multiple_choice' })}
-                                        className={`p-3 rounded-xl text-left border text-xs font-medium transition-all ${
-                                            questionForm.question_type === 'multiple_choice'
-                                                ? 'bg-purple-50 dark:bg-purple-950/60 border-purple-500 text-purple-800 dark:text-purple-200 ring-2 ring-purple-500/20'
-                                                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
-                                        }`}
+                                        className={`p-3 rounded-xl text-left border text-xs font-medium transition-all ${questionForm.question_type === 'multiple_choice'
+                                            ? 'bg-purple-50 dark:bg-purple-950/60 border-purple-500 text-purple-800 dark:text-purple-200 ring-2 ring-purple-500/20'
+                                            : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+                                            }`}
                                     >
                                         <div className="font-bold flex items-center gap-1.5">
                                             <CheckSquare className="w-3.5 h-3.5 text-purple-500" />
@@ -664,11 +661,10 @@ export const ExamBuilderPage: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setQuestionForm({ ...questionForm, question_type: 'fill_in_the_blank', correct_answers: questionForm.correct_answers.length > 0 ? questionForm.correct_answers : [''] })}
-                                        className={`p-3 rounded-xl text-left border text-xs font-medium transition-all ${
-                                            questionForm.question_type === 'fill_in_the_blank'
-                                                ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-500 text-teal-800 dark:text-teal-200 ring-2 ring-teal-500/20'
-                                                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
-                                        }`}
+                                        className={`p-3 rounded-xl text-left border text-xs font-medium transition-all ${questionForm.question_type === 'fill_in_the_blank'
+                                            ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-500 text-teal-800 dark:text-teal-200 ring-2 ring-teal-500/20'
+                                            : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+                                            }`}
                                     >
                                         <div className="font-bold flex items-center gap-1.5">
                                             <Edit3 className="w-3.5 h-3.5 text-teal-600" />
@@ -680,11 +676,10 @@ export const ExamBuilderPage: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setQuestionForm({ ...questionForm, question_type: 'written_paper' })}
-                                        className={`p-3 rounded-xl text-left border text-xs font-medium transition-all ${
-                                            questionForm.question_type === 'written_paper'
-                                                ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-500 text-amber-800 dark:text-amber-200 ring-2 ring-amber-500/20'
-                                                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
-                                        }`}
+                                        className={`p-3 rounded-xl text-left border text-xs font-medium transition-all ${questionForm.question_type === 'written_paper'
+                                            ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-500 text-amber-800 dark:text-amber-200 ring-2 ring-amber-500/20'
+                                            : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+                                            }`}
                                     >
                                         <div className="font-bold flex items-center gap-1.5">
                                             <FileText className="w-3.5 h-3.5 text-amber-500" />
@@ -806,11 +801,10 @@ export const ExamBuilderPage: React.FC = () => {
                                             return (
                                                 <div
                                                     key={opt.id}
-                                                    className={`flex items-center gap-2 p-2 rounded-xl border transition-colors ${
-                                                        isChecked
-                                                            ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20'
-                                                            : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40'
-                                                    }`}
+                                                    className={`flex items-center gap-2 p-2 rounded-xl border transition-colors ${isChecked
+                                                        ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20'
+                                                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40'
+                                                        }`}
                                                 >
                                                     {/* Correct toggle */}
                                                     <button
