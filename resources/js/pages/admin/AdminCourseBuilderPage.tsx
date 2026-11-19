@@ -1500,17 +1500,6 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                                                 {/* Lesson Actions */}
                                                 <div className="flex items-center gap-1.5">
-                                                    {/* Preview Lesson in Student Player */}
-                                                    <a
-                                                        href={`/learning/${course.id}/lessons/${lesson.id}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
-                                                        title="Preview this lesson as student"
-                                                    >
-                                                        <Eye className="w-4 h-4" />
-                                                    </a>
-
                                                     {/* Reorder Lesson Up / Down */}
                                                     <button
                                                         onClick={() => moveLesson(section, lIndex, 'up')}
