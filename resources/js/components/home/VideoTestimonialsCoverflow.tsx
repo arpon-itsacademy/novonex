@@ -164,6 +164,61 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
         touchStartX.current = null;
     };
 
+    const total = items.length;
+    const getIndexAtOffset = (offset: number) => {
+        return ((activeIndex + offset) % total + total) % total;
+    };
+
+    const renderFlankerStrip = (item: VideoTestimonialItem, targetIdx: number, size: 'normal' | 'small' = 'normal') => {
+        if (!item) return null;
+        const thumb = getItemThumbnail(item);
+        const isSmall = size === 'small';
+
+        return (
+            <div
+                key={`${item.id}-${targetIdx}-${size}`}
+                onClick={() => setActiveIndex(targetIdx)}
+                className={`group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer border border-slate-700/60 dark:border-slate-800 shadow-xl hover:border-sky-400 hover:shadow-sky-500/30 transition-all duration-300 shrink-0 select-none ${
+                    isSmall
+                        ? 'hidden xl:block w-[52px] 2xl:w-[64px] h-[170px] sm:h-[230px] md:h-[260px] opacity-40 hover:opacity-85 scale-90'
+                        : 'w-[44px] xs:w-[50px] sm:w-[68px] md:w-[82px] lg:w-[92px] h-[170px] xs:h-[195px] sm:h-[260px] md:h-[305px] lg:h-[340px] opacity-80 hover:opacity-100 hover:scale-[1.03]'
+                }`}
+                title={`View ${item.name}'s review`}
+            >
+                {/* Thumbnail Image */}
+                <img
+                    src={thumb}
+                    alt={item.name}
+                    className="w-full h-full object-cover filter brightness-[0.55] group-hover:brightness-[0.75] transition-all duration-300"
+                    loading="lazy"
+                />
+
+                {/* Dark Vignette Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/85" />
+
+                {/* Play Icon Badge on Top */}
+                <div className="absolute top-2 sm:top-3 inset-x-0 flex justify-center z-10 pointer-events-none">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-black/50 border border-white/50 backdrop-blur-xs flex items-center justify-center text-white group-hover:bg-rose-600 group-hover:border-rose-400 group-hover:scale-110 transition-all">
+                        <Play className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-white text-white ml-0.5" />
+                    </div>
+                </div>
+
+                {/* Prominent Vertical Student Name (Matching the uploaded image reference) */}
+                <div className="absolute inset-0 flex items-center justify-center p-1 sm:p-2 pointer-events-none">
+                    <span
+                        className="text-white font-black text-xs sm:text-sm md:text-base tracking-wide whitespace-nowrap text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] group-hover:text-amber-300 transition-colors"
+                        style={{
+                            writingMode: 'vertical-rl',
+                            transform: 'rotate(180deg)',
+                        }}
+                    >
+                        {item.name}
+                    </span>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <section className="relative py-16 sm:py-24 bg-gradient-to-b from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-white overflow-hidden transition-colors duration-150 border-b border-slate-200 dark:border-slate-800">
             {/* Ambient Background Glows */}
@@ -206,7 +261,7 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
                                 type="button"
                                 onClick={handlePrev}
                                 aria-label="Previous Video"
-                                className="absolute left-2 sm:left-6 md:left-12 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                                className="absolute left-1 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
                             >
                                 <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                             </button>
@@ -215,154 +270,73 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
                                 type="button"
                                 onClick={handleNext}
                                 aria-label="Next Video"
-                                className="absolute right-2 sm:right-6 md:right-12 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                                className="absolute right-1 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
                             >
                                 <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
                             </button>
                         </>
                     )}
 
-                    {/* Cards Visual Layer (3D perspective container) */}
-                    <div className="relative w-full max-w-5xl h-[240px] sm:h-[340px] md:h-[400px] flex items-center justify-center overflow-visible">
-                        {items.map((item, idx) => {
-                            const total = items.length;
-                            // Calculate signed distance from active index
-                            let diff = idx - activeIndex;
-                            if (total > 2) {
-                                if (diff > total / 2) diff -= total;
-                                if (diff < -total / 2) diff += total;
-                            }
+                    {/* Cards Visual Layer (Center active card flanked by vertical name strips) */}
+                    <div className="relative w-full max-w-6xl mx-auto flex items-center justify-center gap-2 xs:gap-3 sm:gap-4 md:gap-5 px-2 overflow-visible">
+                        {/* Outer Left Flanker Strip (when 4+ items) */}
+                        {items.length >= 4 && renderFlankerStrip(items[getIndexAtOffset(-2)], getIndexAtOffset(-2), 'small')}
 
-                            const isActive = diff === 0;
-                            const isImmediateLeft = diff === -1 || (total === 2 && !isActive && activeIndex === 1);
-                            const isImmediateRight = diff === 1 || (total === 2 && !isActive && activeIndex === 0);
-                            const isFar = Math.abs(diff) > 1 && !(total === 2);
+                        {/* Immediate Left Flanker Strip */}
+                        {items.length >= 2 && renderFlankerStrip(items[getIndexAtOffset(-1)], getIndexAtOffset(-1), 'normal')}
 
-                            // Determine transform classes based on distance
-                            let transformStyle: React.CSSProperties = {
-                                transition: 'all 500ms cubic-bezier(0.25, 1, 0.5, 1)',
-                            };
+                        {/* Center Active 16:9 Video Card */}
+                        <div
+                            className="relative w-[260px] xs:w-[310px] sm:w-[460px] md:w-[540px] lg:w-[620px] aspect-video rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-slate-800 ring-4 ring-sky-500/20 cursor-pointer shrink-0 z-20 transition-all duration-300 group/center"
+                            onClick={() => handlePlayItem(activeItem)}
+                        >
+                            {/* Video Thumbnail */}
+                            <img
+                                src={getItemThumbnail(activeItem)}
+                                alt={activeItem.name}
+                                className="w-full h-full object-cover group-hover/center:scale-102 transition-transform duration-500"
+                                loading="lazy"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'https://placehold.co/640x360/0f172a/38bdf8?text=Video+Review';
+                                }}
+                            />
 
-                            let cardClasses = 'absolute aspect-video rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl cursor-pointer border ';
+                            {/* Dark Gradient Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/25 to-black/10" />
 
-                            if (isActive) {
-                                transformStyle = {
-                                    ...transformStyle,
-                                    transform: 'translateX(0%) scale(1)',
-                                    zIndex: 25,
-                                    opacity: 1,
-                                    width: 'min(90vw, 560px)',
-                                };
-                                cardClasses += 'border-slate-800/80 shadow-2xl ring-4 ring-sky-500/20';
-                            } else if (isImmediateLeft) {
-                                transformStyle = {
-                                    ...transformStyle,
-                                    transform: 'translateX(-55%) sm:translateX(-58%) md:translateX(-62%) scale(0.82)',
-                                    zIndex: 15,
-                                    opacity: 0.7,
-                                    width: 'min(90vw, 560px)',
-                                    filter: 'brightness(0.65)',
-                                };
-                                cardClasses += 'border-slate-800/40 hover:opacity-90';
-                            } else if (isImmediateRight) {
-                                transformStyle = {
-                                    ...transformStyle,
-                                    transform: 'translateX(55%) sm:translateX(58%) md:translateX(62%) scale(0.82)',
-                                    zIndex: 15,
-                                    opacity: 0.7,
-                                    width: 'min(90vw, 560px)',
-                                    filter: 'brightness(0.65)',
-                                };
-                                cardClasses += 'border-slate-800/40 hover:opacity-90';
-                            } else {
-                                transformStyle = {
-                                    ...transformStyle,
-                                    transform: `translateX(${diff > 0 ? '110%' : '-110%'}) scale(0.65)`,
-                                    zIndex: 5,
-                                    opacity: 0.2,
-                                    width: 'min(90vw, 560px)',
-                                    pointerEvents: 'none',
-                                };
-                                cardClasses += 'border-transparent hidden sm:block';
-                            }
-
-                            const thumb = getItemThumbnail(item);
-
-                            return (
-                                <div
-                                    key={item.id || idx}
-                                    style={transformStyle}
-                                    className={cardClasses}
-                                    onClick={() => {
-                                        if (isActive) {
-                                            handlePlayItem(item);
-                                        } else {
-                                            setActiveIndex(idx);
-                                        }
-                                    }}
-                                >
-                                    {/* Video Thumbnail Image */}
-                                    <img
-                                        src={thumb}
-                                        alt={item.name}
-                                        className="w-full h-full object-cover"
-                                        loading="lazy"
-                                        onError={(e) => {
-                                            const target = e.target as HTMLImageElement;
-                                            target.src = 'https://placehold.co/640x360/0f172a/38bdf8?text=Video+Review';
-                                        }}
-                                    />
-
-                                    {/* Dark Gradient Overlay for Readability */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10" />
-
-                                    {/* Central Play Button (Only prominent on active card) */}
-                                    {isActive ? (
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="group/play w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/90 text-white flex items-center justify-center shadow-2xl hover:scale-115 hover:bg-sky-500 hover:border-sky-400 transition-all duration-300">
-                                                <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-white text-white ml-1 group-hover/play:scale-110 transition-transform" />
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-xs border border-white/50 text-white flex items-center justify-center">
-                                                <Play className="w-4 h-4 fill-white text-white ml-0.5" />
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Vertical text banner on inactive flankers (matching Bondi/AFS style) */}
-                                    {!isActive && (
-                                        <div className="absolute inset-y-0 inset-x-0 flex items-center justify-center p-2 pointer-events-none">
-                                            <span className="font-extrabold text-xs sm:text-sm text-white tracking-wide uppercase line-clamp-1 bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">
-                                                {item.name}
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {/* Bottom Captions on Active Card */}
-                                    {isActive && (
-                                        <div className="absolute bottom-0 inset-x-0 p-3 sm:p-5 text-left bg-gradient-to-t from-black/95 via-black/80 to-transparent">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-400 flex items-center justify-center shrink-0">
-                                                    <User className="w-4 h-4" />
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <h3 className="text-white font-extrabold text-sm sm:text-lg line-clamp-1">
-                                                        {item.name}
-                                                    </h3>
-                                                    {item.role && (
-                                                        <p className="text-slate-300 text-xs sm:text-sm line-clamp-1 font-medium">
-                                                            {item.role}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+                            {/* Central Large Play Button */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-white/25 backdrop-blur-md border-2 border-white/90 text-white flex items-center justify-center shadow-2xl group-hover/center:scale-115 group-hover/center:bg-rose-600 group-hover/center:border-rose-400 transition-all duration-300">
+                                    <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-white text-white ml-1 group-hover/center:scale-110 transition-transform" />
                                 </div>
-                            );
-                        })}
+                            </div>
+
+                            {/* Bottom Captions on Active Card */}
+                            <div className="absolute bottom-0 inset-x-0 p-3 sm:p-5 text-left bg-gradient-to-t from-black/95 via-black/80 to-transparent">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-400 flex items-center justify-center shrink-0">
+                                        <User className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="text-white font-black text-sm sm:text-lg md:text-xl line-clamp-1 drop-shadow-md">
+                                            {activeItem.name}
+                                        </h3>
+                                        {activeItem.role && (
+                                            <p className="text-slate-300 text-xs sm:text-sm line-clamp-1 font-medium mt-0.5 drop-shadow-sm">
+                                                {activeItem.role}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Immediate Right Flanker Strip */}
+                        {items.length >= 2 && renderFlankerStrip(items[getIndexAtOffset(1)], getIndexAtOffset(1), 'normal')}
+
+                        {/* Outer Right Flanker Strip (when 4+ items) */}
+                        {items.length >= 4 && renderFlankerStrip(items[getIndexAtOffset(2)], getIndexAtOffset(2), 'small')}
                     </div>
 
                     {/* Pagination Indicator Dots */}
