@@ -102,63 +102,49 @@ export const CartDrawer: React.FC = () => {
             />
 
             {/* Slide-over panel */}
-            <div className="fixed inset-y-0 right-0 max-w-full flex pl-10 relative">
-                {/* Floating Outside Cross Button on desktop/tablets */}
-                <div className="absolute top-4 left-0 -ml-12 sm:-ml-14 flex z-20">
-                    <button
-                        type="button"
-                        onClick={closeCart}
-                        className="w-10 h-10 rounded-full bg-slate-900/85 hover:bg-slate-900 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-xl hover:scale-105 border border-white/20 group"
-                        title="Close Cart (Esc)"
-                        aria-label="Close Cart"
-                    >
-                        <X className="w-5 h-5 transition-transform group-hover:rotate-90 duration-200" />
-                    </button>
-                </div>
-
-                <div className="w-screen max-w-md bg-white dark:bg-slate-900 shadow-2xl flex flex-col justify-between border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-300 relative">
+            <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+                <div className="w-screen max-w-md bg-white dark:bg-slate-900 shadow-2xl flex flex-col justify-between border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-300">
                     {/* Header */}
-                    <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-[#25a2ee] flex items-center justify-center">
-                                <ShoppingCart className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span>Shopping Cart</span>
-                                    {cartCount > 0 && (
-                                        <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-[#25a2ee] text-white">
-                                            {cartCount}
-                                        </span>
-                                    )}
-                                </h2>
-                                <p className="text-[11px] text-slate-400">
-                                    {cartCount === 0 ? 'No courses added yet' : `${cartCount} ${cartCount === 1 ? 'course' : 'courses'} in cart`}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            {cartCount > 0 && (
-                                <button
-                                    type="button"
-                                    onClick={clearCart}
-                                    className="text-[11px] text-rose-500 hover:text-rose-600 font-semibold px-2 py-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
-                                    title="Empty Cart"
-                                >
-                                    Clear
-                                </button>
-                            )}
+                    <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                        {/* Left: Cross Icon + Title */}
+                        <div className="flex items-center gap-3 min-w-0">
+                            {/* Cross Icon on the Left side of swipe bar */}
                             <button
                                 type="button"
                                 onClick={closeCart}
-                                className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer border border-slate-200/80 dark:border-slate-700 shadow-2xs group"
+                                className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer border border-slate-200/80 dark:border-slate-700 shadow-2xs shrink-0 group"
                                 title="Close Cart (Esc)"
                                 aria-label="Close Cart"
                             >
                                 <X className="w-5 h-5 transition-transform group-hover:rotate-90 duration-200" />
                             </button>
+
+                            <div className="min-w-0">
+                                <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span>Shopping Cart</span>
+                                    {cartCount > 0 && (
+                                        <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-[#25a2ee] text-white shrink-0">
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </h2>
+                                <p className="text-[11px] text-slate-400 truncate">
+                                    {cartCount === 0 ? 'No courses added yet' : `${cartCount} ${cartCount === 1 ? 'course' : 'courses'} in cart`}
+                                </p>
+                            </div>
                         </div>
+
+                        {/* Right: Clear button */}
+                        {cartCount > 0 && (
+                            <button
+                                type="button"
+                                onClick={clearCart}
+                                className="text-xs text-rose-500 hover:text-rose-600 font-semibold px-2.5 py-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer shrink-0"
+                                title="Empty Cart"
+                            >
+                                Clear
+                            </button>
+                        )}
                     </div>
 
                     {/* Dynamic Offer Notification Banner */}
