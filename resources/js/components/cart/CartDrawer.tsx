@@ -61,17 +61,25 @@ export const CartDrawer: React.FC = () => {
         setCouponSuccessMessage(null);
     };
 
-    // Prevent body scroll when drawer is open
+    // Prevent body scroll when drawer is open and handle Escape key to close
     useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                closeCart();
+            }
+        };
+
         if (isCartOpen) {
             document.body.style.overflow = 'hidden';
+            window.addEventListener('keydown', handleKeyDown);
         } else {
             document.body.style.overflow = '';
         }
         return () => {
             document.body.style.overflow = '';
+            window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isCartOpen]);
+    }, [isCartOpen, closeCart]);
 
     if (!isCartOpen) return null;
 
@@ -94,8 +102,21 @@ export const CartDrawer: React.FC = () => {
             />
 
             {/* Slide-over panel */}
-            <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-                <div className="w-screen max-w-md bg-white dark:bg-slate-900 shadow-2xl flex flex-col justify-between border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-300">
+            <div className="fixed inset-y-0 right-0 max-w-full flex pl-10 relative">
+                {/* Floating Outside Cross Button on desktop/tablets */}
+                <div className="absolute top-4 left-0 -ml-12 sm:-ml-14 flex z-20">
+                    <button
+                        type="button"
+                        onClick={closeCart}
+                        className="w-10 h-10 rounded-full bg-slate-900/85 hover:bg-slate-900 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-xl hover:scale-105 border border-white/20 group"
+                        title="Close Cart (Esc)"
+                        aria-label="Close Cart"
+                    >
+                        <X className="w-5 h-5 transition-transform group-hover:rotate-90 duration-200" />
+                    </button>
+                </div>
+
+                <div className="w-screen max-w-md bg-white dark:bg-slate-900 shadow-2xl flex flex-col justify-between border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-300 relative">
                     {/* Header */}
                     <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
@@ -131,10 +152,11 @@ export const CartDrawer: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={closeCart}
-                                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                                title="Close"
+                                className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer border border-slate-200/80 dark:border-slate-700 shadow-2xs group"
+                                title="Close Cart (Esc)"
+                                aria-label="Close Cart"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-5 h-5 transition-transform group-hover:rotate-90 duration-200" />
                             </button>
                         </div>
                     </div>
@@ -191,17 +213,27 @@ export const CartDrawer: React.FC = () => {
                                         Explore our courses catalog and add the courses you want to prepare with.
                                     </p>
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        closeCart();
-                                        navigate('/courses');
-                                    }}
-                                    className="px-5 py-2.5 bg-[#25a2ee] hover:bg-[#1a8ed2] text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
-                                >
-                                    <BookOpen className="w-4 h-4" />
-                                    <span>Browse Courses</span>
-                                </button>
+                                <div className="flex items-center gap-2 pt-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            closeCart();
+                                            navigate('/courses');
+                                        }}
+                                        className="px-5 py-2.5 bg-[#25a2ee] hover:bg-[#1a8ed2] text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                                    >
+                                        <BookOpen className="w-4 h-4" />
+                                        <span>Browse Courses</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={closeCart}
+                                        className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+                                    >
+                                        <X className="w-3.5 h-3.5" />
+                                        <span>Close</span>
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             <div className="space-y-3.5 pb-2">
