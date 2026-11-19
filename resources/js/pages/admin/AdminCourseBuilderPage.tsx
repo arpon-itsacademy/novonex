@@ -41,9 +41,15 @@ import {
     Calendar,
     Package,
     Truck,
-    FileUp
+    FileUp,
+    Zap
 } from 'lucide-react';
 import { Modal } from '../../components/ui/Modal';
+import {
+    VideoCompressionSession,
+    CompressionPreset,
+    isWebCodecsSupported
+} from '../../utils/videoCompressor';
 
 export const AdminCourseBuilderPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -145,6 +151,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
     const [vdoUploadStatus, setVdoUploadStatus] = useState('');
     const [vdoUploadError, setVdoUploadError] = useState<string | null>(null);
     const [vdoUploadedVideoId, setVdoUploadedVideoId] = useState<string | null>(null);
+    const [vdoCompressEnabled, setVdoCompressEnabled] = useState(true);
+    const [vdoCompressPreset, setVdoCompressPreset] = useState<CompressionPreset>('target_200mb');
+    const [vdoCompressionRatio, setVdoCompressionRatio] = useState<string | null>(null);
+    const compressionSessionRef = React.useRef<VideoCompressionSession | null>(null);
 
     // Attachments upload state
     const [uploadingAttachment, setUploadingAttachment] = useState(false);
@@ -668,6 +678,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
         setVdoUploadStatus('');
         setVdoUploadError(null);
         setVdoUploadedVideoId(null);
+        setVdoCompressionRatio(null);
         setLessonModalOpen(true);
     };
 
@@ -695,6 +706,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
         setVdoUploadStatus('');
         setVdoUploadError(null);
         setVdoUploadedVideoId(isVdo && rawUrl ? rawUrl : null);
+        setVdoCompressionRatio(null);
         setLessonModalOpen(true);
     };
 
@@ -707,6 +719,49 @@ export const AdminCourseBuilderPage: React.FC = () => {
         setVdoUploading(true);
         setVdoUploadProgress(0);
         setVdoUploadError(null);
+        setVdoCompressionRatio(null);
+
+        let fileToUpload: File | Blob = vdoSelectedFile;
+
+        // Step 1: Compress locally if enabled and WebCodecs is supported
+        if (vdoCompressEnabled && vdoCompressPreset !== 'original' && isWebCodecsSupported()) {
+            try {
+                setVdoUploadStatus('Optimizing and compressing video locally (Target ~200 MB)...');
+                const session = new VideoCompressionSession();
+                compressionSessionRef.current = session;
+
+                const result = await session.compress(
+                    vdoSelectedFile,
+                    vdoCompressPreset,
+                    (percent) => {
+                        setVdoUploadProgress(percent);
+                        setVdoUploadStatus(`Compressing video with GPU: ${percent}%`);
+                    }
+                );
+
+                if (result.wasCompressed && result.file) {
+                    fileToUpload = result.file;
+                    const origMb = (result.originalSize / (1024 * 1024)).toFixed(1);
+                    const compMb = (result.compressedSize / (1024 * 1024)).toFixed(1);
+                    setVdoCompressionRatio(`${origMb} MB → ${compMb} MB (${result.savedPercentage}% saved)`);
+                }
+            } catch (compressErr: any) {
+                console.warn('Compression warning/fallback:', compressErr);
+                if (compressErr.message?.includes('cancelled')) {
+                    setVdoUploading(false);
+                    setVdoUploadStatus('');
+                    return;
+                }
+                // Fallback to original file
+                fileToUpload = vdoSelectedFile;
+                setVdoUploadStatus('Compression bypassed. Proceeding with direct upload...');
+            } finally {
+                compressionSessionRef.current = null;
+            }
+        }
+
+        // Step 2: Request VdoCipher upload credentials
+        setVdoUploadProgress(0);
         setVdoUploadStatus('Requesting secure VdoCipher upload link...');
 
         try {
@@ -720,7 +775,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                 throw new Error('Failed to obtain upload link from VdoCipher.');
             }
 
-            setVdoUploadStatus('Uploading video directly to VdoCipher cloud storage...');
+            const uploadSizeMb = (fileToUpload.size / (1024 * 1024)).toFixed(1);
+            setVdoUploadStatus(`Uploading to VdoCipher cloud (${uploadSizeMb} MB)...`);
 
             const formData = new FormData();
             Object.keys(clientPayload).forEach((key) => {
@@ -728,7 +784,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     formData.append(key, clientPayload[key]);
                 }
             });
-            formData.append('file', vdoSelectedFile);
+            formData.append('file', fileToUpload, vdoSelectedFile.name.replace(/\.[^/.]+$/, '') + '.mp4');
 
             await new Promise<void>((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
@@ -740,7 +796,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         setVdoUploadProgress(percent);
                         const loadedMb = (e.loaded / (1024 * 1024)).toFixed(1);
                         const totalMb = (e.total / (1024 * 1024)).toFixed(1);
-                        setVdoUploadStatus(`Uploading: ${percent}% (${loadedMb} MB / ${totalMb} MB)`);
+                        setVdoUploadStatus(`Uploading to VdoCipher: ${percent}% (${loadedMb} MB / ${totalMb} MB)`);
                     }
                 };
 
@@ -772,6 +828,15 @@ export const AdminCourseBuilderPage: React.FC = () => {
         } finally {
             setVdoUploading(false);
         }
+    };
+
+    const handleCancelVdoUpload = () => {
+        if (compressionSessionRef.current) {
+            compressionSessionRef.current.cancel();
+        }
+        setVdoUploading(false);
+        setVdoUploadStatus('');
+        setVdoUploadError('Upload / compression was cancelled.');
     };
 
     const extractVdoCipherId = (input: string): string => {
@@ -3217,33 +3282,137 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                         </div>
 
                                         {vdoSelectedFile && (
-                                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
-                                                <div className="min-w-0 pr-3">
-                                                    <p className="text-xs font-bold text-slate-800 truncate">
-                                                        {vdoSelectedFile.name}
-                                                    </p>
-                                                    <p className="text-[11px] text-slate-500">
-                                                        {(vdoSelectedFile.size / (1024 * 1024)).toFixed(2)} MB
-                                                    </p>
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={handleUploadToVdoCipher}
-                                                    disabled={vdoUploading}
-                                                    className="shrink-0 px-4 py-2 bg-[#25a2ee] hover:bg-[#1f8ed1] text-white text-xs font-bold rounded-lg shadow-xs flex items-center gap-1.5 transition disabled:opacity-50"
-                                                >
-                                                    {vdoUploading ? (
-                                                        <>
-                                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                                            Uploading...
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Upload className="w-3.5 h-3.5" />
-                                                            Upload Now
-                                                        </>
+                                            <div className="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                                                {/* File Info */}
+                                                <div className="flex items-center justify-between">
+                                                    <div className="min-w-0 pr-3">
+                                                        <p className="text-xs font-bold text-slate-800 truncate flex items-center gap-1.5">
+                                                            <Video className="w-4 h-4 text-sky-500 shrink-0" />
+                                                            <span>{vdoSelectedFile.name}</span>
+                                                        </p>
+                                                        <div className="flex items-center gap-2 mt-0.5">
+                                                            <span className="text-[11px] font-semibold text-slate-500">
+                                                                Raw Size: {(vdoSelectedFile.size / (1024 * 1024)).toFixed(1)} MB
+                                                                {vdoSelectedFile.size > 1024 * 1024 * 1024 ? ` (${(vdoSelectedFile.size / (1024 * 1024 * 1024)).toFixed(2)} GB)` : ''}
+                                                            </span>
+                                                            {vdoSelectedFile.size > 200 * 1024 * 1024 && (
+                                                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+                                                                    Large File • Auto-Compress Active
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {!vdoUploading && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleUploadToVdoCipher}
+                                                            className="shrink-0 px-4 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-600/20 flex items-center gap-2 transition cursor-pointer"
+                                                        >
+                                                            <Sparkles className="w-4 h-4 text-amber-300" />
+                                                            <span>{vdoCompressEnabled ? 'Compress & Upload' : 'Upload Direct'}</span>
+                                                        </button>
                                                     )}
-                                                </button>
+
+                                                    {vdoUploading && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleCancelVdoUpload}
+                                                            className="shrink-0 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition cursor-pointer"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                {/* Compression Config Options */}
+                                                {!vdoUploading && (
+                                                    <div className="pt-2 border-t border-slate-200 space-y-2">
+                                                        <div className="flex items-center justify-between">
+                                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={vdoCompressEnabled}
+                                                                    onChange={(e) => setVdoCompressEnabled(e.target.checked)}
+                                                                    className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300"
+                                                                />
+                                                                <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                                                    <Zap className="w-3.5 h-3.5 text-amber-500" />
+                                                                    Smart Hardware Compression (Pre-Upload)
+                                                                </span>
+                                                            </label>
+                                                            <span className="text-[10px] text-slate-400 font-medium">
+                                                                GPU Accelerated
+                                                            </span>
+                                                        </div>
+
+                                                        {vdoCompressEnabled && (
+                                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setVdoCompressPreset('target_200mb')}
+                                                                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${vdoCompressPreset === 'target_200mb'
+                                                                        ? 'bg-sky-50 border-sky-500 text-sky-900 ring-2 ring-sky-500/20'
+                                                                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                                                                    }`}
+                                                                >
+                                                                    <div className="text-[11px] font-black flex items-center justify-between">
+                                                                        <span>Target ≤ 200 MB</span>
+                                                                        <span className="text-[9px] px-1 py-0.2 bg-emerald-100 text-emerald-800 rounded font-bold">Recommended</span>
+                                                                    </div>
+                                                                    <p className="text-[10px] text-slate-500 mt-1 leading-tight">
+                                                                        Compresses 2-3 GB down to ~190 MB. Crisp text for lecture slides.
+                                                                    </p>
+                                                                </button>
+
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setVdoCompressPreset('720p')}
+                                                                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${vdoCompressPreset === '720p'
+                                                                        ? 'bg-sky-50 border-sky-500 text-sky-900 ring-2 ring-sky-500/20'
+                                                                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                                                                    }`}
+                                                                >
+                                                                    <div className="text-[11px] font-black">
+                                                                        <span>720p HD Standard</span>
+                                                                    </div>
+                                                                    <p className="text-[10px] text-slate-500 mt-1 leading-tight">
+                                                                        Balanced 720p 30fps (~250-350 MB per hour).
+                                                                    </p>
+                                                                </button>
+
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setVdoCompressPreset('1080p')}
+                                                                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${vdoCompressPreset === '1080p'
+                                                                        ? 'bg-sky-50 border-sky-500 text-sky-900 ring-2 ring-sky-500/20'
+                                                                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                                                                    }`}
+                                                                >
+                                                                    <div className="text-[11px] font-black">
+                                                                        <span>1080p Full HD</span>
+                                                                    </div>
+                                                                    <p className="text-[10px] text-slate-500 mt-1 leading-tight">
+                                                                        Preserves 1080p resolution (~400-600 MB per hour).
+                                                                    </p>
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Compression Result Banner */}
+                                                {vdoCompressionRatio && (
+                                                    <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center justify-between">
+                                                        <span className="font-bold flex items-center gap-1.5">
+                                                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                                                            Local Compression Complete:
+                                                        </span>
+                                                        <span className="font-extrabold px-2 py-0.5 bg-emerald-100 rounded-md">
+                                                            {vdoCompressionRatio}
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
 

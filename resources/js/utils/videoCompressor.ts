@@ -22,7 +22,7 @@ export interface CompressVideoResult {
     wasCompressed: boolean;
 }
 
-export type CompressionPreset = '720p' | '1080p' | 'original';
+export type CompressionPreset = 'target_200mb' | '720p' | '1080p' | 'original';
 
 export const isWebCodecsSupported = (): boolean => {
     return (
@@ -38,7 +38,7 @@ export class VideoCompressionSession {
 
     public async compress(
         file: File,
-        preset: CompressionPreset = '720p',
+        preset: CompressionPreset = 'target_200mb',
         onProgress?: CompressProgressCallback
     ): Promise<CompressVideoResult> {
         this.isCanceled = false;
@@ -60,7 +60,7 @@ export class VideoCompressionSession {
             formats: ALL_FORMATS
         });
 
-        // Try getting duration for progress calculation
+        // Try getting duration for progress and bitrate calculation
         let duration = 0;
         try {
             duration = (await input.getDurationFromMetadata()) || 0;
@@ -71,26 +71,61 @@ export class VideoCompressionSession {
             target: new BufferTarget()
         });
 
-        const targetHeight = preset === '720p' ? 720 : 1080;
-        const qualityLevel = preset === '720p' ? 'medium' : 'high';
+        let targetHeight = 720;
+        let qualityObj: Quality;
+
+        if (preset === 'target_200mb') {
+            targetHeight = 720;
+            // Target: under 200 MB (195 MB target with safety buffer)
+            const targetBytes = 195 * 1024 * 1024;
+            const targetBits = targetBytes * 8;
+
+            let calculatedVideoBitrate = 450_000; // default ~450 kbps if duration unknown (~200MB/hr)
+            if (duration && duration > 0) {
+                const totalBitrate = targetBits / duration;
+                // Reserve 64 kbps for AAC audio
+                calculatedVideoBitrate = Math.max(220_000, Math.floor(totalBitrate - 64_000));
+                // Cap at 1.8 Mbps if the video is short (e.g. 10 mins) so it doesn't inflate
+                calculatedVideoBitrate = Math.min(1_800_000, calculatedVideoBitrate);
+            }
+
+            qualityObj = new Quality({
+                bitrate: calculatedVideoBitrate,
+                bitrateMode: 'variable'
+            });
+        } else if (preset === '720p') {
+            targetHeight = 720;
+            qualityObj = new Quality({
+                bitrate: 750_000,
+                bitrateMode: 'variable'
+            });
+        } else if (preset === '1080p') {
+            targetHeight = 1080;
+            qualityObj = new Quality({
+                bitrate: 1_500_000,
+                bitrateMode: 'variable'
+            });
+        } else {
+            qualityObj = new Quality('medium');
+        }
 
         // Check video track to avoid upscaling
         const videoOptions: any = {
             codec: 'avc',
-            quality: new Quality(qualityLevel),
+            quality: qualityObj,
+            height: targetHeight,
+            frameRate: 30, // 30 fps cap eliminates bloated 60fps files
             fit: 'contain'
         };
 
         try {
             const videoTrack = await input.getPrimaryVideoTrack();
             if (videoTrack) {
-                const origHeight = videoTrack.codedHeight || 1080;
+                const origHeight = videoTrack.codedHeight || targetHeight;
                 // Only downscale, never upscale
-                if (origHeight > targetHeight) {
-                    videoOptions.height = targetHeight;
+                if (origHeight < targetHeight) {
+                    videoOptions.height = origHeight;
                 }
-            } else {
-                videoOptions.height = targetHeight;
             }
         } catch (_) {
             videoOptions.height = targetHeight;
@@ -102,7 +137,8 @@ export class VideoCompressionSession {
             const audioTracks = await input.getAudioTracks();
             if (audioTracks && audioTracks.length > 0) {
                 audioOptions = {
-                    codec: 'aac'
+                    codec: 'aac',
+                    quality: new Quality(64_000) // 64 kbps AAC speech-optimized
                 };
             }
         } catch (_) {}
