@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient, formatBDT } from '../../api/client';
 import { CourseBundle } from '../../types';
-import { 
-    Boxes, 
-    Plus, 
-    Search, 
-    Wrench, 
-    Edit, 
-    Trash2, 
-    BookOpen, 
+import {
+    Boxes,
+    Plus,
+    Search,
+    Wrench,
+    Edit,
+    Trash2,
+    BookOpen,
     Percent,
     RotateCcw
 } from 'lucide-react';
@@ -125,9 +125,8 @@ export const AdminBundlesPage: React.FC = () => {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className={`w-full sm:w-auto bg-slate-50 border rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold ${
-                            statusFilter === 'trashed' ? 'border-rose-300 text-rose-700 bg-rose-50' : 'border-slate-200 text-slate-700'
-                        }`}
+                        className={`w-full sm:w-auto bg-slate-50 border rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold ${statusFilter === 'trashed' ? 'border-rose-300 text-rose-700 bg-rose-50' : 'border-slate-200 text-slate-700'
+                            }`}
                     >
                         <option value="">All Statuses</option>
                         <option value="published">Published</option>
@@ -138,11 +137,10 @@ export const AdminBundlesPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setStatusFilter(prev => prev === 'trashed' ? '' : 'trashed')}
-                        className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
-                            statusFilter === 'trashed'
-                                ? 'bg-rose-100 text-rose-800 border border-rose-300'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
-                        }`}
+                        className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${statusFilter === 'trashed'
+                            ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                            }`}
                         title="Trash / Recycle Bin"
                     >
                         <Trash2 className="w-3.5 h-3.5 text-rose-500" />
@@ -202,10 +200,10 @@ export const AdminBundlesPage: React.FC = () => {
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-14 h-10 rounded-lg bg-slate-900 overflow-hidden shrink-0">
                                                         {bundle.thumbnail ? (
-                                                            <img 
-                                                                src={bundle.thumbnail} 
-                                                                alt={bundle.title} 
-                                                                className="w-full h-full object-cover" 
+                                                            <img
+                                                                src={bundle.thumbnail}
+                                                                alt={bundle.title}
+                                                                className="w-full h-full object-cover"
                                                             />
                                                         ) : (
                                                             <div className="w-full h-full flex items-center justify-center text-white bg-slate-800">

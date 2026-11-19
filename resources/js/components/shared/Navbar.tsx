@@ -95,6 +95,7 @@ export const Navbar: React.FC = () => {
     const location = useLocation();
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [openMobileSubmenuIds, setOpenMobileSubmenuIds] = useState<Record<string, boolean>>({});
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
     const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
     const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -103,6 +104,13 @@ export const Navbar: React.FC = () => {
     const [notifications, setNotifications] = useState<any[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+
+    const toggleMobileSubmenu = (itemId: string) => {
+        setOpenMobileSubmenuIds(prev => ({
+            ...prev,
+            [itemId]: !prev[itemId]
+        }));
+    };
 
     const headerSettings = settings?.header_settings;
     const logoUrl = headerSettings?.logo_url ?? settings?.logo_url;
@@ -149,6 +157,7 @@ export const Navbar: React.FC = () => {
         setUserDropdownOpen(false);
         setSearchModalOpen(false);
         setNotifDropdownOpen(false);
+        setOpenMobileSubmenuIds({});
     }, [location.pathname]);
 
     useEffect(() => {
@@ -541,7 +550,12 @@ export const Navbar: React.FC = () => {
                         {/* Mobile Hamburger Button */}
                         <button
                             type="button"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            onClick={() => {
+                                setMobileMenuOpen(!mobileMenuOpen);
+                                if (mobileMenuOpen) {
+                                    setOpenMobileSubmenuIds({});
+                                }
+                            }}
                             className="lg:hidden p-2 text-slate-700 dark:text-slate-200 hover:text-[#25a2ee] rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                         >
                             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -555,10 +569,29 @@ export const Navbar: React.FC = () => {
                         {menuItems.map((item) => {
                             const itemLabel = getLocalizedText(item.label, item.label_en, language) || item.label;
                             const hasChildren = Boolean(item.children && item.children.length > 0);
+                            const isSubmenuOpen = Boolean(openMobileSubmenuIds[item.id]);
 
                             return (
                                 <div key={item.id} className="space-y-1">
-                                    {item.is_external || item.url.startsWith('http') ? (
+                                    {hasChildren ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleMobileSubmenu(item.id)}
+                                            className="w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-[#25a2ee] transition-colors cursor-pointer text-left"
+                                        >
+                                            <span className="flex items-center gap-2">
+                                                <span>{itemLabel}</span>
+                                                {item.highlight && (
+                                                    <span className="text-[10px] border border-[#25a2ee] text-[#25a2ee] px-2 py-0.5 rounded-full font-bold">PRO</span>
+                                                )}
+                                            </span>
+                                            <ChevronDown
+                                                className={`w-4 h-4 text-slate-400 dark:text-slate-500 transition-transform duration-200 ${
+                                                    isSubmenuOpen ? 'rotate-180 text-[#25a2ee]' : ''
+                                                }`}
+                                            />
+                                        </button>
+                                    ) : item.is_external || item.url.startsWith('http') ? (
                                         <a
                                             href={item.url}
                                             target="_blank"
@@ -582,9 +615,9 @@ export const Navbar: React.FC = () => {
                                         </Link>
                                     )}
 
-                                    {/* Sub-items if any */}
-                                    {hasChildren && (
-                                        <div className="pl-4 space-y-1 border-l-2 border-slate-100 dark:border-slate-800 ml-3 my-1">
+                                    {/* Sub-items if any (Only rendered when user clicks to open) */}
+                                    {hasChildren && isSubmenuOpen && (
+                                        <div className="pl-4 space-y-1 border-l-2 border-[#25a2ee]/40 dark:border-[#25a2ee]/40 ml-3 my-1 animate-in slide-in-from-top-1 fade-in duration-200">
                                             {item.children!.map((sub) => {
                                                 const subLabel = getLocalizedText(sub.label, sub.label_en, language) || sub.label;
                                                 return sub.is_external || sub.url.startsWith('http') ? (

@@ -115,33 +115,30 @@ export const StudentLiveClassesPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setFilterTab('all')}
-                        className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                            filterTab === 'all'
-                                ? 'bg-white text-slate-800 shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
-                        }`}
+                        className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${filterTab === 'all'
+                            ? 'bg-white text-slate-800 shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                            }`}
                     >
                         All ({liveClasses.length})
                     </button>
                     <button
                         type="button"
                         onClick={() => setFilterTab('live_upcoming')}
-                        className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                            filterTab === 'live_upcoming'
-                                ? 'bg-white text-slate-800 shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
-                        }`}
+                        className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${filterTab === 'live_upcoming'
+                            ? 'bg-white text-slate-800 shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                            }`}
                     >
                         Live & Upcoming
                     </button>
                     <button
                         type="button"
                         onClick={() => setFilterTab('completed')}
-                        className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                            filterTab === 'completed'
-                                ? 'bg-white text-slate-800 shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
-                        }`}
+                        className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${filterTab === 'completed'
+                            ? 'bg-white text-slate-800 shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                            }`}
                     >
                         Completed (Recorded)
                     </button>
@@ -196,11 +193,10 @@ export const StudentLiveClassesPage: React.FC = () => {
                         return (
                             <div
                                 key={item.id}
-                                className={`rounded-3xl border bg-white p-5 flex flex-col justify-between shadow-xs transition-all hover:shadow-md ${
-                                    isLive
-                                        ? 'border-rose-300 ring-2 ring-rose-500/20'
-                                        : 'border-slate-200/80 hover:border-sky-300'
-                                }`}
+                                className={`rounded-3xl border bg-white p-5 flex flex-col justify-between shadow-xs transition-all hover:shadow-md ${isLive
+                                    ? 'border-rose-300 ring-2 ring-rose-500/20'
+                                    : 'border-slate-200/80 hover:border-sky-300'
+                                    }`}
                             >
                                 <div className="space-y-3.5">
                                     {/* Top Course Badge & Status */}
@@ -210,7 +206,7 @@ export const StudentLiveClassesPage: React.FC = () => {
                                         </span>
 
                                         {isLive ? (
-                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-xs animate-pulse">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-xs animate-pulse">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-white" />
                                                 <span>LIVE</span>
                                             </span>
@@ -258,11 +254,10 @@ export const StudentLiveClassesPage: React.FC = () => {
                                 <div className="pt-4">
                                     <Link
                                         to={`/student/live-classes/${item.id}`}
-                                        className={`w-full py-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs ${
-                                            isLive
-                                                ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 shadow-rose-600/25'
-                                                : 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white hover:from-sky-700 hover:to-indigo-700 shadow-sky-600/20'
-                                        }`}
+                                        className={`w-full py-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs ${isLive
+                                            ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 shadow-rose-600/25'
+                                            : 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white hover:from-sky-700 hover:to-indigo-700 shadow-sky-600/20'
+                                            }`}
                                     >
                                         <Play className="w-3.5 h-3.5 fill-white" />
                                         <span>{isLive ? 'Join Live Class Now' : 'Enter Class Room'}</span>

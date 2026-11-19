@@ -219,11 +219,10 @@ export const AdminAffiliateMembersPage: React.FC = () => {
             {/* Alert Message */}
             {alertMessage && (
                 <div
-                    className={`p-4 rounded-xl flex items-center justify-between transition-all ${
-                        alertMessage.type === 'success'
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                            : 'bg-red-50 text-red-800 border border-red-200'
-                    }`}
+                    className={`p-4 rounded-xl flex items-center justify-between transition-all ${alertMessage.type === 'success'
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                        : 'bg-red-50 text-red-800 border border-red-200'
+                        }`}
                 >
                     <div className="flex items-center gap-2">
                         {alertMessage.type === 'success' ? (
@@ -243,33 +242,30 @@ export const AdminAffiliateMembersPage: React.FC = () => {
             <div className="flex border-b border-gray-200 bg-white rounded-t-xl px-4 pt-3 gap-6 shadow-xs">
                 <button
                     onClick={() => setActiveTab('members')}
-                    className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
-                        activeTab === 'members'
-                            ? 'border-indigo-600 text-indigo-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-800'
-                    }`}
+                    className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${activeTab === 'members'
+                        ? 'border-indigo-600 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-800'
+                        }`}
                 >
                     <Users className="h-4 w-4" />
                     Affiliate Members
                 </button>
                 <button
                     onClick={() => setActiveTab('commissions')}
-                    className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
-                        activeTab === 'commissions'
-                            ? 'border-indigo-600 text-indigo-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-800'
-                    }`}
+                    className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${activeTab === 'commissions'
+                        ? 'border-indigo-600 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-800'
+                        }`}
                 >
                     <TrendingUp className="h-4 w-4" />
                     Commission History
                 </button>
                 <button
                     onClick={() => setActiveTab('payouts')}
-                    className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
-                        activeTab === 'payouts'
-                            ? 'border-indigo-600 text-indigo-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-800'
-                    }`}
+                    className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${activeTab === 'payouts'
+                        ? 'border-indigo-600 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-800'
+                        }`}
                 >
                     <CreditCard className="h-4 w-4" />
                     Withdrawal / Payout Requests
@@ -387,11 +383,10 @@ export const AdminAffiliateMembersPage: React.FC = () => {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span
-                                                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
-                                                            aff.status === 'active'
-                                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                                : 'bg-red-50 text-red-700 border border-red-200'
-                                                        }`}
+                                                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${aff.status === 'active'
+                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                            : 'bg-red-50 text-red-700 border border-red-200'
+                                                            }`}
                                                     >
                                                         {aff.status === 'active' ? 'Active' : 'Suspended'}
                                                     </span>
@@ -500,13 +495,12 @@ export const AdminAffiliateMembersPage: React.FC = () => {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span
-                                                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
-                                                            comm.status === 'approved'
-                                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                                : comm.status === 'pending'
+                                                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${comm.status === 'approved'
+                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                            : comm.status === 'pending'
                                                                 ? 'bg-amber-50 text-amber-700 border border-amber-200'
                                                                 : 'bg-red-50 text-red-700 border border-red-200'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {comm.status === 'approved' ? 'Approved' : comm.status === 'pending' ? 'Pending' : 'Cancelled'}
                                                     </span>
@@ -604,13 +598,12 @@ export const AdminAffiliateMembersPage: React.FC = () => {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span
-                                                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
-                                                            p.status === 'approved'
-                                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                                : p.status === 'pending'
+                                                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${p.status === 'approved'
+                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                            : p.status === 'pending'
                                                                 ? 'bg-amber-50 text-amber-700 border border-amber-200'
                                                                 : 'bg-red-50 text-red-700 border border-red-200'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {p.status === 'approved' ? 'Paid' : p.status === 'pending' ? 'Pending' : 'Cancelled'}
                                                     </span>
@@ -693,11 +686,10 @@ export const AdminAffiliateMembersPage: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setPayoutActionForm({ ...payoutActionForm, status: 'approved' })}
-                                        className={`py-2 px-3 rounded-lg text-xs font-bold border transition-colors flex items-center justify-center gap-1.5 ${
-                                            payoutActionForm.status === 'approved'
-                                                ? 'bg-emerald-600 text-white border-emerald-600'
-                                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                                        }`}
+                                        className={`py-2 px-3 rounded-lg text-xs font-bold border transition-colors flex items-center justify-center gap-1.5 ${payoutActionForm.status === 'approved'
+                                            ? 'bg-emerald-600 text-white border-emerald-600'
+                                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                            }`}
                                     >
                                         <CheckCircle2 className="h-4 w-4" />
                                         Approve (Paid)
@@ -705,11 +697,10 @@ export const AdminAffiliateMembersPage: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setPayoutActionForm({ ...payoutActionForm, status: 'rejected' })}
-                                        className={`py-2 px-3 rounded-lg text-xs font-bold border transition-colors flex items-center justify-center gap-1.5 ${
-                                            payoutActionForm.status === 'rejected'
-                                                ? 'bg-red-600 text-white border-red-600'
-                                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                                        }`}
+                                        className={`py-2 px-3 rounded-lg text-xs font-bold border transition-colors flex items-center justify-center gap-1.5 ${payoutActionForm.status === 'rejected'
+                                            ? 'bg-red-600 text-white border-red-600'
+                                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                            }`}
                                     >
                                         <XCircle className="h-4 w-4" />
                                         Reject (Refund)

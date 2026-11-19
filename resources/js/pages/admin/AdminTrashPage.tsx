@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient, formatBDT } from '../../api/client';
-import { 
-    Trash2, 
-    RotateCcw, 
-    BookOpen, 
-    Boxes, 
-    ClipboardList, 
-    TicketPercent, 
-    Search, 
-    AlertTriangle, 
+import {
+    Trash2,
+    RotateCcw,
+    BookOpen,
+    Boxes,
+    ClipboardList,
+    TicketPercent,
+    Search,
+    AlertTriangle,
     Loader2,
     Calendar,
     ArrowLeft
@@ -138,11 +138,10 @@ export const AdminTrashPage: React.FC = () => {
                                 setActiveTab(tab.id);
                                 setSearch('');
                             }}
-                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
-                                isActive
-                                    ? 'bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 shadow-xs'
-                                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
-                            }`}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${isActive
+                                ? 'bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 shadow-xs'
+                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
+                                }`}
                         >
                             <Icon className={`w-4 h-4 ${isActive ? 'text-rose-600' : 'text-slate-400'}`} />
                             <span>{tab.label}</span>

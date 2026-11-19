@@ -187,11 +187,10 @@ export const ExamListPage: React.FC = () => {
                     <select
                         value={statusFilter}
                         onChange={e => setStatusFilter(e.target.value)}
-                        className={`px-3 py-2 rounded-xl border bg-slate-50 dark:bg-slate-800/60 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 ${
-                            statusFilter === 'trashed'
-                                ? 'border-rose-400 text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60'
-                                : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white'
-                        }`}
+                        className={`px-3 py-2 rounded-xl border bg-slate-50 dark:bg-slate-800/60 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 ${statusFilter === 'trashed'
+                            ? 'border-rose-400 text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60'
+                            : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white'
+                            }`}
                     >
                         <option value="">All Statuses</option>
                         <option value="published">Published</option>
@@ -203,11 +202,10 @@ export const ExamListPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setStatusFilter(prev => prev === 'trashed' ? '' : 'trashed')}
-                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
-                            statusFilter === 'trashed'
-                                ? 'bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-200'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
-                        }`}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${statusFilter === 'trashed'
+                            ? 'bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-200'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
+                            }`}
                         title="Trash / Recycle Bin"
                     >
                         <Trash2 className="w-3.5 h-3.5 text-rose-500" />
