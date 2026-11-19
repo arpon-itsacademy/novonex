@@ -45,7 +45,7 @@ export const AdminVdoCipherSettingsPage: React.FC = () => {
     const fetchSettings = async () => {
         try {
             setLoading(true);
-            const { data } = await apiClient.get('/settings/vdocipher');
+            const { data } = await apiClient.get('/admin/settings/vdocipher');
             if (data?.settings) {
                 setSettings({
                     enabled: data.settings.enabled ?? true,
@@ -69,7 +69,7 @@ export const AdminVdoCipherSettingsPage: React.FC = () => {
         setErrorMessage(null);
 
         try {
-            const { data } = await apiClient.put('/settings/vdocipher', settings);
+            const { data } = await apiClient.put('/admin/settings/vdocipher', settings);
             setSuccessMessage(data.message || 'VdoCipher configuration saved successfully.');
             if (data?.settings) {
                 setSettings({
@@ -99,7 +99,7 @@ export const AdminVdoCipherSettingsPage: React.FC = () => {
         setErrorMessage(null);
 
         try {
-            const { data } = await apiClient.post('/settings/vdocipher/test-connection', {
+            const { data } = await apiClient.post('/admin/settings/vdocipher/test-connection', {
                 api_secret_key: settings.api_secret_key,
             });
             setTestResult({

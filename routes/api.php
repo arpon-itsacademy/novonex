@@ -232,6 +232,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('{course}/routine/items/{routine}', [RoutineController::class, 'deleteRoutineItem']);
     });
 
+    // Direct VdoCipher upload credentials for Course Builder (admin & teacher)
+    Route::post('vdocipher/upload-credentials', [VdoCipherController::class, 'getUploadCredentials']);
+    Route::post('admin/vdocipher/upload-credentials', [VdoCipherController::class, 'getUploadCredentials']);
+
+    // VdoCipher settings aliases (both /api/settings/vdocipher and /api/admin/settings/vdocipher)
+    Route::prefix('settings/vdocipher')->middleware('role:admin')->group(function () {
+        Route::get('/', [VdoCipherController::class, 'getSettings']);
+        Route::put('/', [VdoCipherController::class, 'updateSettings']);
+        Route::post('test-connection', [VdoCipherController::class, 'testConnection']);
+    });
+
     // Teacher Specific Routes
     Route::prefix('teacher')->middleware('role:teacher,admin')->group(function () {
         Route::get('my-courses', function (Request $request) {

@@ -3,27 +3,27 @@ import { useParams, Link } from 'react-router-dom';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Course, CourseSection, Lesson, LessonAttachment } from '../../types';
-import { 
-    ArrowLeft, 
-    Plus, 
-    Layers, 
-    PlayCircle, 
-    FileText, 
-    Trash2, 
-    Edit, 
-    Copy, 
-    ChevronUp, 
-    ChevronDown, 
-    Upload, 
-    Paperclip, 
-    Download, 
-    Sparkles, 
-    Lock, 
-    Eye, 
-    Save, 
-    Check, 
-    ShieldCheck, 
-    Globe, 
+import {
+    ArrowLeft,
+    Plus,
+    Layers,
+    PlayCircle,
+    FileText,
+    Trash2,
+    Edit,
+    Copy,
+    ChevronUp,
+    ChevronDown,
+    Upload,
+    Paperclip,
+    Download,
+    Sparkles,
+    Lock,
+    Eye,
+    Save,
+    Check,
+    ShieldCheck,
+    Globe,
     Video,
     ClipboardList,
     Clock,
@@ -627,7 +627,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
         try {
             await apiClient.delete(`/builder/sections/${sectionId}`);
             setSections(prev => prev.filter(s => s.id !== sectionId));
-        } catch {}
+        } catch { }
     };
 
     const moveSection = async (index: number, direction: 'up' | 'down') => {
@@ -645,7 +645,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             await apiClient.post(`/builder/${id}/sections/reorder`, {
                 section_ids: updated.map(s => s.id),
             });
-        } catch {}
+        } catch { }
     };
 
     /* Lesson Actions */
@@ -676,10 +676,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
         setLessonTitle(lesson.title);
         setLessonContent(lesson.content || '');
         const rawUrl = lesson.video_url || '';
-        const isVdo = lesson.video_provider === 'vdocipher' || 
-                      rawUrl.includes('vdocipher') || 
-                      rawUrl.includes('[vdo') || 
-                      /^[a-f0-9]{32}$/i.test(rawUrl.trim());
+        const isVdo = lesson.video_provider === 'vdocipher' ||
+            rawUrl.includes('vdocipher') ||
+            rawUrl.includes('[vdo') ||
+            /^[a-f0-9]{32}$/i.test(rawUrl.trim());
         setLessonVideoProvider(isVdo ? 'vdocipher' : 'youtube');
         setLessonVideoUrl(rawUrl);
         setLessonDuration(String(lesson.duration_minutes || '0'));
@@ -803,14 +803,14 @@ export const AdminCourseBuilderPage: React.FC = () => {
         try {
             await apiClient.delete(`/builder/lessons/${lessonId}`);
             fetchCurriculum();
-        } catch {}
+        } catch { }
     };
 
     const handleDuplicateLesson = async (lessonId: number) => {
         try {
             await apiClient.post(`/builder/lessons/${lessonId}/duplicate`);
             fetchCurriculum();
-        } catch {}
+        } catch { }
     };
 
     const moveLesson = async (section: CourseSection, lessonIndex: number, direction: 'up' | 'down') => {
@@ -828,7 +828,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             await apiClient.post(`/builder/sections/${section.id}/reorder-lessons`, {
                 lesson_ids: lessons.map(l => l.id),
             });
-        } catch {}
+        } catch { }
     };
 
     /* Attachment Actions */
@@ -908,7 +908,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
         try {
             await apiClient.delete(`/builder/attachments/${attachmentId}`);
             fetchCurriculum();
-        } catch {}
+        } catch { }
     };
 
     if (loading || !course) {
@@ -929,9 +929,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="text-xs font-bold text-sky-600 uppercase tracking-wider">Visual Course Builder</span>
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                                course.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
-                            }`}>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${course.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
+                                }`}>
                                 {course.status}
                             </span>
                         </div>
@@ -1030,11 +1029,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
             <div className="flex items-center gap-2 sm:gap-4 border-b border-slate-200 overflow-x-auto pb-1 sm:pb-0">
                 <button
                     onClick={() => setActiveTab('lessons')}
-                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                        activeTab === 'lessons'
-                            ? 'border-sky-600 text-sky-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-800'
-                    }`}
+                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${activeTab === 'lessons'
+                        ? 'border-sky-600 text-sky-600'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                        }`}
                 >
                     <Layers className="w-4 h-4" />
                     <span>Lessons</span>
@@ -1045,11 +1043,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                 <button
                     onClick={() => setActiveTab('live_classes')}
-                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                        activeTab === 'live_classes'
-                            ? 'border-rose-600 text-rose-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-800'
-                    }`}
+                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${activeTab === 'live_classes'
+                        ? 'border-rose-600 text-rose-600'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                        }`}
                 >
                     <Radio className="w-4 h-4" />
                     <span>Live Class</span>
@@ -1060,11 +1057,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                 <button
                     onClick={() => setActiveTab('practice_exams')}
-                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                        activeTab === 'practice_exams'
-                            ? 'border-sky-600 text-sky-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-800'
-                    }`}
+                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${activeTab === 'practice_exams'
+                        ? 'border-sky-600 text-sky-600'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                        }`}
                 >
                     <BookOpen className="w-4 h-4" />
                     <span>Practice Exam</span>
@@ -1075,11 +1071,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                 <button
                     onClick={() => setActiveTab('live_exams')}
-                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                        activeTab === 'live_exams'
-                            ? 'border-amber-600 text-amber-700'
-                            : 'border-transparent text-slate-500 hover:text-slate-800'
-                    }`}
+                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${activeTab === 'live_exams'
+                        ? 'border-amber-600 text-amber-700'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                        }`}
                 >
                     <Clock className="w-4 h-4" />
                     <span>Live Exam</span>
@@ -1090,11 +1085,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                 <button
                     onClick={() => setActiveTab('routine')}
-                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                        activeTab === 'routine'
-                            ? 'border-[#0B4B34] text-[#0B4B34]'
-                            : 'border-transparent text-slate-500 hover:text-slate-800'
-                    }`}
+                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${activeTab === 'routine'
+                        ? 'border-[#0B4B34] text-[#0B4B34]'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                        }`}
                 >
                     <Calendar className="w-4 h-4" />
                     <span>Routine</span>
@@ -1106,209 +1100,209 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
             {/* Lessons Tab Content */}
             {activeTab === 'lessons' && (
-            <div className="space-y-6">
-                {sections.length === 0 ? (
-                    <div className="bg-white p-12 rounded-3xl border border-slate-200/80 shadow-xs text-center space-y-4">
-                        <Layers className="w-12 h-12 text-slate-300 mx-auto" />
-                        <h3 className="text-lg font-bold text-slate-800">No sections added yet</h3>
-                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                            To organize your course, create a topic or section first, such as "Introduction", "Chapter 01".
-                        </p>
-                        <button
-                            onClick={openAddSection}
-                            className="px-6 py-2.5 bg-sky-600 text-white font-bold text-xs rounded-xl shadow-md hover:bg-sky-700"
-                        >
-                            Create First Section
-                        </button>
-                    </div>
-                ) : (
-                    sections.map((section, sIndex) => (
-                        <div
-                            key={section.id}
-                            className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden"
-                        >
-                            {/* Section Header */}
-                            <div className="p-5 sm:p-6 bg-slate-50/70 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div className="flex items-center gap-3">
-                                    <span className="w-8 h-8 rounded-lg bg-sky-600 text-white text-xs font-black flex items-center justify-center shrink-0">
-                                        {String(sIndex + 1).padStart(2, '0')}
-                                    </span>
-                                    <div>
-                                        <h3 className="text-base font-bold text-slate-900">{section.title}</h3>
-                                        {section.description && (
-                                            <p className="text-xs text-slate-500 mt-0.5">{section.description}</p>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    {/* Move Section Up / Down */}
-                                    <button
-                                        onClick={() => moveSection(sIndex, 'up')}
-                                        disabled={sIndex === 0}
-                                        className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg disabled:opacity-30"
-                                        title="Move Up"
-                                    >
-                                        <ChevronUp className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => moveSection(sIndex, 'down')}
-                                        disabled={sIndex === sections.length - 1}
-                                        className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg disabled:opacity-30"
-                                        title="Move Down"
-                                    >
-                                        <ChevronDown className="w-4 h-4" />
-                                    </button>
-
-                                    {/* Edit Section */}
-                                    <button
-                                        onClick={() => openEditSection(section)}
-                                        className="p-1.5 text-slate-500 hover:text-sky-600 rounded-lg hover:bg-slate-100"
-                                        title="Edit Section"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                    </button>
-
-                                    {/* Delete Section */}
-                                    <button
-                                        onClick={() => handleDeleteSection(section.id)}
-                                        className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50"
-                                        title="Delete Section"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-
-                                    {/* Add Lesson Button */}
-                                    <button
-                                        onClick={() => openAddLesson(section.id)}
-                                        className="ml-2 px-3.5 py-1.5 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
-                                    >
-                                        <Plus className="w-3.5 h-3.5" />
-                                        <span>Add Lesson</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Lessons List inside Section */}
-                            <div className="p-4 sm:p-6 space-y-3">
-                                {section.lessons && section.lessons.length > 0 ? (
-                                    section.lessons.map((lesson, lIndex) => (
-                                        <div
-                                            key={lesson.id}
-                                            className="p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-sky-300 shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-                                                    <PlayCircle className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                        <h4 className="text-sm font-bold text-slate-800">{lesson.title}</h4>
-                                                        {lesson.is_preview && (
-                                                            <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
-                                                                Free Preview
-                                                            </span>
-                                                        )}
-                                                        {lesson.status === 'draft' && (
-                                                            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold">
-                                                                Draft
-                                                            </span>
-                                                        )}
-                                                        {Boolean(lesson.video_provider === 'vdocipher' || (lesson.video_url && (lesson.video_url.includes('[vdo') || /^[a-f0-9]{32}$/i.test(lesson.video_url.trim())))) && (
-                                                            <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold flex items-center gap-1" title="VdoCipher DRM Anti-Piracy Protected">
-                                                                <ShieldCheck className="w-3 h-3 text-purple-600" /> VdoCipher DRM
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
-                                                        <span>Duration: {lesson.duration_minutes} mins</span>
-                                                        {lesson.attachments && lesson.attachments.length > 0 && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => openMaterialModal(lesson)}
-                                                                className="flex items-center gap-1 text-sky-600 hover:text-sky-700 font-semibold cursor-pointer"
-                                                                title="View or add study materials"
-                                                            >
-                                                                <Paperclip className="w-3 h-3" />
-                                                                <span>{lesson.attachments.length} Materials</span>
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Lesson Actions */}
-                                            <div className="flex items-center gap-1.5">
-                                                {/* Reorder Lesson Up / Down */}
-                                                <button
-                                                    onClick={() => moveLesson(section, lIndex, 'up')}
-                                                    disabled={lIndex === 0}
-                                                    className="p-1 text-slate-400 hover:text-slate-700 rounded disabled:opacity-30"
-                                                >
-                                                    <ChevronUp className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => moveLesson(section, lIndex, 'down')}
-                                                    disabled={lIndex === section.lessons.length - 1}
-                                                    className="p-1 text-slate-400 hover:text-slate-700 rounded disabled:opacity-30"
-                                                >
-                                                    <ChevronDown className="w-4 h-4" />
-                                                </button>
-
-                                                {/* Manage Study Material (Upload File or Google Drive Link) */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => openMaterialModal(lesson)}
-                                                    className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 rounded-lg relative transition-colors cursor-pointer"
-                                                    title="Study Materials (Upload or Google Drive link)"
-                                                >
-                                                    <Paperclip className="w-4 h-4" />
-                                                    {lesson.attachments && lesson.attachments.length > 0 && (
-                                                        <span className="absolute -top-1 -right-1 min-w-3.5 h-3.5 px-0.5 bg-sky-600 text-white rounded-full text-[9px] font-black flex items-center justify-center">
-                                                            {lesson.attachments.length}
-                                                        </span>
-                                                    )}
-                                                </button>
-
-                                                {/* Duplicate */}
-                                                <button
-                                                    onClick={() => handleDuplicateLesson(lesson.id)}
-                                                    className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-lg"
-                                                    title="Duplicate Lesson"
-                                                >
-                                                    <Copy className="w-4 h-4" />
-                                                </button>
-
-                                                {/* Edit */}
-                                                <button
-                                                    onClick={() => openEditLesson(lesson)}
-                                                    className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-lg"
-                                                    title="Edit Lesson"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                </button>
-
-                                                {/* Delete */}
-                                                <button
-                                                    onClick={() => handleDeleteLesson(lesson.id)}
-                                                    className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg"
-                                                    title="Delete Lesson"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="py-6 text-center text-xs text-slate-400 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
-                                        There are no lessons in this section yet. Click "+ Add Lesson" to get started.
-                                    </div>
-                                )}
-                            </div>
+                <div className="space-y-6">
+                    {sections.length === 0 ? (
+                        <div className="bg-white p-12 rounded-3xl border border-slate-200/80 shadow-xs text-center space-y-4">
+                            <Layers className="w-12 h-12 text-slate-300 mx-auto" />
+                            <h3 className="text-lg font-bold text-slate-800">No sections added yet</h3>
+                            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                                To organize your course, create a topic or section first, such as "Introduction", "Chapter 01".
+                            </p>
+                            <button
+                                onClick={openAddSection}
+                                className="px-6 py-2.5 bg-sky-600 text-white font-bold text-xs rounded-xl shadow-md hover:bg-sky-700"
+                            >
+                                Create First Section
+                            </button>
                         </div>
-                    ))
-                )}
-            </div>
+                    ) : (
+                        sections.map((section, sIndex) => (
+                            <div
+                                key={section.id}
+                                className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden"
+                            >
+                                {/* Section Header */}
+                                <div className="p-5 sm:p-6 bg-slate-50/70 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div className="flex items-center gap-3">
+                                        <span className="w-8 h-8 rounded-lg bg-sky-600 text-white text-xs font-black flex items-center justify-center shrink-0">
+                                            {String(sIndex + 1).padStart(2, '0')}
+                                        </span>
+                                        <div>
+                                            <h3 className="text-base font-bold text-slate-900">{section.title}</h3>
+                                            {section.description && (
+                                                <p className="text-xs text-slate-500 mt-0.5">{section.description}</p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        {/* Move Section Up / Down */}
+                                        <button
+                                            onClick={() => moveSection(sIndex, 'up')}
+                                            disabled={sIndex === 0}
+                                            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg disabled:opacity-30"
+                                            title="Move Up"
+                                        >
+                                            <ChevronUp className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => moveSection(sIndex, 'down')}
+                                            disabled={sIndex === sections.length - 1}
+                                            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg disabled:opacity-30"
+                                            title="Move Down"
+                                        >
+                                            <ChevronDown className="w-4 h-4" />
+                                        </button>
+
+                                        {/* Edit Section */}
+                                        <button
+                                            onClick={() => openEditSection(section)}
+                                            className="p-1.5 text-slate-500 hover:text-sky-600 rounded-lg hover:bg-slate-100"
+                                            title="Edit Section"
+                                        >
+                                            <Edit className="w-4 h-4" />
+                                        </button>
+
+                                        {/* Delete Section */}
+                                        <button
+                                            onClick={() => handleDeleteSection(section.id)}
+                                            className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50"
+                                            title="Delete Section"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+
+                                        {/* Add Lesson Button */}
+                                        <button
+                                            onClick={() => openAddLesson(section.id)}
+                                            className="ml-2 px-3.5 py-1.5 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
+                                        >
+                                            <Plus className="w-3.5 h-3.5" />
+                                            <span>Add Lesson</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Lessons List inside Section */}
+                                <div className="p-4 sm:p-6 space-y-3">
+                                    {section.lessons && section.lessons.length > 0 ? (
+                                        section.lessons.map((lesson, lIndex) => (
+                                            <div
+                                                key={lesson.id}
+                                                className="p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-sky-300 shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                                                        <PlayCircle className="w-5 h-5" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <h4 className="text-sm font-bold text-slate-800">{lesson.title}</h4>
+                                                            {lesson.is_preview && (
+                                                                <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
+                                                                    Free Preview
+                                                                </span>
+                                                            )}
+                                                            {lesson.status === 'draft' && (
+                                                                <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold">
+                                                                    Draft
+                                                                </span>
+                                                            )}
+                                                            {Boolean(lesson.video_provider === 'vdocipher' || (lesson.video_url && (lesson.video_url.includes('[vdo') || /^[a-f0-9]{32}$/i.test(lesson.video_url.trim())))) && (
+                                                                <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold flex items-center gap-1" title="VdoCipher DRM Anti-Piracy Protected">
+                                                                    <ShieldCheck className="w-3 h-3 text-purple-600" /> VdoCipher DRM
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                                                            <span>Duration: {lesson.duration_minutes} mins</span>
+                                                            {lesson.attachments && lesson.attachments.length > 0 && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => openMaterialModal(lesson)}
+                                                                    className="flex items-center gap-1 text-sky-600 hover:text-sky-700 font-semibold cursor-pointer"
+                                                                    title="View or add study materials"
+                                                                >
+                                                                    <Paperclip className="w-3 h-3" />
+                                                                    <span>{lesson.attachments.length} Materials</span>
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Lesson Actions */}
+                                                <div className="flex items-center gap-1.5">
+                                                    {/* Reorder Lesson Up / Down */}
+                                                    <button
+                                                        onClick={() => moveLesson(section, lIndex, 'up')}
+                                                        disabled={lIndex === 0}
+                                                        className="p-1 text-slate-400 hover:text-slate-700 rounded disabled:opacity-30"
+                                                    >
+                                                        <ChevronUp className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => moveLesson(section, lIndex, 'down')}
+                                                        disabled={lIndex === section.lessons.length - 1}
+                                                        className="p-1 text-slate-400 hover:text-slate-700 rounded disabled:opacity-30"
+                                                    >
+                                                        <ChevronDown className="w-4 h-4" />
+                                                    </button>
+
+                                                    {/* Manage Study Material (Upload File or Google Drive Link) */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openMaterialModal(lesson)}
+                                                        className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 rounded-lg relative transition-colors cursor-pointer"
+                                                        title="Study Materials (Upload or Google Drive link)"
+                                                    >
+                                                        <Paperclip className="w-4 h-4" />
+                                                        {lesson.attachments && lesson.attachments.length > 0 && (
+                                                            <span className="absolute -top-1 -right-1 min-w-3.5 h-3.5 px-0.5 bg-sky-600 text-white rounded-full text-[9px] font-black flex items-center justify-center">
+                                                                {lesson.attachments.length}
+                                                            </span>
+                                                        )}
+                                                    </button>
+
+                                                    {/* Duplicate */}
+                                                    <button
+                                                        onClick={() => handleDuplicateLesson(lesson.id)}
+                                                        className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-lg"
+                                                        title="Duplicate Lesson"
+                                                    >
+                                                        <Copy className="w-4 h-4" />
+                                                    </button>
+
+                                                    {/* Edit */}
+                                                    <button
+                                                        onClick={() => openEditLesson(lesson)}
+                                                        className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-lg"
+                                                        title="Edit Lesson"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+
+                                                    {/* Delete */}
+                                                    <button
+                                                        onClick={() => handleDeleteLesson(lesson.id)}
+                                                        className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg"
+                                                        title="Delete Lesson"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="py-6 text-center text-xs text-slate-400 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                                            There are no lessons in this section yet. Click "+ Add Lesson" to get started.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
             )}
 
             {/* Live Classes Tab Content */}
@@ -1368,11 +1362,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 return (
                                     <div
                                         key={lc.id}
-                                        className={`bg-white rounded-2xl border p-5 sm:p-6 transition-all space-y-4 shadow-xs ${
-                                            isLive
-                                                ? 'border-rose-300 ring-2 ring-rose-500/15'
-                                                : 'border-slate-200/80 hover:border-slate-300'
-                                        }`}
+                                        className={`bg-white rounded-2xl border p-5 sm:p-6 transition-all space-y-4 shadow-xs ${isLive
+                                            ? 'border-rose-300 ring-2 ring-rose-500/15'
+                                            : 'border-slate-200/80 hover:border-slate-300'
+                                            }`}
                                     >
                                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                                             <div className="space-y-1.5 flex-1">
@@ -1586,9 +1579,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                             Practice Exam
                                                         </span>
                                                     )}
-                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                                                        exam.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
-                                                    }`}>
+                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${exam.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
+                                                        }`}>
                                                         {exam.status}
                                                     </span>
                                                 </div>
@@ -1788,9 +1780,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                         </span>
                                                     )}
 
-                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                                                        exam.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
-                                                    }`}>
+                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${exam.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
+                                                        }`}>
                                                         {exam.status}
                                                     </span>
                                                 </div>
@@ -2319,11 +2310,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setRoutineItemType('class_upload')}
-                                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
-                                    routineItemType === 'class_upload'
-                                        ? 'border-sky-500 bg-sky-50 text-sky-700 ring-2 ring-sky-400/20 shadow-xs'
-                                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                                }`}
+                                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer ${routineItemType === 'class_upload'
+                                    ? 'border-sky-500 bg-sky-50 text-sky-700 ring-2 ring-sky-400/20 shadow-xs'
+                                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                                    }`}
                             >
                                 <Video className="w-5 h-5 text-sky-600" />
                                 <span>Class Upload</span>
@@ -2332,11 +2322,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setRoutineItemType('material')}
-                                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
-                                    routineItemType === 'material'
-                                        ? 'border-teal-500 bg-teal-50 text-teal-700 ring-2 ring-teal-400/20 shadow-xs'
-                                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                                }`}
+                                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer ${routineItemType === 'material'
+                                    ? 'border-teal-500 bg-teal-50 text-teal-700 ring-2 ring-teal-400/20 shadow-xs'
+                                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                                    }`}
                             >
                                 <FileText className="w-5 h-5 text-teal-600" />
                                 <span>Study Material</span>
@@ -2345,11 +2334,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setRoutineItemType('book_parcel')}
-                                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
-                                    routineItemType === 'book_parcel'
-                                        ? 'border-orange-500 bg-orange-50 text-orange-700 ring-2 ring-orange-400/20 shadow-xs'
-                                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                                }`}
+                                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer ${routineItemType === 'book_parcel'
+                                    ? 'border-orange-500 bg-orange-50 text-orange-700 ring-2 ring-orange-400/20 shadow-xs'
+                                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                                    }`}
                             >
                                 <Package className="w-5 h-5 text-orange-600" />
                                 <span>Book / Parcel Delivery</span>
@@ -2358,11 +2346,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setRoutineItemType('general')}
-                                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
-                                    routineItemType === 'general'
-                                        ? 'border-emerald-500 bg-emerald-50 text-[#0B4B34] ring-2 ring-emerald-400/20 shadow-xs'
-                                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                                }`}
+                                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer ${routineItemType === 'general'
+                                    ? 'border-emerald-500 bg-emerald-50 text-[#0B4B34] ring-2 ring-emerald-400/20 shadow-xs'
+                                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                                    }`}
                             >
                                 <Calendar className="w-5 h-5 text-[#0B4B34]" />
                                 <span>General Notice</span>
@@ -2384,10 +2371,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 routineItemType === 'class_upload'
                                     ? 'e.g. Physics Paper 1 - Dynamics Lecture 02 Upload'
                                     : routineItemType === 'material'
-                                    ? 'e.g. Chemistry Chapter 1 Special Sheet & Practice Booklet PDF'
-                                    : routineItemType === 'book_parcel'
-                                    ? 'e.g. Physics Question Bank & Practice Book Courier Delivery'
-                                    : 'e.g. Special Session / Important Notice'
+                                        ? 'e.g. Chemistry Chapter 1 Special Sheet & Practice Booklet PDF'
+                                        : routineItemType === 'book_parcel'
+                                            ? 'e.g. Physics Question Bank & Practice Book Courier Delivery'
+                                            : 'e.g. Special Session / Important Notice'
                             }
                             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0B4B34]"
                         />
@@ -2522,10 +2509,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     routineItemType === 'class_upload'
                                         ? 'e.g. Watch Class'
                                         : routineItemType === 'material'
-                                        ? 'e.g. Download Note'
-                                        : routineItemType === 'book_parcel'
-                                        ? 'e.g. Track Parcel'
-                                        : 'e.g. View Details'
+                                            ? 'e.g. Download Note'
+                                            : routineItemType === 'book_parcel'
+                                                ? 'e.g. Track Parcel'
+                                                : 'e.g. View Details'
                                 }
                                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0B4B34]"
                             />
@@ -2749,9 +2736,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <button
                             type="submit"
                             disabled={savingExam}
-                            className={`px-6 py-2.5 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50 ${
-                                examModalType === 'live' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-sky-600 hover:bg-sky-700'
-                            }`}
+                            className={`px-6 py-2.5 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50 ${examModalType === 'live' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-sky-600 hover:bg-sky-700'
+                                }`}
                         >
                             {savingExam ? (
                                 <>
@@ -2782,22 +2768,20 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setAttachExamType('practice')}
-                            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                attachExamType === 'practice'
-                                    ? 'bg-white text-sky-700 shadow-xs'
-                                    : 'text-slate-600 hover:text-slate-900'
-                            }`}
+                            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${attachExamType === 'practice'
+                                ? 'bg-white text-sky-700 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                                }`}
                         >
                             📝 As Practice Exam
                         </button>
                         <button
                             type="button"
                             onClick={() => setAttachExamType('live')}
-                            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                attachExamType === 'live'
-                                    ? 'bg-white text-amber-800 shadow-xs'
-                                    : 'text-slate-600 hover:text-slate-900'
-                            }`}
+                            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${attachExamType === 'live'
+                                ? 'bg-white text-amber-800 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                                }`}
                         >
                             ⏰ As Live Exam
                         </button>
@@ -2878,11 +2862,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     .map(exam => (
                                         <label
                                             key={exam.id}
-                                            className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                                                selectedExamId === String(exam.id)
-                                                    ? 'border-sky-500 bg-sky-50/50 ring-1 ring-sky-500'
-                                                    : 'border-slate-200 hover:bg-slate-50'
-                                            }`}
+                                            className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedExamId === String(exam.id)
+                                                ? 'border-sky-500 bg-sky-50/50 ring-1 ring-sky-500'
+                                                : 'border-slate-200 hover:bg-slate-50'
+                                                }`}
                                         >
                                             <input
                                                 type="radio"
@@ -2898,9 +2881,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     <span>Time: {exam.duration_minutes} mins</span>
                                                     <span>•</span>
                                                     <span>Marks: {exam.total_marks}</span>
-                                                    <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold uppercase ${
-                                                        exam.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
-                                                    }`}>
+                                                    <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold uppercase ${exam.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
+                                                        }`}>
                                                         {exam.status}
                                                     </span>
                                                 </div>
@@ -3055,11 +3037,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setVdoMode('upload')}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                                            vdoMode === 'upload'
-                                                ? 'bg-[#25a2ee] text-white shadow-xs'
-                                                : 'text-slate-600 hover:bg-slate-200'
-                                        }`}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${vdoMode === 'upload'
+                                            ? 'bg-[#25a2ee] text-white shadow-xs'
+                                            : 'text-slate-600 hover:bg-slate-200'
+                                            }`}
                                     >
                                         <Upload className="w-3.5 h-3.5" />
                                         Upload Video
@@ -3067,11 +3048,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setVdoMode('shortcode')}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                                            vdoMode === 'shortcode'
-                                                ? 'bg-[#25a2ee] text-white shadow-xs'
-                                                : 'text-slate-600 hover:bg-slate-200'
-                                        }`}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${vdoMode === 'shortcode'
+                                            ? 'bg-[#25a2ee] text-white shadow-xs'
+                                            : 'text-slate-600 hover:bg-slate-200'
+                                            }`}
                                     >
                                         <FileText className="w-3.5 h-3.5" />
                                         Shortcode / Video ID
@@ -3470,11 +3450,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setMaterialTab('upload')}
-                                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                                    materialTab === 'upload'
-                                        ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
-                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                                }`}
+                                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${materialTab === 'upload'
+                                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
+                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                                    }`}
                             >
                                 <Upload className="w-4 h-4" />
                                 <span>File Upload</span>
@@ -3483,11 +3462,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setMaterialTab('link')}
-                                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                                    materialTab === 'link'
-                                        ? 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-xs'
-                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                                }`}
+                                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${materialTab === 'link'
+                                    ? 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-xs'
+                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                                    }`}
                             >
                                 <Globe className="w-4 h-4" />
                                 <span>Link</span>
@@ -3594,13 +3572,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                 className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3 text-xs"
                                             >
                                                 <div className="flex items-center gap-2.5 min-w-0">
-                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                                                        isDrive
-                                                            ? 'bg-amber-100 dark:bg-amber-950 text-amber-600'
-                                                            : isLink
+                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isDrive
+                                                        ? 'bg-amber-100 dark:bg-amber-950 text-amber-600'
+                                                        : isLink
                                                             ? 'bg-purple-100 dark:bg-purple-950 text-purple-600'
                                                             : 'bg-sky-100 dark:bg-sky-950 text-sky-600'
-                                                    }`}>
+                                                        }`}>
                                                         {isDrive ? (
                                                             <Globe className="w-4 h-4" />
                                                         ) : isLink ? (
