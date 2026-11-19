@@ -135,9 +135,44 @@ class AdminPageController extends Controller
     {
         $page = Page::findOrFail($id);
 
-        if ($page->slug === 'home' && (!is_array($page->blocks) || count($page->blocks) < 5)) {
-            $page->blocks = Page::defaultHomeBlocks();
-            $page->save();
+        if ($page->slug === 'home') {
+            if (!is_array($page->blocks) || count($page->blocks) < 5) {
+                $page->blocks = Page::defaultHomeBlocks();
+                $page->save();
+            } else {
+                $hasVideoBlock = false;
+                $defaultVideoBlock = null;
+                foreach (Page::defaultHomeBlocks() as $db) {
+                    if (($db['type'] ?? '') === 'video_testimonials') {
+                        $defaultVideoBlock = $db;
+                        break;
+                    }
+                }
+                foreach ($page->blocks as $b) {
+                    if (($b['type'] ?? '') === 'video_testimonials') {
+                        $hasVideoBlock = true;
+                        break;
+                    }
+                }
+                if (!$hasVideoBlock && $defaultVideoBlock) {
+                    $newBlocks = [];
+                    $inserted = false;
+                    foreach ($page->blocks as $b) {
+                        $newBlocks[] = $b;
+                        if (($b['type'] ?? '') === 'teachers_showcase') {
+                            $newBlocks[] = $defaultVideoBlock;
+                            $inserted = true;
+                        }
+                    }
+                    if (!$inserted) {
+                        $newBlocks[] = $defaultVideoBlock;
+                    }
+                    $page->blocks = $newBlocks;
+                    try {
+                        $page->save();
+                    } catch (\Throwable $e) {}
+                }
+            }
         }
 
         return response()->json([

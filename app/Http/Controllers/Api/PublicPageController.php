@@ -86,6 +86,51 @@ class PublicPageController extends Controller
             }
         }
 
+        // Ensure video testimonials section exists in home blocks
+        if ($slug === 'home' && is_array($page->blocks)) {
+            $hasVideoBlock = false;
+            $defaultVideoBlock = null;
+            foreach (Page::defaultHomeBlocks() as $db) {
+                if (($db['type'] ?? '') === 'video_testimonials') {
+                    $defaultVideoBlock = $db;
+                    break;
+                }
+            }
+
+            $updatedBlocks = [];
+            foreach ($page->blocks as $b) {
+                if (($b['type'] ?? '') === 'video_testimonials') {
+                    $hasVideoBlock = true;
+                    $items = $b['settings']['items'] ?? [];
+                    if (!is_array($items) || count($items) === 0 || empty($items[0]['videoUrl']) || str_contains($items[0]['videoUrl'] ?? '', 'dQw4w9WgXcQ')) {
+                        $b['settings']['items'] = $defaultVideoBlock['settings']['items'] ?? [];
+                    }
+                }
+                $updatedBlocks[] = $b;
+            }
+
+            if (!$hasVideoBlock && $defaultVideoBlock) {
+                $newBlocks = [];
+                $inserted = false;
+                foreach ($page->blocks as $b) {
+                    $newBlocks[] = $b;
+                    if (($b['type'] ?? '') === 'teachers_showcase') {
+                        $newBlocks[] = $defaultVideoBlock;
+                        $inserted = true;
+                    }
+                }
+                if (!$inserted) {
+                    $newBlocks[] = $defaultVideoBlock;
+                }
+                $page->blocks = $newBlocks;
+                try {
+                    $page->save();
+                } catch (\Throwable $e) {}
+            } else {
+                $page->blocks = $updatedBlocks;
+            }
+        }
+
         return response()->json([
             'page' => $page,
         ]);

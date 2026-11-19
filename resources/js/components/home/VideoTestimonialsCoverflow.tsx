@@ -50,16 +50,16 @@ export const getYouTubeVideoId = (url?: string): string | null => {
 const DEFAULT_ITEMS: VideoTestimonialItem[] = [
     {
         id: '1',
-        name: 'Farhan Islam',
-        role: 'Student & Guardian',
-        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        name: 'Samiul',
+        role: 'NovoNex Student Review',
+        videoUrl: 'https://youtu.be/Cbw_yhBGM_4',
         thumbnailUrl: '',
     },
     {
         id: '2',
-        name: 'Sadia Afrin',
-        role: 'Varsity Admission Achiever',
-        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        name: 'Khurshed',
+        role: 'NovoNex Student Review',
+        videoUrl: 'https://youtu.be/Zt7yfNIbInQ',
         thumbnailUrl: '',
     },
 ];
@@ -74,7 +74,20 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
 
     const rawItems = settings?.items;
     const items: VideoTestimonialItem[] = (Array.isArray(rawItems) && rawItems.length > 0)
-        ? rawItems
+        ? rawItems.map((item, idx) => {
+            if (item.videoUrl && item.videoUrl.trim() && !item.videoUrl.includes('dQw4w9WgXcQ')) {
+                return item;
+            }
+            const fallback = DEFAULT_ITEMS[idx] || DEFAULT_ITEMS[0];
+            return {
+                ...item,
+                name: (item.name && item.name !== 'Student Name' && item.name !== 'Farhan Islam' && item.name !== 'Sadia Afrin')
+                    ? item.name
+                    : fallback.name,
+                role: item.role || fallback.role,
+                videoUrl: fallback.videoUrl,
+            };
+        })
         : DEFAULT_ITEMS;
 
     const [activeIndex, setActiveIndex] = useState(0);

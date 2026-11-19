@@ -808,16 +808,16 @@ export const AdminPageBuilderPage: React.FC = () => {
                         items: [
                             {
                                 id: '1',
-                                name: 'Farhan Islam',
-                                role: 'Student & Guardian',
-                                videoUrl: '',
+                                name: 'Samiul',
+                                role: 'NovoNex Student Review',
+                                videoUrl: 'https://youtu.be/Cbw_yhBGM_4',
                                 thumbnailUrl: '',
                             },
                             {
                                 id: '2',
-                                name: 'Sadia Afrin',
-                                role: 'Varsity Admission Achiever',
-                                videoUrl: '',
+                                name: 'Khurshed',
+                                role: 'NovoNex Student Review',
+                                videoUrl: 'https://youtu.be/Zt7yfNIbInQ',
                                 thumbnailUrl: '',
                             },
                         ]

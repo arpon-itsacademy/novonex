@@ -179,16 +179,16 @@ class Page extends Model
                     'items' => [
                         [
                             'id' => 'v1',
-                            'name' => 'Farhan Islam',
-                            'role' => 'Student & Guardian',
-                            'videoUrl' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                            'name' => 'Samiul',
+                            'role' => 'NovoNex Student Review',
+                            'videoUrl' => 'https://youtu.be/Cbw_yhBGM_4',
                             'thumbnailUrl' => '',
                         ],
                         [
                             'id' => 'v2',
-                            'name' => 'Sadia Afrin',
-                            'role' => 'Varsity Admission Achiever',
-                            'videoUrl' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                            'name' => 'Khurshed',
+                            'role' => 'NovoNex Student Review',
+                            'videoUrl' => 'https://youtu.be/Zt7yfNIbInQ',
                             'thumbnailUrl' => '',
                         ],
                     ]

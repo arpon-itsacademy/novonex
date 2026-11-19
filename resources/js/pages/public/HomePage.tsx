@@ -269,10 +269,51 @@ export const HomePage: React.FC = () => {
     }
 
     if (customPage && Array.isArray(customPage.blocks) && customPage.blocks.length > 0) {
+        let displayBlocks = customPage.blocks;
+        const hasVideoTestimonials = displayBlocks.some((b) => b.type === 'video_testimonials');
+        if (!hasVideoTestimonials) {
+            const fallbackVideoBlock = {
+                id: 'block_video_testimonials_default',
+                type: 'video_testimonials' as const,
+                title: 'Video Testimonials',
+                settings: {
+                    sectionTag: 'Student Stories & Video Reviews',
+                    sectionTitle: 'What Our Students Say',
+                    sectionSub: 'Real journeys, genuine experiences, and success stories shared on camera.',
+                    items: [
+                        {
+                            id: 'v1',
+                            name: 'Samiul',
+                            role: 'NovoNex Student Review',
+                            videoUrl: 'https://youtu.be/Cbw_yhBGM_4',
+                            thumbnailUrl: '',
+                        },
+                        {
+                            id: 'v2',
+                            name: 'Khurshed',
+                            role: 'NovoNex Student Review',
+                            videoUrl: 'https://youtu.be/Zt7yfNIbInQ',
+                            thumbnailUrl: '',
+                        },
+                    ],
+                },
+            };
+            const teacherIdx = displayBlocks.findIndex((b) => b.type === 'teachers_showcase');
+            if (teacherIdx !== -1) {
+                displayBlocks = [
+                    ...displayBlocks.slice(0, teacherIdx + 1),
+                    fallbackVideoBlock,
+                    ...displayBlocks.slice(teacherIdx + 1),
+                ];
+            } else {
+                displayBlocks = [...displayBlocks, fallbackVideoBlock];
+            }
+        }
+
         return (
             <div className="space-y-0 overflow-hidden font-sans">
                 {customPage.custom_css && <style>{customPage.custom_css}</style>}
-                {customPage.blocks.map((block) => (
+                {displayBlocks.map((block) => (
                     <PageBlockRenderer key={block.id} block={block} isBuilder={false} />
                 ))}
             </div>
