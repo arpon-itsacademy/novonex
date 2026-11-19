@@ -1,28 +1,28 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { apiClient } from '../../api/client';
-import { 
-    Users, 
-    BookOpen, 
-    Boxes, 
-    Search, 
-    ArrowLeft, 
-    UserPlus, 
-    Download, 
-    Trash2, 
-    Phone, 
-    Mail, 
-    Calendar, 
-    CheckCircle2, 
-    AlertCircle, 
-    Loader2, 
-    X, 
-    ChevronRight, 
-    GraduationCap, 
-    Sparkles, 
-    Layers, 
-    Eye, 
-    Check, 
+import {
+    Users,
+    BookOpen,
+    Boxes,
+    Search,
+    ArrowLeft,
+    UserPlus,
+    Download,
+    Trash2,
+    Phone,
+    Mail,
+    Calendar,
+    CheckCircle2,
+    AlertCircle,
+    Loader2,
+    X,
+    ChevronRight,
+    GraduationCap,
+    Sparkles,
+    Layers,
+    Eye,
+    Check,
     Send,
     ExternalLink,
     UserMinus,
@@ -170,9 +170,9 @@ export const AdminCourseStudentsPage: React.FC = () => {
     };
 
     const fetchTargetStudents = async (
-        type: 'course' | 'bundle', 
-        id: number, 
-        page = 1, 
+        type: 'course' | 'bundle',
+        id: number,
+        page = 1,
         query = ''
     ) => {
         setLoadingStudents(true);
@@ -230,7 +230,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
         return targets.filter(t => {
             const matchesType = targetFilter === 'all' || t.type === targetFilter;
             const searchLower = targetSearch.toLowerCase().trim();
-            const matchesSearch = !searchLower || 
+            const matchesSearch = !searchLower ||
                 t.title.toLowerCase().includes(searchLower) ||
                 (t.category?.name && t.category.name.toLowerCase().includes(searchLower));
             return matchesType && matchesSearch;
@@ -253,7 +253,7 @@ export const AdminCourseStudentsPage: React.FC = () => {
 
     const handleToggleSelectOne = (enrollmentId: number) => {
         setSelectAllAcrossPages(false);
-        setSelectedEnrollmentIds(prev => 
+        setSelectedEnrollmentIds(prev =>
             prev.includes(enrollmentId)
                 ? prev.filter(id => id !== enrollmentId)
                 : [...prev, enrollmentId]
@@ -529,11 +529,10 @@ export const AdminCourseStudentsPage: React.FC = () => {
 
                             <div className="flex-1 min-w-0">
                                 <div className="flex flex-wrap items-center gap-2.5 mb-2">
-                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                                        selectedTarget.type === 'bundle'
-                                            ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
-                                            : 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
-                                    }`}>
+                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${selectedTarget.type === 'bundle'
+                                        ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                                        : 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
+                                        }`}>
                                         {selectedTarget.type === 'bundle' ? 'Combo Bundle' : 'Course'}
                                     </span>
                                     {selectedTarget.category && (
@@ -621,8 +620,8 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm font-bold text-slate-900 dark:text-white">
-                                            {selectAllAcrossPages 
-                                                ? `All (${pagination.total}) students in this course selected` 
+                                            {selectAllAcrossPages
+                                                ? `All (${pagination.total}) students in this course selected`
                                                 : `${selectedEnrollmentIds.length} students selected`}
                                         </p>
                                         {!selectAllAcrossPages && pagination.total > students.length && isAllPageSelected && (
@@ -714,13 +713,12 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                             const serialNo = (currentPage - 1) * pagination.per_page + idx + 1;
                                             const isRowSelected = selectAllAcrossPages || selectedEnrollmentIds.includes(student.enrollment_id);
                                             return (
-                                                <tr 
+                                                <tr
                                                     key={student.enrollment_id}
-                                                    className={`transition-colors ${
-                                                        isRowSelected 
-                                                            ? 'bg-sky-50/70 dark:bg-sky-950/40 hover:bg-sky-50 dark:hover:bg-sky-950/60' 
-                                                            : 'hover:bg-slate-50/60 dark:hover:bg-slate-850/40'
-                                                    }`}
+                                                    className={`transition-colors ${isRowSelected
+                                                        ? 'bg-sky-50/70 dark:bg-sky-950/40 hover:bg-sky-50 dark:hover:bg-sky-950/60'
+                                                        : 'hover:bg-slate-50/60 dark:hover:bg-slate-850/40'
+                                                        }`}
                                                 >
                                                     <td className="py-3.5 px-4 text-center">
                                                         <input
@@ -879,33 +877,30 @@ export const AdminCourseStudentsPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setTargetFilter('all')}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                                    targetFilter === 'all'
-                                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${targetFilter === 'all'
+                                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                                    }`}
                             >
                                 All ({targets.length})
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setTargetFilter('course')}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                                    targetFilter === 'course'
-                                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${targetFilter === 'course'
+                                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                                    }`}
                             >
                                 Courses ({targets.filter(t => t.type === 'course').length})
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setTargetFilter('bundle')}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                                    targetFilter === 'bundle'
-                                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${targetFilter === 'bundle'
+                                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                                    }`}
                             >
                                 Combo Bundles ({targets.filter(t => t.type === 'bundle').length})
                             </button>
@@ -980,11 +975,10 @@ export const AdminCourseStudentsPage: React.FC = () => {
 
                                             {/* Type Badge */}
                                             <div className="absolute top-3 left-3 flex items-center gap-2">
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-md ${
-                                                    isBundle
-                                                        ? 'bg-purple-600 text-white'
-                                                        : 'bg-sky-600 text-white'
-                                                }`}>
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-md ${isBundle
+                                                    ? 'bg-purple-600 text-white'
+                                                    : 'bg-sky-600 text-white'
+                                                    }`}>
                                                     {isBundle ? 'Combo Bundle' : 'Course'}
                                                 </span>
                                                 {target.category?.name && (
@@ -1075,22 +1069,20 @@ export const AdminCourseStudentsPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setEnrollTab('search')}
-                                className={`pb-3 border-b-2 transition-all ${
-                                    enrollTab === 'search'
-                                        ? 'border-sky-600 text-sky-600 dark:text-sky-400'
-                                        : 'border-transparent text-slate-400 hover:text-slate-700'
-                                }`}
+                                className={`pb-3 border-b-2 transition-all ${enrollTab === 'search'
+                                    ? 'border-sky-600 text-sky-600 dark:text-sky-400'
+                                    : 'border-transparent text-slate-400 hover:text-slate-700'
+                                    }`}
                             >
                                 Search & Select Students
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setEnrollTab('bulk')}
-                                className={`pb-3 border-b-2 transition-all ${
-                                    enrollTab === 'bulk'
-                                        ? 'border-sky-600 text-sky-600 dark:text-sky-400'
-                                        : 'border-transparent text-slate-400 hover:text-slate-700'
-                                }`}
+                                className={`pb-3 border-b-2 transition-all ${enrollTab === 'bulk'
+                                    ? 'border-sky-600 text-sky-600 dark:text-sky-400'
+                                    : 'border-transparent text-slate-400 hover:text-slate-700'
+                                    }`}
                             >
                                 Bulk Mobile Numbers
                             </button>
@@ -1130,9 +1122,8 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                     <div
                                                         key={user.id}
                                                         onClick={() => handleToggleUser(user)}
-                                                        className={`p-3 flex items-center justify-between gap-3 cursor-pointer hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors ${
-                                                            isSelected ? 'bg-sky-50 dark:bg-sky-950/40' : ''
-                                                        }`}
+                                                        className={`p-3 flex items-center justify-between gap-3 cursor-pointer hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors ${isSelected ? 'bg-sky-50 dark:bg-sky-950/40' : ''
+                                                            }`}
                                                     >
                                                         <div className="min-w-0">
                                                             <div className="font-bold text-xs text-slate-900 dark:text-white truncate">
@@ -1149,11 +1140,10 @@ export const AdminCourseStudentsPage: React.FC = () => {
                                                                     Already Enrolled
                                                                 </span>
                                                             )}
-                                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                                                isSelected
-                                                                    ? 'bg-sky-600 border-sky-600 text-white'
-                                                                    : 'border-slate-300 dark:border-slate-600'
-                                                            }`}>
+                                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${isSelected
+                                                                ? 'bg-sky-600 border-sky-600 text-white'
+                                                                : 'border-slate-300 dark:border-slate-600'
+                                                                }`}>
                                                                 {isSelected && <Check className="w-3.5 h-3.5" />}
                                                             </div>
                                                         </div>

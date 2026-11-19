@@ -214,11 +214,10 @@ export const ExamFormPage: React.FC = () => {
                         Exam Type
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <label className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
-                            formData.exam_type === 'practice'
-                                ? 'bg-sky-50/70 border-sky-500 text-sky-950 dark:bg-sky-950/40 dark:text-sky-200'
-                                : 'border-slate-200 hover:bg-slate-100 dark:border-slate-700'
-                        }`}>
+                        <label className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${formData.exam_type === 'practice'
+                            ? 'bg-sky-50/70 border-sky-500 text-sky-950 dark:bg-sky-950/40 dark:text-sky-200'
+                            : 'border-slate-200 hover:bg-slate-100 dark:border-slate-700'
+                            }`}>
                             <input
                                 type="radio"
                                 name="exam_type"
@@ -235,11 +234,10 @@ export const ExamFormPage: React.FC = () => {
                             </div>
                         </label>
 
-                        <label className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
-                            formData.exam_type === 'live'
-                                ? 'bg-amber-50/70 border-amber-500 text-amber-950 dark:bg-amber-950/40 dark:text-amber-200'
-                                : 'border-slate-200 hover:bg-slate-100 dark:border-slate-700'
-                        }`}>
+                        <label className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${formData.exam_type === 'live'
+                            ? 'bg-amber-50/70 border-amber-500 text-amber-950 dark:bg-amber-950/40 dark:text-amber-200'
+                            : 'border-slate-200 hover:bg-slate-100 dark:border-slate-700'
+                            }`}>
                             <input
                                 type="radio"
                                 name="exam_type"

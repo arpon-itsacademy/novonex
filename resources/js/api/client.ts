@@ -24,8 +24,8 @@ apiClient.interceptors.response.use(
             localStorage.removeItem('auth_token');
             localStorage.removeItem('auth_user');
             // If on a protected route, redirect to login
-            if (window.location.pathname.startsWith('/admin') || 
-                window.location.pathname.startsWith('/teacher') || 
+            if (window.location.pathname.startsWith('/admin') ||
+                window.location.pathname.startsWith('/teacher') ||
                 window.location.pathname.startsWith('/student') ||
                 window.location.pathname.startsWith('/learning')) {
                 window.location.href = '/login';
