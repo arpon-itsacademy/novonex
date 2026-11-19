@@ -21,6 +21,8 @@ class AdminCouponController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        Coupon::ensureTableExists();
+
         $query = Coupon::with([
             'courses:id,title,price',
             'categories:id,name',
@@ -110,6 +112,8 @@ class AdminCouponController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        Coupon::ensureTableExists();
+
         $validated = $request->validate([
             'code' => ['required', 'string', 'max:50', 'unique:coupons,code'],
             'title' => ['nullable', 'string', 'max:255'],
@@ -132,50 +136,65 @@ class AdminCouponController extends Controller
             'usage_limit' => ['nullable', 'integer', 'min:1'],
             'usage_limit_per_user' => ['nullable', 'integer', 'min:1'],
             'start_date' => ['nullable', 'date'],
-            'expiry_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'is_active' => ['boolean'],
+            'expiry_date' => ['nullable', 'date'],
+            'is_active' => ['nullable', 'boolean'],
         ]);
+
+        if (!empty($validated['start_date']) && !empty($validated['expiry_date'])) {
+            if (strtotime($validated['expiry_date']) < strtotime($validated['start_date'])) {
+                return response()->json([
+                    'message' => 'Expiry date must be after or equal to start date.',
+                    'errors' => ['expiry_date' => ['Expiry date must be after or equal to start date.']],
+                ], 422);
+            }
+        }
 
         $code = strtoupper(trim($validated['code']));
 
-        $coupon = DB::transaction(function () use ($validated, $code, $request) {
-            $coupon = Coupon::create([
-                'code' => $code,
-                'title' => !empty($validated['title']) ? $validated['title'] : $code,
-                'description' => $validated['description'] ?? null,
-                'discount_type' => $validated['discount_type'],
-                'discount_amount' => $validated['discount_amount'],
-                'max_discount_amount' => $validated['max_discount_amount'] ?? null,
-                'min_order_amount' => $validated['min_order_amount'] ?? null,
-                'scope_type' => $validated['scope_type'] ?? 'all',
-                'user_restriction_type' => $validated['user_restriction_type'] ?? 'all',
-                'restricted_user_id' => ($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC ? $validated['restricted_user_id'] : null,
-                'usage_limit' => $validated['usage_limit'] ?? null,
-                'usage_limit_per_user' => !empty($validated['usage_limit_per_user']) ? $validated['usage_limit_per_user'] : null,
-                'times_used' => 0,
-                'start_date' => $validated['start_date'] ?? null,
-                'expiry_date' => $validated['expiry_date'] ?? null,
-                'is_active' => $validated['is_active'] ?? true,
-                'created_by' => $request->user()->id,
-            ]);
+        try {
+            $coupon = DB::transaction(function () use ($validated, $code, $request) {
+                $coupon = Coupon::create([
+                    'code' => $code,
+                    'title' => !empty($validated['title']) ? $validated['title'] : $code,
+                    'description' => $validated['description'] ?? null,
+                    'discount_type' => $validated['discount_type'],
+                    'discount_amount' => $validated['discount_amount'],
+                    'max_discount_amount' => $validated['max_discount_amount'] ?? null,
+                    'min_order_amount' => $validated['min_order_amount'] ?? null,
+                    'scope_type' => $validated['scope_type'] ?? 'all',
+                    'user_restriction_type' => $validated['user_restriction_type'] ?? 'all',
+                    'restricted_user_id' => ($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC ? $validated['restricted_user_id'] : null,
+                    'usage_limit' => $validated['usage_limit'] ?? null,
+                    'usage_limit_per_user' => !empty($validated['usage_limit_per_user']) ? $validated['usage_limit_per_user'] : 1,
+                    'times_used' => 0,
+                    'start_date' => $validated['start_date'] ?? null,
+                    'expiry_date' => $validated['expiry_date'] ?? null,
+                    'is_active' => $validated['is_active'] ?? true,
+                    'created_by' => $request->user()?->id ?? auth()->id() ?? null,
+                ]);
 
-            // Sync courses if scope is course
-            if ($validated['scope_type'] === Coupon::SCOPE_COURSE && !empty($validated['course_ids'])) {
-                $coupon->courses()->sync($validated['course_ids']);
-            }
+                // Sync courses if scope is course
+                if ($validated['scope_type'] === Coupon::SCOPE_COURSE && !empty($validated['course_ids'])) {
+                    $coupon->courses()->sync($validated['course_ids']);
+                }
 
-            // Sync categories if scope is category
-            if ($validated['scope_type'] === Coupon::SCOPE_CATEGORY && !empty($validated['category_ids'])) {
-                $coupon->categories()->sync($validated['category_ids']);
-            }
+                // Sync categories if scope is category
+                if ($validated['scope_type'] === Coupon::SCOPE_CATEGORY && !empty($validated['category_ids'])) {
+                    $coupon->categories()->sync($validated['category_ids']);
+                }
 
-            return $coupon;
-        });
+                return $coupon;
+            });
 
-        return response()->json([
-            'message' => 'Coupon created successfully!',
-            'coupon' => $coupon->load(['courses:id,title', 'categories:id,name', 'restrictedUser:id,name,phone,email']),
-        ], 201);
+            return response()->json([
+                'message' => 'Coupon created successfully!',
+                'coupon' => $coupon->load(['courses:id,title', 'categories:id,name', 'restrictedUser:id,name,phone,email']),
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to create coupon: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -183,6 +202,8 @@ class AdminCouponController extends Controller
      */
     public function show($id): JsonResponse
     {
+        Coupon::ensureTableExists();
+
         $coupon = Coupon::with([
             'courses:id,title,price',
             'categories:id,name',
@@ -203,6 +224,8 @@ class AdminCouponController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
+        Coupon::ensureTableExists();
+
         $coupon = Coupon::findOrFail($id);
 
         $validated = $request->validate([
@@ -227,50 +250,65 @@ class AdminCouponController extends Controller
             'usage_limit' => ['nullable', 'integer', 'min:1'],
             'usage_limit_per_user' => ['nullable', 'integer', 'min:1'],
             'start_date' => ['nullable', 'date'],
-            'expiry_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'is_active' => ['boolean'],
+            'expiry_date' => ['nullable', 'date'],
+            'is_active' => ['nullable', 'boolean'],
         ]);
+
+        if (!empty($validated['start_date']) && !empty($validated['expiry_date'])) {
+            if (strtotime($validated['expiry_date']) < strtotime($validated['start_date'])) {
+                return response()->json([
+                    'message' => 'Expiry date must be after or equal to start date.',
+                    'errors' => ['expiry_date' => ['Expiry date must be after or equal to start date.']],
+                ], 422);
+            }
+        }
 
         $code = strtoupper(trim($validated['code']));
 
-        DB::transaction(function () use ($coupon, $validated, $code) {
-            $coupon->update([
-                'code' => $code,
-                'title' => !empty($validated['title']) ? $validated['title'] : ($coupon->title ?: $code),
-                'description' => $validated['description'] ?? null,
-                'discount_type' => $validated['discount_type'],
-                'discount_amount' => $validated['discount_amount'],
-                'max_discount_amount' => $validated['max_discount_amount'] ?? null,
-                'min_order_amount' => $validated['min_order_amount'] ?? null,
-                'scope_type' => $validated['scope_type'] ?? 'all',
-                'user_restriction_type' => $validated['user_restriction_type'] ?? 'all',
-                'restricted_user_id' => ($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC ? $validated['restricted_user_id'] : null,
-                'usage_limit' => $validated['usage_limit'] ?? null,
-                'usage_limit_per_user' => !empty($validated['usage_limit_per_user']) ? $validated['usage_limit_per_user'] : null,
-                'start_date' => $validated['start_date'] ?? null,
-                'expiry_date' => $validated['expiry_date'] ?? null,
-                'is_active' => $validated['is_active'] ?? $coupon->is_active,
+        try {
+            DB::transaction(function () use ($coupon, $validated, $code) {
+                $coupon->update([
+                    'code' => $code,
+                    'title' => !empty($validated['title']) ? $validated['title'] : ($coupon->title ?: $code),
+                    'description' => $validated['description'] ?? null,
+                    'discount_type' => $validated['discount_type'],
+                    'discount_amount' => $validated['discount_amount'],
+                    'max_discount_amount' => $validated['max_discount_amount'] ?? null,
+                    'min_order_amount' => $validated['min_order_amount'] ?? null,
+                    'scope_type' => $validated['scope_type'] ?? 'all',
+                    'user_restriction_type' => $validated['user_restriction_type'] ?? 'all',
+                    'restricted_user_id' => ($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC ? $validated['restricted_user_id'] : null,
+                    'usage_limit' => $validated['usage_limit'] ?? null,
+                    'usage_limit_per_user' => !empty($validated['usage_limit_per_user']) ? $validated['usage_limit_per_user'] : 1,
+                    'start_date' => $validated['start_date'] ?? null,
+                    'expiry_date' => $validated['expiry_date'] ?? null,
+                    'is_active' => $validated['is_active'] ?? $coupon->is_active,
+                ]);
+
+                // Sync courses
+                if ($validated['scope_type'] === Coupon::SCOPE_COURSE) {
+                    $coupon->courses()->sync($validated['course_ids'] ?? []);
+                } else {
+                    $coupon->courses()->detach();
+                }
+
+                // Sync categories
+                if ($validated['scope_type'] === Coupon::SCOPE_CATEGORY) {
+                    $coupon->categories()->sync($validated['category_ids'] ?? []);
+                } else {
+                    $coupon->categories()->detach();
+                }
+            });
+
+            return response()->json([
+                'message' => 'Coupon updated successfully!',
+                'coupon' => $coupon->fresh(['courses:id,title', 'categories:id,name', 'restrictedUser:id,name,phone,email']),
             ]);
-
-            // Sync courses
-            if ($validated['scope_type'] === Coupon::SCOPE_COURSE) {
-                $coupon->courses()->sync($validated['course_ids'] ?? []);
-            } else {
-                $coupon->courses()->detach();
-            }
-
-            // Sync categories
-            if ($validated['scope_type'] === Coupon::SCOPE_CATEGORY) {
-                $coupon->categories()->sync($validated['category_ids'] ?? []);
-            } else {
-                $coupon->categories()->detach();
-            }
-        });
-
-        return response()->json([
-            'message' => 'Coupon updated successfully!',
-            'coupon' => $coupon->fresh(['courses:id,title', 'categories:id,name', 'restrictedUser:id,name,phone,email']),
-        ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to update coupon: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

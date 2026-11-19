@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class Coupon extends Model
 {
@@ -23,6 +25,110 @@ class Coupon extends Model
 
     public const USER_ALL = 'all';
     public const USER_SPECIFIC = 'specific';
+
+    public static function ensureTableExists(): void
+    {
+        if (!Schema::hasTable('coupons')) {
+            try {
+                Schema::create('coupons', function (Blueprint $table) {
+                    $table->id();
+                    $table->string('code', 50)->unique();
+                    $table->string('title');
+                    $table->text('description')->nullable();
+                    $table->enum('discount_type', ['fixed', 'percentage'])->default('fixed');
+                    $table->decimal('discount_amount', 10, 2);
+                    $table->decimal('max_discount_amount', 10, 2)->nullable();
+                    $table->decimal('min_order_amount', 10, 2)->nullable();
+                    $table->enum('scope_type', ['all', 'course', 'category'])->default('all');
+                    $table->enum('user_restriction_type', ['all', 'specific'])->default('all');
+                    $table->unsignedBigInteger('restricted_user_id')->nullable();
+                    $table->unsignedInteger('usage_limit')->nullable();
+                    $table->unsignedInteger('usage_limit_per_user')->default(1)->nullable();
+                    $table->unsignedInteger('times_used')->default(0);
+                    $table->dateTime('start_date')->nullable();
+                    $table->dateTime('expiry_date')->nullable();
+                    $table->boolean('is_active')->default(true);
+                    $table->unsignedBigInteger('created_by')->nullable();
+                    $table->softDeletes();
+                    $table->timestamps();
+
+                    $table->index(['code', 'is_active']);
+                });
+            } catch (\Throwable $e) {}
+        } else {
+            try {
+                if (!Schema::hasColumn('coupons', 'deleted_at')) {
+                    Schema::table('coupons', function (Blueprint $table) {
+                        $table->softDeletes();
+                    });
+                }
+                if (!Schema::hasColumn('coupons', 'usage_limit_per_user')) {
+                    Schema::table('coupons', function (Blueprint $table) {
+                        $table->unsignedInteger('usage_limit_per_user')->default(1)->nullable();
+                    });
+                }
+                if (!Schema::hasColumn('coupons', 'times_used')) {
+                    Schema::table('coupons', function (Blueprint $table) {
+                        $table->unsignedInteger('times_used')->default(0);
+                    });
+                }
+                if (!Schema::hasColumn('coupons', 'user_restriction_type')) {
+                    Schema::table('coupons', function (Blueprint $table) {
+                        $table->string('user_restriction_type', 20)->default('all');
+                    });
+                }
+                if (!Schema::hasColumn('coupons', 'restricted_user_id')) {
+                    Schema::table('coupons', function (Blueprint $table) {
+                        $table->unsignedBigInteger('restricted_user_id')->nullable();
+                    });
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        if (!Schema::hasTable('coupon_courses')) {
+            try {
+                Schema::create('coupon_courses', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('coupon_id');
+                    $table->unsignedBigInteger('course_id');
+                    $table->timestamps();
+                    $table->index(['coupon_id', 'course_id']);
+                });
+            } catch (\Throwable $e) {}
+        }
+
+        if (!Schema::hasTable('coupon_categories')) {
+            try {
+                Schema::create('coupon_categories', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('coupon_id');
+                    $table->unsignedBigInteger('category_id');
+                    $table->timestamps();
+                    $table->index(['coupon_id', 'category_id']);
+                });
+            } catch (\Throwable $e) {}
+        }
+
+        if (!Schema::hasTable('coupon_usages')) {
+            try {
+                Schema::create('coupon_usages', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('coupon_id');
+                    $table->unsignedBigInteger('user_id');
+                    $table->unsignedBigInteger('order_id')->nullable();
+                    $table->decimal('discount_amount', 10, 2)->default(0);
+                    $table->timestamps();
+                    $table->index(['coupon_id', 'user_id']);
+                });
+            } catch (\Throwable $e) {}
+        }
+    }
+
+    public static function booted(): void
+    {
+        parent::booted();
+        static::ensureTableExists();
+    }
 
     protected $fillable = [
         'code',

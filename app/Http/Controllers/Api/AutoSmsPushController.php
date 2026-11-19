@@ -170,7 +170,7 @@ class AutoSmsPushController extends Controller
             $validated['template']
         );
 
-        $result = $smsService->sendSms($validated['phone'], $rendered, 'test_auto_push');
+        $result = $smsService->sendSms($validated['phone'], $rendered, 'test_auto_push', null, true);
 
         return response()->json([
             'message' => $result['message'] ?? 'Test SMS processed.',

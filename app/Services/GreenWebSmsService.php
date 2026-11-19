@@ -16,13 +16,13 @@ class GreenWebSmsService
     public function __construct()
     {
         $settings = SmsSetting::current();
-        $this->token = $settings->api_token;
+        $this->token = !empty($settings->api_token) ? trim((string) $settings->api_token) : null;
         $this->enabled = (bool) $settings->sms_enabled;
     }
 
     public function isConfigured(): bool
     {
-        return ! empty($this->token);
+        return !empty($this->token);
     }
 
     public function isEnabled(): bool
@@ -35,7 +35,7 @@ class GreenWebSmsService
      *
      * @return array [success => bool, status => string, message => string]
      */
-    public function sendSms(string $phone, string $message, string $type = 'transactional', ?int $campaignId = null): array
+    public function sendSms(string $phone, string $message, string $type = 'transactional', ?int $campaignId = null, bool $forceLive = false): array
     {
         $normalizedPhone = User::normalizePhone($phone);
         if (! $normalizedPhone || ! User::isValidPhoneNumber($normalizedPhone)) {
@@ -49,34 +49,62 @@ class GreenWebSmsService
         // GreenWeb standard recipient format: 8801XXXXXXXXX or 01XXXXXXXXX
         $recipient = ltrim($normalizedPhone, '+');
 
-        if (! $this->isEnabled()) {
-            // Simulated / Mock mode
+        $isTestMode = $forceLive || in_array($type, ['test', 'test_auto_push', 'test_sms'], true);
+
+        if (! $this->isConfigured()) {
+            return [
+                'success' => false,
+                'status' => 'not_configured',
+                'message' => 'GreenWeb SMS token is not configured. Please set your API token in SMS Settings.',
+            ];
+        }
+
+        if (! $this->isEnabled() && ! $isTestMode) {
             SmsLog::create([
                 'campaign_id' => $campaignId,
                 'phone' => $normalizedPhone,
                 'message' => $message,
-                'status' => 'simulated',
+                'status' => 'disabled',
                 'type' => $type,
-                'response_payload' => json_encode(['note' => 'SMS gateway is disabled or in simulation mode']),
+                'response_payload' => json_encode(['note' => 'SMS gateway is disabled in settings']),
                 'created_at' => now(),
             ]);
 
             return [
-                'success' => true,
-                'status' => 'simulated',
-                'message' => 'SMS simulated successfully (gateway disabled).',
+                'success' => false,
+                'status' => 'disabled',
+                'message' => 'SMS gateway is currently disabled. Please toggle SMS Enabled ON in SMS Settings.',
             ];
         }
 
         try {
-            $response = Http::timeout(10)->asForm()->post('http://api.greenweb.com.bd/api.php', [
-                'token' => $this->token,
+            $postData = [
+                'token' => trim((string) $this->token),
                 'to' => $recipient,
                 'message' => $message,
-            ]);
+            ];
 
-            $responseBody = $response->body();
-            $isSuccess = $response->successful() && ! str_contains(strtolower($responseBody), 'error');
+            // Attempt via HTTPS first without verifying local CA certs (fixes shared hosting curl 60 errors)
+            try {
+                $response = Http::timeout(15)
+                    ->withoutVerifying()
+                    ->withHeaders([
+                        'User-Agent' => 'NovoNex-LMS/1.0',
+                        'Accept' => '*/*',
+                    ])
+                    ->asForm()
+                    ->post('https://api.greenweb.com.bd/api.php', $postData);
+            } catch (\Throwable $httpsEx) {
+                // Fallback to HTTP if HTTPS connection is blocked on host
+                $response = Http::timeout(15)
+                    ->asForm()
+                    ->post('http://api.greenweb.com.bd/api.php', $postData);
+            }
+
+            $responseBody = trim($response->body());
+            $isSuccess = $response->successful()
+                && ! str_starts_with(strtolower($responseBody), 'error')
+                && ! str_contains(strtolower($responseBody), 'error:');
 
             SmsLog::create([
                 'campaign_id' => $campaignId,
@@ -91,7 +119,7 @@ class GreenWebSmsService
             return [
                 'success' => $isSuccess,
                 'status' => $isSuccess ? 'sent' : 'failed',
-                'message' => $responseBody,
+                'message' => $responseBody ?: ($isSuccess ? 'SMS sent successfully.' : 'No response from SMS gateway.'),
             ];
         } catch (\Throwable $e) {
             Log::error('GreenWeb SMS Error: ' . $e->getMessage());
@@ -109,7 +137,7 @@ class GreenWebSmsService
             return [
                 'success' => false,
                 'status' => 'error',
-                'message' => 'Failed to reach SMS provider.',
+                'message' => 'Failed to reach SMS provider: ' . $e->getMessage(),
             ];
         }
     }
@@ -128,15 +156,25 @@ class GreenWebSmsService
         }
 
         try {
-            $response = Http::timeout(8)->get('http://api.greenweb.com.bd/g_api.php', [
-                'token' => $this->token,
-                'balance' => 'true',
-            ]);
+            $token = trim((string) $this->token);
+            try {
+                $response = Http::timeout(10)
+                    ->withoutVerifying()
+                    ->get('https://api.greenweb.com.bd/g_api.php', [
+                        'token' => $token,
+                        'balance' => 'true',
+                    ]);
+            } catch (\Throwable $e) {
+                $response = Http::timeout(10)->get('http://api.greenweb.com.bd/g_api.php', [
+                    'token' => $token,
+                    'balance' => 'true',
+                ]);
+            }
 
             return [
                 'success' => $response->successful(),
-                'message' => $response->body(),
-                'balance' => $response->body(),
+                'message' => trim($response->body()),
+                'balance' => trim($response->body()),
             ];
         } catch (\Throwable $e) {
             return [

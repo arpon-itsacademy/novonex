@@ -307,6 +307,14 @@ class OrderController extends Controller
             ], 500);
         }
 
+        if ($isFree) {
+            try {
+                app(\App\Services\CoursePurchaseSmsService::class)->sendPurchaseSms($order);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Purchase SMS failed on free checkout: ' . $e->getMessage());
+            }
+        }
+
         return response()->json([
             'message' => $isFree ? 'Enrolled in course(s) successfully!' : 'Order placed successfully. Enrollment will be activated upon payment verification.',
             'is_free' => $isFree,

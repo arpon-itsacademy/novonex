@@ -469,7 +469,14 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
             setModalOpen(false);
             fetchCoupons();
         } catch (err: any) {
-            const msg = err.response?.data?.message || err.response?.data?.errors?.code?.[0] || 'Failed to save coupon.';
+            let msg = err.response?.data?.message || 'Failed to save coupon.';
+            const validationErrors = err.response?.data?.errors;
+            if (validationErrors && typeof validationErrors === 'object') {
+                const firstKey = Object.keys(validationErrors)[0];
+                if (firstKey && validationErrors[firstKey]?.[0]) {
+                    msg = `${msg} (${validationErrors[firstKey][0]})`;
+                }
+            }
             setFormError(msg);
         } finally {
             setSaving(false);

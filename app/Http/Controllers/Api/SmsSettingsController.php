@@ -57,10 +57,12 @@ class SmsSettingsController extends Controller
 
         $settings->update($updateData);
 
-        AuditLog::log('sms_settings_updated', 'SmsSetting', $settings->id, null, [
-            'sms_enabled' => $settings->sms_enabled,
-            'otp_enabled' => $settings->otp_enabled,
-        ]);
+        try {
+            AuditLog::log('sms_settings_updated', 'SmsSetting', $settings->id, null, [
+                'sms_enabled' => $settings->sms_enabled,
+                'otp_enabled' => $settings->otp_enabled,
+            ]);
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'message' => 'SMS configuration saved successfully.',
@@ -85,7 +87,10 @@ class SmsSettingsController extends Controller
 
         $result = $smsService->sendSms(
             $validated['phone'],
-            'Novonex LMS: This is a test message from SMS gateway.'
+            'Novonex LMS: This is a test message from SMS gateway.',
+            'test',
+            null,
+            true
         );
 
         return response()->json($result);
