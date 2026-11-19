@@ -23,6 +23,7 @@ class WebsiteSetting extends Model
         'footer_settings',
         'manual_payment_settings',
         'shurjopay_settings',
+        'vdocipher_settings',
         'openai_settings',
     ];
 
@@ -31,6 +32,7 @@ class WebsiteSetting extends Model
         'footer_settings' => 'array',
         'manual_payment_settings' => 'array',
         'shurjopay_settings' => 'array',
+        'vdocipher_settings' => 'array',
         'openai_settings' => 'array',
     ];
 
@@ -235,12 +237,32 @@ class WebsiteSetting extends Model
         ];
     }
 
+    public static function defaultVdocipherSettings(): array
+    {
+        return [
+            'enabled' => true,
+            'api_secret_key' => '',
+            'folder_id' => '',
+            'watermark_enabled' => true,
+        ];
+    }
+
     public static function current(): self
     {
         if (Schema::hasTable('website_settings') && !Schema::hasColumn('website_settings', 'shurjopay_settings')) {
             try {
                 Schema::table('website_settings', function (Blueprint $table) {
                     $table->json('shurjopay_settings')->nullable()->after('manual_payment_settings');
+                });
+            } catch (\Throwable $e) {
+                // Table/column might already exist
+            }
+        }
+
+        if (Schema::hasTable('website_settings') && !Schema::hasColumn('website_settings', 'vdocipher_settings')) {
+            try {
+                Schema::table('website_settings', function (Blueprint $table) {
+                    $table->json('vdocipher_settings')->nullable()->after('shurjopay_settings');
                 });
             } catch (\Throwable $e) {
                 // Table/column might already exist
@@ -264,6 +286,7 @@ class WebsiteSetting extends Model
                 'footer_settings' => static::defaultFooterSettings(),
                 'manual_payment_settings' => static::defaultManualPaymentSettings(),
                 'shurjopay_settings' => static::defaultShurjopaySettings(),
+                'vdocipher_settings' => static::defaultVdocipherSettings(),
                 'openai_settings' => static::defaultOpenaiSettings(),
             ]);
         }
@@ -304,6 +327,9 @@ class WebsiteSetting extends Model
         }
         if (empty($setting->shurjopay_settings)) {
             $setting->shurjopay_settings = static::defaultShurjopaySettings();
+        }
+        if (empty($setting->vdocipher_settings)) {
+            $setting->vdocipher_settings = static::defaultVdocipherSettings();
         }
 
         return $setting;

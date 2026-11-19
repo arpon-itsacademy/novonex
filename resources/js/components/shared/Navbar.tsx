@@ -6,19 +6,19 @@ import { useSettings } from '../../context/SettingsContext';
 import { ThemeSwitcher } from '../ui/ThemeSwitcher';
 import { getLocalizedText } from '../../utils/localization';
 import { apiClient } from '../../api/client';
-import { 
+import {
     Home,
-    GraduationCap, 
-    BookOpen, 
-    FileText, 
-    Users, 
+    GraduationCap,
+    BookOpen,
+    FileText,
+    Users,
     ClipboardList,
     Search,
-    Menu, 
-    X, 
-    User as UserIcon, 
-    LayoutDashboard, 
-    LogOut, 
+    Menu,
+    X,
+    User as UserIcon,
+    LayoutDashboard,
+    LogOut,
     ChevronDown,
     Sparkles,
     Boxes,
@@ -159,7 +159,7 @@ export const Navbar: React.FC = () => {
                 setNotifications(data.data || []);
                 const unreadRes = await apiClient.get('/notifications/unread-count');
                 setUnreadCount(unreadRes.data.unread_count || 0);
-            } catch {}
+            } catch { }
         };
         fetchNotifs();
         const interval = setInterval(fetchNotifs, 30000);
@@ -171,7 +171,7 @@ export const Navbar: React.FC = () => {
             await apiClient.post('/notifications/read-all');
             setUnreadCount(0);
             setNotifications(prev => prev.map(n => ({ ...n, read_at: new Date().toISOString() })));
-        } catch {}
+        } catch { }
     };
 
     const handleNotificationClick = async (n: any) => {
@@ -181,7 +181,7 @@ export const Navbar: React.FC = () => {
                 setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, read_at: new Date().toISOString() } : item));
                 setUnreadCount(prev => Math.max(0, prev - 1));
             }
-        } catch {}
+        } catch { }
         setNotifDropdownOpen(false);
         const targetLink = n.data?.link || n.link;
         if (targetLink) {
@@ -230,7 +230,7 @@ export const Navbar: React.FC = () => {
         setBannerDismissed(true);
         try {
             sessionStorage.setItem(`novonex_header_banner_dismissed_${bannerKey}`, 'true');
-        } catch {}
+        } catch { }
     };
 
     const shouldShowBanner = Boolean(
@@ -342,11 +342,10 @@ export const Navbar: React.FC = () => {
                                         >
                                             <Link
                                                 to={item.url}
-                                                className={`flex items-center gap-1 text-xs sm:text-sm font-semibold transition-colors py-1 ${
-                                                    isOpen || (location.pathname.startsWith(item.url) && item.url !== '/')
-                                                        ? 'text-[#25a2ee]'
-                                                        : 'text-slate-800 dark:text-slate-200 hover:text-[#25a2ee]'
-                                                }`}
+                                                className={`flex items-center gap-1 text-xs sm:text-sm font-semibold transition-colors py-1 ${isOpen || (location.pathname.startsWith(item.url) && item.url !== '/')
+                                                    ? 'text-[#25a2ee]'
+                                                    : 'text-slate-800 dark:text-slate-200 hover:text-[#25a2ee]'
+                                                    }`}
                                             >
                                                 <span>{itemLabel}</span>
                                                 <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#25a2ee]' : ''}`} />
@@ -403,11 +402,10 @@ export const Navbar: React.FC = () => {
                                     <Link
                                         key={item.id}
                                         to={item.url}
-                                        className={`text-xs sm:text-sm font-semibold transition-colors ${
-                                            isCurrentActive
-                                                ? 'text-[#25a2ee] font-bold'
-                                                : 'text-slate-800 dark:text-slate-200 hover:text-[#25a2ee]'
-                                        }`}
+                                        className={`text-xs sm:text-sm font-semibold transition-colors ${isCurrentActive
+                                            ? 'text-[#25a2ee] font-bold'
+                                            : 'text-slate-800 dark:text-slate-200 hover:text-[#25a2ee]'
+                                            }`}
                                     >
                                         {itemLabel}
                                     </Link>
@@ -450,7 +448,7 @@ export const Navbar: React.FC = () => {
                                     </button>
 
                                     {notifDropdownOpen && (
-                                        <div 
+                                        <div
                                             className="absolute right-0 mt-2 w-72 sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
                                             onMouseLeave={() => setNotifDropdownOpen(false)}
                                         >
@@ -473,12 +471,11 @@ export const Navbar: React.FC = () => {
                                                     </div>
                                                 ) : (
                                                     notifications.slice(0, 8).map((n) => (
-                                                        <div 
-                                                            key={n.id} 
+                                                        <div
+                                                            key={n.id}
                                                             onClick={() => handleNotificationClick(n)}
-                                                            className={`p-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer ${
-                                                                !n.read_at ? 'bg-sky-50/50 dark:bg-sky-950/40' : ''
-                                                            }`}
+                                                            className={`p-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer ${!n.read_at ? 'bg-sky-50/50 dark:bg-sky-950/40' : ''
+                                                                }`}
                                                         >
                                                             <div className="flex items-center justify-between gap-1">
                                                                 <p className="text-xs font-bold text-slate-800 dark:text-slate-100 line-clamp-1">
@@ -708,137 +705,137 @@ export const Navbar: React.FC = () => {
             )}
 
             {/* 10 MINUTE SCHOOL STYLE SUB-HEADER BANNER */}
-        {shouldShowBanner && (
-            <div
-                style={{
-                    backgroundColor: headerSettings?.banner_bg_color || '#8a0000',
-                    color: headerSettings?.banner_text_color || '#ffffff',
-                }}
-                className="w-full relative shadow-xs overflow-hidden border-b border-black/10 z-40 transition-all duration-300"
-            >
-                {/* Mode 1: Image Banner */}
-                {headerSettings?.banner_mode !== 'text' && headerSettings?.banner_image_url ? (
-                    headerSettings.banner_link ? (
-                        headerSettings.banner_link.startsWith('http') ? (
-                            <a
-                                href={headerSettings.banner_link}
-                                target={headerSettings.banner_link_open_new_tab ? '_blank' : '_self'}
-                                rel={headerSettings.banner_link_open_new_tab ? 'noopener noreferrer' : undefined}
-                                className="block relative w-full h-[55px] sm:h-[70px] md:h-[80px] lg:h-[85px] group overflow-hidden"
-                            >
-                                <img
-                                    src={headerSettings.banner_image_url}
-                                    alt={headerSettings.banner_title || 'Promotional Banner'}
-                                    className="w-full h-full object-cover sm:object-contain object-center mx-auto transition-transform duration-300 group-hover:scale-[1.008]"
-                                />
-                            </a>
+            {shouldShowBanner && (
+                <div
+                    style={{
+                        backgroundColor: headerSettings?.banner_bg_color || '#8a0000',
+                        color: headerSettings?.banner_text_color || '#ffffff',
+                    }}
+                    className="w-full relative shadow-xs overflow-hidden border-b border-black/10 z-40 transition-all duration-300"
+                >
+                    {/* Mode 1: Image Banner */}
+                    {headerSettings?.banner_mode !== 'text' && headerSettings?.banner_image_url ? (
+                        headerSettings.banner_link ? (
+                            headerSettings.banner_link.startsWith('http') ? (
+                                <a
+                                    href={headerSettings.banner_link}
+                                    target={headerSettings.banner_link_open_new_tab ? '_blank' : '_self'}
+                                    rel={headerSettings.banner_link_open_new_tab ? 'noopener noreferrer' : undefined}
+                                    className="block relative w-full h-[55px] sm:h-[70px] md:h-[80px] lg:h-[85px] group overflow-hidden"
+                                >
+                                    <img
+                                        src={headerSettings.banner_image_url}
+                                        alt={headerSettings.banner_title || 'Promotional Banner'}
+                                        className="w-full h-full object-cover sm:object-contain object-center mx-auto transition-transform duration-300 group-hover:scale-[1.008]"
+                                    />
+                                </a>
+                            ) : (
+                                <Link
+                                    to={headerSettings.banner_link}
+                                    className="block relative w-full h-[55px] sm:h-[70px] md:h-[80px] lg:h-[85px] group overflow-hidden"
+                                >
+                                    <img
+                                        src={headerSettings.banner_image_url}
+                                        alt={headerSettings.banner_title || 'Promotional Banner'}
+                                        className="w-full h-full object-cover sm:object-contain object-center mx-auto transition-transform duration-300 group-hover:scale-[1.008]"
+                                    />
+                                </Link>
+                            )
                         ) : (
-                            <Link
-                                to={headerSettings.banner_link}
-                                className="block relative w-full h-[55px] sm:h-[70px] md:h-[80px] lg:h-[85px] group overflow-hidden"
-                            >
+                            <div className="relative w-full h-[55px] sm:h-[70px] md:h-[80px] lg:h-[85px] overflow-hidden">
                                 <img
                                     src={headerSettings.banner_image_url}
                                     alt={headerSettings.banner_title || 'Promotional Banner'}
-                                    className="w-full h-full object-cover sm:object-contain object-center mx-auto transition-transform duration-300 group-hover:scale-[1.008]"
+                                    className="w-full h-full object-cover sm:object-contain object-center mx-auto"
                                 />
-                            </Link>
+                            </div>
                         )
                     ) : (
-                        <div className="relative w-full h-[55px] sm:h-[70px] md:h-[80px] lg:h-[85px] overflow-hidden">
-                            <img
-                                src={headerSettings.banner_image_url}
-                                alt={headerSettings.banner_title || 'Promotional Banner'}
-                                className="w-full h-full object-cover sm:object-contain object-center mx-auto"
-                            />
-                        </div>
-                    )
-                ) : (
-                    /* Mode 2: Custom Text & Background Color Banner */
-                    <div className="py-2.5 sm:py-3 px-4 sm:px-6 lg:px-8">
-                        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs sm:text-sm">
-                            <div className="flex items-center gap-2.5 min-w-0 pr-6 sm:pr-0">
-                                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
-                                <span className="font-extrabold truncate text-white">
-                                    {headerSettings?.banner_title || 'First class is completely free in the new batch!'}
-                                </span>
-                                {headerSettings?.banner_subtitle && (
-                                    <span className="hidden md:inline text-xs text-white/90 truncate font-medium">
-                                        • {headerSettings.banner_subtitle}
+                        /* Mode 2: Custom Text & Background Color Banner */
+                        <div className="py-2.5 sm:py-3 px-4 sm:px-6 lg:px-8">
+                            <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs sm:text-sm">
+                                <div className="flex items-center gap-2.5 min-w-0 pr-6 sm:pr-0">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
+                                    <span className="font-extrabold truncate text-white">
+                                        {headerSettings?.banner_title || 'First class is completely free in the new batch!'}
                                     </span>
-                                )}
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                                {headerSettings?.banner_btn_text && (
-                                    headerSettings.banner_btn_link?.startsWith('http') ? (
-                                        <a
-                                            href={headerSettings.banner_btn_link}
-                                            target={headerSettings.banner_link_open_new_tab ? '_blank' : '_self'}
-                                            rel="noopener noreferrer"
-                                            style={{
-                                                backgroundColor: headerSettings.banner_btn_bg || '#16a34a',
-                                                color: headerSettings.banner_btn_text_color || '#ffffff',
-                                            }}
-                                            className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-lg text-xs font-black shadow-xs hover:brightness-110 transition-all flex items-center gap-1"
-                                        >
-                                            <span>{headerSettings.banner_btn_text}</span>
-                                            <ChevronRight className="w-3.5 h-3.5" />
-                                        </a>
-                                    ) : (
-                                        <Link
-                                            to={headerSettings.banner_btn_link || headerSettings.banner_link || '/courses'}
-                                            style={{
-                                                backgroundColor: headerSettings.banner_btn_bg || '#16a34a',
-                                                color: headerSettings.banner_btn_text_color || '#ffffff',
-                                            }}
-                                            className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-lg text-xs font-black shadow-xs hover:brightness-110 transition-all flex items-center gap-1"
-                                        >
-                                            <span>{headerSettings.banner_btn_text}</span>
-                                            <ChevronRight className="w-3.5 h-3.5" />
-                                        </Link>
-                                    )
-                                )}
-
-                                {headerSettings?.banner_secondary_text && (
-                                    headerSettings.banner_secondary_link ? (
-                                        <a
-                                            href={headerSettings.banner_secondary_link}
-                                            className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold transition-colors shadow-xs"
-                                        >
-                                            <PhoneCall className="w-3.5 h-3.5" />
-                                            <span>{headerSettings.banner_secondary_text}</span>
-                                        </a>
-                                    ) : (
-                                        <span className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/15 text-white text-xs font-bold shadow-xs">
-                                            <PhoneCall className="w-3.5 h-3.5" />
-                                            <span>{headerSettings.banner_secondary_text}</span>
+                                    {headerSettings?.banner_subtitle && (
+                                        <span className="hidden md:inline text-xs text-white/90 truncate font-medium">
+                                            • {headerSettings.banner_subtitle}
                                         </span>
-                                    )
-                                )}
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0">
+                                    {headerSettings?.banner_btn_text && (
+                                        headerSettings.banner_btn_link?.startsWith('http') ? (
+                                            <a
+                                                href={headerSettings.banner_btn_link}
+                                                target={headerSettings.banner_link_open_new_tab ? '_blank' : '_self'}
+                                                rel="noopener noreferrer"
+                                                style={{
+                                                    backgroundColor: headerSettings.banner_btn_bg || '#16a34a',
+                                                    color: headerSettings.banner_btn_text_color || '#ffffff',
+                                                }}
+                                                className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-lg text-xs font-black shadow-xs hover:brightness-110 transition-all flex items-center gap-1"
+                                            >
+                                                <span>{headerSettings.banner_btn_text}</span>
+                                                <ChevronRight className="w-3.5 h-3.5" />
+                                            </a>
+                                        ) : (
+                                            <Link
+                                                to={headerSettings.banner_btn_link || headerSettings.banner_link || '/courses'}
+                                                style={{
+                                                    backgroundColor: headerSettings.banner_btn_bg || '#16a34a',
+                                                    color: headerSettings.banner_btn_text_color || '#ffffff',
+                                                }}
+                                                className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-lg text-xs font-black shadow-xs hover:brightness-110 transition-all flex items-center gap-1"
+                                            >
+                                                <span>{headerSettings.banner_btn_text}</span>
+                                                <ChevronRight className="w-3.5 h-3.5" />
+                                            </Link>
+                                        )
+                                    )}
+
+                                    {headerSettings?.banner_secondary_text && (
+                                        headerSettings.banner_secondary_link ? (
+                                            <a
+                                                href={headerSettings.banner_secondary_link}
+                                                className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold transition-colors shadow-xs"
+                                            >
+                                                <PhoneCall className="w-3.5 h-3.5" />
+                                                <span>{headerSettings.banner_secondary_text}</span>
+                                            </a>
+                                        ) : (
+                                            <span className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/15 text-white text-xs font-bold shadow-xs">
+                                                <PhoneCall className="w-3.5 h-3.5" />
+                                                <span>{headerSettings.banner_secondary_text}</span>
+                                            </span>
+                                        )
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Dismiss / Close 'X' Button */}
-                {headerSettings?.banner_closeable !== false && (
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleDismissBanner();
-                        }}
-                        className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 w-6 h-6 rounded-full bg-black/40 hover:bg-black/75 text-white flex items-center justify-center transition-all cursor-pointer z-30 backdrop-blur-xs"
-                        title="Close Banner"
-                        aria-label="Close banner"
-                    >
-                        <X className="w-3.5 h-3.5" />
-                    </button>
-                )}
-            </div>
-        )}
-    </div>
+                    {/* Dismiss / Close 'X' Button */}
+                    {headerSettings?.banner_closeable !== false && (
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleDismissBanner();
+                            }}
+                            className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 w-6 h-6 rounded-full bg-black/40 hover:bg-black/75 text-white flex items-center justify-center transition-all cursor-pointer z-30 backdrop-blur-xs"
+                            title="Close Banner"
+                            aria-label="Close banner"
+                        >
+                            <X className="w-3.5 h-3.5" />
+                        </button>
+                    )}
+                </div>
+            )}
+        </div>
     );
 };

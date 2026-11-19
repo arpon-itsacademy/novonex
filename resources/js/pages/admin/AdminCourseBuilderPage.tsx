@@ -130,10 +130,20 @@ export const AdminCourseBuilderPage: React.FC = () => {
     const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
     const [lessonTitle, setLessonTitle] = useState('');
     const [lessonContent, setLessonContent] = useState('');
+    const [lessonVideoProvider, setLessonVideoProvider] = useState<'youtube' | 'vdocipher'>('youtube');
     const [lessonVideoUrl, setLessonVideoUrl] = useState('');
     const [lessonDuration, setLessonDuration] = useState('0');
     const [lessonIsPreview, setLessonIsPreview] = useState(false);
     const [lessonStatus, setLessonStatus] = useState<'draft' | 'published'>('published');
+
+    // VdoCipher upload & shortcode state for Lesson modal
+    const [vdoMode, setVdoMode] = useState<'upload' | 'shortcode'>('upload');
+    const [vdoSelectedFile, setVdoSelectedFile] = useState<File | null>(null);
+    const [vdoUploading, setVdoUploading] = useState(false);
+    const [vdoUploadProgress, setVdoUploadProgress] = useState(0);
+    const [vdoUploadStatus, setVdoUploadStatus] = useState('');
+    const [vdoUploadError, setVdoUploadError] = useState<string | null>(null);
+    const [vdoUploadedVideoId, setVdoUploadedVideoId] = useState<string | null>(null);
 
     // Attachments upload state
     const [uploadingAttachment, setUploadingAttachment] = useState(false);
@@ -644,10 +654,19 @@ export const AdminCourseBuilderPage: React.FC = () => {
         setEditingLesson(null);
         setLessonTitle('');
         setLessonContent('');
+        setLessonVideoProvider('youtube');
         setLessonVideoUrl('');
         setLessonDuration('0');
         setLessonIsPreview(false);
         setLessonStatus('published');
+        // Reset VdoCipher states
+        setVdoMode('upload');
+        setVdoSelectedFile(null);
+        setVdoUploading(false);
+        setVdoUploadProgress(0);
+        setVdoUploadStatus('');
+        setVdoUploadError(null);
+        setVdoUploadedVideoId(null);
         setLessonModalOpen(true);
     };
 
@@ -656,11 +675,102 @@ export const AdminCourseBuilderPage: React.FC = () => {
         setTargetSectionId(lesson.section_id);
         setLessonTitle(lesson.title);
         setLessonContent(lesson.content || '');
-        setLessonVideoUrl(lesson.video_url || '');
+        const rawUrl = lesson.video_url || '';
+        const isVdo = lesson.video_provider === 'vdocipher' || 
+                      rawUrl.includes('vdocipher') || 
+                      rawUrl.includes('[vdo') || 
+                      /^[a-f0-9]{32}$/i.test(rawUrl.trim());
+        setLessonVideoProvider(isVdo ? 'vdocipher' : 'youtube');
+        setLessonVideoUrl(rawUrl);
         setLessonDuration(String(lesson.duration_minutes || '0'));
         setLessonIsPreview(Boolean(lesson.is_preview));
         setLessonStatus(lesson.status);
+
+        // Reset VdoCipher states
+        setVdoMode(rawUrl ? 'shortcode' : 'upload');
+        setVdoSelectedFile(null);
+        setVdoUploading(false);
+        setVdoUploadProgress(0);
+        setVdoUploadStatus('');
+        setVdoUploadError(null);
+        setVdoUploadedVideoId(isVdo && rawUrl ? rawUrl : null);
         setLessonModalOpen(true);
+    };
+
+    const handleUploadToVdoCipher = async () => {
+        if (!vdoSelectedFile) {
+            setVdoUploadError('Please select a video file to upload.');
+            return;
+        }
+
+        setVdoUploading(true);
+        setVdoUploadProgress(0);
+        setVdoUploadError(null);
+        setVdoUploadStatus('Requesting secure VdoCipher upload link...');
+
+        try {
+            const credsRes = await apiClient.post('/vdocipher/upload-credentials', {
+                title: lessonTitle.trim() || vdoSelectedFile.name.replace(/\.[^/.]+$/, ''),
+            });
+
+            const { clientPayload, videoId, uploadLink } = credsRes.data;
+
+            if (!clientPayload || !uploadLink) {
+                throw new Error('Failed to obtain upload link from VdoCipher.');
+            }
+
+            setVdoUploadStatus('Uploading video directly to VdoCipher cloud storage...');
+
+            const formData = new FormData();
+            Object.keys(clientPayload).forEach((key) => {
+                if (key !== 'uploadLink') {
+                    formData.append(key, clientPayload[key]);
+                }
+            });
+            formData.append('file', vdoSelectedFile);
+
+            await new Promise<void>((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', uploadLink, true);
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        setVdoUploadProgress(percent);
+                        const loadedMb = (e.loaded / (1024 * 1024)).toFixed(1);
+                        const totalMb = (e.total / (1024 * 1024)).toFixed(1);
+                        setVdoUploadStatus(`Uploading: ${percent}% (${loadedMb} MB / ${totalMb} MB)`);
+                    }
+                };
+
+                xhr.onload = () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve();
+                    } else {
+                        reject(new Error(`VdoCipher S3 upload failed with HTTP status ${xhr.status}: ${xhr.statusText || 'Upload rejected'}`));
+                    }
+                };
+
+                xhr.onerror = () => {
+                    reject(new Error('Network error during video upload. Please check your internet connection.'));
+                };
+
+                xhr.send(formData);
+            });
+
+            setVdoUploadProgress(100);
+            setVdoUploadStatus('Video uploaded successfully! Cloud compression and DRM encryption initiated.');
+            setVdoUploadedVideoId(videoId);
+            setLessonVideoUrl(videoId);
+            setVdoSelectedFile(null);
+        } catch (err: any) {
+            console.error('VdoCipher direct upload error:', err);
+            const msg = err.response?.data?.message || err.message || 'Failed to upload video to VdoCipher.';
+            setVdoUploadError(msg);
+            setVdoUploadStatus('');
+        } finally {
+            setVdoUploading(false);
+        }
     };
 
     const handleSaveLesson = async (e: React.FormEvent) => {
@@ -668,6 +778,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
         const payload = {
             title: lessonTitle,
             content: lessonContent,
+            video_provider: lessonVideoProvider,
             video_url: lessonVideoUrl,
             duration_minutes: parseInt(lessonDuration, 10) || 0,
             is_preview: lessonIsPreview,
@@ -1091,7 +1202,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                     <PlayCircle className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-2 flex-wrap">
                                                         <h4 className="text-sm font-bold text-slate-800">{lesson.title}</h4>
                                                         {lesson.is_preview && (
                                                             <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
@@ -1101,6 +1212,11 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                                         {lesson.status === 'draft' && (
                                                             <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold">
                                                                 Draft
+                                                            </span>
+                                                        )}
+                                                        {Boolean(lesson.video_provider === 'vdocipher' || (lesson.video_url && (lesson.video_url.includes('[vdo') || /^[a-f0-9]{32}$/i.test(lesson.video_url.trim())))) && (
+                                                            <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold flex items-center gap-1" title="VdoCipher DRM Anti-Piracy Protected">
+                                                                <ShieldCheck className="w-3 h-3 text-purple-600" /> VdoCipher DRM
                                                             </span>
                                                         )}
                                                     </div>
@@ -2881,21 +2997,220 @@ export const AdminCourseBuilderPage: React.FC = () => {
                         />
                     </div>
 
-                    {/* Video Link */}
-                    <div className="space-y-4">
+                    {/* Video Source Selection */}
+                    <div className="space-y-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                                <Video className="w-3.5 h-3.5 text-sky-600" />
-                                <span>Lesson Video URL (YouTube / Vimeo / Direct Video URL)</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={lessonVideoUrl}
-                                onChange={(e) => setLessonVideoUrl(e.target.value)}
-                                placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..."
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500"
-                            />
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                    <Video className="w-4 h-4 text-[#25a2ee]" />
+                                    <span>Video Source</span>
+                                </label>
+                                {lessonVideoProvider === 'vdocipher' && (
+                                    <span className="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200 flex items-center gap-1">
+                                        <ShieldCheck className="w-3 h-3 text-purple-600" />
+                                        DRM Protected
+                                    </span>
+                                )}
+                            </div>
+                            <select
+                                value={lessonVideoProvider}
+                                onChange={(e) => {
+                                    const val = e.target.value as 'youtube' | 'vdocipher';
+                                    setLessonVideoProvider(val);
+                                    if (val === 'youtube' && (lessonVideoUrl.includes('[vdo') || /^[a-f0-9]{32}$/i.test(lessonVideoUrl.trim()))) {
+                                        setLessonVideoUrl('');
+                                    }
+                                }}
+                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-[#25a2ee]"
+                            >
+                                <option value="youtube">YouTube</option>
+                                <option value="vdocipher">VdoCipher (DRM Anti-Piracy)</option>
+                            </select>
                         </div>
+
+                        {/* YouTube Video URL Input */}
+                        {lessonVideoProvider === 'youtube' && (
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1">
+                                    YouTube Video URL
+                                </label>
+                                <input
+                                    type="text"
+                                    value={lessonVideoUrl}
+                                    onChange={(e) => setLessonVideoUrl(e.target.value)}
+                                    placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#25a2ee]"
+                                />
+                                <p className="text-[11px] text-slate-500 mt-1">
+                                    Paste standard YouTube or unlisted video URL.
+                                </p>
+                            </div>
+                        )}
+
+                        {/* VdoCipher Upload & Shortcode Options */}
+                        {lessonVideoProvider === 'vdocipher' && (
+                            <div className="space-y-3 pt-1">
+                                {/* Sub-mode Tabs */}
+                                <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setVdoMode('upload')}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                                            vdoMode === 'upload'
+                                                ? 'bg-[#25a2ee] text-white shadow-xs'
+                                                : 'text-slate-600 hover:bg-slate-200'
+                                        }`}
+                                    >
+                                        <Upload className="w-3.5 h-3.5" />
+                                        Upload Video
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setVdoMode('shortcode')}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                                            vdoMode === 'shortcode'
+                                                ? 'bg-[#25a2ee] text-white shadow-xs'
+                                                : 'text-slate-600 hover:bg-slate-200'
+                                        }`}
+                                    >
+                                        <FileText className="w-3.5 h-3.5" />
+                                        Shortcode / Video ID
+                                    </button>
+                                </div>
+
+                                {vdoMode === 'upload' ? (
+                                    <div className="space-y-3 bg-white p-4 rounded-xl border border-slate-200">
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                                                Select Video File to Upload
+                                            </label>
+                                            <input
+                                                type="file"
+                                                accept="video/mp4,video/quicktime,video/x-matroska,video/webm,video/x-msvideo,video/*"
+                                                onChange={(e) => {
+                                                    const f = e.target.files?.[0] || null;
+                                                    setVdoSelectedFile(f);
+                                                    setVdoUploadError(null);
+                                                    setVdoUploadStatus('');
+                                                }}
+                                                disabled={vdoUploading}
+                                                className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#25a2ee]/10 file:text-[#25a2ee] hover:file:bg-[#25a2ee]/20 cursor-pointer"
+                                            />
+                                            <p className="text-[11px] text-slate-500 mt-1">
+                                                Direct high-speed upload to VdoCipher cloud storage. Video will be automatically compressed, encrypted, and multi-bitrate DRM encoded.
+                                            </p>
+                                        </div>
+
+                                        {vdoSelectedFile && (
+                                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                                <div className="min-w-0 pr-3">
+                                                    <p className="text-xs font-bold text-slate-800 truncate">
+                                                        {vdoSelectedFile.name}
+                                                    </p>
+                                                    <p className="text-[11px] text-slate-500">
+                                                        {(vdoSelectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleUploadToVdoCipher}
+                                                    disabled={vdoUploading}
+                                                    className="shrink-0 px-4 py-2 bg-[#25a2ee] hover:bg-[#1f8ed1] text-white text-xs font-bold rounded-lg shadow-xs flex items-center gap-1.5 transition disabled:opacity-50"
+                                                >
+                                                    {vdoUploading ? (
+                                                        <>
+                                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                            Uploading...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Upload className="w-3.5 h-3.5" />
+                                                            Upload Now
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {/* Upload Progress Bar */}
+                                        {vdoUploading && (
+                                            <div className="space-y-1.5 pt-1">
+                                                <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                                                    <div
+                                                        className="bg-[#25a2ee] h-2.5 rounded-full transition-all duration-200"
+                                                        style={{ width: `${vdoUploadProgress}%` }}
+                                                    />
+                                                </div>
+                                                <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium">
+                                                    <span>{vdoUploadStatus}</span>
+                                                    <span>{vdoUploadProgress}%</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Upload Error */}
+                                        {vdoUploadError && (
+                                            <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs flex items-center gap-2">
+                                                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                                                <span>{vdoUploadError}</span>
+                                            </div>
+                                        )}
+
+                                        {/* Upload Success Badge */}
+                                        {lessonVideoUrl && (lessonVideoUrl.length === 32 || vdoUploadedVideoId) && (
+                                            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-xs space-y-1">
+                                                <div className="flex items-center gap-1.5 font-bold">
+                                                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                                    <span>Video Attached to Lesson!</span>
+                                                </div>
+                                                <p className="font-mono text-[11px] text-emerald-900 break-all">
+                                                    Video ID: {lessonVideoUrl}
+                                                </p>
+                                                <p className="text-[10px] text-emerald-700">
+                                                    VdoCipher cloud encoding is running. It will be protected with dynamic student watermarking.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2 bg-white p-4 rounded-xl border border-slate-200">
+                                        <label className="block text-xs font-bold text-slate-700">
+                                            VdoCipher Video ID or Shortcode
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={lessonVideoUrl}
+                                            onChange={(e) => setLessonVideoUrl(e.target.value)}
+                                            placeholder='e.g. 1234567890abcdef1234567890abcdef or [vdo id="..."]'
+                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-[#25a2ee]"
+                                        />
+                                        <p className="text-[11px] text-slate-500">
+                                            Enter the 32-character Video ID from your VdoCipher dashboard, or paste the WordPress embed shortcode <code className="bg-slate-100 px-1 py-0.5 rounded text-[10px]">[vdo id="..."]</code> or iframe embed code.
+                                        </p>
+                                        {lessonVideoUrl && (
+                                            <div className="pt-1">
+                                                {/^[a-f0-9]{32}$/i.test(lessonVideoUrl.trim()) ? (
+                                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                                        Valid 32-char VdoCipher Video ID detected
+                                                    </span>
+                                                ) : lessonVideoUrl.includes('[vdo') ? (
+                                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-md border border-sky-200">
+                                                        <CheckCircle2 className="w-3.5 h-3.5 text-[#25a2ee]" />
+                                                        VdoCipher WordPress Shortcode detected
+                                                    </span>
+                                                ) : lessonVideoUrl.includes('<iframe') ? (
+                                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-200">
+                                                        <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
+                                                        VdoCipher Embed Iframe detected
+                                                    </span>
+                                                ) : null}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">Lesson Duration (Minutes)</label>
@@ -2904,7 +3219,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 min={0}
                                 value={lessonDuration}
                                 onChange={(e) => setLessonDuration(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500"
+                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#25a2ee]"
                             />
                         </div>
                     </div>

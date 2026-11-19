@@ -204,11 +204,10 @@ export const StudentAffiliatePage: React.FC = () => {
             {/* Notification alert */}
             {alertMessage && (
                 <div
-                    className={`p-4 rounded-xl flex items-center justify-between transition-all ${
-                        alertMessage.type === 'success'
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                            : 'bg-red-50 text-red-800 border border-red-200'
-                    }`}
+                    className={`p-4 rounded-xl flex items-center justify-between transition-all ${alertMessage.type === 'success'
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                        : 'bg-red-50 text-red-800 border border-red-200'
+                        }`}
                 >
                     <div className="flex items-center gap-2">
                         {alertMessage.type === 'success' ? (
@@ -550,11 +549,10 @@ export const StudentAffiliatePage: React.FC = () => {
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         <span
-                                                            className={`inline-flex px-1.5 py-0.5 rounded-sm font-semibold ${
-                                                                comm.status === 'approved'
-                                                                    ? 'bg-emerald-50 text-emerald-700'
-                                                                    : 'bg-amber-50 text-amber-700'
-                                                            }`}
+                                                            className={`inline-flex px-1.5 py-0.5 rounded-sm font-semibold ${comm.status === 'approved'
+                                                                ? 'bg-emerald-50 text-emerald-700'
+                                                                : 'bg-amber-50 text-amber-700'
+                                                                }`}
                                                         >
                                                             {comm.status === 'approved' ? 'Approved' : 'Pending'}
                                                         </span>
@@ -620,13 +618,12 @@ export const StudentAffiliatePage: React.FC = () => {
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         <span
-                                                            className={`inline-flex px-1.5 py-0.5 rounded-sm font-semibold ${
-                                                                p.status === 'approved'
-                                                                    ? 'bg-emerald-50 text-emerald-700'
-                                                                    : p.status === 'pending'
+                                                            className={`inline-flex px-1.5 py-0.5 rounded-sm font-semibold ${p.status === 'approved'
+                                                                ? 'bg-emerald-50 text-emerald-700'
+                                                                : p.status === 'pending'
                                                                     ? 'bg-amber-50 text-amber-700'
                                                                     : 'bg-red-50 text-red-700'
-                                                            }`}
+                                                                }`}
                                                         >
                                                             {p.status === 'approved' ? 'Paid' : p.status === 'pending' ? 'Pending' : 'Cancelled'}
                                                         </span>

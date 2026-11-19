@@ -24,17 +24,6 @@ export const extractYouTubeId = (url?: string | null): string | null => {
     return match ? match[1] : null;
 };
 
-/**
- * Extracts Vimeo video ID from Vimeo URL formats.
- */
-export const extractVimeoId = (url?: string | null): string | null => {
-    if (!url) return null;
-    const cleanUrl = url.trim();
-    const regExp = /vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|)(\d+)(?:$|\/|\?)/;
-    const match = cleanUrl.match(regExp);
-    return match ? match[3] : null;
-};
-
 const QUALITY_STORAGE_KEY = 'novonex_video_quality';
 
 const QUALITY_OPTIONS = [
@@ -68,8 +57,7 @@ export const PlyrVideoPlayer: React.FC<PlyrVideoPlayerProps> = ({
     });
 
     const youtubeId = extractYouTubeId(url);
-    const vimeoId = !youtubeId ? extractVimeoId(url) : null;
-    const isDirectVideo = !youtubeId && !vimeoId && url && (
+    const isDirectVideo = !youtubeId && url && (
         url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.ogg') || url.includes('/media/') || url.includes('/storage/')
     );
 
@@ -216,7 +204,7 @@ export const PlyrVideoPlayer: React.FC<PlyrVideoPlayerProps> = ({
             }
             setControlsEl(null);
         };
-    }, [url, autoplay, youtubeId, vimeoId]);
+    }, [url, autoplay, youtubeId]);
 
     // Single click on video toggles Play/Pause
     const handleVideoClick = useCallback(() => {
@@ -305,17 +293,6 @@ export const PlyrVideoPlayer: React.FC<PlyrVideoPlayerProps> = ({
                             className="w-full h-full pointer-events-none"
                         />
                     </div>
-                ) : vimeoId ? (
-                    /* Vimeo Plyr Embed */
-                    <div className="plyr__video-embed w-full h-full">
-                        <iframe
-                            src={`https://player.vimeo.com/video/${vimeoId}?loop=false&byline=false&portrait=false&title=false&speed=true&transparent=0&gesture=media`}
-                            allowFullScreen
-                            allow="autoplay"
-                            title={title || 'Video Player'}
-                            className="w-full h-full pointer-events-none"
-                        />
-                    </div>
                 ) : (
                     /* Direct HTML5 Video (mp4, webm, etc.) */
                     <video
@@ -330,7 +307,7 @@ export const PlyrVideoPlayer: React.FC<PlyrVideoPlayerProps> = ({
                 )}
 
                 {/* Top Shield Mask: Conceals YouTube top bar, channel link, and title */}
-                {(youtubeId || vimeoId) && (
+                {youtubeId && (
                     <div 
                         className={`absolute top-0 left-0 right-0 h-16 z-[12] pointer-events-none bg-gradient-to-b from-black/90 via-black/40 to-transparent flex items-start px-4 pt-3 transition-opacity duration-300 ${
                             isHovered ? 'opacity-100' : 'opacity-0'
@@ -355,7 +332,7 @@ export const PlyrVideoPlayer: React.FC<PlyrVideoPlayerProps> = ({
                 {/* Click interceptor overlay:
                     Leaves bottom 64px clear so clicks and drags on the progress bar and controls never get hijacked.
                     Clicking video toggles play/pause, double clicking toggles fullscreen. */}
-                {(youtubeId || vimeoId) && (
+                {youtubeId && (
                     <div 
                         onClick={handleVideoClick}
                         onDoubleClick={handleDoubleClick}

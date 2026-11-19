@@ -465,7 +465,7 @@ export const ExamSubmissionsPage: React.FC = () => {
                                     <span>Submission Review: {selectedSubmission?.user?.name}</span>
                                 </h3>
                                 <p className="text-xs text-slate-500 mt-0.5">
-                                    Marks Obtained: <strong className="text-emerald-600">{selectedSubmission?.obtained_marks}</strong> / {selectedSubmission?.total_marks} • 
+                                    Marks Obtained: <strong className="text-emerald-600">{selectedSubmission?.obtained_marks}</strong> / {selectedSubmission?.total_marks} •
                                     Rank: <strong className="text-purple-600">#{selectedSubmission?.merit_position}</strong>
                                 </p>
                             </div>
@@ -495,13 +495,12 @@ export const ExamSubmissionsPage: React.FC = () => {
                                         return (
                                             <div
                                                 key={ans.id}
-                                                className={`p-4 rounded-xl border transition-colors space-y-3 ${
-                                                    isWritten
-                                                        ? 'bg-amber-50/30 dark:bg-amber-950/10 border-amber-200 dark:border-amber-900/40'
-                                                        : ans.is_correct
+                                                className={`p-4 rounded-xl border transition-colors space-y-3 ${isWritten
+                                                    ? 'bg-amber-50/30 dark:bg-amber-950/10 border-amber-200 dark:border-amber-900/40'
+                                                    : ans.is_correct
                                                         ? 'bg-emerald-50/30 dark:bg-emerald-950/10 border-emerald-200 dark:border-emerald-900/40'
                                                         : 'bg-rose-50/30 dark:bg-rose-950/10 border-rose-200 dark:border-rose-900/40'
-                                                }`}
+                                                    }`}
                                             >
                                                 {/* Question Header */}
                                                 <div className="flex items-start justify-between gap-3">
@@ -587,11 +586,10 @@ export const ExamSubmissionsPage: React.FC = () => {
                                                     <div className="pl-8 space-y-2 pt-1 text-xs">
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-bold text-slate-700 dark:text-slate-300">Student Answer:</span>
-                                                            <span className={`px-2.5 py-0.5 rounded-md font-mono font-bold ${
-                                                                ans.is_correct
-                                                                    ? 'bg-emerald-100 text-emerald-800'
-                                                                    : 'bg-rose-100 text-rose-800'
-                                                            }`}>
+                                                            <span className={`px-2.5 py-0.5 rounded-md font-mono font-bold ${ans.is_correct
+                                                                ? 'bg-emerald-100 text-emerald-800'
+                                                                : 'bg-rose-100 text-rose-800'
+                                                                }`}>
                                                                 {Array.isArray(ans.student_answer) ? (ans.student_answer.join(', ') || 'No answer submitted') : (ans.student_answer || 'No answer submitted')}
                                                             </span>
                                                         </div>

@@ -130,6 +130,7 @@ export interface Lesson {
     title: string;
     slug?: string;
     content?: string | null;
+    video_provider?: 'youtube' | 'vdocipher' | null;
     video_url?: string | null;
     duration_minutes: number;
     is_preview: boolean;
@@ -322,6 +323,13 @@ export interface ShurjopaySettings {
     description?: string;
 }
 
+export interface VdocipherSettings {
+    enabled: boolean;
+    api_secret_key: string;
+    folder_id?: string;
+    watermark_enabled?: boolean;
+}
+
 export interface WebsiteSetting {
     id?: number;
     site_name: string;
@@ -341,6 +349,7 @@ export interface WebsiteSetting {
     footer_settings?: FooterSettings;
     manual_payment_settings?: ManualPaymentSettings;
     shurjopay_settings?: ShurjopaySettings;
+    vdocipher_settings?: VdocipherSettings;
 }
 
 export interface SmsSetting {

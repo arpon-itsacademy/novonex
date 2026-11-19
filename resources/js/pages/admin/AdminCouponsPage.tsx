@@ -1,26 +1,26 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { apiClient, formatBDT } from '../../api/client';
-import { 
-    TicketPercent, 
-    Plus, 
-    Search, 
-    Filter, 
-    Copy, 
-    Check, 
-    Edit2, 
-    Trash2, 
-    Users, 
-    BookOpen, 
-    Calendar, 
-    AlertCircle, 
-    CheckCircle2, 
-    Sparkles, 
-    X, 
-    Loader2, 
-    Clock, 
-    Tag, 
-    ChevronDown, 
+import {
+    TicketPercent,
+    Plus,
+    Search,
+    Filter,
+    Copy,
+    Check,
+    Edit2,
+    Trash2,
+    Users,
+    BookOpen,
+    Calendar,
+    AlertCircle,
+    CheckCircle2,
+    Sparkles,
+    X,
+    Loader2,
+    Clock,
+    Tag,
+    ChevronDown,
     ChevronUp,
     Sliders,
     User as UserIcon,
@@ -168,7 +168,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
     const selectedCoursesList = useMemo(() => {
         const fromAll = allCourses.filter(c => formData.course_ids.includes(c.id));
         if (editingCoupon && editingCoupon.courses) {
-            const missing = editingCoupon.courses.filter(c => 
+            const missing = editingCoupon.courses.filter(c =>
                 formData.course_ids.includes(c.id) && !fromAll.some(a => a.id === c.id)
             );
             return [...fromAll, ...missing];
@@ -185,7 +185,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
     const selectedCategoriesList = useMemo(() => {
         const fromAll = allCategories.filter(cat => formData.category_ids.includes(cat.id));
         if (editingCoupon && editingCoupon.categories) {
-            const missing = editingCoupon.categories.filter(cat => 
+            const missing = editingCoupon.categories.filter(cat =>
                 formData.category_ids.includes(cat.id) && !fromAll.some(a => a.id === cat.id)
             );
             return [...fromAll, ...missing];
@@ -593,11 +593,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                             setStatusFilter(e.target.value);
                             setPage(1);
                         }}
-                        className={`px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500 ${
-                            statusFilter === 'trashed'
-                                ? 'border-rose-400 text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60'
-                                : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
-                        }`}
+                        className={`px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500 ${statusFilter === 'trashed'
+                            ? 'border-rose-400 text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60'
+                            : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
+                            }`}
                     >
                         <option value="">All Statuses</option>
                         <option value="active">Active</option>
@@ -612,11 +611,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                             setStatusFilter(prev => prev === 'trashed' ? '' : 'trashed');
                             setPage(1);
                         }}
-                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                            statusFilter === 'trashed'
-                                ? 'bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-200'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
-                        }`}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${statusFilter === 'trashed'
+                            ? 'bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-200'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
+                            }`}
                         title="Trash / Recycle Bin"
                     >
                         <Trash2 className="w-3.5 h-3.5 text-rose-500" />
@@ -834,11 +832,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                 <button
                                                     type="button"
                                                     onClick={() => handleToggleStatus(coupon.id)}
-                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
-                                                        coupon.is_active && !isExpired
-                                                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200'
-                                                            : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border border-slate-200'
-                                                    }`}
+                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${coupon.is_active && !isExpired
+                                                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200'
+                                                        : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border border-slate-200'
+                                                        }`}
                                                 >
                                                     <span className={`w-1.5 h-1.5 rounded-full ${coupon.is_active && !isExpired ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                                                     {coupon.is_active && !isExpired ? 'Active' : 'Inactive'}
@@ -1060,33 +1057,30 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                             <button
                                                 type="button"
                                                 onClick={() => setFormData(prev => ({ ...prev, scope_type: 'all' }))}
-                                                className={`py-2 px-3 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
-                                                    formData.scope_type === 'all'
-                                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                                                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
-                                                }`}
+                                                className={`py-2 px-3 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${formData.scope_type === 'all'
+                                                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                                                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                                                    }`}
                                             >
                                                 Open (All Courses)
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setFormData(prev => ({ ...prev, scope_type: 'course' }))}
-                                                className={`py-2 px-3 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
-                                                    formData.scope_type === 'course'
-                                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                                                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
-                                                }`}
+                                                className={`py-2 px-3 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${formData.scope_type === 'course'
+                                                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                                                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                                                    }`}
                                             >
                                                 Specific Course(s)
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setFormData(prev => ({ ...prev, scope_type: 'category' }))}
-                                                className={`py-2 px-3 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
-                                                    formData.scope_type === 'category'
-                                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                                                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
-                                                }`}
+                                                className={`py-2 px-3 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${formData.scope_type === 'category'
+                                                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                                                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                                                    }`}
                                             >
                                                 Course Category(ies)
                                             </button>
@@ -1175,16 +1169,15 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                                                 : [...prev.course_ids, course.id]
                                                                         }));
                                                                     }}
-                                                                    className={`flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-colors text-xs ${
-                                                                        checked
-                                                                            ? 'bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200'
-                                                                            : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                                                    }`}
+                                                                    className={`flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-colors text-xs ${checked
+                                                                        ? 'bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200'
+                                                                        : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                                        }`}
                                                                 >
                                                                     <input
                                                                         type="checkbox"
                                                                         checked={checked}
-                                                                        onChange={() => {}}
+                                                                        onChange={() => { }}
                                                                         className="rounded text-indigo-600 focus:ring-indigo-500 pointer-events-none"
                                                                     />
                                                                     <span className="font-semibold flex-1 leading-snug">{course.title}</span>
@@ -1284,16 +1277,15 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                                                 : [...prev.category_ids, cat.id]
                                                                         }));
                                                                     }}
-                                                                    className={`flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-colors text-xs ${
-                                                                        checked
-                                                                            ? 'bg-amber-50/90 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200'
-                                                                            : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                                                    }`}
+                                                                    className={`flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-colors text-xs ${checked
+                                                                        ? 'bg-amber-50/90 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200'
+                                                                        : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                                        }`}
                                                                 >
                                                                     <input
                                                                         type="checkbox"
                                                                         checked={checked}
-                                                                        onChange={() => {}}
+                                                                        onChange={() => { }}
                                                                         className="rounded text-indigo-600 focus:ring-indigo-500 pointer-events-none"
                                                                     />
                                                                     <span className="font-semibold flex-1 leading-snug">{cat.name}</span>
@@ -1325,11 +1317,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                     setFormData(prev => ({ ...prev, user_restriction_type: 'all', restricted_user_id: null }));
                                                     setSelectedUser(null);
                                                 }}
-                                                className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
-                                                    formData.user_restriction_type === 'all'
-                                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-900 dark:bg-indigo-950 dark:text-indigo-200 ring-2 ring-indigo-500/20'
-                                                        : 'border-slate-200 dark:border-slate-700'
-                                                }`}
+                                                className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${formData.user_restriction_type === 'all'
+                                                    ? 'border-indigo-600 bg-indigo-50 text-indigo-900 dark:bg-indigo-950 dark:text-indigo-200 ring-2 ring-indigo-500/20'
+                                                    : 'border-slate-200 dark:border-slate-700'
+                                                    }`}
                                             >
                                                 <Users className="w-4 h-4 text-indigo-600 shrink-0" />
                                                 <div>
@@ -1341,11 +1332,10 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                             <button
                                                 type="button"
                                                 onClick={() => setFormData(prev => ({ ...prev, user_restriction_type: 'specific' }))}
-                                                className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
-                                                    formData.user_restriction_type === 'specific'
-                                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-900 dark:bg-indigo-950 dark:text-indigo-200 ring-2 ring-indigo-500/20'
-                                                        : 'border-slate-200 dark:border-slate-700'
-                                                }`}
+                                                className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${formData.user_restriction_type === 'specific'
+                                                    ? 'border-indigo-600 bg-indigo-50 text-indigo-900 dark:bg-indigo-950 dark:text-indigo-200 ring-2 ring-indigo-500/20'
+                                                    : 'border-slate-200 dark:border-slate-700'
+                                                    }`}
                                             >
                                                 <UserIcon className="w-4 h-4 text-rose-600 shrink-0" />
                                                 <div>

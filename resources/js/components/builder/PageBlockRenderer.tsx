@@ -5,16 +5,16 @@ import { apiClient, formatBDT, getImageUrl } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedText } from '../../utils/localization';
 import { PlyrVideoPlayer } from '../shared/PlyrVideoPlayer';
-import { 
-    Sparkles, 
-    BookOpen, 
-    CheckCircle2, 
-    Users, 
-    PlayCircle, 
-    ArrowRight, 
-    Award, 
-    Clock, 
-    HelpCircle, 
+import {
+    Sparkles,
+    BookOpen,
+    CheckCircle2,
+    Users,
+    PlayCircle,
+    ArrowRight,
+    Award,
+    Clock,
+    HelpCircle,
     Star,
     ShieldCheck,
     Zap,
@@ -385,17 +385,15 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                             key={tab.id}
                             type="button"
                             onClick={() => handleTabClick(tab)}
-                            className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer flex items-center gap-2 ${
-                                isSelected
-                                    ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
-                                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-2xs'
-                            }`}
+                            className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer flex items-center gap-2 ${isSelected
+                                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-2xs'
+                                }`}
                         >
                             <span>{tab.label}</span>
                             {tab.type === 'html' && (
-                                <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
-                                    isSelected ? 'bg-white/20 text-white' : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'
-                                }`}>
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${isSelected ? 'bg-white/20 text-white' : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'
+                                    }`}>
                                     HTML
                                 </span>
                             )}
@@ -419,17 +417,15 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                                 };
                                 handleTabClick(customTab);
                             }}
-                            className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                                isSelected
-                                    ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
-                                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-2xs'
-                            }`}
+                            className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${isSelected
+                                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-2xs'
+                                }`}
                         >
                             <span>{cat.name}</span>
                             {cat.courses_count !== undefined && cat.courses_count > 0 && (
-                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                                    isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                                }`}>
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                                    }`}>
                                     {cat.courses_count}
                                 </span>
                             )}
@@ -444,10 +440,10 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                     {activeTab.cssContent && (
                         <style>{activeTab.cssContent}</style>
                     )}
-                    <div 
-                        dangerouslySetInnerHTML={{ 
-                            __html: activeTab.htmlContent || `<div class="text-center text-slate-400 py-8">Add custom HTML widget content...</div>` 
-                        }} 
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: activeTab.htmlContent || `<div class="text-center text-slate-400 py-8">Add custom HTML widget content...</div>`
+                        }}
                     />
                 </div>
             ) : (
@@ -561,8 +557,8 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-xs font-medium text-slate-500 truncate mr-2">
                                                         Instructor: <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            {course.instructors && course.instructors.length > 0 
-                                                                ? course.instructors[0].name 
+                                                            {course.instructors && course.instructors.length > 0
+                                                                ? course.instructors[0].name
                                                                 : (course.instructor?.name || 'Expert Mentor')}
                                                         </span>
                                                     </div>
@@ -628,10 +624,10 @@ const HtmlWidgetBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
             {s.cssContent && (
                 <style>{s.cssContent}</style>
             )}
-            <div 
-                dangerouslySetInnerHTML={{ 
-                    __html: s.htmlContent || `<div class="p-8 bg-slate-100 text-slate-400 rounded-2xl text-center text-sm font-mono">Custom HTML/CSS Widget Preview...</div>` 
-                }} 
+            <div
+                dangerouslySetInnerHTML={{
+                    __html: s.htmlContent || `<div class="p-8 bg-slate-100 text-slate-400 rounded-2xl text-center text-sm font-mono">Custom HTML/CSS Widget Preview...</div>`
+                }}
             />
         </section>
     );
@@ -781,7 +777,7 @@ const RichTextBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ bl
 
     return (
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div 
+            <div
                 className="prose prose-slate dark:prose-invert lg:prose-lg max-w-none prose-headings:font-black prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-p:leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: content }}
             />
@@ -1046,7 +1042,7 @@ const BundleShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> =
             try {
                 const res = await apiClient.get('/bundles/featured');
                 setBundles((res.data?.bundles || []).slice(0, limit));
-            } catch {}
+            } catch { }
         };
         fetchBundles();
     }, [limit]);
@@ -1168,7 +1164,7 @@ const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }>
                 const res = await apiClient.get('/teachers/featured');
                 const list = res.data?.data || res.data?.teachers || [];
                 setTeachers(list.slice(0, limit));
-            } catch {}
+            } catch { }
         };
         fetchTeachers();
     }, [limit]);
@@ -1216,11 +1212,10 @@ const TeachersShowcaseBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }>
                                 key={btn.key}
                                 type="button"
                                 onClick={() => setFilter(btn.key as any)}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                                    filter === btn.key
-                                        ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${filter === btn.key
+                                    ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                                    }`}
                             >
                                 {btn.label}
                             </button>
@@ -1486,9 +1481,8 @@ const FaqAccordionBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = (
                                     className="w-full text-left p-5 flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-slate-900 dark:text-white cursor-pointer hover:text-sky-600 transition-colors"
                                 >
                                     <span>{faq.q}</span>
-                                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-transform ${
-                                        isOpen ? 'bg-sky-100 text-sky-600 rotate-180 dark:bg-sky-950' : 'bg-slate-100 text-slate-400 dark:bg-slate-800'
-                                    }`}>
+                                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-transform ${isOpen ? 'bg-sky-100 text-sky-600 rotate-180 dark:bg-sky-950' : 'bg-slate-100 text-slate-400 dark:bg-slate-800'
+                                        }`}>
                                         <ChevronDown className="w-4 h-4" />
                                     </div>
                                 </button>

@@ -271,7 +271,16 @@ export const DashboardLayout: React.FC = () => {
                         { title: 'Custom Roles', path: '/admin/users/roles', permission: 'roles.manage' },
                     ]
                 },
-                { title: t.sidebar.settings, path: '/admin/settings', icon: Settings, permission: 'settings.manage' },
+                { 
+                    title: 'Website Settings', 
+                    path: '/admin/settings', 
+                    icon: Settings, 
+                    permission: 'settings.manage',
+                    children: [
+                        { title: 'General Settings', path: '/admin/settings', permission: 'settings.manage' },
+                        { title: 'VdoCipher Configuration', path: '/admin/settings/vdocipher', permission: 'settings.manage' },
+                    ]
+                },
                 { title: 'Recycle Bin', path: '/admin/trash', icon: Trash2, permission: 'courses.view' },
             ];
 
@@ -436,6 +445,9 @@ export const DashboardLayout: React.FC = () => {
                                                 child.path === '/admin/bundles' &&
                                                 location.pathname.startsWith('/admin/bundles') &&
                                                 location.pathname !== '/admin/bundles/create'
+                                            ) || (
+                                                child.path === '/admin/settings' &&
+                                                (location.pathname === '/admin/settings' || location.pathname === '/admin/settings/general')
                                             );
                                             return (
                                                 <Link

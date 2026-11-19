@@ -120,7 +120,8 @@ class CourseBuilderController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
-            'video_url' => ['nullable', 'string', 'max:500'],
+            'video_provider' => ['nullable', 'string', 'in:youtube,vdocipher'],
+            'video_url' => ['nullable', 'string', 'max:5000'],
             'duration_minutes' => ['nullable', 'integer', 'min:0'],
             'is_preview' => ['nullable', 'boolean'],
             'status' => ['required', 'in:draft,published'],
@@ -134,6 +135,7 @@ class CourseBuilderController extends Controller
             'title' => $validated['title'],
             'slug' => Str::slug($validated['title']) . '-' . Str::random(4),
             'content' => $validated['content'] ?? null,
+            'video_provider' => $validated['video_provider'] ?? 'youtube',
             'video_url' => $validated['video_url'] ?? null,
             'duration_minutes' => (int) ($validated['duration_minutes'] ?? 0),
             'is_preview' => (bool) ($validated['is_preview'] ?? false),
@@ -154,7 +156,8 @@ class CourseBuilderController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
-            'video_url' => ['nullable', 'string', 'max:500'],
+            'video_provider' => ['nullable', 'string', 'in:youtube,vdocipher'],
+            'video_url' => ['nullable', 'string', 'max:5000'],
             'duration_minutes' => ['nullable', 'integer', 'min:0'],
             'is_preview' => ['nullable', 'boolean'],
             'status' => ['required', 'in:draft,published'],
@@ -164,6 +167,7 @@ class CourseBuilderController extends Controller
         $lesson->update([
             'title' => $validated['title'],
             'content' => $validated['content'] ?? null,
+            'video_provider' => $validated['video_provider'] ?? $lesson->video_provider ?? 'youtube',
             'video_url' => $validated['video_url'] ?? null,
             'duration_minutes' => (int) ($validated['duration_minutes'] ?? 0),
             'is_preview' => (bool) ($validated['is_preview'] ?? false),

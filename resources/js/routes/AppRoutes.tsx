@@ -35,6 +35,7 @@ import { AdminBundlesPage } from '../pages/admin/AdminBundlesPage';
 import { AdminBundleFormPage } from '../pages/admin/AdminBundleFormPage';
 import { AdminBundleBuilderPage } from '../pages/admin/AdminBundleBuilderPage';
 import { AdminSettingsPage } from '../pages/admin/AdminSettingsPage';
+import { AdminVdoCipherSettingsPage } from '../pages/admin/AdminVdoCipherSettingsPage';
 import { AdminMediaPage } from '../pages/admin/AdminMediaPage';
 import { AdminCourseCategoriesPage } from '../pages/admin/AdminCourseCategoriesPage';
 import { AdminPagesPage } from '../pages/admin/AdminPagesPage';
@@ -170,6 +171,8 @@ export const AppRoutes: React.FC = () => {
                 <Route path="sms/auto-push" element={<AdminAutoSmsPushPage />} />
                 <Route path="sms-marketing" element={<AdminSmsMarketingPage />} />
                 <Route path="settings" element={<AdminSettingsPage />} />
+                <Route path="settings/general" element={<AdminSettingsPage />} />
+                <Route path="settings/vdocipher" element={<AdminVdoCipherSettingsPage />} />
                 <Route path="media" element={<AdminMediaPage />} />
                 <Route path="trash" element={<AdminTrashPage />} />
             </Route>

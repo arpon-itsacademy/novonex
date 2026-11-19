@@ -1,16 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { apiClient } from '../../api/client';
 import { ExamQuestion } from '../../types';
-import { 
-    Upload, 
-    Download, 
-    FileSpreadsheet, 
-    CheckCircle2, 
-    AlertCircle, 
-    Loader2, 
-    X, 
-    HelpCircle, 
-    ChevronDown, 
+import {
+    Upload,
+    Download,
+    FileSpreadsheet,
+    CheckCircle2,
+    AlertCircle,
+    Loader2,
+    X,
+    HelpCircle,
+    ChevronDown,
     ChevronUp,
     FileText,
     Check,
@@ -83,7 +83,7 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
     const parseCsvForPreview = (text: string) => {
         // Strip BOM
         let clean = text.replace(/^\uFEFF/, '');
-        
+
         // Simple robust CSV row splitter that accounts for quotes
         const rows: string[][] = [];
         let currentRow: string[] = [];
@@ -350,13 +350,12 @@ export const CsvQuestionImportModal: React.FC<CsvQuestionImportModalProps> = ({
                             onDragOver={handleDrag}
                             onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
-                            className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
-                                dragActive
-                                    ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20'
-                                    : selectedFile
+                            className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${dragActive
+                                ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20'
+                                : selectedFile
                                     ? 'border-sky-500 bg-sky-50/40 dark:bg-sky-950/20'
                                     : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 bg-slate-50/60 dark:bg-slate-850/40'
-                            }`}
+                                }`}
                         >
                             <input
                                 ref={fileInputRef}

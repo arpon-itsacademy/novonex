@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\RoutineController;
 use App\Http\Controllers\Api\LiveClassController;
 use App\Http\Controllers\Api\ShurjopayController;
+use App\Http\Controllers\Api\VdoCipherController;
 use App\Http\Controllers\Api\AdminRoleController;
 use App\Http\Controllers\Api\AdminManualEnrollmentController;
 use App\Models\Course;
@@ -102,6 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('student/my-courses', [EnrollmentController::class, 'myCourses']);
     Route::get('learning/{course}/lessons/{lesson}', [EnrollmentController::class, 'getLesson']);
     Route::post('learning/lessons/{lesson}/progress', [EnrollmentController::class, 'toggleProgress']);
+    Route::get('learning/lessons/{lesson}/vdocipher-otp', [VdoCipherController::class, 'getOtp']);
 
     // Lesson Discussion & Comments
     Route::get('learning/lessons/{lesson}/comments', [LessonCommentController::class, 'index']);
@@ -384,6 +386,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/', [ShurjopayController::class, 'updateSettings']);
             Route::post('test-connection', [ShurjopayController::class, 'testConnection']);
         });
+
+        // VdoCipher Configuration & Upload
+        Route::prefix('settings/vdocipher')->group(function () {
+            Route::get('/', [VdoCipherController::class, 'getSettings']);
+            Route::put('/', [VdoCipherController::class, 'updateSettings']);
+            Route::post('test-connection', [VdoCipherController::class, 'testConnection']);
+        });
+        Route::post('vdocipher/upload-credentials', [VdoCipherController::class, 'getUploadCredentials']);
 
         // Media Library
         Route::get('media', [MediaController::class, 'index']);

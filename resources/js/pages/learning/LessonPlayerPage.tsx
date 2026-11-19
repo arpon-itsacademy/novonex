@@ -19,7 +19,10 @@ import {
     Sparkles, 
     ArrowLeft,
     Check,
-    ExternalLink
+    ExternalLink,
+    Loader2,
+    AlertCircle,
+    ShieldCheck
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { PlyrVideoPlayer } from '../../components/shared/PlyrVideoPlayer';
@@ -43,6 +46,62 @@ export const LessonPlayerPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [togglingProgress, setTogglingProgress] = useState(false);
     const [submittingComment, setSubmittingComment] = useState(false);
+
+    // VdoCipher DRM playback state
+    const [vdoOtpData, setVdoOtpData] = useState<{ otp: string; playbackInfo: string; embedUrl?: string } | null>(null);
+    const [vdoLoading, setVdoLoading] = useState(false);
+    const [vdoError, setVdoError] = useState<string | null>(null);
+
+    const isVdoCipher = Boolean(
+        lesson?.video_provider === 'vdocipher' ||
+        (lesson?.video_url && (
+            lesson.video_url.includes('vdocipher') ||
+            lesson.video_url.includes('[vdo') ||
+            /^[a-f0-9]{32}$/i.test(lesson.video_url.trim())
+        ))
+    );
+
+    useEffect(() => {
+        if (!lesson || !isVdoCipher) {
+            setVdoOtpData(null);
+            setVdoError(null);
+            return;
+        }
+
+        const rawUrl = lesson.video_url?.trim() || '';
+        if (rawUrl.startsWith('<iframe') || rawUrl.includes('player.vdocipher.com/v2/?otp=')) {
+            setVdoOtpData({ otp: '', playbackInfo: '', embedUrl: rawUrl });
+            return;
+        }
+
+        let isMounted = true;
+        setVdoLoading(true);
+        setVdoError(null);
+
+        apiClient.get(`/learning/lessons/${lesson.id}/vdocipher-otp`)
+            .then(({ data }) => {
+                if (isMounted) {
+                    setVdoOtpData({
+                        otp: data.otp,
+                        playbackInfo: data.playbackInfo,
+                        embedUrl: data.embedUrl,
+                    });
+                }
+            })
+            .catch((err: any) => {
+                if (isMounted) {
+                    console.error('Failed to get VdoCipher OTP:', err);
+                    setVdoError(err.response?.data?.message || 'Failed to authenticate secure DRM video playback.');
+                }
+            })
+            .finally(() => {
+                if (isMounted) setVdoLoading(false);
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [lesson?.id, lesson?.video_url, isVdoCipher]);
 
     useEffect(() => {
         fetchLessonData();
@@ -222,9 +281,44 @@ export const LessonPlayerPage: React.FC = () => {
                 {/* Center Content Scroll Area */}
                 <div className="flex-1 overflow-y-auto">
                     {/* Video Player Box */}
-                    {/* Video Player Box with Plyr.js */}
                     <div className="w-full bg-black aspect-video max-h-[65vh] flex items-center justify-center relative">
-                        {lesson.video_url ? (
+                        {isVdoCipher ? (
+                            <div className="w-full h-full relative bg-black flex items-center justify-center">
+                                {vdoLoading ? (
+                                    <div className="flex flex-col items-center gap-3 text-slate-400 p-8">
+                                        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                                        <p className="text-xs font-semibold">Loading DRM Protected Video Player...</p>
+                                    </div>
+                                ) : vdoError ? (
+                                    <div className="p-6 text-center max-w-md space-y-2 text-rose-400">
+                                        <AlertCircle className="w-10 h-10 mx-auto text-rose-500" />
+                                        <p className="text-sm font-bold">Playback Authorization Notice</p>
+                                        <p className="text-xs text-slate-400">{vdoError}</p>
+                                    </div>
+                                ) : vdoOtpData ? (
+                                    vdoOtpData.embedUrl && vdoOtpData.embedUrl.startsWith('<iframe') ? (
+                                        <div 
+                                            className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
+                                            dangerouslySetInnerHTML={{ __html: vdoOtpData.embedUrl }}
+                                        />
+                                    ) : (
+                                        <iframe
+                                            src={vdoOtpData.embedUrl || `https://player.vdocipher.com/v2/?otp=${vdoOtpData.otp}&playbackInfo=${vdoOtpData.playbackInfo}`}
+                                            style={{ border: 0, width: '100%', height: '100%' }}
+                                            allow="encrypted-media; fullscreen"
+                                            allowFullScreen
+                                            title={lesson.title}
+                                            className="w-full h-full"
+                                        />
+                                    )
+                                ) : (
+                                    <div className="text-center p-8 text-slate-500 space-y-2">
+                                        <PlayCircle className="w-12 h-12 mx-auto text-slate-600" />
+                                        <p className="text-xs">No video is ready for this lesson.</p>
+                                    </div>
+                                )}
+                            </div>
+                        ) : lesson.video_url ? (
                             <PlyrVideoPlayer
                                 url={lesson.video_url}
                                 title={lesson.title}

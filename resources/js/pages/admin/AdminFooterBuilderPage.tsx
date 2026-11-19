@@ -179,7 +179,7 @@ export const AdminFooterBuilderPage: React.FC = () => {
             const { data } = await apiClient.put('/admin/website-settings/footer', {
                 footer_settings: footerSettings
             });
-            updateSettingsLocally({ 
+            updateSettingsLocally({
                 footer_settings: footerSettings,
                 copyright_text: footerSettings.copyright_text,
             });
@@ -265,7 +265,7 @@ export const AdminFooterBuilderPage: React.FC = () => {
                 </div>
 
                 {/* Actual Footer Preview Box */}
-                <div 
+                <div
                     style={{ backgroundColor: footerSettings.bg_color || '#0f172a' }}
                     className="rounded-2xl p-6 sm:p-8 text-slate-300 border border-slate-800 shadow-inner"
                 >
@@ -380,11 +380,10 @@ export const AdminFooterBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('col1')}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
-                            activeTab === 'col1'
-                                ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
-                                : 'text-slate-600 hover:bg-white/60'
-                        }`}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${activeTab === 'col1'
+                            ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
+                            : 'text-slate-600 hover:bg-white/60'
+                            }`}
                     >
                         <Layers className="w-4 h-4" />
                         <span>1. Brand & About</span>
@@ -393,11 +392,10 @@ export const AdminFooterBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('col2')}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
-                            activeTab === 'col2'
-                                ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
-                                : 'text-slate-600 hover:bg-white/60'
-                        }`}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${activeTab === 'col2'
+                            ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
+                            : 'text-slate-600 hover:bg-white/60'
+                            }`}
                     >
                         <span>2. Quick Links</span>
                     </button>
@@ -405,11 +403,10 @@ export const AdminFooterBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('col3')}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
-                            activeTab === 'col3'
-                                ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
-                                : 'text-slate-600 hover:bg-white/60'
-                        }`}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${activeTab === 'col3'
+                            ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
+                            : 'text-slate-600 hover:bg-white/60'
+                            }`}
                     >
                         <span>3. Subjects & Courses</span>
                     </button>
@@ -417,11 +414,10 @@ export const AdminFooterBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('col4')}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
-                            activeTab === 'col4'
-                                ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
-                                : 'text-slate-600 hover:bg-white/60'
-                        }`}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${activeTab === 'col4'
+                            ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
+                            : 'text-slate-600 hover:bg-white/60'
+                            }`}
                     >
                         <Phone className="w-4 h-4" />
                         <span>4. Contact & Social</span>
@@ -430,11 +426,10 @@ export const AdminFooterBuilderPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setActiveTab('bottom')}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
-                            activeTab === 'bottom'
-                                ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
-                                : 'text-slate-600 hover:bg-white/60'
-                        }`}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${activeTab === 'bottom'
+                            ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
+                            : 'text-slate-600 hover:bg-white/60'
+                            }`}
                     >
                         <FileText className="w-4 h-4" />
                         <span>5. Legal & Styling</span>

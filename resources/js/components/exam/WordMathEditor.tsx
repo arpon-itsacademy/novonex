@@ -223,9 +223,8 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                     <button
                         type="button"
                         onClick={() => setViewMode('split')}
-                        className={`px-2.5 py-1 rounded-md flex items-center gap-1 font-medium transition-colors ${
-                            viewMode === 'split' ? 'bg-white text-slate-800 shadow-xs' : 'text-blue-100 hover:text-white'
-                        }`}
+                        className={`px-2.5 py-1 rounded-md flex items-center gap-1 font-medium transition-colors ${viewMode === 'split' ? 'bg-white text-slate-800 shadow-xs' : 'text-blue-100 hover:text-white'
+                            }`}
                         title="View Editor and Preview side-by-side"
                     >
                         <Columns className="w-3.5 h-3.5" />
@@ -234,9 +233,8 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                     <button
                         type="button"
                         onClick={() => setViewMode('editor')}
-                        className={`px-2.5 py-1 rounded-md flex items-center gap-1 font-medium transition-colors ${
-                            viewMode === 'editor' ? 'bg-white text-slate-800 shadow-xs' : 'text-blue-100 hover:text-white'
-                        }`}
+                        className={`px-2.5 py-1 rounded-md flex items-center gap-1 font-medium transition-colors ${viewMode === 'editor' ? 'bg-white text-slate-800 shadow-xs' : 'text-blue-100 hover:text-white'
+                            }`}
                         title="Editor only"
                     >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -245,9 +243,8 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                     <button
                         type="button"
                         onClick={() => setViewMode('preview')}
-                        className={`px-2.5 py-1 rounded-md flex items-center gap-1 font-medium transition-colors ${
-                            viewMode === 'preview' ? 'bg-white text-slate-800 shadow-xs' : 'text-blue-100 hover:text-white'
-                        }`}
+                        className={`px-2.5 py-1 rounded-md flex items-center gap-1 font-medium transition-colors ${viewMode === 'preview' ? 'bg-white text-slate-800 shadow-xs' : 'text-blue-100 hover:text-white'
+                            }`}
                         title="Preview only"
                     >
                         <Eye className="w-3.5 h-3.5" />
@@ -263,22 +260,20 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                     <button
                         type="button"
                         onClick={() => setActiveTab('home')}
-                        className={`text-xs font-bold px-2.5 py-1 rounded-md transition-colors ${
-                            activeTab === 'home'
-                                ? 'bg-white dark:bg-slate-900 text-[#2b579a] dark:text-sky-400 shadow-xs'
-                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                        }`}
+                        className={`text-xs font-bold px-2.5 py-1 rounded-md transition-colors ${activeTab === 'home'
+                            ? 'bg-white dark:bg-slate-900 text-[#2b579a] dark:text-sky-400 shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                            }`}
                     >
                         Home (Formatting)
                     </button>
                     <button
                         type="button"
                         onClick={() => setActiveTab('equation')}
-                        className={`text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1 transition-colors ${
-                            activeTab === 'equation'
-                                ? 'bg-white dark:bg-slate-900 text-[#2b579a] dark:text-sky-400 shadow-xs'
-                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                        }`}
+                        className={`text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1 transition-colors ${activeTab === 'equation'
+                            ? 'bg-white dark:bg-slate-900 text-[#2b579a] dark:text-sky-400 shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                            }`}
                     >
                         <Calculator className="w-3.5 h-3.5 text-sky-500" />
                         <span>Equations</span>
@@ -286,11 +281,10 @@ export const WordMathEditor: React.FC<WordMathEditorProps> = ({
                     <button
                         type="button"
                         onClick={() => setActiveTab('symbols')}
-                        className={`text-xs font-bold px-2.5 py-1 rounded-md transition-colors ${
-                            activeTab === 'symbols'
-                                ? 'bg-white dark:bg-slate-900 text-[#2b579a] dark:text-sky-400 shadow-xs'
-                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                        }`}
+                        className={`text-xs font-bold px-2.5 py-1 rounded-md transition-colors ${activeTab === 'symbols'
+                            ? 'bg-white dark:bg-slate-900 text-[#2b579a] dark:text-sky-400 shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                            }`}
                     >
                         Symbols
                     </button>
