@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient } from '../../api/client';
-import { 
-    Calendar as CalendarIcon, 
-    Clock, 
-    Radio, 
-    BookOpen, 
-    CheckCircle2, 
-    Bell, 
-    Sparkles, 
-    ChevronLeft, 
-    ChevronRight, 
-    PlayCircle, 
+import {
+    Calendar as CalendarIcon,
+    Clock,
+    Radio,
+    BookOpen,
+    CheckCircle2,
+    Bell,
+    Sparkles,
+    ChevronLeft,
+    ChevronRight,
+    PlayCircle,
     Award,
     Loader2,
     Package,
@@ -330,11 +330,10 @@ export const StudentRoutinePage: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setSelectedCourseId('all')}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
-                                selectedCourseId === 'all'
-                                    ? 'bg-[#0B4B34] text-white shadow-xs'
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                            }`}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${selectedCourseId === 'all'
+                                ? 'bg-[#0B4B34] text-white shadow-xs'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                }`}
                         >
                             All My Courses
                         </button>
@@ -344,11 +343,10 @@ export const StudentRoutinePage: React.FC = () => {
                                 key={c.id}
                                 type="button"
                                 onClick={() => setSelectedCourseId(c.id)}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 truncate max-w-[220px] transition-all cursor-pointer ${
-                                    selectedCourseId === c.id
-                                        ? 'bg-[#0B4B34] text-white shadow-xs'
-                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                }`}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 truncate max-w-[220px] transition-all cursor-pointer ${selectedCourseId === c.id
+                                    ? 'bg-[#0B4B34] text-white shadow-xs'
+                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                    }`}
                                 title={c.title}
                             >
                                 {c.title}
@@ -363,22 +361,20 @@ export const StudentRoutinePage: React.FC = () => {
                 <button
                     type="button"
                     onClick={() => setSelectedType('all')}
-                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap ${
-                        selectedType === 'all'
-                            ? 'bg-slate-900 text-white shadow-xs'
-                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap ${selectedType === 'all'
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                        }`}
                 >
                     All Schedules
                 </button>
                 <button
                     type="button"
                     onClick={() => setSelectedType('live_class')}
-                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                        selectedType === 'live_class'
-                            ? 'bg-rose-600 text-white shadow-xs'
-                            : 'bg-white text-rose-700 hover:bg-rose-50 border border-slate-200/80'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${selectedType === 'live_class'
+                        ? 'bg-rose-600 text-white shadow-xs'
+                        : 'bg-white text-rose-700 hover:bg-rose-50 border border-slate-200/80'
+                        }`}
                 >
                     <Radio className="w-3.5 h-3.5" />
                     <span>Live Classes</span>
@@ -386,11 +382,10 @@ export const StudentRoutinePage: React.FC = () => {
                 <button
                     type="button"
                     onClick={() => setSelectedType('live_exam')}
-                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                        selectedType === 'live_exam'
-                            ? 'bg-amber-600 text-white shadow-xs'
-                            : 'bg-white text-amber-700 hover:bg-amber-50 border border-slate-200/80'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${selectedType === 'live_exam'
+                        ? 'bg-amber-600 text-white shadow-xs'
+                        : 'bg-white text-amber-700 hover:bg-amber-50 border border-slate-200/80'
+                        }`}
                 >
                     <Clock className="w-3.5 h-3.5" />
                     <span>Live Exams</span>
@@ -398,11 +393,10 @@ export const StudentRoutinePage: React.FC = () => {
                 <button
                     type="button"
                     onClick={() => setSelectedType('class_upload')}
-                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                        selectedType === 'class_upload'
-                            ? 'bg-sky-600 text-white shadow-xs'
-                            : 'bg-white text-sky-700 hover:bg-sky-50 border border-slate-200/80'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${selectedType === 'class_upload'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'bg-white text-sky-700 hover:bg-sky-50 border border-slate-200/80'
+                        }`}
                 >
                     <Video className="w-3.5 h-3.5" />
                     <span>Class Uploads</span>
@@ -410,11 +404,10 @@ export const StudentRoutinePage: React.FC = () => {
                 <button
                     type="button"
                     onClick={() => setSelectedType('material')}
-                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                        selectedType === 'material'
-                            ? 'bg-teal-600 text-white shadow-xs'
-                            : 'bg-white text-teal-700 hover:bg-teal-50 border border-slate-200/80'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${selectedType === 'material'
+                        ? 'bg-teal-600 text-white shadow-xs'
+                        : 'bg-white text-teal-700 hover:bg-teal-50 border border-slate-200/80'
+                        }`}
                 >
                     <FileText className="w-3.5 h-3.5" />
                     <span>Study Materials</span>
@@ -422,11 +415,10 @@ export const StudentRoutinePage: React.FC = () => {
                 <button
                     type="button"
                     onClick={() => setSelectedType('book_parcel')}
-                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                        selectedType === 'book_parcel'
-                            ? 'bg-orange-600 text-white shadow-xs'
-                            : 'bg-white text-orange-700 hover:bg-orange-50 border border-slate-200/80'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${selectedType === 'book_parcel'
+                        ? 'bg-orange-600 text-white shadow-xs'
+                        : 'bg-white text-orange-700 hover:bg-orange-50 border border-slate-200/80'
+                        }`}
                 >
                     <Package className="w-3.5 h-3.5" />
                     <span>Book / Parcel Delivery</span>
@@ -435,7 +427,7 @@ export const StudentRoutinePage: React.FC = () => {
 
             {/* Horizontal Calendar Date Strip */}
             <div className="relative">
-                <div 
+                <div
                     ref={dateStripRef}
                     className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto py-2 px-1 scroll-smooth no-scrollbar"
                 >
@@ -448,15 +440,13 @@ export const StudentRoutinePage: React.FC = () => {
                                 id={`date-chip-${day.dateStr}`}
                                 type="button"
                                 onClick={() => setSelectedDateStr(day.dateStr)}
-                                className={`shrink-0 w-12 sm:w-14 py-2.5 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer ${
-                                    isSelected
-                                        ? 'bg-[#0B4B34] text-white shadow-md shadow-emerald-950/25 ring-2 ring-[#0B4B34]/30 scale-105'
-                                        : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 shadow-2xs'
-                                }`}
+                                className={`shrink-0 w-12 sm:w-14 py-2.5 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer ${isSelected
+                                    ? 'bg-[#0B4B34] text-white shadow-md shadow-emerald-950/25 ring-2 ring-[#0B4B34]/30 scale-105'
+                                    : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 shadow-2xs'
+                                    }`}
                             >
-                                <span className={`text-[11px] font-bold ${
-                                    isSelected ? 'text-emerald-100' : 'text-slate-400'
-                                }`}>
+                                <span className={`text-[11px] font-bold ${isSelected ? 'text-emerald-100' : 'text-slate-400'
+                                    }`}>
                                     {day.isToday ? 'Today' : day.dayName}
                                 </span>
                                 <span className="text-base font-black tracking-tight mt-0.5">
@@ -464,14 +454,13 @@ export const StudentRoutinePage: React.FC = () => {
                                 </span>
 
                                 {/* Event indicator dot below */}
-                                <span 
-                                    className={`w-1.5 h-1.5 rounded-full mt-1.5 transition-all ${
-                                        isSelected 
-                                            ? 'bg-white' 
-                                            : day.hasEvents 
-                                                ? 'bg-[#0B4B34]' 
-                                                : 'opacity-0'
-                                    }`}
+                                <span
+                                    className={`w-1.5 h-1.5 rounded-full mt-1.5 transition-all ${isSelected
+                                        ? 'bg-white'
+                                        : day.hasEvents
+                                            ? 'bg-[#0B4B34]'
+                                            : 'opacity-0'
+                                        }`}
                                 />
                             </button>
                         );
@@ -719,11 +708,10 @@ export const StudentRoutinePage: React.FC = () => {
                                         <button
                                             type="button"
                                             onClick={() => handleToggleReminder(eventKey, evt.title)}
-                                            className={`px-5 py-2 rounded-full font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
-                                                isReminderSet
-                                                    ? 'bg-emerald-100 text-[#0B4B34] border border-emerald-300'
-                                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                                            }`}
+                                            className={`px-5 py-2 rounded-full font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${isReminderSet
+                                                ? 'bg-emerald-100 text-[#0B4B34] border border-emerald-300'
+                                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                                                }`}
                                         >
                                             <Bell className={`w-3.5 h-3.5 ${isReminderSet ? 'fill-current text-[#0B4B34]' : 'text-slate-400'}`} />
                                             <span>{isReminderSet ? 'Reminder Set' : 'Set Reminder'}</span>

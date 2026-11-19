@@ -152,9 +152,9 @@ export const StudentDashboardPage: React.FC = () => {
             </div>
 
             {/* Top 2-Column Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
                 {/* 1. Personal Information Card */}
-                <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-4">
+                <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs space-y-4">
                     <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
                         <UserIcon className="w-4 h-4 text-[#25a2ee]" />
                         <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
@@ -238,7 +238,7 @@ export const StudentDashboardPage: React.FC = () => {
                 </div>
 
                 {/* 2. Account Summary Card */}
-                <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-5 flex flex-col justify-between">
+                <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs space-y-5 flex flex-col justify-between">
                     <div>
                         <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
                             <BarChart3 className="w-4 h-4 text-[#25a2ee]" />
@@ -332,7 +332,7 @@ export const StudentDashboardPage: React.FC = () => {
             </div>
 
             {/* Bottom Section: Recent Courses */}
-            <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-4">
+            <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <h2 className="text-base font-black text-slate-900 tracking-tight">
                         Recent Courses
@@ -352,10 +352,10 @@ export const StudentDashboardPage: React.FC = () => {
                             const course = item.course;
                             const enrolledDate = item.enrolled_at
                                 ? new Date(item.enrolled_at).toLocaleDateString('en-US', {
-                                      month: 'long',
-                                      day: 'numeric',
-                                      year: 'numeric'
-                                  })
+                                    month: 'long',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                })
                                 : 'Recent';
                             const playUrl = item.last_lesson_id
                                 ? `/learning/${course.id}/lessons/${item.last_lesson_id}`
@@ -364,10 +364,10 @@ export const StudentDashboardPage: React.FC = () => {
                             return (
                                 <div
                                     key={item.enrollment_id || course.id}
-                                    className="p-3.5 bg-slate-50/70 hover:bg-slate-50 border border-slate-200/80 hover:border-sky-300 rounded-2xl transition-all flex items-center gap-4 group"
+                                    className="p-3.5 bg-slate-50/70 hover:bg-slate-50 border border-slate-200/80 hover:border-sky-300 rounded-2xl transition-all flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 group"
                                 >
                                     {/* Thumbnail */}
-                                    <div className="w-24 sm:w-28 h-18 sm:h-20 bg-slate-900 rounded-xl overflow-hidden shrink-0 relative shadow-2xs">
+                                    <div className="w-full sm:w-28 h-36 sm:h-20 bg-slate-900 rounded-xl overflow-hidden shrink-0 relative shadow-2xs">
                                         {course.thumbnail ? (
                                             <img
                                                 src={course.thumbnail}
@@ -382,7 +382,7 @@ export const StudentDashboardPage: React.FC = () => {
                                     </div>
 
                                     {/* Details */}
-                                    <div className="flex-1 min-w-0 space-y-1">
+                                    <div className="w-full flex-1 min-w-0 space-y-1">
                                         <h3 className="font-extrabold text-sm text-slate-900 truncate group-hover:text-[#25a2ee] transition-colors">
                                             {course.title}
                                         </h3>

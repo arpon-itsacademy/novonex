@@ -1,26 +1,26 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { 
-    X, 
-    RotateCw, 
-    ZoomIn, 
-    ZoomOut, 
-    Maximize2, 
-    Undo2, 
-    Redo2, 
-    Trash2, 
-    Download, 
-    Save, 
-    Check, 
-    XCircle, 
-    HelpCircle, 
-    Star, 
-    Type, 
-    Pen, 
-    Highlighter, 
-    Square, 
-    Circle, 
-    Palette, 
-    Loader2, 
+import {
+    X,
+    RotateCw,
+    ZoomIn,
+    ZoomOut,
+    Maximize2,
+    Undo2,
+    Redo2,
+    Trash2,
+    Download,
+    Save,
+    Check,
+    XCircle,
+    HelpCircle,
+    Star,
+    Type,
+    Pen,
+    Highlighter,
+    Square,
+    Circle,
+    Palette,
+    Loader2,
     MessageSquare,
     Paintbrush,
     Eraser
@@ -694,11 +694,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('pen')}
                         title="Pen"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'pen'
-                                ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 scale-105'
-                                : 'text-slate-300 hover:text-white hover:bg-slate-800'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'pen'
+                            ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 scale-105'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                            }`}
                     >
                         <Pen className="w-4 h-4" />
                     </button>
@@ -707,11 +706,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('brush')}
                         title="Paint Brush"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'brush'
-                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 scale-105'
-                                : 'text-slate-300 hover:text-white hover:bg-slate-800'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'brush'
+                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 scale-105'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                            }`}
                     >
                         <Paintbrush className="w-4 h-4" />
                     </button>
@@ -720,11 +718,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('highlighter')}
                         title="Highlighter"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'highlighter'
-                                ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30 scale-105'
-                                : 'text-slate-300 hover:text-white hover:bg-slate-800'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'highlighter'
+                            ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30 scale-105'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                            }`}
                     >
                         <Highlighter className="w-4 h-4" />
                     </button>
@@ -733,11 +730,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('eraser')}
                         title="Eraser"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'eraser'
-                                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105'
-                                : 'text-slate-300 hover:text-white hover:bg-slate-800'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'eraser'
+                            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                            }`}
                     >
                         <Eraser className="w-4 h-4" />
                     </button>
@@ -746,11 +742,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('text')}
                         title="Text Note"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'text'
-                                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30 scale-105'
-                                : 'text-slate-300 hover:text-white hover:bg-slate-800'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'text'
+                            ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30 scale-105'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                            }`}
                     >
                         <Type className="w-4 h-4" />
                     </button>
@@ -759,11 +754,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('rect')}
                         title="Rectangle"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'rect'
-                                ? 'bg-slate-700 text-white ring-1 ring-slate-500 scale-105'
-                                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'rect'
+                            ? 'bg-slate-700 text-white ring-1 ring-slate-500 scale-105'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                            }`}
                     >
                         <Square className="w-4 h-4" />
                     </button>
@@ -772,11 +766,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('circle')}
                         title="Circle"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'circle'
-                                ? 'bg-slate-700 text-white ring-1 ring-slate-500 scale-105'
-                                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'circle'
+                            ? 'bg-slate-700 text-white ring-1 ring-slate-500 scale-105'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                            }`}
                     >
                         <Circle className="w-4 h-4" />
                     </button>
@@ -790,11 +783,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('stamp_tick')}
                         title="Tick (✔)"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'stamp_tick'
-                                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/40 scale-105'
-                                : 'text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40 border border-emerald-800/50'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'stamp_tick'
+                            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/40 scale-105'
+                            : 'text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40 border border-emerald-800/50'
+                            }`}
                     >
                         <Check className="w-4 h-4 stroke-[3]" />
                     </button>
@@ -803,11 +795,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('stamp_cross')}
                         title="Cross (✖)"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'stamp_cross'
-                                ? 'bg-rose-600 text-white shadow-md shadow-rose-600/40 scale-105'
-                                : 'text-rose-400 bg-rose-950/40 hover:bg-rose-900/40 border border-rose-800/50'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'stamp_cross'
+                            ? 'bg-rose-600 text-white shadow-md shadow-rose-600/40 scale-105'
+                            : 'text-rose-400 bg-rose-950/40 hover:bg-rose-900/40 border border-rose-800/50'
+                            }`}
                     >
                         <X className="w-4 h-4 stroke-[3]" />
                     </button>
@@ -816,11 +807,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('stamp_doubt')}
                         title="Question Mark (?)"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'stamp_doubt'
-                                ? 'bg-amber-600 text-white scale-105 shadow-md'
-                                : 'text-amber-400 bg-amber-950/40 hover:bg-amber-900/40 border border-amber-800/50'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'stamp_doubt'
+                            ? 'bg-amber-600 text-white scale-105 shadow-md'
+                            : 'text-amber-400 bg-amber-950/40 hover:bg-amber-900/40 border border-amber-800/50'
+                            }`}
                     >
                         <HelpCircle className="w-4 h-4" />
                     </button>
@@ -829,11 +819,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                         type="button"
                         onClick={() => selectTool('stamp_star')}
                         title="Star (★)"
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                            activeTool === 'stamp_star'
-                                ? 'bg-yellow-500 text-slate-950 scale-105 shadow-md'
-                                : 'text-yellow-400 bg-yellow-950/40 hover:bg-yellow-900/40 border border-yellow-800/50'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${activeTool === 'stamp_star'
+                            ? 'bg-yellow-500 text-slate-950 scale-105 shadow-md'
+                            : 'text-yellow-400 bg-yellow-950/40 hover:bg-yellow-900/40 border border-yellow-800/50'
+                            }`}
                     >
                         <Star className="w-4 h-4 fill-current" />
                     </button>
@@ -850,11 +839,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                             onClick={() => setStrokeColor(c.hex)}
                             title={c.name}
                             style={{ backgroundColor: c.hex }}
-                            className={`w-6 h-6 rounded-full transition-transform cursor-pointer relative ${
-                                strokeColor.toLowerCase() === c.hex.toLowerCase()
-                                    ? 'ring-2 ring-white scale-110 shadow-lg'
-                                    : 'opacity-85 hover:opacity-100 hover:scale-105'
-                            }`}
+                            className={`w-6 h-6 rounded-full transition-transform cursor-pointer relative ${strokeColor.toLowerCase() === c.hex.toLowerCase()
+                                ? 'ring-2 ring-white scale-110 shadow-lg'
+                                : 'opacity-85 hover:opacity-100 hover:scale-105'
+                                }`}
                         >
                             {strokeColor.toLowerCase() === c.hex.toLowerCase() && (
                                 <span className="absolute inset-0 flex items-center justify-center text-[10px] text-white drop-shadow-md">
@@ -889,11 +877,10 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                             type="button"
                             onClick={() => setStrokeWidth(s.width)}
                             title={`${s.width}px`}
-                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
-                                strokeWidth === s.width
-                                    ? 'bg-slate-700 text-white shadow-sm ring-1 ring-slate-400'
-                                    : 'hover:bg-slate-800'
-                            }`}
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${strokeWidth === s.width
+                                ? 'bg-slate-700 text-white shadow-sm ring-1 ring-slate-400'
+                                : 'hover:bg-slate-800'
+                                }`}
                         >
                             <span
                                 style={{
@@ -1014,15 +1001,14 @@ export const KhataEvaluationCanvasModal: React.FC<KhataEvaluationCanvasModalProp
                             onTouchStart={handlePointerDown}
                             onTouchMove={handlePointerMove}
                             onTouchEnd={handlePointerUp}
-                            className={`rounded-lg bg-white shadow-2xl block ${
-                                activeTool === 'pen' || activeTool === 'brush' || activeTool === 'highlighter'
-                                    ? 'cursor-crosshair'
-                                    : activeTool === 'eraser'
+                            className={`rounded-lg bg-white shadow-2xl block ${activeTool === 'pen' || activeTool === 'brush' || activeTool === 'highlighter'
+                                ? 'cursor-crosshair'
+                                : activeTool === 'eraser'
                                     ? 'cursor-cell'
                                     : activeTool === 'text'
-                                    ? 'cursor-text'
-                                    : 'cursor-cell'
-                            }`}
+                                        ? 'cursor-text'
+                                        : 'cursor-cell'
+                                }`}
                             style={{
                                 maxWidth: '92vw',
                                 maxHeight: 'calc(100vh - 12rem)',

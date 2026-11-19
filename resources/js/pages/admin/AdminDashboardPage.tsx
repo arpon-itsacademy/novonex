@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient, formatBDT } from '../../api/client';
-import { 
-    Users, 
-    BookOpen, 
-    ShoppingCart, 
-    TrendingUp, 
-    Plus, 
-    ArrowUpRight, 
-    Clock, 
+import {
+    Users,
+    BookOpen,
+    ShoppingCart,
+    TrendingUp,
+    Plus,
+    ArrowUpRight,
+    Clock,
     CheckCircle2,
     Calendar,
     GraduationCap
 } from 'lucide-react';
-import { 
-    ResponsiveContainer, 
-    AreaChart, 
-    Area, 
-    XAxis, 
-    YAxis, 
-    Tooltip, 
-    CartesianGrid 
+import {
+    ResponsiveContainer,
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    Tooltip,
+    CartesianGrid
 } from 'recharts';
 
 const DEFAULT_DATA = {
@@ -193,14 +193,14 @@ export const AdminDashboardPage: React.FC = () => {
                         <AreaChart data={daily_trends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#0284c7" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#0284c7" stopOpacity={0}/>
+                                    <stop offset="5%" stopColor="#0284c7" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#0284c7" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                             <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
                             <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} tickFormatter={(val) => `Tk ${val}`} />
-                            <Tooltip 
+                            <Tooltip
                                 formatter={(val: any) => [`Tk ${Number(val).toLocaleString()}`, 'Revenue']}
                                 labelFormatter={(label) => `Date: ${label}`}
                                 contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
