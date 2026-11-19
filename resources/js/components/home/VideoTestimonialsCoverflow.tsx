@@ -118,11 +118,11 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
     }, [popupVideoId, items.length]);
 
     const handlePrev = () => {
-        setActiveIndex((prev) => (prev > 0 ? prev - 1 : items.length - 1));
+        setActiveIndex((prev) => Math.max(0, prev - 1));
     };
 
     const handleNext = () => {
-        setActiveIndex((prev) => (prev < items.length - 1 ? prev + 1 : 0));
+        setActiveIndex((prev) => Math.min(items.length - 1, prev + 1));
     };
 
     const activeItem = items[activeIndex] || items[0];
@@ -165,9 +165,21 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
     };
 
     const total = items.length;
-    const getIndexAtOffset = (offset: number) => {
-        return ((activeIndex + offset) % total + total) % total;
-    };
+
+    // Separate preceding and following items (strictly non-looping, no duplicated cards)
+    const leftItems: { item: VideoTestimonialItem; idx: number }[] = [];
+    for (let i = 0; i < activeIndex; i++) {
+        leftItems.push({ item: items[i], idx: i });
+    }
+
+    const rightItems: { item: VideoTestimonialItem; idx: number }[] = [];
+    for (let i = activeIndex + 1; i < items.length; i++) {
+        rightItems.push({ item: items[i], idx: i });
+    }
+
+    // Show up to 2 closest flankers on left and 2 on right
+    const visibleLeft = leftItems.slice(-2);
+    const visibleRight = rightItems.slice(0, 2);
 
     const renderFlankerStrip = (item: VideoTestimonialItem, targetIdx: number, size: 'normal' | 'small' = 'normal') => {
         if (!item) return null;
@@ -260,8 +272,13 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
                             <button
                                 type="button"
                                 onClick={handlePrev}
+                                disabled={activeIndex === 0}
                                 aria-label="Previous Video"
-                                className="absolute left-1 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                                className={`absolute left-1 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-700 dark:text-slate-200 flex items-center justify-center transition-all ${
+                                    activeIndex === 0
+                                        ? 'opacity-30 cursor-not-allowed pointer-events-none'
+                                        : 'hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 hover:scale-105 active:scale-95 cursor-pointer'
+                                }`}
                             >
                                 <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                             </button>
@@ -269,8 +286,13 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
                             <button
                                 type="button"
                                 onClick={handleNext}
+                                disabled={activeIndex === items.length - 1}
                                 aria-label="Next Video"
-                                className="absolute right-1 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                                className={`absolute right-1 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-700 dark:text-slate-200 flex items-center justify-center transition-all ${
+                                    activeIndex === items.length - 1
+                                        ? 'opacity-30 cursor-not-allowed pointer-events-none'
+                                        : 'hover:bg-sky-50 dark:hover:bg-slate-800 hover:text-sky-600 hover:scale-105 active:scale-95 cursor-pointer'
+                                }`}
                             >
                                 <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
                             </button>
@@ -279,11 +301,11 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
 
                     {/* Cards Visual Layer (Center active card flanked by vertical name strips) */}
                     <div className="relative w-full max-w-6xl mx-auto flex items-center justify-center gap-2 xs:gap-3 sm:gap-4 md:gap-5 px-2 overflow-visible">
-                        {/* Outer Left Flanker Strip (when 4+ items) */}
-                        {items.length >= 4 && renderFlankerStrip(items[getIndexAtOffset(-2)], getIndexAtOffset(-2), 'small')}
-
-                        {/* Immediate Left Flanker Strip */}
-                        {items.length >= 2 && renderFlankerStrip(items[getIndexAtOffset(-1)], getIndexAtOffset(-1), 'normal')}
+                        {/* Left Flanker Strips (strictly existing items before activeIndex) */}
+                        {visibleLeft.map((entry, vPos) => {
+                            const isFar = visibleLeft.length > 1 && vPos === 0;
+                            return renderFlankerStrip(entry.item, entry.idx, isFar ? 'small' : 'normal');
+                        })}
 
                         {/* Center Active 16:9 Video Card */}
                         <div
@@ -332,11 +354,11 @@ export const VideoTestimonialsCoverflow: React.FC<VideoTestimonialsProps> = ({
                             </div>
                         </div>
 
-                        {/* Immediate Right Flanker Strip */}
-                        {items.length >= 2 && renderFlankerStrip(items[getIndexAtOffset(1)], getIndexAtOffset(1), 'normal')}
-
-                        {/* Outer Right Flanker Strip (when 4+ items) */}
-                        {items.length >= 4 && renderFlankerStrip(items[getIndexAtOffset(2)], getIndexAtOffset(2), 'small')}
+                        {/* Right Flanker Strips (strictly existing items after activeIndex) */}
+                        {visibleRight.map((entry, vPos) => {
+                            const isFar = visibleRight.length > 1 && vPos === 1;
+                            return renderFlankerStrip(entry.item, entry.idx, isFar ? 'small' : 'normal');
+                        })}
                     </div>
 
                     {/* Pagination Indicator Dots */}
