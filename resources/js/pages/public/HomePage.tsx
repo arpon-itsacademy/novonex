@@ -35,6 +35,7 @@ import {
 import { useCart } from '../../context/CartContext';
 import { StudentReviewsMarquee } from '../../components/home/StudentReviewsMarquee';
 import { PagePreloader } from '../../components/shared/PagePreloader';
+import { VideoTestimonialsCoverflow } from '../../components/home/VideoTestimonialsCoverflow';
 
 interface FeaturedTeacher {
     id: number;
@@ -280,6 +281,9 @@ export const HomePage: React.FC = () => {
 
     const testimonialsBlock = customPage?.blocks?.find(
         (b) => b.type === 'testimonials' || b.type === 'student_reviews_marquee'
+    );
+    const videoTestimonialsBlock = customPage?.blocks?.find(
+        (b) => b.type === 'video_testimonials'
     );
 
     return (
@@ -1101,6 +1105,9 @@ export const HomePage: React.FC = () => {
                     )}
                 </div>
             </section>
+
+            {/* 6.1. VIDEO TESTIMONIALS (3D Coverflow Slider with YouTube Lightbox) */}
+            <VideoTestimonialsCoverflow settings={videoTestimonialsBlock?.settings} />
 
             {/* 6.5. STUDENT REVIEWS / TESTIMONIALS DUAL-DIRECTION SCROLL MARQUEE */}
             <StudentReviewsMarquee settings={testimonialsBlock?.settings} />

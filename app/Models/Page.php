@@ -169,6 +169,32 @@ class Page extends Model
                 ]
             ],
             [
+                'id' => 'block_video_testimonials_1',
+                'type' => 'video_testimonials',
+                'title' => 'Video Testimonials Section',
+                'settings' => [
+                    'sectionTag' => 'Student Stories & Video Reviews',
+                    'sectionTitle' => 'What Our Students Say',
+                    'sectionSub' => 'Real journeys, genuine experiences, and success stories shared on camera.',
+                    'items' => [
+                        [
+                            'id' => 'v1',
+                            'name' => 'Farhan Islam',
+                            'role' => 'Student & Guardian',
+                            'videoUrl' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                            'thumbnailUrl' => '',
+                        ],
+                        [
+                            'id' => 'v2',
+                            'name' => 'Sadia Afrin',
+                            'role' => 'Varsity Admission Achiever',
+                            'videoUrl' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                            'thumbnailUrl' => '',
+                        ],
+                    ]
+                ]
+            ],
+            [
                 'id' => 'block_learning_path_1',
                 'type' => 'learning_path',
                 'title' => 'Learning Methodology Section',

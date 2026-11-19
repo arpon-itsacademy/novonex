@@ -5,6 +5,7 @@ import { CustomPage, PageBlock, BlockType, CourseTabItem, Category } from '../..
 import { PageBlockRenderer } from '../../components/builder/PageBlockRenderer';
 import { MediaPickerModal } from '../../components/shared/MediaPickerModal';
 import { getDefaultMarqueeReviews } from '../../components/home/StudentReviewsMarquee';
+import { getYouTubeVideoId } from '../../components/home/VideoTestimonialsCoverflow';
 import {
     ArrowLeft,
     Save,
@@ -254,6 +255,15 @@ const WIDGET_CATALOG: WidgetDef[] = [
         iconColor: 'text-amber-400',
     },
     {
+        type: 'video_testimonials',
+        name: 'Video Testimonials',
+        description: '3D coverflow video reviews slider',
+        category: 'Pro & Marketing',
+        icon: Video,
+        iconBg: 'bg-rose-500/20',
+        iconColor: 'text-rose-400',
+    },
+    {
         type: 'faq_accordion',
         name: 'FAQ Accordion',
         description: 'Expandable Q&A accordion',
@@ -375,6 +385,7 @@ export const AdminPageBuilderPage: React.FC = () => {
     const [testimonialMediaPickerOpen, setTestimonialMediaPickerOpen] = useState(false);
     const [manualImageUrl, setManualImageUrl] = useState('');
     const [loadingMediaReviews, setLoadingMediaReviews] = useState(false);
+    const [videoThumbnailPickerIndex, setVideoThumbnailPickerIndex] = useState<number | null>(null);
 
     // Inspector 3 sub-tabs: 'content' | 'style' | 'advanced'
     const [inspectorSubTab, setInspectorSubTab] = useState<'content' | 'style' | 'advanced'>('content');
@@ -780,6 +791,35 @@ export const AdminPageBuilderPage: React.FC = () => {
                             { id: '1', name: 'Tanvir Ahmed', role: 'Engineering Batch \'23', rating: 5, quote: 'The interactive classes transformed my preparation. The instant AI doubt solver was a game changer!' },
                             { id: '2', name: 'Sadia Afrin', role: 'Medical College \'24', rating: 5, quote: 'The mock test platform replicates real exams perfectly. Tracking merit rankings helped me improve consistently.' },
                             { id: '3', name: 'Farhan Kabir', role: 'Top College GPA 5', rating: 5, quote: 'The lecture sheets and practice sets were so well structured that I could complete my entire revision smoothly.' },
+                        ]
+                    }
+                };
+                break;
+
+            case 'video_testimonials':
+                newBlock = {
+                    id: newBlockId,
+                    type: 'video_testimonials',
+                    title: 'Video Testimonials',
+                    settings: {
+                        sectionTag: 'Student Stories & Video Reviews',
+                        sectionTitle: 'What Our Students Say',
+                        sectionSub: 'Real journeys, genuine experiences, and success stories shared on camera.',
+                        items: [
+                            {
+                                id: '1',
+                                name: 'Farhan Islam',
+                                role: 'Student & Guardian',
+                                videoUrl: '',
+                                thumbnailUrl: '',
+                            },
+                            {
+                                id: '2',
+                                name: 'Sadia Afrin',
+                                role: 'Varsity Admission Achiever',
+                                videoUrl: '',
+                                thumbnailUrl: '',
+                            },
                         ]
                     }
                 };
@@ -2337,6 +2377,257 @@ export const AdminPageBuilderPage: React.FC = () => {
                                                     );
                                                 })()}
 
+                                                {/* --- 11.5. VIDEO TESTIMONIALS COVERFLOW --- */}
+                                                {selectedBlock.type === 'video_testimonials' && (
+                                                    <div className="space-y-4 text-xs">
+                                                        <div>
+                                                            <label className="block text-slate-400 font-bold mb-1">Section Tag</label>
+                                                            <input
+                                                                type="text"
+                                                                value={selectedBlock.settings.sectionTag || ''}
+                                                                onChange={(e) => handleUpdateSelectedSettings('sectionTag', e.target.value)}
+                                                                placeholder="e.g. Student Stories & Video Reviews"
+                                                                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-slate-400 font-bold mb-1">Main Title</label>
+                                                            <input
+                                                                type="text"
+                                                                value={selectedBlock.settings.sectionTitle || ''}
+                                                                onChange={(e) => handleUpdateSelectedSettings('sectionTitle', e.target.value)}
+                                                                placeholder="e.g. What Our Students Say"
+                                                                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white font-bold"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-slate-400 font-bold mb-1">Subtitle</label>
+                                                            <textarea
+                                                                rows={2}
+                                                                value={selectedBlock.settings.sectionSub || ''}
+                                                                onChange={(e) => handleUpdateSelectedSettings('sectionSub', e.target.value)}
+                                                                placeholder="e.g. Real journeys, genuine experiences, and success stories shared on camera."
+                                                                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white"
+                                                            />
+                                                        </div>
+
+                                                        {/* Video List Manager */}
+                                                        <div className="pt-3 border-t border-slate-800 space-y-3">
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <span className="font-bold text-slate-200">Video Testimonials</span>
+                                                                    <span className="ml-2 text-[11px] text-slate-500">
+                                                                        ({(selectedBlock.settings.items || []).length})
+                                                                    </span>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        const items = selectedBlock.settings.items || [];
+                                                                        const newItem = {
+                                                                            id: String(Date.now()),
+                                                                            name: 'Student Name',
+                                                                            role: 'Batch / Goal',
+                                                                            videoUrl: '',
+                                                                            thumbnailUrl: '',
+                                                                        };
+                                                                        handleUpdateSelectedSettings('items', [...items, newItem]);
+                                                                    }}
+                                                                    className="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                                                >
+                                                                    <Plus className="w-3.5 h-3.5" />
+                                                                    <span>Add Video</span>
+                                                                </button>
+                                                            </div>
+
+                                                            <div className="space-y-3">
+                                                                {(!selectedBlock.settings.items || selectedBlock.settings.items.length === 0) && (
+                                                                    <div className="p-4 rounded-xl bg-slate-950 border border-dashed border-slate-800 text-center text-slate-500 text-xs">
+                                                                        No video reviews added yet. Click &quot;Add Video&quot; above to add one.
+                                                                    </div>
+                                                                )}
+
+                                                                {(selectedBlock.settings.items || []).map((item: any, vIdx: number) => {
+                                                                    const videoId = getYouTubeVideoId(item.videoUrl);
+                                                                    const effectiveThumb = item.thumbnailUrl?.trim()
+                                                                        ? getImageUrl(item.thumbnailUrl.trim())
+                                                                        : (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '');
+
+                                                                    return (
+                                                                        <div
+                                                                            key={item.id || vIdx}
+                                                                            className="p-3 bg-slate-950 rounded-xl border border-slate-800 hover:border-slate-700 transition-colors space-y-2.5"
+                                                                        >
+                                                                            <div className="flex items-center justify-between">
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <span className="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 font-black text-[10px] flex items-center justify-center">
+                                                                                        {vIdx + 1}
+                                                                                    </span>
+                                                                                    <span className="font-bold text-slate-300 text-xs truncate max-w-[140px]">
+                                                                                        {item.name || 'Untitled Video'}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-1">
+                                                                                    {vIdx > 0 && (
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => {
+                                                                                                const items = [...(selectedBlock.settings.items || [])];
+                                                                                                const temp = items[vIdx - 1];
+                                                                                                items[vIdx - 1] = items[vIdx];
+                                                                                                items[vIdx] = temp;
+                                                                                                handleUpdateSelectedSettings('items', items);
+                                                                                            }}
+                                                                                            className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800"
+                                                                                            title="Move Up"
+                                                                                        >
+                                                                                            <ChevronUp className="w-3.5 h-3.5" />
+                                                                                        </button>
+                                                                                    )}
+                                                                                    {vIdx < (selectedBlock.settings.items || []).length - 1 && (
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => {
+                                                                                                const items = [...(selectedBlock.settings.items || [])];
+                                                                                                const temp = items[vIdx + 1];
+                                                                                                items[vIdx + 1] = items[vIdx];
+                                                                                                items[vIdx] = temp;
+                                                                                                handleUpdateSelectedSettings('items', items);
+                                                                                            }}
+                                                                                            className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800"
+                                                                                            title="Move Down"
+                                                                                        >
+                                                                                            <ChevronDown className="w-3.5 h-3.5" />
+                                                                                        </button>
+                                                                                    )}
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            const items = [...(selectedBlock.settings.items || [])];
+                                                                                            items.splice(vIdx, 1);
+                                                                                            handleUpdateSelectedSettings('items', items);
+                                                                                        }}
+                                                                                        className="p-1 text-rose-400 hover:text-rose-300 rounded hover:bg-rose-950/40"
+                                                                                        title="Delete Video"
+                                                                                    >
+                                                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* Student Name & Role */}
+                                                                            <div className="grid grid-cols-2 gap-2">
+                                                                                <div>
+                                                                                    <label className="block text-[10px] text-slate-400 mb-1">Student / Reviewer Name</label>
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        value={item.name || ''}
+                                                                                        onChange={(e) => {
+                                                                                            const items = [...(selectedBlock.settings.items || [])];
+                                                                                            items[vIdx] = { ...items[vIdx], name: e.target.value };
+                                                                                            handleUpdateSelectedSettings('items', items);
+                                                                                        }}
+                                                                                        placeholder="e.g. Farhan Islam"
+                                                                                        className="w-full px-2 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-xs"
+                                                                                    />
+                                                                                </div>
+                                                                                <div>
+                                                                                    <label className="block text-[10px] text-slate-400 mb-1">Role / Batch / Tag</label>
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        value={item.role || ''}
+                                                                                        onChange={(e) => {
+                                                                                            const items = [...(selectedBlock.settings.items || [])];
+                                                                                            items[vIdx] = { ...items[vIdx], role: e.target.value };
+                                                                                            handleUpdateSelectedSettings('items', items);
+                                                                                        }}
+                                                                                        placeholder="e.g. Student & Guardian"
+                                                                                        className="w-full px-2 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-xs"
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* YouTube Video URL */}
+                                                                            <div>
+                                                                                <div className="flex items-center justify-between mb-1">
+                                                                                    <label className="block text-[10px] text-slate-400">YouTube Video Link</label>
+                                                                                    {videoId ? (
+                                                                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
+                                                                                            <Check className="w-3 h-3" />
+                                                                                            <span>ID: {videoId}</span>
+                                                                                        </span>
+                                                                                    ) : item.videoUrl ? (
+                                                                                        <span className="text-[10px] text-amber-400">Invalid YouTube URL</span>
+                                                                                    ) : null}
+                                                                                </div>
+                                                                                <input
+                                                                                    type="text"
+                                                                                    value={item.videoUrl || ''}
+                                                                                    onChange={(e) => {
+                                                                                        const items = [...(selectedBlock.settings.items || [])];
+                                                                                        items[vIdx] = { ...items[vIdx], videoUrl: e.target.value };
+                                                                                        handleUpdateSelectedSettings('items', items);
+                                                                                    }}
+                                                                                    placeholder="https://www.youtube.com/watch?v=... or youtu.be/..."
+                                                                                    className="w-full px-2 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-xs font-mono"
+                                                                                />
+                                                                            </div>
+
+                                                                            {/* Thumbnail Preview & Picker */}
+                                                                            <div>
+                                                                                <label className="block text-[10px] text-slate-400 mb-1">Cover Thumbnail</label>
+                                                                                <div className="flex items-center gap-3">
+                                                                                    <div className="w-24 h-14 rounded-lg bg-slate-900 border border-slate-800 overflow-hidden shrink-0 relative flex items-center justify-center">
+                                                                                        {effectiveThumb ? (
+                                                                                            <img
+                                                                                                src={effectiveThumb}
+                                                                                                alt="Preview"
+                                                                                                className="w-full h-full object-cover"
+                                                                                            />
+                                                                                        ) : (
+                                                                                            <Video className="w-5 h-5 text-slate-600" />
+                                                                                        )}
+                                                                                    </div>
+                                                                                    <div className="space-y-1.5 flex-1">
+                                                                                        <div className="flex items-center gap-1.5">
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                onClick={() => setVideoThumbnailPickerIndex(vIdx)}
+                                                                                                className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold flex items-center gap-1 cursor-pointer border border-slate-700"
+                                                                                            >
+                                                                                                <ImageIcon className="w-3.5 h-3.5 text-sky-400" />
+                                                                                                <span>Upload / Pick Media</span>
+                                                                                            </button>
+                                                                                            {item.thumbnailUrl && (
+                                                                                                <button
+                                                                                                    type="button"
+                                                                                                    onClick={() => {
+                                                                                                        const items = [...(selectedBlock.settings.items || [])];
+                                                                                                        items[vIdx] = { ...items[vIdx], thumbnailUrl: '' };
+                                                                                                        handleUpdateSelectedSettings('items', items);
+                                                                                                    }}
+                                                                                                    className="px-2 py-1 rounded text-rose-400 hover:bg-rose-950/40 text-[10px]"
+                                                                                                >
+                                                                                                    Use YouTube Auto-Thumb
+                                                                                                </button>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <p className="text-[10px] text-slate-500 leading-tight">
+                                                                                            {item.thumbnailUrl
+                                                                                                ? 'Custom uploaded thumbnail active.'
+                                                                                                : (videoId ? 'Using automatic YouTube HQ thumbnail.' : 'No thumbnail yet.')}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
                                                 {/* --- 12. FAQ ACCORDION --- */}
                                                 {selectedBlock.type === 'faq_accordion' && (
                                                     <div className="space-y-3 text-xs">
@@ -3435,6 +3726,30 @@ export const AdminPageBuilderPage: React.FC = () => {
                         handleUpdateSelectedSettings('images', [...currentImages, newImg]);
                         setTestimonialMediaPickerOpen(false);
                         showToast('Review screenshot added!');
+                    }}
+                />
+            )}
+
+            {/* Video Testimonial Thumbnail Media Picker Modal */}
+            {videoThumbnailPickerIndex !== null && (
+                <MediaPickerModal
+                    isOpen={videoThumbnailPickerIndex !== null}
+                    onClose={() => setVideoThumbnailPickerIndex(null)}
+                    filterType="image"
+                    title="Select Video Testimonial Cover Thumbnail"
+                    onSelect={(url) => {
+                        if (selectedBlock && videoThumbnailPickerIndex !== null) {
+                            const items = [...(selectedBlock.settings?.items || [])];
+                            if (items[videoThumbnailPickerIndex]) {
+                                items[videoThumbnailPickerIndex] = {
+                                    ...items[videoThumbnailPickerIndex],
+                                    thumbnailUrl: url,
+                                };
+                                handleUpdateSelectedSettings('items', items);
+                            }
+                        }
+                        setVideoThumbnailPickerIndex(null);
+                        showToast('Video cover thumbnail updated!');
                     }}
                 />
             )}

@@ -17,6 +17,7 @@ export type BlockType =
     | 'cta_banner' 
     | 'rich_text' 
     | 'video_embed' 
+    | 'video_testimonials'
     | 'stats_counter';
 
 export interface CourseTabItem {

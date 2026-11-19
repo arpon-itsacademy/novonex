@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { StudentReviewsMarquee } from '../home/StudentReviewsMarquee';
+import { VideoTestimonialsCoverflow } from '../home/VideoTestimonialsCoverflow';
 
 interface PageBlockRendererProps {
     block: PageBlock;
@@ -81,6 +82,8 @@ export const PageBlockRenderer: React.FC<PageBlockRendererProps> = ({
                 return <TeachersShowcaseBlock block={block} isBuilder={isBuilder} />;
             case 'learning_path':
                 return <LearningPathBlock block={block} isBuilder={isBuilder} />;
+            case 'video_testimonials':
+                return <VideoTestimonialsCoverflow settings={block.settings} isBuilder={isBuilder} />;
             case 'testimonials':
             case 'student_reviews_marquee':
                 return <StudentReviewsMarquee settings={block.settings} isBuilder={isBuilder} />;
