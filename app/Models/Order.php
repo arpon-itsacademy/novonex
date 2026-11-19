@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Order extends Model
@@ -56,6 +58,29 @@ class Order extends Model
         'has_nexpilot' => 'boolean',
         'nexpilot_price' => 'float',
     ];
+
+    public static function booted(): void
+    {
+        parent::booted();
+
+        if (Schema::hasTable('orders')) {
+            try {
+                Schema::table('orders', function (Blueprint $table) {
+                    if (!Schema::hasColumn('orders', 'dynamic_offer_id')) {
+                        $table->unsignedBigInteger('dynamic_offer_id')->nullable()->after('coupon_discount');
+                    }
+                    if (!Schema::hasColumn('orders', 'dynamic_offer_title')) {
+                        $table->string('dynamic_offer_title')->nullable()->after('dynamic_offer_id');
+                    }
+                    if (!Schema::hasColumn('orders', 'dynamic_offer_discount')) {
+                        $table->decimal('dynamic_offer_discount', 10, 2)->default(0.00)->after('dynamic_offer_title');
+                    }
+                });
+            } catch (\Throwable $e) {
+                // Ignore schema migration issues
+            }
+        }
+    }
 
     public static function generateOrderNumber(): string
     {

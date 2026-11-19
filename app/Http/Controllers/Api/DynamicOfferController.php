@@ -30,77 +30,81 @@ class DynamicOfferController extends Controller
      */
     public function evaluate(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'course_ids' => ['nullable', 'array'],
-            'course_ids.*' => ['integer'],
-        ]);
-
-        $courseIds = array_filter((array) ($validated['course_ids'] ?? []));
-        if (empty($courseIds) || !Schema::hasTable('dynamic_offers')) {
-            return response()->json([
-                'has_offer' => false,
-                'discount_amount' => 0,
-                'offer' => null,
+        try {
+            $validated = $request->validate([
+                'course_ids' => ['nullable', 'array'],
+                'course_ids.*' => ['integer'],
             ]);
-        }
 
-        $courses = Course::with('categories')
-            ->whereIn('id', $courseIds)
-            ->where('status', Course::STATUS_PUBLISHED)
-            ->get();
-
-        if ($courses->isEmpty()) {
-            return response()->json([
-                'has_offer' => false,
-                'discount_amount' => 0,
-                'offer' => null,
-            ]);
-        }
-
-        $subtotal = $courses->sum(function ($c) {
-            return (float) ($c->effective_price ?? $c->price ?? 0);
-        });
-
-        $activeOffers = DynamicOffer::active()->get();
-        if ($activeOffers->isEmpty()) {
-            return response()->json([
-                'has_offer' => false,
-                'discount_amount' => 0,
-                'offer' => null,
-            ]);
-        }
-
-        $bestEvaluation = null;
-        $maxDiscount = -1.0;
-        $bestNextTierOffer = null;
-
-        foreach ($activeOffers as $offer) {
-            $eval = $offer->evaluateForCourses($courses, $subtotal);
-
-            if (!empty($eval['applied']) && (float) $eval['discount_amount'] > $maxDiscount) {
-                $maxDiscount = (float) $eval['discount_amount'];
-                $bestEvaluation = $eval;
-            } elseif (empty($eval['applied']) && !empty($eval['next_tier']) && !$bestNextTierOffer) {
-                $bestNextTierOffer = $eval;
+            $courseIds = array_filter((array) ($validated['course_ids'] ?? []));
+            if (empty($courseIds) || !Schema::hasTable('dynamic_offers')) {
+                return response()->json([
+                    'has_offer' => false,
+                    'discount_amount' => 0,
+                    'offer' => null,
+                ]);
             }
-        }
 
-        if ($bestEvaluation) {
-            return response()->json([
-                'has_offer' => true,
-                'applied' => true,
-                'discount_amount' => (float) $bestEvaluation['discount_amount'],
-                'offer' => $bestEvaluation,
-            ]);
-        }
+            $courses = Course::with('categories')
+                ->whereIn('id', $courseIds)
+                ->where('status', Course::STATUS_PUBLISHED)
+                ->get();
 
-        if ($bestNextTierOffer) {
-            return response()->json([
-                'has_offer' => false,
-                'applied' => false,
-                'discount_amount' => 0,
-                'offer' => $bestNextTierOffer,
-            ]);
+            if ($courses->isEmpty()) {
+                return response()->json([
+                    'has_offer' => false,
+                    'discount_amount' => 0,
+                    'offer' => null,
+                ]);
+            }
+
+            $subtotal = $courses->sum(function ($c) {
+                return (float) ($c->effective_price ?? $c->price ?? 0);
+            });
+
+            $activeOffers = DynamicOffer::active()->get();
+            if ($activeOffers->isEmpty()) {
+                return response()->json([
+                    'has_offer' => false,
+                    'discount_amount' => 0,
+                    'offer' => null,
+                ]);
+            }
+
+            $bestEvaluation = null;
+            $maxDiscount = -1.0;
+            $bestNextTierOffer = null;
+
+            foreach ($activeOffers as $offer) {
+                $eval = $offer->evaluateForCourses($courses, $subtotal);
+
+                if (!empty($eval['applied']) && (float) ($eval['discount_amount'] ?? 0) > $maxDiscount) {
+                    $maxDiscount = (float) $eval['discount_amount'];
+                    $bestEvaluation = $eval;
+                } elseif (empty($eval['applied']) && !empty($eval['next_tier']) && !$bestNextTierOffer) {
+                    $bestNextTierOffer = $eval;
+                }
+            }
+
+            if ($bestEvaluation) {
+                return response()->json([
+                    'has_offer' => true,
+                    'applied' => true,
+                    'discount_amount' => (float) $bestEvaluation['discount_amount'],
+                    'offer' => $bestEvaluation,
+                ]);
+            }
+
+            if ($bestNextTierOffer) {
+                return response()->json([
+                    'has_offer' => false,
+                    'applied' => false,
+                    'discount_amount' => 0,
+                    'offer' => $bestNextTierOffer,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            // Fail safely
         }
 
         return response()->json([

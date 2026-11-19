@@ -119,6 +119,7 @@ class ShurjopayController extends Controller
             'notes' => ['nullable', 'string', 'max:500'],
             'affiliate_code' => ['nullable', 'string', 'max:50'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
+            'dynamic_offer_id' => ['nullable', 'integer'],
         ]);
 
         $user = auth()->user();
@@ -134,7 +135,7 @@ class ShurjopayController extends Controller
             return response()->json(['message' => 'Please select at least one course for checkout.'], 422);
         }
 
-        $courses = Course::with('nexpilot')->whereIn('id', $courseIds)->get();
+        $courses = Course::with(['nexpilot', 'categories'])->whereIn('id', $courseIds)->get();
         if ($courses->isEmpty()) {
             return response()->json(['message' => 'Selected courses are not available for purchase.'], 404);
         }
@@ -237,26 +238,30 @@ class ShurjopayController extends Controller
         // Check and apply active dynamic offer discount
         $dynamicOffer = null;
         $dynamicOfferDiscount = 0.0;
-        if (class_exists(\App\Models\DynamicOffer::class) && \Illuminate\Support\Facades\Schema::hasTable('dynamic_offers')) {
-            $activeOffers = \App\Models\DynamicOffer::active()->get();
-            $bestOfferEval = null;
-            $bestOfferModel = null;
-            $maxOfferDiscount = 0.0;
+        try {
+            if (class_exists(\App\Models\DynamicOffer::class) && \Illuminate\Support\Facades\Schema::hasTable('dynamic_offers')) {
+                $activeOffers = \App\Models\DynamicOffer::active()->get();
+                $bestOfferEval = null;
+                $bestOfferModel = null;
+                $maxOfferDiscount = 0.0;
 
-            foreach ($activeOffers as $offer) {
-                $eval = $offer->evaluateForCourses($courses, $courseFinalAmount);
-                if (!empty($eval['applied']) && (float) $eval['discount_amount'] > $maxOfferDiscount) {
-                    $maxOfferDiscount = (float) $eval['discount_amount'];
-                    $bestOfferEval = $eval;
-                    $bestOfferModel = $offer;
+                foreach ($activeOffers as $offer) {
+                    $eval = $offer->evaluateForCourses($courses, $courseFinalAmount);
+                    if (!empty($eval['applied']) && (float) ($eval['discount_amount'] ?? 0) > $maxOfferDiscount) {
+                        $maxOfferDiscount = (float) $eval['discount_amount'];
+                        $bestOfferEval = $eval;
+                        $bestOfferModel = $offer;
+                    }
+                }
+
+                if ($bestOfferEval && $bestOfferModel) {
+                    $dynamicOffer = $bestOfferModel;
+                    $dynamicOfferDiscount = min($courseFinalAmount, $maxOfferDiscount);
+                    $courseFinalAmount = max(0, $courseFinalAmount - $dynamicOfferDiscount);
                 }
             }
-
-            if ($bestOfferEval && $bestOfferModel) {
-                $dynamicOffer = $bestOfferModel;
-                $dynamicOfferDiscount = min($courseFinalAmount, $maxOfferDiscount);
-                $courseFinalAmount = max(0, $courseFinalAmount - $dynamicOfferDiscount);
-            }
+        } catch (\Throwable $e) {
+            Log::warning('Dynamic offer evaluation skipped in shurjoPay checkout: ' . $e->getMessage());
         }
 
         $finalAmount = max(0, $courseFinalAmount + $nexpilotPrice);
@@ -264,8 +269,130 @@ class ShurjopayController extends Controller
         // If amount is 0 (100% coupon, 100% discount, or free course), do NOT call shurjoPay.
         // Immediately mark order as PAID and activate enrollment.
         if ($finalAmount <= 0) {
-            $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $includeNexPilot, $nexpilotId, $nexpilotPrice) {
-                $order = Order::create([
+            try {
+                $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $includeNexPilot, $nexpilotId, $nexpilotPrice) {
+                    $orderData = [
+                        'order_number' => Order::generateOrderNumber(),
+                        'user_id' => $user->id,
+                        'affiliate_id' => $affiliateProfile ? $affiliateProfile->id : null,
+                        'affiliate_code' => $affiliateProfile ? $affiliateProfile->affiliate_code : null,
+                        'course_id' => $primaryCourse->id,
+                        'original_price' => $price,
+                        'discount_amount' => $discountAmount,
+                        'affiliate_discount' => $affiliateDiscount,
+                        'coupon_id' => $coupon ? $coupon->id : null,
+                        'coupon_code' => $coupon ? $coupon->code : null,
+                        'coupon_discount' => $couponDiscount,
+                        'final_amount' => 0,
+                        'has_nexpilot' => $nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId),
+                        'nexpilot_id' => $nexpilotId,
+                        'nexpilot_price' => $nexpilotPrice,
+                        'payment_status' => Order::PAYMENT_PAID,
+                        'order_status' => Order::ORDER_COMPLETED,
+                        'payment_method' => 'free',
+                        'notes' => $validated['notes'] ?? '100% Discount / Free Enrollment with Coupon Code',
+                    ];
+
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_id')) {
+                        $orderData['dynamic_offer_id'] = $dynamicOffer ? $dynamicOffer->id : null;
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_title')) {
+                        $orderData['dynamic_offer_title'] = $dynamicOffer ? $dynamicOffer->title : null;
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_discount')) {
+                        $orderData['dynamic_offer_discount'] = $dynamicOfferDiscount;
+                    }
+
+                    $order = Order::create($orderData);
+
+                    if ($coupon) {
+                        CouponUsage::create([
+                            'coupon_id' => $coupon->id,
+                            'user_id' => $user->id,
+                            'order_id' => $order->id,
+                            'discount_amount' => $couponDiscount,
+                        ]);
+                        $coupon->increment('times_used');
+                    }
+
+                    foreach ($courses as $c) {
+                        OrderItem::create([
+                            'order_id' => $order->id,
+                            'course_id' => $c->id,
+                            'price' => 0,
+                        ]);
+                    }
+
+                    Payment::create([
+                        'order_id' => $order->id,
+                        'transaction_ref' => 'FREE_' . $order->order_number,
+                        'sender_phone' => $user->phone ?? '01700000000',
+                        'amount' => 0,
+                        'payment_method' => 'free',
+                        'status' => Payment::STATUS_APPROVED,
+                        'verified_at' => now(),
+                        'notes' => '100% Discount / Free Enrollment Approved',
+                    ]);
+
+                    // Immediately create active Enrollment for each course
+                    foreach ($courses as $c) {
+                        Enrollment::updateOrCreate(
+                            [
+                                'user_id' => $user->id,
+                                'course_id' => $c->id,
+                            ],
+                            [
+                                'order_id' => $order->id,
+                                'status' => Enrollment::STATUS_ACTIVE,
+                                'has_nexpilot' => (bool) ($nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId && $c->id === $primaryCourse->id)),
+                                'nexpilot_id' => ($c->id === $primaryCourse->id ? $nexpilotId : null),
+                                'enrolled_at' => now(),
+                            ]
+                        );
+                    }
+
+                    AuditLog::log('free_enrollment_auto_activated', 'Order', $order->id, null, [
+                        'order_number' => $order->order_number,
+                        'user_id' => $user->id,
+                        'course_id' => $primaryCourse->id,
+                        'coupon_code' => $coupon?->code,
+                    ]);
+
+                    try {
+                        $user->notify(new PaymentConfirmedNotification($order));
+                    } catch (\Throwable $e) {
+                        Log::error('Free enrollment notification failed: ' . $e->getMessage());
+                    }
+
+                    try {
+                        app(CoursePurchaseSmsService::class)->sendPurchaseSms($order);
+                    } catch (\Throwable $e) {
+                        Log::error('Free enrollment SMS failed: ' . $e->getMessage());
+                    }
+
+                    return $order;
+                });
+            } catch (\Throwable $e) {
+                Log::error('Free checkout transaction failed: ' . $e->getMessage(), [
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                return response()->json(['message' => 'Failed to process free checkout: ' . $e->getMessage()], 500);
+            }
+
+            return response()->json([
+                'success' => true,
+                'is_free' => true,
+                'message' => 'Enrolled in course(s) with 100% discount successfully!',
+                'order_number' => $order->order_number,
+                'order' => $order->load(['course', 'items.course', 'latestPayment']),
+                'redirect_url' => "/order-status/{$order->order_number}?status=success",
+            ]);
+        }
+
+        // Create order and pending payment
+        try {
+            $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice) {
+                $orderData = [
                     'order_number' => Order::generateOrderNumber(),
                     'user_id' => $user->id,
                     'affiliate_id' => $affiliateProfile ? $affiliateProfile->id : null,
@@ -277,18 +404,27 @@ class ShurjopayController extends Controller
                     'coupon_id' => $coupon ? $coupon->id : null,
                     'coupon_code' => $coupon ? $coupon->code : null,
                     'coupon_discount' => $couponDiscount,
-                    'dynamic_offer_id' => $dynamicOffer ? $dynamicOffer->id : null,
-                    'dynamic_offer_title' => $dynamicOffer ? $dynamicOffer->title : null,
-                    'dynamic_offer_discount' => $dynamicOfferDiscount,
-                    'final_amount' => 0,
+                    'final_amount' => $finalAmount,
                     'has_nexpilot' => $nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId),
                     'nexpilot_id' => $nexpilotId,
                     'nexpilot_price' => $nexpilotPrice,
-                    'payment_status' => Order::PAYMENT_PAID,
-                    'order_status' => Order::ORDER_COMPLETED,
-                    'payment_method' => 'free',
-                    'notes' => $validated['notes'] ?? '100% Discount / Free Enrollment with Coupon Code',
-                ]);
+                    'payment_status' => Order::PAYMENT_PENDING,
+                    'order_status' => Order::ORDER_PROCESSING,
+                    'payment_method' => 'shurjopay',
+                    'notes' => $validated['notes'] ?? 'Online payment via shurjoPay',
+                ];
+
+                if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_id')) {
+                    $orderData['dynamic_offer_id'] = $dynamicOffer ? $dynamicOffer->id : null;
+                }
+                if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_title')) {
+                    $orderData['dynamic_offer_title'] = $dynamicOffer ? $dynamicOffer->title : null;
+                }
+                if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_discount')) {
+                    $orderData['dynamic_offer_discount'] = $dynamicOfferDiscount;
+                }
+
+                $order = Order::create($orderData);
 
                 if ($coupon) {
                     CouponUsage::create([
@@ -304,127 +440,28 @@ class ShurjopayController extends Controller
                     OrderItem::create([
                         'order_id' => $order->id,
                         'course_id' => $c->id,
-                        'price' => 0,
+                        'price' => (float) $c->effective_price,
                     ]);
                 }
 
                 Payment::create([
                     'order_id' => $order->id,
-                    'transaction_ref' => 'FREE_' . $order->order_number,
+                    'transaction_ref' => 'PENDING_' . $order->order_number,
                     'sender_phone' => $user->phone ?? '01700000000',
-                    'amount' => 0,
-                    'payment_method' => 'free',
-                    'status' => Payment::STATUS_APPROVED,
-                    'verified_at' => now(),
-                    'notes' => '100% Discount / Free Enrollment Approved',
+                    'amount' => $finalAmount,
+                    'payment_method' => 'shurjopay',
+                    'status' => Payment::STATUS_PENDING,
+                    'notes' => 'Awaiting shurjoPay gateway payment',
                 ]);
-
-                // Immediately create active Enrollment for each course
-                foreach ($courses as $c) {
-                    Enrollment::updateOrCreate(
-                        [
-                            'user_id' => $user->id,
-                            'course_id' => $c->id,
-                        ],
-                        [
-                            'order_id' => $order->id,
-                            'status' => Enrollment::STATUS_ACTIVE,
-                            'has_nexpilot' => (bool) ($nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId && $c->id === $primaryCourse->id)),
-                            'nexpilot_id' => ($c->id === $primaryCourse->id ? $nexpilotId : null),
-                            'enrolled_at' => now(),
-                        ]
-                    );
-                }
-
-                AuditLog::log('free_enrollment_auto_activated', 'Order', $order->id, null, [
-                    'order_number' => $order->order_number,
-                    'user_id' => $user->id,
-                    'course_id' => $primaryCourse->id,
-                    'coupon_code' => $coupon?->code,
-                ]);
-
-                try {
-                    $user->notify(new PaymentConfirmedNotification($order));
-                } catch (\Throwable $e) {
-                    Log::error('Free enrollment notification failed: ' . $e->getMessage());
-                }
-
-                try {
-                    app(CoursePurchaseSmsService::class)->sendPurchaseSms($order);
-                } catch (\Throwable $e) {
-                    Log::error('Free enrollment SMS failed: ' . $e->getMessage());
-                }
 
                 return $order;
             });
-
-            return response()->json([
-                'success' => true,
-                'is_free' => true,
-                'message' => 'Enrolled in course(s) with 100% discount successfully!',
-                'order_number' => $order->order_number,
-                'order' => $order->load(['course', 'items.course', 'latestPayment']),
-                'redirect_url' => "/order-status/{$order->order_number}?status=success",
+        } catch (\Throwable $e) {
+            Log::error('shurjoPay checkout order creation failed: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
+            return response()->json(['message' => 'Failed to initialize payment: ' . $e->getMessage()], 500);
         }
-
-        // Create order and pending payment
-        $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice) {
-            $order = Order::create([
-                'order_number' => Order::generateOrderNumber(),
-                'user_id' => $user->id,
-                'affiliate_id' => $affiliateProfile ? $affiliateProfile->id : null,
-                'affiliate_code' => $affiliateProfile ? $affiliateProfile->affiliate_code : null,
-                'course_id' => $primaryCourse->id,
-                'original_price' => $price,
-                'discount_amount' => $discountAmount,
-                'affiliate_discount' => $affiliateDiscount,
-                'coupon_id' => $coupon ? $coupon->id : null,
-                'coupon_code' => $coupon ? $coupon->code : null,
-                'coupon_discount' => $couponDiscount,
-                'dynamic_offer_id' => $dynamicOffer ? $dynamicOffer->id : null,
-                'dynamic_offer_title' => $dynamicOffer ? $dynamicOffer->title : null,
-                'dynamic_offer_discount' => $dynamicOfferDiscount,
-                'final_amount' => $finalAmount,
-                'has_nexpilot' => $nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId),
-                'nexpilot_id' => $nexpilotId,
-                'nexpilot_price' => $nexpilotPrice,
-                'payment_status' => Order::PAYMENT_PENDING,
-                'order_status' => Order::ORDER_PROCESSING,
-                'payment_method' => 'shurjopay',
-                'notes' => $validated['notes'] ?? 'Online payment via shurjoPay',
-            ]);
-
-            if ($coupon) {
-                CouponUsage::create([
-                    'coupon_id' => $coupon->id,
-                    'user_id' => $user->id,
-                    'order_id' => $order->id,
-                    'discount_amount' => $couponDiscount,
-                ]);
-                $coupon->increment('times_used');
-            }
-
-            foreach ($courses as $c) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'course_id' => $c->id,
-                    'price' => (float) $c->effective_price,
-                ]);
-            }
-
-            Payment::create([
-                'order_id' => $order->id,
-                'transaction_ref' => 'PENDING_' . $order->order_number,
-                'sender_phone' => $user->phone ?? '01700000000',
-                'amount' => $finalAmount,
-                'payment_method' => 'shurjopay',
-                'status' => Payment::STATUS_PENDING,
-                'notes' => 'Awaiting shurjoPay gateway payment',
-            ]);
-
-            return $order;
-        });
 
         // Call shurjoPay initiate
         $payResult = ShurjopayService::initiatePayment($order, $user, $request->ip() ?: '127.0.0.1');

@@ -35,6 +35,7 @@ class OrderController extends Controller
             'notes' => ['nullable', 'string', 'max:500'],
             'affiliate_code' => ['nullable', 'string', 'max:50'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
+            'dynamic_offer_id' => ['nullable', 'integer'],
         ]);
 
         $user = auth()->user();
@@ -52,7 +53,7 @@ class OrderController extends Controller
             ], 422);
         }
 
-        $courses = Course::with('nexpilot')->whereIn('id', $courseIds)->get();
+        $courses = Course::with(['nexpilot', 'categories'])->whereIn('id', $courseIds)->get();
         if ($courses->isEmpty()) {
             abort(404, 'Selected courses are not available for purchase.');
         }
@@ -158,26 +159,30 @@ class OrderController extends Controller
         // Check and apply active dynamic offer discount
         $dynamicOffer = null;
         $dynamicOfferDiscount = 0.0;
-        if (class_exists(\App\Models\DynamicOffer::class) && \Illuminate\Support\Facades\Schema::hasTable('dynamic_offers')) {
-            $activeOffers = \App\Models\DynamicOffer::active()->get();
-            $bestOfferEval = null;
-            $bestOfferModel = null;
-            $maxOfferDiscount = 0.0;
+        try {
+            if (class_exists(\App\Models\DynamicOffer::class) && \Illuminate\Support\Facades\Schema::hasTable('dynamic_offers')) {
+                $activeOffers = \App\Models\DynamicOffer::active()->get();
+                $bestOfferEval = null;
+                $bestOfferModel = null;
+                $maxOfferDiscount = 0.0;
 
-            foreach ($activeOffers as $offer) {
-                $eval = $offer->evaluateForCourses($courses, $courseFinalAmount);
-                if (!empty($eval['applied']) && (float) $eval['discount_amount'] > $maxOfferDiscount) {
-                    $maxOfferDiscount = (float) $eval['discount_amount'];
-                    $bestOfferEval = $eval;
-                    $bestOfferModel = $offer;
+                foreach ($activeOffers as $offer) {
+                    $eval = $offer->evaluateForCourses($courses, $courseFinalAmount);
+                    if (!empty($eval['applied']) && (float) ($eval['discount_amount'] ?? 0) > $maxOfferDiscount) {
+                        $maxOfferDiscount = (float) $eval['discount_amount'];
+                        $bestOfferEval = $eval;
+                        $bestOfferModel = $offer;
+                    }
+                }
+
+                if ($bestOfferEval && $bestOfferModel) {
+                    $dynamicOffer = $bestOfferModel;
+                    $dynamicOfferDiscount = min($courseFinalAmount, $maxOfferDiscount);
+                    $courseFinalAmount = max(0, $courseFinalAmount - $dynamicOfferDiscount);
                 }
             }
-
-            if ($bestOfferEval && $bestOfferModel) {
-                $dynamicOffer = $bestOfferModel;
-                $dynamicOfferDiscount = min($courseFinalAmount, $maxOfferDiscount);
-                $courseFinalAmount = max(0, $courseFinalAmount - $dynamicOfferDiscount);
-            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Dynamic offer evaluation skipped during checkout: ' . $e->getMessage());
         }
 
         $finalAmount = max(0, $courseFinalAmount + $nexpilotPrice);
@@ -204,82 +209,103 @@ class OrderController extends Controller
             }
         }
 
-        $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice, $isFree) {
-            $order = Order::create([
-                'order_number' => Order::generateOrderNumber(),
-                'user_id' => $user->id,
-                'affiliate_id' => $affiliateProfile ? $affiliateProfile->id : null,
-                'affiliate_code' => $affiliateProfile ? $affiliateProfile->affiliate_code : null,
-                'course_id' => $primaryCourse->id,
-                'original_price' => $price,
-                'discount_amount' => $discountAmount,
-                'affiliate_discount' => $affiliateDiscount,
-                'coupon_id' => $coupon ? $coupon->id : null,
-                'coupon_code' => $coupon ? $coupon->code : null,
-                'coupon_discount' => $couponDiscount,
-                'dynamic_offer_id' => $dynamicOffer ? $dynamicOffer->id : null,
-                'dynamic_offer_title' => $dynamicOffer ? $dynamicOffer->title : null,
-                'dynamic_offer_discount' => $dynamicOfferDiscount,
-                'final_amount' => $finalAmount,
-                'has_nexpilot' => $nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId),
-                'nexpilot_id' => $nexpilotId,
-                'nexpilot_price' => $nexpilotPrice,
-                'payment_status' => $isFree ? Order::PAYMENT_PAID : Order::PAYMENT_PENDING,
-                'order_status' => $isFree ? Order::ORDER_COMPLETED : Order::ORDER_PROCESSING,
-                'payment_method' => $isFree ? 'free' : $validated['payment_method'],
-                'notes' => $validated['notes'] ?? ($isFree ? '100% Discount / Free Coupon Enrollment' : null),
-            ]);
-
-            // Track coupon usage
-            if ($coupon) {
-                CouponUsage::create([
-                    'coupon_id' => $coupon->id,
+        try {
+            $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice, $isFree) {
+                $orderData = [
+                    'order_number' => Order::generateOrderNumber(),
                     'user_id' => $user->id,
-                    'order_id' => $order->id,
-                    'discount_amount' => $couponDiscount,
-                ]);
-                $coupon->increment('times_used');
-            }
+                    'affiliate_id' => $affiliateProfile ? $affiliateProfile->id : null,
+                    'affiliate_code' => $affiliateProfile ? $affiliateProfile->affiliate_code : null,
+                    'course_id' => $primaryCourse->id,
+                    'original_price' => $price,
+                    'discount_amount' => $discountAmount,
+                    'affiliate_discount' => $affiliateDiscount,
+                    'coupon_id' => $coupon ? $coupon->id : null,
+                    'coupon_code' => $coupon ? $coupon->code : null,
+                    'coupon_discount' => $couponDiscount,
+                    'final_amount' => $finalAmount,
+                    'has_nexpilot' => $nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId),
+                    'nexpilot_id' => $nexpilotId,
+                    'nexpilot_price' => $nexpilotPrice,
+                    'payment_status' => $isFree ? Order::PAYMENT_PAID : Order::PAYMENT_PENDING,
+                    'order_status' => $isFree ? Order::ORDER_COMPLETED : Order::ORDER_PROCESSING,
+                    'payment_method' => $isFree ? 'free' : $validated['payment_method'],
+                    'notes' => $validated['notes'] ?? ($isFree ? '100% Discount / Free Coupon Enrollment' : null),
+                ];
 
-            // Create OrderItem for each course
-            foreach ($courses as $c) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'course_id' => $c->id,
-                    'price' => (float) $c->effective_price,
-                ]);
-            }
+                if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_id')) {
+                    $orderData['dynamic_offer_id'] = $dynamicOffer ? $dynamicOffer->id : null;
+                }
+                if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_title')) {
+                    $orderData['dynamic_offer_title'] = $dynamicOffer ? $dynamicOffer->title : null;
+                }
+                if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_discount')) {
+                    $orderData['dynamic_offer_discount'] = $dynamicOfferDiscount;
+                }
 
-            Payment::create([
-                'order_id' => $order->id,
-                'transaction_ref' => $isFree ? ('FREE_' . $order->order_number) : $validated['transaction_ref'],
-                'sender_phone' => $isFree ? ($user->phone ?? '01700000000') : $validated['sender_phone'],
-                'amount' => $finalAmount,
-                'payment_method' => $isFree ? 'free' : $validated['payment_method'],
-                'status' => $isFree ? Payment::STATUS_APPROVED : Payment::STATUS_PENDING,
-                'verified_at' => $isFree ? now() : null,
+                $order = Order::create($orderData);
+
+                // Track coupon usage
+                if ($coupon) {
+                    CouponUsage::create([
+                        'coupon_id' => $coupon->id,
+                        'user_id' => $user->id,
+                        'order_id' => $order->id,
+                        'discount_amount' => $couponDiscount,
+                    ]);
+                    $coupon->increment('times_used');
+                }
+
+                // Create OrderItem for each course
+                foreach ($courses as $c) {
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'course_id' => $c->id,
+                        'price' => (float) $c->effective_price,
+                    ]);
+                }
+
+                Payment::create([
+                    'order_id' => $order->id,
+                    'transaction_ref' => $isFree ? ('FREE_' . $order->order_number) : $validated['transaction_ref'],
+                    'sender_phone' => $isFree ? ($user->phone ?? '01700000000') : $validated['sender_phone'],
+                    'amount' => $finalAmount,
+                    'payment_method' => $isFree ? 'free' : $validated['payment_method'],
+                    'status' => $isFree ? Payment::STATUS_APPROVED : Payment::STATUS_PENDING,
+                    'verified_at' => $isFree ? now() : null,
+                ]);
+
+                if ($isFree) {
+                    foreach ($courses as $c) {
+                        Enrollment::updateOrCreate(
+                            [
+                                'user_id' => $user->id,
+                                'course_id' => $c->id,
+                            ],
+                            [
+                                'order_id' => $order->id,
+                                'status' => Enrollment::STATUS_ACTIVE,
+                                'has_nexpilot' => (bool) ($nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId && $c->id === $primaryCourse->id)),
+                                'nexpilot_id' => ($c->id === $primaryCourse->id ? $nexpilotId : null),
+                                'enrolled_at' => now(),
+                            ]
+                        );
+                    }
+                }
+
+                return $order;
+            });
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Order checkout transaction failed: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $user->id,
+                'course_ids' => $courseIds,
             ]);
 
-            if ($isFree) {
-                foreach ($courses as $c) {
-                    Enrollment::updateOrCreate(
-                        [
-                            'user_id' => $user->id,
-                            'course_id' => $c->id,
-                        ],
-                        [
-                            'order_id' => $order->id,
-                            'status' => Enrollment::STATUS_ACTIVE,
-                            'has_nexpilot' => (bool) ($nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId && $c->id === $primaryCourse->id)),
-                            'nexpilot_id' => ($c->id === $primaryCourse->id ? $nexpilotId : null),
-                            'enrolled_at' => now(),
-                        ]
-                    );
-                }
-            }
-
-            return $order;
-        });
+            return response()->json([
+                'message' => 'Failed to process order: ' . $e->getMessage(),
+            ], 500);
+        }
 
         return response()->json([
             'message' => $isFree ? 'Enrolled in course(s) successfully!' : 'Order placed successfully. Enrollment will be activated upon payment verification.',

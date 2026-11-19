@@ -205,10 +205,20 @@ class AdminDynamicOfferController extends Controller
      */
     public function getCoursesAndCategories(): JsonResponse
     {
-        $courses = Course::select(['id', 'title', 'price', 'sale_price', 'category_id'])
+        $courses = Course::with('categories:id,name')
+            ->select(['id', 'title', 'price', 'sale_price'])
             ->where('status', Course::STATUS_PUBLISHED)
             ->latest('id')
-            ->get();
+            ->get()
+            ->map(function ($c) {
+                return [
+                    'id' => $c->id,
+                    'title' => $c->title,
+                    'price' => (float) $c->price,
+                    'sale_price' => $c->sale_price !== null ? (float) $c->sale_price : null,
+                    'category_id' => $c->categories->first()?->id ?? null,
+                ];
+            });
 
         $categories = Category::select(['id', 'name', 'slug'])
             ->withCount('courses')
