@@ -410,12 +410,6 @@ export const StudentDashboardPage: React.FC = () => {
                     <div className="py-12 text-center space-y-3">
                         <BookOpen className="w-10 h-10 text-slate-300 mx-auto" />
                         <p className="text-sm font-bold text-slate-600">You haven't enrolled in any courses yet.</p>
-                        <Link
-                            to="/courses"
-                            className="inline-flex px-5 py-2 bg-[#25a2ee] hover:bg-[#1f8ed1] text-white text-xs font-bold rounded-xl shadow-xs transition"
-                        >
-                            Explore Courses
-                        </Link>
                     </div>
                 )}
             </div>

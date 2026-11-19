@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { apiClient, formatBDT } from '../../api/client';
 import { Course, CourseBundle } from '../../types';
-import { 
-    Boxes, 
-    ArrowLeft, 
-    Save, 
-    Loader2, 
-    Check, 
-    BookOpen, 
-    Search, 
-    DollarSign, 
-    Percent, 
+import {
+    Boxes,
+    ArrowLeft,
+    Save,
+    Loader2,
+    Check,
+    BookOpen,
+    Search,
+    DollarSign,
+    Percent,
     Image as ImageIcon,
     Sparkles
 } from 'lucide-react';
@@ -85,7 +85,7 @@ export const AdminBundleFormPage: React.FC = () => {
     };
 
     const toggleCourse = (courseId: number) => {
-        setSelectedCourseIds(prev => 
+        setSelectedCourseIds(prev =>
             prev.includes(courseId) ? prev.filter(c => c !== courseId) : [...prev, courseId]
         );
     };
@@ -134,7 +134,7 @@ export const AdminBundleFormPage: React.FC = () => {
         }
     };
 
-    const filteredCourses = allCourses.filter(c => 
+    const filteredCourses = allCourses.filter(c =>
         c.title.toLowerCase().includes(courseSearch.toLowerCase())
     );
 
@@ -357,9 +357,8 @@ export const AdminBundleFormPage: React.FC = () => {
                                 return (
                                     <label
                                         key={course.id}
-                                        className={`p-3.5 flex items-center justify-between gap-3 cursor-pointer transition ${
-                                            isSelected ? 'bg-sky-50/70' : 'hover:bg-slate-50'
-                                        }`}
+                                        className={`p-3.5 flex items-center justify-between gap-3 cursor-pointer transition ${isSelected ? 'bg-sky-50/70' : 'hover:bg-slate-50'
+                                            }`}
                                     >
                                         <div className="flex items-center gap-3">
                                             <input

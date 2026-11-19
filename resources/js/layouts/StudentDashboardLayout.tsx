@@ -24,7 +24,6 @@ import {
     KeyRound,
     User as UserIcon,
     Radio,
-    PlusCircle,
     SlidersHorizontal,
     GraduationCap,
     Loader2
@@ -120,11 +119,6 @@ export const StudentDashboardLayout: React.FC = () => {
             path: '/student',
             icon: Home,
             exact: true
-        },
-        {
-            title: 'Explore Courses',
-            path: '/courses',
-            icon: PlusCircle
         },
         {
             title: 'My Courses',

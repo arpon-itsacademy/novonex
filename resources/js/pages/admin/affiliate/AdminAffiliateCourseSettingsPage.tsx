@@ -166,11 +166,10 @@ export const AdminAffiliateCourseSettingsPage: React.FC = () => {
             {/* Alert Message */}
             {alertMessage && (
                 <div
-                    className={`p-4 rounded-xl flex items-center justify-between transition-all ${
-                        alertMessage.type === 'success'
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                            : 'bg-red-50 text-red-800 border border-red-200'
-                    }`}
+                    className={`p-4 rounded-xl flex items-center justify-between transition-all ${alertMessage.type === 'success'
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                        : 'bg-red-50 text-red-800 border border-red-200'
+                        }`}
                 >
                     <div className="flex items-center gap-2">
                         {alertMessage.type === 'success' ? (
@@ -239,31 +238,28 @@ export const AdminAffiliateCourseSettingsPage: React.FC = () => {
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button
                         onClick={() => setFilterType('all')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                            filterType === 'all'
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterType === 'all'
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
                     >
                         All ({courses.length})
                     </button>
                     <button
                         onClick={() => setFilterType('custom')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                            filterType === 'custom'
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterType === 'custom'
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
                     >
                         Custom Rates ({customCount})
                     </button>
                     <button
                         onClick={() => setFilterType('default')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                            filterType === 'default'
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterType === 'default'
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
                     >
                         Default Rates ({courses.length - customCount})
                     </button>

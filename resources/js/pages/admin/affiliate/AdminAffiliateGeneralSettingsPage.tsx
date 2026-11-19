@@ -144,11 +144,10 @@ export const AdminAffiliateGeneralSettingsPage: React.FC = () => {
             )}
 
             {alertMessage && (
-                <div className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-2.5 ${
-                    alertMessage.type === 'success'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
-                        : 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
-                }`}>
+                <div className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-2.5 ${alertMessage.type === 'success'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
+                    : 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
+                    }`}>
                     {alertMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
                     <span>{alertMessage.text}</span>
                 </div>
@@ -169,11 +168,10 @@ export const AdminAffiliateGeneralSettingsPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setFormData({ ...formData, is_enabled: !formData.is_enabled })}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 self-start sm:self-auto ${
-                            formData.is_enabled
-                                ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                        }`}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 self-start sm:self-auto ${formData.is_enabled
+                            ? 'bg-emerald-600 text-white shadow-xs'
+                            : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                            }`}
                     >
                         <span>{formData.is_enabled ? 'Enabled' : 'Disabled'}</span>
                     </button>
