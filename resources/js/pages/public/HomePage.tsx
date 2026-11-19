@@ -33,6 +33,7 @@ import {
     ShoppingCart
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { StudentReviewsMarquee } from '../../components/home/StudentReviewsMarquee';
 
 interface FeaturedTeacher {
     id: number;
@@ -1057,6 +1058,9 @@ export const HomePage: React.FC = () => {
                     )}
                 </div>
             </section>
+
+            {/* 6.5. STUDENT REVIEWS / TESTIMONIALS DUAL-DIRECTION SCROLL MARQUEE */}
+            <StudentReviewsMarquee />
 
             {/* 7. WHY CHOOSE NOVONEX (Platform Pillars) */}
             <section className="bg-slate-900 text-white py-16 sm:py-20 relative overflow-hidden">

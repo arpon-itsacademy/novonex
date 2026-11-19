@@ -70,6 +70,7 @@ Route::get('affiliate/check-code/{code}', [AffiliateStudentController::class, 'c
 Route::get('teachers/featured', [TeacherPublicController::class, 'getFeaturedTeachers']);
 Route::get('teachers/{id}', [TeacherPublicController::class, 'getTeacherProfile']);
 Route::get('instructors/{id}', [TeacherPublicController::class, 'getTeacherProfile']);
+Route::get('testimonials/marquee', [PublicCourseController::class, 'marqueeReviews']);
 
 // shurjoPay Public Redirect Callback & Cancel
 Route::match(['get', 'post'], 'payment/shurjopay/callback', [ShurjopayController::class, 'callback']);

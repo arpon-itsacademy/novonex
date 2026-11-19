@@ -36,6 +36,7 @@ import {
     ShoppingCart
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { StudentReviewsMarquee } from '../home/StudentReviewsMarquee';
 
 interface PageBlockRendererProps {
     block: PageBlock;
@@ -81,7 +82,8 @@ export const PageBlockRenderer: React.FC<PageBlockRendererProps> = ({
             case 'learning_path':
                 return <LearningPathBlock block={block} isBuilder={isBuilder} />;
             case 'testimonials':
-                return <TestimonialsBlock block={block} isBuilder={isBuilder} />;
+            case 'student_reviews_marquee':
+                return <StudentReviewsMarquee />;
             case 'faq_accordion':
                 return <FaqAccordionBlock block={block} isBuilder={isBuilder} />;
             case 'html_widget':

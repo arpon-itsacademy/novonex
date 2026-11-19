@@ -357,3 +357,36 @@ html.dark {
 .dark .math-rendered-content hr { border-top-color: #334155; }
 .math-rendered-content a { color: #2563eb; text-decoration: underline; }
 .math-rendered-content a:hover { color: #1d4ed8; }
+
+/* Dual-Direction Infinite Marquee Animations for Student Reviews */
+@keyframes marquee-scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-scroll-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll-left 45s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll-right 45s linear infinite;
+  will-change: transform;
+}
+
+.marquee-group:hover .animate-marquee-left,
+.marquee-group:hover .animate-marquee-right,
+.animate-marquee-left:hover,
+.animate-marquee-right:hover {
+  animation-play-state: paused;
+}
+
