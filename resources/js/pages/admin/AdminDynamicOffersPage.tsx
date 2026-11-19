@@ -106,8 +106,10 @@ export const AdminDynamicOffersPage: React.FC = () => {
         priority: 0,
     });
 
-    // Course search inside modal
+    // Modal search & category filters
     const [modalCourseSearch, setModalCourseSearch] = useState('');
+    const [modalCourseCategoryFilter, setModalCourseCategoryFilter] = useState('all');
+    const [modalCategorySearch, setModalCategorySearch] = useState('');
 
     useEffect(() => {
         fetchOffers();
@@ -142,10 +144,13 @@ export const AdminDynamicOffersPage: React.FC = () => {
 
     const handleOpenCreateModal = () => {
         setEditingOffer(null);
+        setModalCourseSearch('');
+        setModalCourseCategoryFilter('all');
+        setModalCategorySearch('');
         setFormData({
             title: '',
             description: '',
-            banner_text: 'Buy 2 courses & get 15% OFF, Buy 3 & get 25% OFF!',
+            banner_text: '',
             scope_type: 'all',
             applicable_categories: [],
             applicable_courses: [],
@@ -165,6 +170,9 @@ export const AdminDynamicOffersPage: React.FC = () => {
 
     const handleOpenEditModal = (offer: DynamicOfferItem) => {
         setEditingOffer(offer);
+        setModalCourseSearch('');
+        setModalCourseCategoryFilter('all');
+        setModalCategorySearch('');
         setFormData({
             title: offer.title,
             description: offer.description || '',
@@ -222,6 +230,18 @@ export const AdminDynamicOffersPage: React.FC = () => {
         });
     };
 
+    const handleSelectAllFilteredCategories = () => {
+        const filteredIds = filteredModalCategories.map((cat) => cat.id);
+        setFormData((prev) => {
+            const combined = Array.from(new Set([...prev.applicable_categories, ...filteredIds]));
+            return { ...prev, applicable_categories: combined };
+        });
+    };
+
+    const handleClearCategories = () => {
+        setFormData((prev) => ({ ...prev, applicable_categories: [] }));
+    };
+
     const handleToggleCourse = (courseId: number) => {
         setFormData((prev) => {
             const exists = prev.applicable_courses.includes(courseId);
@@ -232,6 +252,18 @@ export const AdminDynamicOffersPage: React.FC = () => {
                     : [...prev.applicable_courses, courseId],
             };
         });
+    };
+
+    const handleSelectAllFilteredCourses = () => {
+        const filteredIds = filteredModalCourses.map((c) => c.id);
+        setFormData((prev) => {
+            const combined = Array.from(new Set([...prev.applicable_courses, ...filteredIds]));
+            return { ...prev, applicable_courses: combined };
+        });
+    };
+
+    const handleClearCourses = () => {
+        setFormData((prev) => ({ ...prev, applicable_courses: [] }));
     };
 
     const handleSaveOffer = async (e: React.FormEvent) => {
@@ -342,12 +374,29 @@ export const AdminDynamicOffersPage: React.FC = () => {
         });
     }, [offers, searchQuery, statusFilter, scopeFilter]);
 
-    // Modal filtered courses
+    // Modal filtered categories
+    const filteredModalCategories = useMemo(() => {
+        if (!modalCategorySearch.trim()) return categoriesList;
+        const q = modalCategorySearch.toLowerCase();
+        return categoriesList.filter(
+            (cat) => cat.name.toLowerCase().includes(q) || cat.slug.toLowerCase().includes(q)
+        );
+    }, [categoriesList, modalCategorySearch]);
+
+    // Modal filtered courses (by title and category filter)
     const filteredModalCourses = useMemo(() => {
-        if (!modalCourseSearch.trim()) return coursesList;
-        const q = modalCourseSearch.toLowerCase();
-        return coursesList.filter((c) => c.title.toLowerCase().includes(q));
-    }, [coursesList, modalCourseSearch]);
+        return coursesList.filter((c) => {
+            if (modalCourseSearch.trim()) {
+                const q = modalCourseSearch.toLowerCase();
+                if (!c.title.toLowerCase().includes(q)) return false;
+            }
+            if (modalCourseCategoryFilter !== 'all') {
+                const catId = Number(modalCourseCategoryFilter);
+                if (c.category_id !== catId) return false;
+            }
+            return true;
+        });
+    }, [coursesList, modalCourseSearch, modalCourseCategoryFilter]);
 
     return (
         <div className="space-y-6">
@@ -502,7 +551,7 @@ export const AdminDynamicOffersPage: React.FC = () => {
                         <table className="w-full text-left text-xs sm:text-sm">
                             <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-bold border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[11px]">
                                 <tr>
-                                    <th className="px-5 py-3.5">Offer Title & Banner</th>
+                                    <th className="px-5 py-3.5">Offer Title</th>
                                     <th className="px-5 py-3.5">Scope Rule</th>
                                     <th className="px-5 py-3.5">Tiered Discount Rules</th>
                                     <th className="px-5 py-3.5">Status</th>
@@ -516,17 +565,11 @@ export const AdminDynamicOffersPage: React.FC = () => {
                                             key={offer.id}
                                             className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
                                         >
-                                            {/* Offer Title & Banner */}
+                                            {/* Offer Title */}
                                             <td className="px-5 py-4 max-w-xs">
-                                                <div className="font-bold text-slate-900 dark:text-white line-clamp-1">
+                                                <div className="font-bold text-slate-900 dark:text-white line-clamp-2">
                                                     {offer.title}
                                                 </div>
-                                                {offer.banner_text && (
-                                                    <div className="text-[11px] text-sky-600 dark:text-sky-400 flex items-center gap-1 mt-0.5 line-clamp-1">
-                                                        <Sparkles className="w-3 h-3 shrink-0" />
-                                                        <span>{offer.banner_text}</span>
-                                                    </div>
-                                                )}
                                                 {offer.min_order_amount && (
                                                     <div className="text-[10px] text-slate-400 mt-1">
                                                         Min cart: {formatBDT(offer.min_order_amount)}
@@ -679,194 +722,253 @@ export const AdminDynamicOffersPage: React.FC = () => {
                                 </div>
                             )}
 
-                            {/* Offer Title & Banner */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="space-y-1.5 sm:col-span-2">
-                                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                        Offer Title <span className="text-rose-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        placeholder="e.g. Special Bundle Saver: Buy 2 Get 15% Off, Buy 3 Get 25% Off"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee]"
-                                    />
-                                </div>
-
-                                <div className="space-y-1.5 sm:col-span-2">
-                                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                        Cart Announcement / Banner Text (Optional)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={formData.banner_text}
-                                        onChange={(e) => setFormData({ ...formData, banner_text: e.target.value })}
-                                        placeholder="e.g. 🎉 Buy 2 courses & get 15% OFF, Buy 3 & get 25% OFF!"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee]"
-                                    />
-                                </div>
+                            {/* Offer Title */}
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                    Offer Title <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={formData.title}
+                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                    placeholder="e.g. Special Bundle Saver: Buy 2 Get 15% Off, Buy 3 Get 25% Off"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee]"
+                                />
                             </div>
 
                             {/* Scope Selection */}
                             <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
-                                    Applicable Course Scope <span className="text-rose-500">*</span>
-                                </label>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    {/* All Courses */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, scope_type: 'all' })}
-                                        className={`p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer ${
-                                            formData.scope_type === 'all'
-                                                ? 'border-[#25a2ee] bg-sky-50/50 dark:bg-sky-950/40 text-slate-900 dark:text-white shadow-xs'
-                                                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 text-slate-600 dark:text-slate-400'
-                                        }`}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                                        Applicable Course Scope <span className="text-rose-500">*</span>
+                                    </label>
+                                    <select
+                                        value={formData.scope_type}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, scope_type: e.target.value as any })
+                                        }
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee] cursor-pointer"
                                     >
-                                        <div className="font-bold text-xs flex items-center justify-between mb-1">
-                                            <span>All Courses</span>
-                                            {formData.scope_type === 'all' && (
-                                                <Check className="w-4 h-4 text-[#25a2ee]" />
-                                            )}
-                                        </div>
-                                        <p className="text-[11px] text-slate-400">
-                                            Storewide: Any course added to the cart counts.
-                                        </p>
-                                    </button>
-
-                                    {/* Specific Categories */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, scope_type: 'category' })}
-                                        className={`p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer ${
-                                            formData.scope_type === 'category'
-                                                ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-950/40 text-slate-900 dark:text-white shadow-xs'
-                                                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 text-slate-600 dark:text-slate-400'
-                                        }`}
-                                    >
-                                        <div className="font-bold text-xs flex items-center justify-between mb-1">
-                                            <span>Specific Categories</span>
-                                            {formData.scope_type === 'category' && (
-                                                <Check className="w-4 h-4 text-purple-600" />
-                                            )}
-                                        </div>
-                                        <p className="text-[11px] text-slate-400">
-                                            Only courses in selected categories qualify.
-                                        </p>
-                                    </button>
-
-                                    {/* Specific Courses */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, scope_type: 'course' })}
-                                        className={`p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer ${
-                                            formData.scope_type === 'course'
-                                                ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/40 text-slate-900 dark:text-white shadow-xs'
-                                                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 text-slate-600 dark:text-slate-400'
-                                        }`}
-                                    >
-                                        <div className="font-bold text-xs flex items-center justify-between mb-1">
-                                            <span>Specific Courses</span>
-                                            {formData.scope_type === 'course' && (
-                                                <Check className="w-4 h-4 text-amber-600" />
-                                            )}
-                                        </div>
-                                        <p className="text-[11px] text-slate-400">
-                                            Only specific chosen courses qualify.
-                                        </p>
-                                    </button>
+                                        <option value="all">All Courses (Storewide)</option>
+                                        <option value="category">Specific Categories</option>
+                                        <option value="course">Specific Courses</option>
+                                    </select>
+                                    <p className="text-[11px] text-slate-400">
+                                        {formData.scope_type === 'all' &&
+                                            'Storewide: Any course added to the cart counts toward the tiered discount.'}
+                                        {formData.scope_type === 'category' &&
+                                            'Category Scope: Only courses belonging to the selected categories qualify.'}
+                                        {formData.scope_type === 'course' &&
+                                            'Course Scope: Only the specifically selected courses qualify for the offer.'}
+                                    </p>
                                 </div>
 
-                                {/* Category Multi-Select Picker */}
+                                {/* Category Scope Multi-Select Picker with Search */}
                                 {formData.scope_type === 'category' && (
-                                    <div className="p-4 rounded-2xl bg-purple-50/30 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/50 space-y-2">
-                                        <span className="text-xs font-bold text-purple-900 dark:text-purple-300 block">
-                                            Select Eligible Categories: ({formData.applicable_categories.length} selected)
-                                        </span>
-                                        <div className="flex flex-wrap gap-2 max-h-44 overflow-y-auto pt-1">
-                                            {categoriesList.map((cat) => {
-                                                const selected = formData.applicable_categories.includes(cat.id);
-                                                return (
-                                                    <button
-                                                        key={cat.id}
-                                                        type="button"
-                                                        onClick={() => handleToggleCategory(cat.id)}
-                                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                                                            selected
-                                                                ? 'bg-purple-600 text-white shadow-xs'
-                                                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-purple-300'
-                                                        }`}
-                                                    >
-                                                        <span>{cat.name}</span>
-                                                        {selected && <Check className="w-3.5 h-3.5" />}
-                                                    </button>
-                                                );
-                                            })}
+                                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                            <div>
+                                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+                                                    Eligible Categories ({formData.applicable_categories.length} selected)
+                                                </span>
+                                                <p className="text-[11px] text-slate-400">
+                                                    Search and select the categories where this offer is applicable.
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleSelectAllFilteredCategories}
+                                                    className="text-[11px] font-bold text-[#25a2ee] hover:underline cursor-pointer"
+                                                >
+                                                    Select All Matching ({filteredModalCategories.length})
+                                                </button>
+                                                {formData.applicable_categories.length > 0 && (
+                                                    <>
+                                                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleClearCategories}
+                                                            className="text-[11px] font-bold text-rose-500 hover:underline cursor-pointer"
+                                                        >
+                                                            Clear Selection
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Category Search Input */}
+                                        <div className="relative">
+                                            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                            <input
+                                                type="text"
+                                                value={modalCategorySearch}
+                                                onChange={(e) => setModalCategorySearch(e.target.value)}
+                                                placeholder="Search categories by name..."
+                                                className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-850 text-xs text-slate-800 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee]"
+                                            />
+                                        </div>
+
+                                        {/* Categories List */}
+                                        <div className="max-h-56 overflow-y-auto space-y-1 pr-1 divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-850 p-2">
+                                            {filteredModalCategories.length === 0 ? (
+                                                <div className="p-4 text-center text-xs text-slate-400">
+                                                    No categories found matching your search.
+                                                </div>
+                                            ) : (
+                                                filteredModalCategories.map((cat) => {
+                                                    const selected = formData.applicable_categories.includes(cat.id);
+                                                    return (
+                                                        <div
+                                                            key={cat.id}
+                                                            onClick={() => handleToggleCategory(cat.id)}
+                                                            className={`p-2.5 rounded-lg flex items-center justify-between gap-3 cursor-pointer transition-colors ${
+                                                                selected
+                                                                    ? 'bg-sky-50 dark:bg-sky-950/40 text-slate-900 dark:text-white'
+                                                                    : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-center gap-2.5 min-w-0">
+                                                                <div
+                                                                    className={`w-4 h-4 rounded flex items-center justify-center shrink-0 border ${
+                                                                        selected
+                                                                            ? 'bg-[#25a2ee] border-[#25a2ee] text-white'
+                                                                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
+                                                                    }`}
+                                                                >
+                                                                    {selected && <Check className="w-3 h-3 stroke-[3]" />}
+                                                                </div>
+                                                                <span className="text-xs font-bold truncate">
+                                                                    {cat.name}
+                                                                </span>
+                                                            </div>
+                                                            <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 font-semibold shrink-0">
+                                                                {cat.courses_count ?? 0} courses
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
                                         </div>
                                     </div>
                                 )}
 
-                                {/* Course Multi-Select Picker */}
+                                {/* Course Scope Multi-Select Picker with Course Search & Category Filter */}
                                 {formData.scope_type === 'course' && (
-                                    <div className="p-4 rounded-2xl bg-amber-50/30 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 space-y-2.5">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs font-bold text-amber-900 dark:text-amber-300">
-                                                Select Eligible Courses: ({formData.applicable_courses.length} selected)
-                                            </span>
-                                            {formData.applicable_courses.length > 0 && (
+                                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                            <div>
+                                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+                                                    Eligible Courses ({formData.applicable_courses.length} selected)
+                                                </span>
+                                                <p className="text-[11px] text-slate-400">
+                                                    Search and select specific courses that qualify for this bundle offer.
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
                                                 <button
                                                     type="button"
-                                                    onClick={() => setFormData({ ...formData, applicable_courses: [] })}
-                                                    className="text-[11px] text-rose-500 hover:underline font-semibold cursor-pointer"
+                                                    onClick={handleSelectAllFilteredCourses}
+                                                    className="text-[11px] font-bold text-[#25a2ee] hover:underline cursor-pointer"
                                                 >
-                                                    Clear selection
+                                                    Select All Matching ({filteredModalCourses.length})
                                                 </button>
-                                            )}
+                                                {formData.applicable_courses.length > 0 && (
+                                                    <>
+                                                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleClearCourses}
+                                                            className="text-[11px] font-bold text-rose-500 hover:underline cursor-pointer"
+                                                        >
+                                                            Clear Selection
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        <input
-                                            type="text"
-                                            value={modalCourseSearch}
-                                            onChange={(e) => setModalCourseSearch(e.target.value)}
-                                            placeholder="Search courses to add..."
-                                            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100"
-                                        />
+                                        {/* Search Bar & Category Filter Row */}
+                                        <div className="flex flex-col sm:flex-row gap-2">
+                                            {/* Course Title Search */}
+                                            <div className="relative flex-1">
+                                                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                                <input
+                                                    type="text"
+                                                    value={modalCourseSearch}
+                                                    onChange={(e) => setModalCourseSearch(e.target.value)}
+                                                    placeholder="Search course by title..."
+                                                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-850 text-xs text-slate-800 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee]"
+                                                />
+                                            </div>
 
-                                        <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1 divide-y divide-slate-100 dark:divide-slate-800">
-                                            {filteredModalCourses.map((c) => {
-                                                const selected = formData.applicable_courses.includes(c.id);
-                                                return (
-                                                    <div
-                                                        key={c.id}
-                                                        onClick={() => handleToggleCourse(c.id)}
-                                                        className={`p-2 rounded-xl flex items-center justify-between gap-3 cursor-pointer transition-colors ${
-                                                            selected
-                                                                ? 'bg-amber-100/70 dark:bg-amber-950/50'
-                                                                : 'hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                                                        }`}
-                                                    >
-                                                        <div className="flex items-center gap-2 min-w-0">
-                                                            <div
-                                                                className={`w-4 h-4 rounded flex items-center justify-center shrink-0 border ${
-                                                                    selected
-                                                                        ? 'bg-amber-600 border-amber-600 text-white'
-                                                                        : 'border-slate-300 dark:border-slate-600'
-                                                                }`}
-                                                            >
-                                                                {selected && <Check className="w-3 h-3" />}
+                                            {/* Category Filter Dropdown */}
+                                            <div className="w-full sm:w-56 shrink-0">
+                                                <select
+                                                    value={modalCourseCategoryFilter}
+                                                    onChange={(e) => setModalCourseCategoryFilter(e.target.value)}
+                                                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-850 text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee] cursor-pointer"
+                                                >
+                                                    <option value="all">All Categories ({coursesList.length})</option>
+                                                    {categoriesList.map((cat) => (
+                                                        <option key={cat.id} value={String(cat.id)}>
+                                                            {cat.name} ({cat.courses_count ?? 0})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        {/* Course List */}
+                                        <div className="max-h-60 overflow-y-auto space-y-1 pr-1 divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-850 p-2">
+                                            {filteredModalCourses.length === 0 ? (
+                                                <div className="p-4 text-center text-xs text-slate-400">
+                                                    No courses found matching your search or category filter.
+                                                </div>
+                                            ) : (
+                                                filteredModalCourses.map((c) => {
+                                                    const selected = formData.applicable_courses.includes(c.id);
+                                                    const cat = categoriesList.find((item) => item.id === c.category_id);
+                                                    return (
+                                                        <div
+                                                            key={c.id}
+                                                            onClick={() => handleToggleCourse(c.id)}
+                                                            className={`p-2.5 rounded-lg flex items-center justify-between gap-3 cursor-pointer transition-colors ${
+                                                                selected
+                                                                    ? 'bg-sky-50 dark:bg-sky-950/40 text-slate-900 dark:text-white'
+                                                                    : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-center gap-2.5 min-w-0">
+                                                                <div
+                                                                    className={`w-4 h-4 rounded flex items-center justify-center shrink-0 border ${
+                                                                        selected
+                                                                            ? 'bg-[#25a2ee] border-[#25a2ee] text-white'
+                                                                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
+                                                                    }`}
+                                                                >
+                                                                    {selected && <Check className="w-3 h-3 stroke-[3]" />}
+                                                                </div>
+                                                                <div className="min-w-0">
+                                                                    <span className="text-xs font-bold block truncate">
+                                                                        {c.title}
+                                                                    </span>
+                                                                    {cat && (
+                                                                        <span className="text-[10px] text-slate-400 font-medium">
+                                                                            {cat.name}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
-                                                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                                                                {c.title}
+                                                            <span className="text-xs font-black text-[#25a2ee] shrink-0">
+                                                                {formatBDT(c.sale_price || c.price)}
                                                             </span>
                                                         </div>
-                                                        <span className="text-xs font-semibold text-slate-500 shrink-0">
-                                                            {formatBDT(c.sale_price || c.price)}
-                                                        </span>
-                                                    </div>
-                                                );
-                                            })}
+                                                    );
+                                                })
+                                            )}
                                         </div>
                                     </div>
                                 )}
