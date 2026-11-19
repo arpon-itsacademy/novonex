@@ -221,12 +221,22 @@ class VdoCipherController extends Controller
             ], 404);
         }
 
+        // Direct iframe or player URL support
+        if (str_starts_with($videoRaw, '<iframe') || str_contains($videoRaw, 'player.vdocipher.com/v2/?otp=')) {
+            return response()->json([
+                'otp' => '',
+                'playbackInfo' => '',
+                'videoId' => $this->extractVideoId($videoRaw) ?? '',
+                'embedUrl' => $videoRaw,
+            ]);
+        }
+
         // Extract Video ID from raw string (can be direct 32-char ID, or shortcode [vdo id="..."], or iframe URL)
         $videoId = $this->extractVideoId($videoRaw);
 
         if (empty($videoId)) {
             return response()->json([
-                'message' => 'Could not determine a valid VdoCipher Video ID from the lesson settings.',
+                'message' => 'Could not determine a valid VdoCipher Video ID from the lesson settings. Please ensure you provided a valid 32-character Video ID or [vdo id="..."] shortcode.',
                 'raw' => $videoRaw,
             ], 422);
         }
@@ -237,8 +247,8 @@ class VdoCipherController extends Controller
 
         if (empty($apiKey)) {
             return response()->json([
-                'message' => 'VdoCipher API Secret Key is not configured on this platform.',
-            ], 500);
+                'message' => 'VdoCipher API Secret Key is not configured. Please configure it in Website Settings > VdoCipher Configuration.',
+            ], 422);
         }
 
         // Dynamic DRM Watermark setup (student anti-piracy overlay)
@@ -269,8 +279,10 @@ class VdoCipherController extends Controller
 
             if (!$response->successful()) {
                 $err = $response->json('message') ?? ('VdoCipher returned status ' . $response->status());
+                Log::warning("VdoCipher OTP generation failed for video {$videoId}: {$err}");
                 return response()->json([
-                    'message' => 'Failed to generate video playback token: ' . $err,
+                    'message' => 'VdoCipher API Error: ' . $err,
+                    'videoId' => $videoId,
                 ], 400);
             }
 
@@ -285,8 +297,9 @@ class VdoCipherController extends Controller
         } catch (\Throwable $e) {
             Log::error('VdoCipher OTP generation error: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Error generating video playback token: ' . $e->getMessage(),
-            ], 500);
+                'message' => 'Failed to connect to VdoCipher: ' . $e->getMessage(),
+                'videoId' => $videoId,
+            ], 400);
         }
     }
 
@@ -294,30 +307,57 @@ class VdoCipherController extends Controller
      * Helper to extract 32-character VdoCipher Video ID from various user inputs:
      * - "1234567890abcdef1234567890abcdef"
      * - "[vdo id=\"1234567890abcdef1234567890abcdef\"]"
+     * - "[vdocipher id='...']"
      * - "<iframe src=\"https://player.vdocipher.com/v2/?otp=...&playbackInfo=...\"></iframe>"
      * - URL containing video id
      */
-    protected function extractVideoId(string $input): ?string
+    public function extractVideoId(string $input): ?string
     {
         $clean = trim($input);
+        if (empty($clean)) return null;
 
-        // Direct 32-char hex string
+        // 1. Direct 32-char hex string
         if (preg_match('/^[a-f0-9]{32}$/i', $clean)) {
             return $clean;
         }
 
-        // Shortcode [vdo id="..."] or [vdocipher id="..."]
-        if (preg_match('/\[(?:vdo|vdocipher)[^\]]*id=[\'"]([a-f0-9]{32})[\'"][^\]]*\]/i', $clean, $matches)) {
+        // 2. Shortcode [vdo id="..."] or [vdocipher id='...'] with single, double, curly, or no quotes
+        if (preg_match('/\[(?:vdo|vdocipher)[^\]]*?(?:id|video-id|videoId)\s*=\s*[\'"`“”‘’]?([a-zA-Z0-9_-]{16,40})[\'"`“”‘’]?[^\]]*\]/i', $clean, $matches)) {
             return $matches[1];
         }
 
-        // URL or attribute containing 32-character hex id
-        if (preg_match('/(?:video|videos|v)\/([a-f0-9]{32})/i', $clean, $matches)) {
+        // 3. Shortcode without "id=": [vdo 1234567890abcdef...]
+        if (preg_match('/\[(?:vdo|vdocipher)\s+[\'"`“”‘’]?([a-zA-Z0-9_-]{16,40})[\'"`“”‘’]?/i', $clean, $matches)) {
             return $matches[1];
         }
 
-        // Search for any 32-character hex string anywhere in the input
+        // 4. HTML tag e.g. <vdo-player video-id="..."> or data-video-id="..."
+        if (preg_match('/(?:id|video-id|videoId)\s*=\s*[\'"`“”‘’]?([a-zA-Z0-9_-]{16,40})[\'"`“”‘’]?/i', $clean, $matches)) {
+            return $matches[1];
+        }
+
+        // 5. URL containing video ID (e.g. dev.vdocipher.com/api/videos/{id} or vdocipher.com/dashboard/video/{id})
+        if (preg_match('/(?:videos|video|v)\/([a-zA-Z0-9_-]{16,40})/i', $clean, $matches)) {
+            return $matches[1];
+        }
+
+        // 6. Base64 playbackInfo extraction from iframe or embed URL
+        if (preg_match('/playbackInfo=([a-zA-Z0-9_-]+={0,2})/i', $clean, $matches)) {
+            try {
+                $decoded = base64_decode($matches[1]);
+                if ($decoded && preg_match('/(?:videoId|id)["\']?\s*:\s*["\']([a-zA-Z0-9_-]{16,40})["\']/i', $decoded, $jsonMatch)) {
+                    return $jsonMatch[1];
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // 7. Search for any 32-character hex string anywhere in the input
         if (preg_match('/([a-f0-9]{32})/i', $clean, $matches)) {
+            return $matches[1];
+        }
+
+        // 8. Search for any 24-40 char alphanumeric identifier
+        if (preg_match('/([a-zA-Z0-9_-]{24,40})/i', $clean, $matches)) {
             return $matches[1];
         }
 

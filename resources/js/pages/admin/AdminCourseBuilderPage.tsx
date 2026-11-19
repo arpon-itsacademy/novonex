@@ -773,13 +773,38 @@ export const AdminCourseBuilderPage: React.FC = () => {
         }
     };
 
+    const extractVdoCipherId = (input: string): string => {
+        const trimmed = (input || '').trim();
+        if (!trimmed) return '';
+        if (/^[a-f0-9]{32}$/i.test(trimmed)) return trimmed;
+        const scMatch = trimmed.match(/\[(?:vdo|vdocipher)[^\]]*?(?:id|video-id|videoId)\s*=\s*['"`“”‘’]?([a-zA-Z0-9_-]{16,40})['"`“”‘’]?[^\]]*\]/i);
+        if (scMatch) return scMatch[1];
+        const rawSc = trimmed.match(/\[(?:vdo|vdocipher)\s+['"`“”‘’]?([a-zA-Z0-9_-]{16,40})['"`“”‘’]?/i);
+        if (rawSc) return rawSc[1];
+        const idMatch = trimmed.match(/(?:id|video-id|videoId)\s*=\s*['"`“”‘’]?([a-zA-Z0-9_-]{16,40})['"`“”‘’]?/i);
+        if (idMatch) return idMatch[1];
+        const urlMatch = trimmed.match(/(?:videos|video|v)\/([a-zA-Z0-9_-]{16,40})/i);
+        if (urlMatch) return urlMatch[1];
+        const hexMatch = trimmed.match(/([a-f0-9]{32})/i);
+        if (hexMatch) return hexMatch[1];
+        return trimmed;
+    };
+
     const handleSaveLesson = async (e: React.FormEvent) => {
         e.preventDefault();
+        let cleanVideoUrl = lessonVideoUrl.trim();
+        if (lessonVideoProvider === 'vdocipher' && cleanVideoUrl) {
+            const extracted = extractVdoCipherId(cleanVideoUrl);
+            if (extracted) {
+                cleanVideoUrl = extracted;
+            }
+        }
+
         const payload = {
             title: lessonTitle,
             content: lessonContent,
             video_provider: lessonVideoProvider,
-            video_url: lessonVideoUrl,
+            video_url: cleanVideoUrl,
             duration_minutes: parseInt(lessonDuration, 10) || 0,
             is_preview: lessonIsPreview,
             status: lessonStatus,
@@ -3169,22 +3194,49 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                         </p>
                                         {lessonVideoUrl && (
                                             <div className="pt-1">
-                                                {/^[a-f0-9]{32}$/i.test(lessonVideoUrl.trim()) ? (
-                                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-                                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                                                        Valid 32-char VdoCipher Video ID detected
-                                                    </span>
-                                                ) : lessonVideoUrl.includes('[vdo') ? (
-                                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-md border border-sky-200">
-                                                        <CheckCircle2 className="w-3.5 h-3.5 text-[#25a2ee]" />
-                                                        VdoCipher WordPress Shortcode detected
-                                                    </span>
-                                                ) : lessonVideoUrl.includes('<iframe') ? (
-                                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-200">
-                                                        <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
-                                                        VdoCipher Embed Iframe detected
-                                                    </span>
-                                                ) : null}
+                                                {(() => {
+                                                    const cleanId = extractVdoCipherId(lessonVideoUrl);
+                                                    const isShortcode = lessonVideoUrl.includes('[vdo') || lessonVideoUrl.includes('[vdocipher');
+                                                    const isIframe = lessonVideoUrl.includes('<iframe');
+
+                                                    if (cleanId && cleanId.length === 32) {
+                                                        return (
+                                                            <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs">
+                                                                <span className="inline-flex items-center gap-1.5 font-semibold">
+                                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                                                    <span>
+                                                                        {isShortcode ? 'Shortcode detected (Video ID: ' : 'Valid Video ID: '}
+                                                                        <code className="font-mono text-emerald-950 font-bold">{cleanId}</code>
+                                                                        {isShortcode ? ')' : ''}
+                                                                    </span>
+                                                                </span>
+                                                                {isShortcode && cleanId !== lessonVideoUrl.trim() && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setLessonVideoUrl(cleanId)}
+                                                                        className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] cursor-pointer"
+                                                                    >
+                                                                        Convert to ID
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    }
+                                                    if (isIframe) {
+                                                        return (
+                                                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-200">
+                                                                <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
+                                                                VdoCipher Embed Iframe detected
+                                                            </span>
+                                                        );
+                                                    }
+                                                    return (
+                                                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">
+                                                            <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                                                            Enter a valid 32-character Video ID or [vdo id=&quot;...&quot;] shortcode
+                                                        </span>
+                                                    );
+                                                })()}
                                             </div>
                                         )}
                                     </div>

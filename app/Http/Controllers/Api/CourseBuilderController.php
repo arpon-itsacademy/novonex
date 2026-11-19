@@ -113,9 +113,78 @@ class CourseBuilderController extends Controller
         return response()->json(['message' => 'Section order updated successfully.']);
     }
 
+    protected function ensureLessonColumns(): void
+    {
+        if (Schema::hasTable('lessons')) {
+            if (!Schema::hasColumn('lessons', 'video_provider')) {
+                try {
+                    Schema::table('lessons', function ($table) {
+                        $table->string('video_provider', 50)->default('youtube')->nullable()->after('content');
+                    });
+                } catch (\Throwable $e) {
+                    \Log::warning('Could not add video_provider column to lessons: ' . $e->getMessage());
+                }
+            }
+            if (Schema::hasColumn('lessons', 'video_url')) {
+                try {
+                    \DB::statement("ALTER TABLE lessons MODIFY COLUMN video_url TEXT NULL");
+                } catch (\Throwable $e) {}
+            }
+        }
+    }
+
+    public static function extractVdoCipherVideoId(?string $input): ?string
+    {
+        if (empty($input)) return null;
+        $clean = trim($input);
+
+        // 1. Direct 32-char hex string
+        if (preg_match('/^[a-f0-9]{32}$/i', $clean)) {
+            return $clean;
+        }
+
+        // 2. Shortcode [vdo id="..."] or [vdocipher id='...'] with single, double, curly, or no quotes
+        if (preg_match('/\[(?:vdo|vdocipher)[^\]]*?(?:id|video-id|videoId)\s*=\s*[\'"`“”‘’]?([a-zA-Z0-9_-]{16,40})[\'"`“”‘’]?[^\]]*\]/i', $clean, $matches)) {
+            return $matches[1];
+        }
+
+        // 3. Shortcode without "id=": [vdo 1234567890abcdef...]
+        if (preg_match('/\[(?:vdo|vdocipher)\s+[\'"`“”‘’]?([a-zA-Z0-9_-]{16,40})[\'"`“”‘’]?/i', $clean, $matches)) {
+            return $matches[1];
+        }
+
+        // 4. HTML tag e.g. <vdo-player video-id="..."> or data-video-id="..."
+        if (preg_match('/(?:id|video-id|videoId)\s*=\s*[\'"`“”‘’]?([a-zA-Z0-9_-]{16,40})[\'"`“”‘’]?/i', $clean, $matches)) {
+            return $matches[1];
+        }
+
+        // 5. URL containing video ID (e.g. dev.vdocipher.com/api/videos/{id} or vdocipher.com/dashboard/video/{id})
+        if (preg_match('/(?:videos|video|v)\/([a-zA-Z0-9_-]{16,40})/i', $clean, $matches)) {
+            return $matches[1];
+        }
+
+        // 6. Base64 playbackInfo extraction from iframe or embed URL
+        if (preg_match('/playbackInfo=([a-zA-Z0-9_-]+={0,2})/i', $clean, $matches)) {
+            try {
+                $decoded = base64_decode($matches[1]);
+                if ($decoded && preg_match('/(?:videoId|id)["\']?\s*:\s*["\']([a-zA-Z0-9_-]{16,40})["\']/i', $decoded, $jsonMatch)) {
+                    return $jsonMatch[1];
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // 7. Search for any 32-character hex string anywhere in the input
+        if (preg_match('/([a-f0-9]{32})/i', $clean, $matches)) {
+            return $matches[1];
+        }
+
+        return $clean;
+    }
+
     public function storeLesson(Request $request, CourseSection $section): JsonResponse
     {
         $this->authorizeCourseAccess($section->course);
+        $this->ensureLessonColumns();
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -127,31 +196,55 @@ class CourseBuilderController extends Controller
             'status' => ['required', 'in:draft,published'],
         ]);
 
+        $videoProvider = $validated['video_provider'] ?? 'youtube';
+        $videoUrl = $validated['video_url'] ?? null;
+
+        // If VdoCipher, extract the clean video ID if a shortcode or embed was provided
+        if ($videoProvider === 'vdocipher' && !empty($videoUrl)) {
+            $extracted = static::extractVdoCipherVideoId($videoUrl);
+            if (!empty($extracted)) {
+                $videoUrl = $extracted;
+            }
+        }
+
         $maxSort = $section->lessons()->max('sort_order') ?? 0;
 
-        $lesson = Lesson::create([
+        $lessonData = [
             'course_id' => $section->course_id,
             'section_id' => $section->id,
             'title' => $validated['title'],
             'slug' => Str::slug($validated['title']) . '-' . Str::random(4),
             'content' => $validated['content'] ?? null,
-            'video_provider' => $validated['video_provider'] ?? 'youtube',
-            'video_url' => $validated['video_url'] ?? null,
+            'video_url' => $videoUrl,
             'duration_minutes' => (int) ($validated['duration_minutes'] ?? 0),
             'is_preview' => (bool) ($validated['is_preview'] ?? false),
             'status' => $validated['status'],
             'sort_order' => $maxSort + 1,
-        ]);
+        ];
 
-        return response()->json([
-            'message' => 'New lesson added successfully.',
-            'lesson' => $lesson->load('attachments'),
-        ], 201);
+        if (Schema::hasColumn('lessons', 'video_provider')) {
+            $lessonData['video_provider'] = $videoProvider;
+        }
+
+        try {
+            $lesson = Lesson::create($lessonData);
+
+            return response()->json([
+                'message' => 'New lesson added successfully.',
+                'lesson' => $lesson->load('attachments'),
+            ], 201);
+        } catch (\Throwable $e) {
+            \Log::error('storeLesson error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to save lesson: ' . $e->getMessage(),
+            ], 422);
+        }
     }
 
     public function updateLesson(Request $request, Lesson $lesson): JsonResponse
     {
         $this->authorizeCourseAccess($lesson->course);
+        $this->ensureLessonColumns();
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -164,21 +257,43 @@ class CourseBuilderController extends Controller
             'section_id' => ['nullable', 'exists:course_sections,id'],
         ]);
 
-        $lesson->update([
+        $videoProvider = $validated['video_provider'] ?? $lesson->video_provider ?? 'youtube';
+        $videoUrl = $validated['video_url'] ?? null;
+
+        if ($videoProvider === 'vdocipher' && !empty($videoUrl)) {
+            $extracted = static::extractVdoCipherVideoId($videoUrl);
+            if (!empty($extracted)) {
+                $videoUrl = $extracted;
+            }
+        }
+
+        $lessonData = [
             'title' => $validated['title'],
             'content' => $validated['content'] ?? null,
-            'video_provider' => $validated['video_provider'] ?? $lesson->video_provider ?? 'youtube',
-            'video_url' => $validated['video_url'] ?? null,
+            'video_url' => $videoUrl,
             'duration_minutes' => (int) ($validated['duration_minutes'] ?? 0),
             'is_preview' => (bool) ($validated['is_preview'] ?? false),
             'status' => $validated['status'],
             'section_id' => $validated['section_id'] ?? $lesson->section_id,
-        ]);
+        ];
 
-        return response()->json([
-            'message' => 'Lesson updated successfully.',
-            'lesson' => $lesson->fresh('attachments'),
-        ]);
+        if (Schema::hasColumn('lessons', 'video_provider')) {
+            $lessonData['video_provider'] = $videoProvider;
+        }
+
+        try {
+            $lesson->update($lessonData);
+
+            return response()->json([
+                'message' => 'Lesson updated successfully.',
+                'lesson' => $lesson->fresh('attachments'),
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('updateLesson error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to update lesson: ' . $e->getMessage(),
+            ], 422);
+        }
     }
 
     public function deleteLesson(Lesson $lesson): JsonResponse
