@@ -769,8 +769,6 @@ export const AdminPageBuilderPage: React.FC = () => {
                         sectionTag: 'Real Feedback & Success Stories',
                         sectionTitle: 'Loved by Thousands of Learners Across Bangladesh',
                         sectionSub: 'Swipe through genuine screenshots and student reviews from our academic, admission, and skill batches.',
-                        row1Label: 'Academic & Admission Feedback',
-                        row2Label: 'Exam Ranks & Placement Stories',
                         speed: 45,
                         images: [],
                         items: [
@@ -2020,28 +2018,6 @@ export const AdminPageBuilderPage: React.FC = () => {
                                                                         onChange={(e) => handleUpdateSelectedSettings('sectionSub', e.target.value)}
                                                                         className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white"
                                                                     />
-                                                                </div>
-                                                                <div className="grid grid-cols-2 gap-2 pt-1">
-                                                                    <div>
-                                                                        <label className="block text-slate-400 font-semibold mb-1">Row 1 Label</label>
-                                                                        <input
-                                                                            type="text"
-                                                                            value={selectedBlock.settings.row1Label ?? ''}
-                                                                            placeholder="Academic & Admission Feedback"
-                                                                            onChange={(e) => handleUpdateSelectedSettings('row1Label', e.target.value)}
-                                                                            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-[11px]"
-                                                                        />
-                                                                    </div>
-                                                                    <div>
-                                                                        <label className="block text-slate-400 font-semibold mb-1">Row 2 Label</label>
-                                                                        <input
-                                                                            type="text"
-                                                                            value={selectedBlock.settings.row2Label ?? ''}
-                                                                            placeholder="Exam Ranks & Placement Stories"
-                                                                            onChange={(e) => handleUpdateSelectedSettings('row2Label', e.target.value)}
-                                                                            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-[11px]"
-                                                                        />
-                                                                    </div>
                                                                 </div>
                                                             </div>
 
