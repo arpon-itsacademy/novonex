@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { apiClient } from '../../api/client';
+import { apiClient, getImageUrl } from '../../api/client';
 import { CustomPage, PageBlock, BlockType, CourseTabItem, Category } from '../../types';
 import { PageBlockRenderer } from '../../components/builder/PageBlockRenderer';
+import { MediaPickerModal } from '../../components/shared/MediaPickerModal';
+import { getDefaultMarqueeReviews } from '../../components/home/StudentReviewsMarquee';
 import {
     ArrowLeft,
     Save,
@@ -44,7 +46,8 @@ import {
     Star,
     Boxes,
     RefreshCw,
-    Palette
+    Palette,
+    Clock
 } from 'lucide-react';
 
 /* -------------------------------------------------------------
@@ -367,6 +370,11 @@ export const AdminPageBuilderPage: React.FC = () => {
 
     // Resetting state
     const [resetting, setResetting] = useState(false);
+
+    // Testimonial Media & Screenshot Management States
+    const [testimonialMediaPickerOpen, setTestimonialMediaPickerOpen] = useState(false);
+    const [manualImageUrl, setManualImageUrl] = useState('');
+    const [loadingMediaReviews, setLoadingMediaReviews] = useState(false);
 
     // Inspector 3 sub-tabs: 'content' | 'style' | 'advanced'
     const [inspectorSubTab, setInspectorSubTab] = useState<'content' | 'style' | 'advanced'>('content');
@@ -756,11 +764,15 @@ export const AdminPageBuilderPage: React.FC = () => {
                 newBlock = {
                     id: newBlockId,
                     type: 'testimonials',
-                    title: 'Student Testimonials',
+                    title: 'Student Testimonials & Reviews',
                     settings: {
-                        sectionTag: 'Student Reviews',
-                        sectionTitle: 'Hear Real Success Stories from Our Learners',
-                        sectionSub: 'Authentic feedback and experiences shared by our enrolled students.',
+                        sectionTag: 'Real Feedback & Success Stories',
+                        sectionTitle: 'Loved by Thousands of Learners Across Bangladesh',
+                        sectionSub: 'Swipe through genuine screenshots and student reviews from our academic, admission, and skill batches.',
+                        row1Label: 'Academic & Admission Feedback',
+                        row2Label: 'Exam Ranks & Placement Stories',
+                        speed: 45,
+                        images: [],
                         items: [
                             { id: '1', name: 'Tanvir Ahmed', role: 'Engineering Batch \'23', rating: 5, quote: 'The interactive classes transformed my preparation. The instant AI doubt solver was a game changer!' },
                             { id: '2', name: 'Sadia Afrin', role: 'Medical College \'24', rating: 5, quote: 'The mock test platform replicates real exams perfectly. Tracking merit rankings helped me improve consistently.' },
@@ -1965,117 +1977,384 @@ export const AdminPageBuilderPage: React.FC = () => {
                                                     </div>
                                                 )}
 
-                                                {/* --- 11. TESTIMONIALS --- */}
-                                                {selectedBlock.type === 'testimonials' && (
-                                                    <div className="space-y-3 text-xs">
-                                                        <div>
-                                                            <label className="block text-slate-400 font-bold mb-1">Section Tag</label>
-                                                            <input
-                                                                type="text"
-                                                                value={selectedBlock.settings.sectionTag || ''}
-                                                                onChange={(e) => handleUpdateSelectedSettings('sectionTag', e.target.value)}
-                                                                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-slate-400 font-bold mb-1">Main Title</label>
-                                                            <input
-                                                                type="text"
-                                                                value={selectedBlock.settings.sectionTitle || ''}
-                                                                onChange={(e) => handleUpdateSelectedSettings('sectionTitle', e.target.value)}
-                                                                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white font-bold"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-slate-400 font-bold mb-1">Subtitle</label>
-                                                            <textarea
-                                                                rows={2}
-                                                                value={selectedBlock.settings.sectionSub || ''}
-                                                                onChange={(e) => handleUpdateSelectedSettings('sectionSub', e.target.value)}
-                                                                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white"
-                                                            />
-                                                        </div>
+                                                {/* --- 11. TESTIMONIALS & REVIEWS SHOWCASE --- */}
+                                                {selectedBlock.type === 'testimonials' && (() => {
+                                                    const rawImages = selectedBlock.settings.images;
+                                                    const hasCustomImages = Array.isArray(rawImages);
+                                                    const imagesList: Array<{ id?: string | number; url: string; title?: string }> = hasCustomImages ? rawImages : [];
+                                                    const currentSpeed = Number(selectedBlock.settings.speed) || 45;
 
-                                                        {/* Testimonial Items Manager */}
-                                                        <div className="pt-2 border-t border-slate-800 space-y-2">
-                                                            <div className="flex items-center justify-between">
-                                                                <span className="font-bold text-slate-300">Reviews & Quotes</span>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        const items = selectedBlock.settings.items || [];
-                                                                        const newItem = {
-                                                                            id: String(Date.now()),
-                                                                            name: 'Student Name',
-                                                                            role: 'Batch / College',
-                                                                            rating: 5,
-                                                                            quote: 'Learning with NovoNex has been truly transformative and wonderful!'
-                                                                        };
-                                                                        handleUpdateSelectedSettings('items', [...items, newItem]);
-                                                                    }}
-                                                                    className="px-2 py-0.5 rounded bg-sky-600 hover:bg-sky-500 text-white font-bold text-[10px]"
-                                                                >
-                                                                    + Add Review
-                                                                </button>
-                                                            </div>
-                                                            <div className="space-y-2 max-h-56 builder-sidebar-scroll pr-1">
-                                                                {(selectedBlock.settings.items || []).map((item: any, iIdx: number) => (
-                                                                    <div key={item.id || iIdx} className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 space-y-2">
-                                                                        <div className="flex items-center justify-between">
-                                                                            <span className="font-bold text-sky-400 text-[10px]">Review #{iIdx + 1}</span>
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() => {
-                                                                                    const items = [...(selectedBlock.settings.items || [])];
-                                                                                    items.splice(iIdx, 1);
-                                                                                    handleUpdateSelectedSettings('items', items);
-                                                                                }}
-                                                                                className="text-rose-400 hover:text-rose-300 p-1"
-                                                                            >
-                                                                                <Trash2 className="w-3.5 h-3.5" />
-                                                                            </button>
-                                                                        </div>
-                                                                        <div className="grid grid-cols-2 gap-1.5">
-                                                                            <input
-                                                                                type="text"
-                                                                                value={item.name || ''}
-                                                                                onChange={(e) => {
-                                                                                    const items = [...(selectedBlock.settings.items || [])];
-                                                                                    items[iIdx] = { ...items[iIdx], name: e.target.value };
-                                                                                    handleUpdateSelectedSettings('items', items);
-                                                                                }}
-                                                                                placeholder="Student Name"
-                                                                                className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-bold"
-                                                                            />
-                                                                            <input
-                                                                                type="text"
-                                                                                value={item.role || ''}
-                                                                                onChange={(e) => {
-                                                                                    const items = [...(selectedBlock.settings.items || [])];
-                                                                                    items[iIdx] = { ...items[iIdx], role: e.target.value };
-                                                                                    handleUpdateSelectedSettings('items', items);
-                                                                                }}
-                                                                                placeholder="Role / Institution"
-                                                                                className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-slate-300"
-                                                                            />
-                                                                        </div>
-                                                                        <textarea
-                                                                            rows={2}
-                                                                            value={item.quote || ''}
-                                                                            onChange={(e) => {
-                                                                                const items = [...(selectedBlock.settings.items || [])];
-                                                                                items[iIdx] = { ...items[iIdx], quote: e.target.value };
-                                                                                handleUpdateSelectedSettings('items', items);
-                                                                            }}
-                                                                            placeholder="Student Quote"
-                                                                            className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-slate-300 text-[11px]"
+                                                    return (
+                                                        <div className="space-y-4 text-xs">
+                                                            {/* Header & Text Labels */}
+                                                            <div className="space-y-2.5 bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+                                                                <span className="font-bold text-slate-300 block text-[11px] uppercase tracking-wider">
+                                                                    Header & Text Labels
+                                                                </span>
+                                                                <div>
+                                                                    <label className="block text-slate-400 font-semibold mb-1">Section Tag / Badge</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={selectedBlock.settings.sectionTag ?? ''}
+                                                                        placeholder="Real Feedback & Success Stories"
+                                                                        onChange={(e) => handleUpdateSelectedSettings('sectionTag', e.target.value)}
+                                                                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-slate-400 font-semibold mb-1">Main Heading</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={selectedBlock.settings.sectionTitle ?? ''}
+                                                                        placeholder="Loved by Thousands of Learners Across Bangladesh"
+                                                                        onChange={(e) => handleUpdateSelectedSettings('sectionTitle', e.target.value)}
+                                                                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white font-bold"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-slate-400 font-semibold mb-1">Subtitle Description</label>
+                                                                    <textarea
+                                                                        rows={2}
+                                                                        value={selectedBlock.settings.sectionSub ?? ''}
+                                                                        placeholder="Swipe through genuine screenshots and student reviews from our academic, admission, and skill batches."
+                                                                        onChange={(e) => handleUpdateSelectedSettings('sectionSub', e.target.value)}
+                                                                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white"
+                                                                    />
+                                                                </div>
+                                                                <div className="grid grid-cols-2 gap-2 pt-1">
+                                                                    <div>
+                                                                        <label className="block text-slate-400 font-semibold mb-1">Row 1 Label</label>
+                                                                        <input
+                                                                            type="text"
+                                                                            value={selectedBlock.settings.row1Label ?? ''}
+                                                                            placeholder="Academic & Admission Feedback"
+                                                                            onChange={(e) => handleUpdateSelectedSettings('row1Label', e.target.value)}
+                                                                            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-[11px]"
                                                                         />
                                                                     </div>
-                                                                ))}
+                                                                    <div>
+                                                                        <label className="block text-slate-400 font-semibold mb-1">Row 2 Label</label>
+                                                                        <input
+                                                                            type="text"
+                                                                            value={selectedBlock.settings.row2Label ?? ''}
+                                                                            placeholder="Exam Ranks & Placement Stories"
+                                                                            onChange={(e) => handleUpdateSelectedSettings('row2Label', e.target.value)}
+                                                                            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-[11px]"
+                                                                        />
+                                                                    </div>
+                                                                </div>
                                                             </div>
+
+                                                            {/* Scroll Speed Control */}
+                                                            <div className="space-y-2 bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className="font-bold text-slate-300 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                                                                        <Clock className="w-3.5 h-3.5 text-sky-400" />
+                                                                        Marquee Scroll Speed
+                                                                    </span>
+                                                                    <span className="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold text-[11px]">
+                                                                        {currentSpeed}s
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-[10px] text-slate-400">
+                                                                    Cycle duration in seconds. Lower number = faster; higher number = slower.
+                                                                </p>
+                                                                <div className="flex items-center gap-3">
+                                                                    <input
+                                                                        type="range"
+                                                                        min={15}
+                                                                        max={120}
+                                                                        step={5}
+                                                                        value={currentSpeed}
+                                                                        onChange={(e) => handleUpdateSelectedSettings('speed', Number(e.target.value))}
+                                                                        className="w-full accent-sky-500 cursor-pointer"
+                                                                    />
+                                                                    <input
+                                                                        type="number"
+                                                                        min={10}
+                                                                        max={180}
+                                                                        value={currentSpeed}
+                                                                        onChange={(e) => handleUpdateSelectedSettings('speed', Math.max(10, Math.min(180, Number(e.target.value) || 45)))}
+                                                                        className="w-16 px-2 py-1 bg-slate-900 border border-slate-800 rounded text-center text-white font-bold"
+                                                                    />
+                                                                </div>
+                                                                {/* Speed presets */}
+                                                                <div className="grid grid-cols-4 gap-1.5 pt-1">
+                                                                    {[
+                                                                        { label: '25s (Fast)', val: 25 },
+                                                                        { label: '35s (Brisk)', val: 35 },
+                                                                        { label: '45s (Normal)', val: 45 },
+                                                                        { label: '65s (Smooth)', val: 65 },
+                                                                    ].map((p) => (
+                                                                        <button
+                                                                            key={p.val}
+                                                                            type="button"
+                                                                            onClick={() => handleUpdateSelectedSettings('speed', p.val)}
+                                                                            className={`py-1 px-1.5 rounded text-[10px] font-semibold text-center transition-colors cursor-pointer ${
+                                                                                currentSpeed === p.val
+                                                                                    ? 'bg-sky-600 text-white shadow-sm'
+                                                                                    : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
+                                                                            }`}
+                                                                        >
+                                                                            {p.label}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Testimonials Screenshots Manager */}
+                                                            <div className="space-y-2.5 bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+                                                                <div className="flex items-center justify-between">
+                                                                    <div>
+                                                                        <span className="font-bold text-slate-300 block text-[11px] uppercase tracking-wider">
+                                                                            Review Screenshots
+                                                                        </span>
+                                                                        <span className="text-[10px] text-slate-400">
+                                                                            {hasCustomImages
+                                                                                ? `${imagesList.length} customized screenshot${imagesList.length === 1 ? '' : 's'}`
+                                                                                : 'Using 50 uploaded screenshots (Default)'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setTestimonialMediaPickerOpen(true)}
+                                                                        className="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm transition-colors cursor-pointer"
+                                                                    >
+                                                                        <Plus className="w-3.5 h-3.5" />
+                                                                        <span>Add from Media</span>
+                                                                    </button>
+                                                                </div>
+
+                                                                {/* Preload / Reset helper buttons */}
+                                                                <div className="flex items-center gap-1.5 flex-wrap">
+                                                                    <button
+                                                                        type="button"
+                                                                        disabled={loadingMediaReviews}
+                                                                        onClick={async () => {
+                                                                            setLoadingMediaReviews(true);
+                                                                            try {
+                                                                                const { data } = await apiClient.get('/testimonials/marquee');
+                                                                                if (data && Array.isArray(data.reviews) && data.reviews.length > 0) {
+                                                                                    handleUpdateSelectedSettings('images', data.reviews);
+                                                                                    showToast(`Loaded ${data.reviews.length} screenshots from media`);
+                                                                                } else {
+                                                                                    const fallback = getDefaultMarqueeReviews();
+                                                                                    handleUpdateSelectedSettings('images', fallback);
+                                                                                    showToast(`Loaded ${fallback.length} default screenshots`);
+                                                                                }
+                                                                            } catch (e) {
+                                                                                const fallback = getDefaultMarqueeReviews();
+                                                                                handleUpdateSelectedSettings('images', fallback);
+                                                                                showToast(`Loaded ${fallback.length} default screenshots`);
+                                                                            } finally {
+                                                                                setLoadingMediaReviews(false);
+                                                                            }
+                                                                        }}
+                                                                        className="px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                                                                        title="Load all 50 uploaded screenshots into the list to curate & delete unwanted ones"
+                                                                    >
+                                                                        <RefreshCw className={`w-3 h-3 text-sky-400 ${loadingMediaReviews ? 'animate-spin' : ''}`} />
+                                                                        <span>{hasCustomImages ? 'Reset to All 50 Media' : 'Populate All 50 to Curate'}</span>
+                                                                    </button>
+
+                                                                    {hasCustomImages && imagesList.length > 0 && (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                handleUpdateSelectedSettings('images', []);
+                                                                                showToast('Cleared review images');
+                                                                            }}
+                                                                            className="px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-[10px] font-semibold transition-colors cursor-pointer"
+                                                                        >
+                                                                            Clear All
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Quick Add URL */}
+                                                                <div className="flex items-center gap-1.5 pt-1">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={manualImageUrl}
+                                                                        onChange={(e) => setManualImageUrl(e.target.value)}
+                                                                        placeholder="Or paste screenshot image URL..."
+                                                                        className="flex-1 px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-[11px]"
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            if (!manualImageUrl.trim()) return;
+                                                                            const current = Array.isArray(selectedBlock.settings?.images)
+                                                                                ? [...selectedBlock.settings.images]
+                                                                                : [];
+                                                                            const newImg = {
+                                                                                id: String(Date.now()),
+                                                                                url: manualImageUrl.trim(),
+                                                                                title: `Screenshot ${current.length + 1}`
+                                                                            };
+                                                                            handleUpdateSelectedSettings('images', [...current, newImg]);
+                                                                            setManualImageUrl('');
+                                                                            showToast('Screenshot added');
+                                                                        }}
+                                                                        className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold text-[10px] cursor-pointer"
+                                                                    >
+                                                                        + Add URL
+                                                                    </button>
+                                                                </div>
+
+                                                                {/* Screenshots List with Thumbnail & Delete Button */}
+                                                                {hasCustomImages ? (
+                                                                    <div className="space-y-1.5 max-h-72 overflow-y-auto builder-sidebar-scroll pr-1 pt-1">
+                                                                        {imagesList.length === 0 ? (
+                                                                            <div className="text-center py-6 px-3 bg-slate-900/50 rounded-lg border border-dashed border-slate-800 text-slate-400 text-[11px]">
+                                                                                No screenshots in list. Click "Populate All 50 to Curate" or "+ Add from Media".
+                                                                            </div>
+                                                                        ) : (
+                                                                            imagesList.map((img, imgIdx) => {
+                                                                                const imgUrl = typeof img === 'string' ? img : img.url;
+                                                                                const imgTitle = (typeof img === 'object' && img.title) ? img.title : `Screenshot #${imgIdx + 1}`;
+                                                                                return (
+                                                                                    <div
+                                                                                        key={img.id || imgIdx}
+                                                                                        className="flex items-center gap-2 p-1.5 bg-slate-900 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors group"
+                                                                                    >
+                                                                                        <span className="text-[10px] font-mono text-slate-500 w-5 text-right shrink-0">
+                                                                                            #{imgIdx + 1}
+                                                                                        </span>
+                                                                                        <div className="w-12 h-9 rounded bg-slate-950 border border-slate-800 overflow-hidden shrink-0 flex items-center justify-center">
+                                                                                            <img
+                                                                                                src={getImageUrl(imgUrl)}
+                                                                                                alt={imgTitle}
+                                                                                                className="w-full h-full object-cover"
+                                                                                                onError={(e) => {
+                                                                                                    const target = e.target as HTMLImageElement;
+                                                                                                    target.src = 'https://placehold.co/100x75/0f172a/38bdf8?text=Review';
+                                                                                                }}
+                                                                                            />
+                                                                                        </div>
+                                                                                        <div className="flex-1 min-w-0">
+                                                                                            <p className="text-[11px] font-medium text-slate-200 truncate" title={imgTitle}>
+                                                                                                {imgTitle}
+                                                                                            </p>
+                                                                                            <p className="text-[9px] text-slate-500 truncate" title={imgUrl}>
+                                                                                                {imgUrl}
+                                                                                            </p>
+                                                                                        </div>
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => {
+                                                                                                const updated = imagesList.filter((_, idx) => idx !== imgIdx);
+                                                                                                handleUpdateSelectedSettings('images', updated);
+                                                                                                showToast(`Removed #${imgIdx + 1}`);
+                                                                                            }}
+                                                                                            title="Delete this screenshot from review showcase"
+                                                                                            className="p-1.5 rounded-md text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer shrink-0"
+                                                                                        >
+                                                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                                                        </button>
+                                                                                    </div>
+                                                                                );
+                                                                            })
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="p-3 bg-sky-950/20 border border-sky-800/30 rounded-xl space-y-2">
+                                                                        <p className="text-[11px] text-sky-300 font-medium leading-relaxed">
+                                                                            💡 All 50 media images are currently auto-scrolling on the home page.
+                                                                        </p>
+                                                                        <p className="text-[10px] text-slate-400 leading-relaxed">
+                                                                            Click <strong>"Populate All 50 to Curate"</strong> above to load the list here. Then you can inspect each screenshot and delete any non-testimonial images with one click!
+                                                                        </p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Optional Quotes Manager */}
+                                                            <details className="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800/70 text-slate-400 text-[11px]">
+                                                                <summary className="font-semibold text-slate-300 cursor-pointer select-none">
+                                                                    Quotes & Text Reviews (Optional)
+                                                                </summary>
+                                                                <div className="pt-2 space-y-2">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="text-[10px] text-slate-400">Add text quotes if needed</span>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                const items = selectedBlock.settings.items || [];
+                                                                                const newItem = {
+                                                                                    id: String(Date.now()),
+                                                                                    name: 'Student Name',
+                                                                                    role: 'Batch / College',
+                                                                                    rating: 5,
+                                                                                    quote: 'Learning with NovoNex has been truly transformative and wonderful!'
+                                                                                };
+                                                                                handleUpdateSelectedSettings('items', [...items, newItem]);
+                                                                            }}
+                                                                            className="px-2 py-0.5 rounded bg-sky-600 hover:bg-sky-500 text-white font-bold text-[10px] cursor-pointer"
+                                                                        >
+                                                                            + Add Quote
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="space-y-2 max-h-48 builder-sidebar-scroll pr-1">
+                                                                        {(selectedBlock.settings.items || []).map((item: any, iIdx: number) => (
+                                                                            <div key={item.id || iIdx} className="p-2 bg-slate-900 rounded-lg border border-slate-800 space-y-1.5">
+                                                                                <div className="flex items-center justify-between">
+                                                                                    <span className="font-bold text-sky-400 text-[10px]">Quote #{iIdx + 1}</span>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            const items = [...(selectedBlock.settings.items || [])];
+                                                                                            items.splice(iIdx, 1);
+                                                                                            handleUpdateSelectedSettings('items', items);
+                                                                                        }}
+                                                                                        className="text-rose-400 hover:text-rose-300 p-0.5"
+                                                                                    >
+                                                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                                                    </button>
+                                                                                </div>
+                                                                                <div className="grid grid-cols-2 gap-1.5">
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        value={item.name || ''}
+                                                                                        onChange={(e) => {
+                                                                                            const items = [...(selectedBlock.settings.items || [])];
+                                                                                            items[iIdx] = { ...items[iIdx], name: e.target.value };
+                                                                                            handleUpdateSelectedSettings('items', items);
+                                                                                        }}
+                                                                                        placeholder="Student Name"
+                                                                                        className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded text-white text-[10px]"
+                                                                                    />
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        value={item.role || ''}
+                                                                                        onChange={(e) => {
+                                                                                            const items = [...(selectedBlock.settings.items || [])];
+                                                                                            items[iIdx] = { ...items[iIdx], role: e.target.value };
+                                                                                            handleUpdateSelectedSettings('items', items);
+                                                                                        }}
+                                                                                        placeholder="Role / Institution"
+                                                                                        className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded text-slate-300 text-[10px]"
+                                                                                    />
+                                                                                </div>
+                                                                                <textarea
+                                                                                    rows={2}
+                                                                                    value={item.quote || ''}
+                                                                                    onChange={(e) => {
+                                                                                        const items = [...(selectedBlock.settings.items || [])];
+                                                                                        items[iIdx] = { ...items[iIdx], quote: e.target.value };
+                                                                                        handleUpdateSelectedSettings('items', items);
+                                                                                    }}
+                                                                                    placeholder="Student Quote"
+                                                                                    className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded text-slate-300 text-[10px]"
+                                                                                />
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            </details>
                                                         </div>
-                                                    </div>
-                                                )}
+                                                    );
+                                                })()}
 
                                                 {/* --- 12. FAQ ACCORDION --- */}
                                                 {selectedBlock.type === 'faq_accordion' && (
@@ -3154,6 +3433,30 @@ export const AdminPageBuilderPage: React.FC = () => {
                     </div>
                 </main>
             </div>
+
+            {/* Testimonials Review Screenshot Media Picker Modal */}
+            {testimonialMediaPickerOpen && (
+                <MediaPickerModal
+                    isOpen={testimonialMediaPickerOpen}
+                    onClose={() => setTestimonialMediaPickerOpen(false)}
+                    filterType="image"
+                    title="Select Testimonial / Review Screenshot"
+                    onSelect={(url, item) => {
+                        if (!selectedBlock) return;
+                        const currentImages = Array.isArray(selectedBlock.settings?.images)
+                            ? [...selectedBlock.settings.images]
+                            : [];
+                        const newImg = {
+                            id: item?.id ? String(item.id) : String(Date.now()),
+                            url: url,
+                            title: item?.file_name || `Screenshot ${currentImages.length + 1}`,
+                        };
+                        handleUpdateSelectedSettings('images', [...currentImages, newImg]);
+                        setTestimonialMediaPickerOpen(false);
+                        showToast('Review screenshot added!');
+                    }}
+                />
+            )}
         </div>
     );
 };

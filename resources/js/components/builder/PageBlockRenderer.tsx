@@ -83,7 +83,7 @@ export const PageBlockRenderer: React.FC<PageBlockRendererProps> = ({
                 return <LearningPathBlock block={block} isBuilder={isBuilder} />;
             case 'testimonials':
             case 'student_reviews_marquee':
-                return <StudentReviewsMarquee />;
+                return <StudentReviewsMarquee settings={block.settings} isBuilder={isBuilder} />;
             case 'faq_accordion':
                 return <FaqAccordionBlock block={block} isBuilder={isBuilder} />;
             case 'html_widget':

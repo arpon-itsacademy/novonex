@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { apiClient, getImageUrl } from '../../api/client';
 import {
     Sparkles,
@@ -11,14 +11,28 @@ import {
     MessageSquareQuote
 } from 'lucide-react';
 
-interface ReviewItem {
+export interface ReviewItem {
     id: number | string;
     url: string;
     title?: string;
 }
 
+export interface StudentReviewsMarqueeProps {
+    settings?: {
+        sectionTag?: string;
+        sectionTitle?: string;
+        sectionSub?: string;
+        row1Label?: string;
+        row2Label?: string;
+        speed?: number | string;
+        images?: any[];
+        items?: any[];
+    };
+    isBuilder?: boolean;
+}
+
 // Fallback items from uploaded media library
-const DEFAULT_MEDIA_FILES: string[] = [
+export const DEFAULT_MEDIA_FILES: string[] = [
     'Dvf93tePcSijBdHF40XsNEz7NJyrjTwa4b9IWe4U.jpg',
     '2ilyybrdxRCRlPbt3MmmB1Sh8lU9AtqdRDNuVUHW.png',
     '4UmfhyGw1sj3ZVwvF9rkb30CcNCV1UtPpMo0sKGW.jpg',
@@ -73,24 +87,43 @@ const DEFAULT_MEDIA_FILES: string[] = [
     'iWiZEQ9f6L4bv9lRzBHHXTKUK3tL8ukiccHTDVaZ.jpg',
 ];
 
-export const StudentReviewsMarquee: React.FC = () => {
-    const [reviews, setReviews] = useState<ReviewItem[]>(() =>
-        DEFAULT_MEDIA_FILES.map((fileName, idx) => ({
-            id: `init_${idx}`,
-            url: `/storage/media/${fileName}`,
-            title: `Student Review ${idx + 1}`,
-        }))
+export const getDefaultMarqueeReviews = (): ReviewItem[] =>
+    DEFAULT_MEDIA_FILES.map((fileName, idx) => ({
+        id: `init_${idx}`,
+        url: `/storage/media/${fileName}`,
+        title: `Student Review ${idx + 1}`,
+    }));
+
+export const StudentReviewsMarquee: React.FC<StudentReviewsMarqueeProps> = ({
+    settings,
+    isBuilder = false,
+}) => {
+    // Determine configured texts with defaults
+    const sectionTag = settings?.sectionTag !== undefined ? settings.sectionTag : 'Real Feedback & Success Stories';
+    const sectionTitle = settings?.sectionTitle !== undefined ? settings.sectionTitle : 'Loved by Thousands of Learners Across Bangladesh';
+    const sectionSub = settings?.sectionSub !== undefined ? settings.sectionSub : 'Swipe through genuine screenshots and student reviews from our academic, admission, and skill batches.';
+    const row1Label = settings?.row1Label !== undefined ? settings.row1Label : 'Academic & Admission Feedback';
+    const row2Label = settings?.row2Label !== undefined ? settings.row2Label : 'Exam Ranks & Placement Stories';
+    const scrollSpeed = Math.max(10, Math.min(180, Number(settings?.speed) || 45));
+
+    const [fetchedReviews, setFetchedReviews] = useState<ReviewItem[]>(() =>
+        getDefaultMarqueeReviews()
     );
 
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+    // Fetch live media if settings.images is not explicitly provided
     useEffect(() => {
+        if (Array.isArray(settings?.images) && settings.images.length > 0) {
+            return;
+        }
+
         let isMounted = true;
         apiClient
             .get('/testimonials/marquee')
             .then(({ data }) => {
                 if (isMounted && data && Array.isArray(data.reviews) && data.reviews.length > 0) {
-                    setReviews(data.reviews);
+                    setFetchedReviews(data.reviews);
                 }
             })
             .catch(() => {
@@ -100,16 +133,48 @@ export const StudentReviewsMarquee: React.FC = () => {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [settings?.images]);
+
+    // Active reviews: prefer settings.images if configured by user in page builder
+    const activeReviews: ReviewItem[] = useMemo(() => {
+        if (Array.isArray(settings?.images) && settings.images.length > 0) {
+            return settings.images.map((img: any, idx: number) => {
+                if (typeof img === 'string') {
+                    return {
+                        id: `setting_${idx}`,
+                        url: img,
+                        title: `Review ${idx + 1}`,
+                    };
+                }
+                return {
+                    id: img.id || `setting_${idx}`,
+                    url: img.url || '',
+                    title: img.title || `Review ${idx + 1}`,
+                };
+            }).filter((i) => Boolean(i.url));
+        }
+
+        return fetchedReviews;
+    }, [settings?.images, fetchedReviews]);
+
+    // Helper to repeat items so infinite scroll is smooth even with 1-4 images
+    const repeatToFill = (list: ReviewItem[], minCount: number = 8): ReviewItem[] => {
+        if (list.length === 0) return [];
+        let result = [...list];
+        while (result.length < minCount) {
+            result = [...result, ...list];
+        }
+        return [...result, ...result];
+    };
 
     // Split items into 2 rows for dual-direction marquee
-    const half = Math.ceil(reviews.length / 2);
-    const row1 = reviews.slice(0, half);
-    const row2 = reviews.slice(half);
+    const half = Math.ceil(activeReviews.length / 2);
+    const row1 = activeReviews.slice(0, half);
+    const row2 = activeReviews.length > 1 ? activeReviews.slice(half) : activeReviews;
 
-    // Duplicate arrays once to ensure seamless infinite loop
-    const row1Duplicated = [...row1, ...row1];
-    const row2Duplicated = [...row2, ...row2];
+    // Duplicate arrays seamlessly
+    const row1Duplicated = repeatToFill(row1, 8);
+    const row2Duplicated = repeatToFill(row2, 8);
 
     // Lightbox keyboard controls
     useEffect(() => {
@@ -119,17 +184,21 @@ export const StudentReviewsMarquee: React.FC = () => {
             if (e.key === 'Escape') {
                 setLightboxIndex(null);
             } else if (e.key === 'ArrowLeft') {
-                setLightboxIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : reviews.length - 1));
+                setLightboxIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : activeReviews.length - 1));
             } else if (e.key === 'ArrowRight') {
-                setLightboxIndex((prev) => (prev !== null && prev < reviews.length - 1 ? prev + 1 : 0));
+                setLightboxIndex((prev) => (prev !== null && prev < activeReviews.length - 1 ? prev + 1 : 0));
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [lightboxIndex, reviews.length]);
+    }, [lightboxIndex, activeReviews.length]);
 
-    const activePreview = lightboxIndex !== null ? reviews[lightboxIndex] : null;
+    const activePreview = lightboxIndex !== null ? activeReviews[lightboxIndex] : null;
+
+    if (activeReviews.length === 0) {
+        return null;
+    }
 
     return (
         <section className="relative py-16 sm:py-24 bg-slate-950 text-white overflow-hidden border-y border-slate-800/80">
@@ -143,133 +212,155 @@ export const StudentReviewsMarquee: React.FC = () => {
 
             {/* Section Header */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 mb-12 sm:mb-16 relative z-10">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500/15 to-sky-500/15 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-extrabold shadow-sm">
-                    <Sparkles className="w-4 h-4 text-emerald-400" />
-                    <span>Real Feedback & Success Stories</span>
-                </div>
+                {sectionTag && (
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500/15 to-sky-500/15 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-extrabold shadow-sm">
+                        <Sparkles className="w-4 h-4 text-emerald-400" />
+                        <span>{sectionTag}</span>
+                    </div>
+                )}
 
-                <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-                    Loved by Thousands of Learners <br className="hidden sm:inline" />
-                    <span className="bg-gradient-to-r from-[#25a2ee] via-sky-400 to-emerald-400 bg-clip-text text-transparent">
-                        Across Bangladesh
-                    </span>
-                </h2>
+                {sectionTitle && (
+                    <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                        {sectionTitle}
+                    </h2>
+                )}
 
-                <p className="text-xs sm:text-sm lg:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                    Swipe through genuine screenshots and student reviews from our academic, admission, and skill batches.
-                </p>
+                {sectionSub && (
+                    <p className="text-xs sm:text-sm lg:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                        {sectionSub}
+                    </p>
+                )}
             </div>
 
             {/* Marquee Group */}
             <div className="space-y-6 sm:space-y-8 marquee-group">
                 {/* Row 1: Scrolling Right-to-Left */}
-                <div className="space-y-2.5">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Academic & Admission Feedback</span>
+                {row1Duplicated.length > 0 && (
+                    <div className="space-y-2.5">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                <span>{row1Label}</span>
+                            </div>
+                            <span className="text-[11px] text-slate-500 hidden sm:inline font-medium">
+                                Hover to pause • Click to zoom
+                            </span>
                         </div>
-                        <span className="text-[11px] text-slate-500 hidden sm:inline font-medium">
-                            Hover to pause • Click to zoom
-                        </span>
-                    </div>
 
-                    <div className="overflow-hidden py-1">
-                        <div className="animate-marquee-left flex gap-4 sm:gap-6">
-                            {row1Duplicated.map((item, idx) => {
-                                const realIdx = idx % row1.length;
-                                return (
-                                    <div
-                                        key={`r1_${item.id}_${idx}`}
-                                        onClick={() => setLightboxIndex(realIdx)}
-                                        className="group relative w-[260px] sm:w-[330px] h-[175px] sm:h-[210px] rounded-2xl sm:rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-[#25a2ee]/60 p-2.5 sm:p-3 shadow-md hover:shadow-2xl hover:shadow-[#25a2ee]/15 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer shrink-0 flex flex-col justify-between overflow-hidden"
-                                    >
-                                        <div className="relative w-full flex-1 rounded-xl sm:rounded-2xl bg-slate-950 overflow-hidden flex items-center justify-center p-1">
-                                            <img
-                                                src={getImageUrl(item.url)}
-                                                alt={item.title || 'Student Review'}
-                                                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 rounded-lg"
-                                                loading="lazy"
-                                                onError={(e) => {
-                                                    const target = e.target as HTMLImageElement;
-                                                    target.src = 'https://placehold.co/600x400/0f172a/38bdf8?text=Review+Screenshot';
-                                                }}
-                                            />
+                        <div className="overflow-hidden py-1">
+                            <div
+                                className="animate-marquee-left flex gap-4 sm:gap-6"
+                                style={{ animationDuration: `${scrollSpeed}s` }}
+                            >
+                                {row1Duplicated.map((item, idx) => {
+                                    const realIdx = idx % row1.length;
+                                    return (
+                                        <div
+                                            key={`r1_${item.id}_${idx}`}
+                                            onClick={() => setLightboxIndex(realIdx)}
+                                            className="group relative w-[260px] sm:w-[330px] h-[175px] sm:h-[210px] rounded-2xl sm:rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-[#25a2ee]/60 p-2.5 sm:p-3 shadow-md hover:shadow-2xl hover:shadow-[#25a2ee]/15 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer shrink-0 flex flex-col justify-between overflow-hidden"
+                                        >
+                                            <div className="relative w-full flex-1 rounded-xl sm:rounded-2xl bg-slate-950 overflow-hidden flex items-center justify-center p-1">
+                                                <img
+                                                    src={getImageUrl(item.url)}
+                                                    alt={item.title || 'Student Review'}
+                                                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 rounded-lg"
+                                                    loading="lazy"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.src = 'https://placehold.co/600x400/0f172a/38bdf8?text=Review+Screenshot';
+                                                    }}
+                                                />
 
-                                            <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-bold text-xs backdrop-blur-2xs">
-                                                <Maximize2 className="w-4 h-4 text-[#25a2ee]" />
-                                                <span>Click to Zoom</span>
+                                                <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-bold text-xs backdrop-blur-2xs">
+                                                    <Maximize2 className="w-4 h-4 text-[#25a2ee]" />
+                                                    <span>Click to Zoom</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-2 px-1 flex items-center justify-between text-[11px] text-slate-400">
+                                                <span className="flex items-center gap-1 font-semibold text-emerald-400">
+                                                    <CheckCircle2 className="w-3 h-3" />
+                                                    <span>Verified Student</span>
+                                                </span>
+                                                <span className="text-[10px] text-slate-500">NovoNex Community</span>
                                             </div>
                                         </div>
-
-                                        <div className="pt-2 px-1 flex items-center justify-between text-[11px] text-slate-400">
-                                            <span className="flex items-center gap-1 font-semibold text-emerald-400">
-                                                <CheckCircle2 className="w-3 h-3" />
-                                                <span>Verified Student</span>
-                                            </span>
-                                            <span className="text-[10px] text-slate-500">NovoNex Community</span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Row 2: Scrolling Left-to-Right */}
-                <div className="space-y-2.5 pt-2">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold">
-                            <Award className="w-3.5 h-3.5" />
-                            <span>Exam Ranks & Placement Stories</span>
+                {row2Duplicated.length > 0 && (
+                    <div className="space-y-2.5 pt-2">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold">
+                                <Award className="w-3.5 h-3.5" />
+                                <span>{row2Label}</span>
+                            </div>
+                            <span className="text-[11px] text-slate-500 hidden sm:inline font-medium">
+                                Hover to pause • Click to zoom
+                            </span>
                         </div>
-                        <span className="text-[11px] text-slate-500 hidden sm:inline font-medium">
-                            Hover to pause • Click to zoom
-                        </span>
-                    </div>
 
-                    <div className="overflow-hidden py-1">
-                        <div className="animate-marquee-right flex gap-4 sm:gap-6">
-                            {row2Duplicated.map((item, idx) => {
-                                const realIdx = half + (idx % row2.length);
-                                return (
-                                    <div
-                                        key={`r2_${item.id}_${idx}`}
-                                        onClick={() => setLightboxIndex(realIdx)}
-                                        className="group relative w-[260px] sm:w-[330px] h-[175px] sm:h-[210px] rounded-2xl sm:rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/60 p-2.5 sm:p-3 shadow-md hover:shadow-2xl hover:shadow-emerald-500/15 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer shrink-0 flex flex-col justify-between overflow-hidden"
-                                    >
-                                        <div className="relative w-full flex-1 rounded-xl sm:rounded-2xl bg-slate-950 overflow-hidden flex items-center justify-center p-1">
-                                            <img
-                                                src={getImageUrl(item.url)}
-                                                alt={item.title || 'Student Review'}
-                                                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 rounded-lg"
-                                                loading="lazy"
-                                                onError={(e) => {
-                                                    const target = e.target as HTMLImageElement;
-                                                    target.src = 'https://placehold.co/600x400/0f172a/10b981?text=Review+Screenshot';
-                                                }}
-                                            />
+                        <div className="overflow-hidden py-1">
+                            <div
+                                className="animate-marquee-right flex gap-4 sm:gap-6"
+                                style={{ animationDuration: `${scrollSpeed}s` }}
+                            >
+                                {row2Duplicated.map((item, idx) => {
+                                    const realIdx = half + (idx % row2.length);
+                                    return (
+                                        <div
+                                            key={`r2_${item.id}_${idx}`}
+                                            onClick={() => setLightboxIndex(realIdx)}
+                                            className="group relative w-[260px] sm:w-[330px] h-[175px] sm:h-[210px] rounded-2xl sm:rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/60 p-2.5 sm:p-3 shadow-md hover:shadow-2xl hover:shadow-emerald-500/15 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer shrink-0 flex flex-col justify-between overflow-hidden"
+                                        >
+                                            <div className="relative w-full flex-1 rounded-xl sm:rounded-2xl bg-slate-950 overflow-hidden flex items-center justify-center p-1">
+                                                <img
+                                                    src={getImageUrl(item.url)}
+                                                    alt={item.title || 'Student Review'}
+                                                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 rounded-lg"
+                                                    loading="lazy"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.src = 'https://placehold.co/600x400/0f172a/10b981?text=Review+Screenshot';
+                                                    }}
+                                                />
 
-                                            <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-bold text-xs backdrop-blur-2xs">
-                                                <Maximize2 className="w-4 h-4 text-emerald-400" />
-                                                <span>Click to Zoom</span>
+                                                <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-bold text-xs backdrop-blur-2xs">
+                                                    <Maximize2 className="w-4 h-4 text-emerald-400" />
+                                                    <span>Click to Zoom</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-2 px-1 flex items-center justify-between text-[11px] text-slate-400">
+                                                <span className="flex items-center gap-1 font-semibold text-sky-400">
+                                                    <Award className="w-3 h-3" />
+                                                    <span>Top Performance</span>
+                                                </span>
+                                                <span className="text-[10px] text-slate-500">Live Feedback</span>
                                             </div>
                                         </div>
-
-                                        <div className="pt-2 px-1 flex items-center justify-between text-[11px] text-slate-400">
-                                            <span className="flex items-center gap-1 font-semibold text-sky-400">
-                                                <Award className="w-3 h-3" />
-                                                <span>Top Performance</span>
-                                            </span>
-                                            <span className="text-[10px] text-slate-500">Live Feedback</span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
+
+            {/* Empty State if all reviews removed */}
+            {activeReviews.length === 0 && (
+                <div className="max-w-md mx-auto text-center py-12 px-6 rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 relative z-10">
+                    <MessageSquareQuote className="w-10 h-10 text-slate-500 mx-auto mb-3" />
+                    <p className="text-sm font-semibold text-slate-300">No review screenshots selected</p>
+                    <p className="text-xs text-slate-500 mt-1">Use the page builder sidebar on the right to add screenshots from media library or load default uploads.</p>
+                </div>
+            )}
 
             {/* Lightbox Preview Modal */}
             {activePreview && (
@@ -286,7 +377,7 @@ export const StudentReviewsMarquee: React.FC = () => {
                             <div className="flex items-center gap-2">
                                 <MessageSquareQuote className="w-5 h-5 text-[#25a2ee]" />
                                 <span className="text-xs sm:text-sm font-bold">
-                                    Student Review ({(lightboxIndex ?? 0) + 1} of {reviews.length})
+                                    Student Review ({(lightboxIndex ?? 0) + 1} of {activeReviews.length})
                                 </span>
                             </div>
                             <button
@@ -312,7 +403,7 @@ export const StudentReviewsMarquee: React.FC = () => {
                                 type="button"
                                 onClick={() =>
                                     setLightboxIndex((prev) =>
-                                        prev !== null && prev > 0 ? prev - 1 : reviews.length - 1
+                                        prev !== null && prev > 0 ? prev - 1 : activeReviews.length - 1
                                     )
                                 }
                                 className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/70 hover:bg-[#25a2ee] text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer border border-white/20 shadow-lg"
@@ -326,7 +417,7 @@ export const StudentReviewsMarquee: React.FC = () => {
                                 type="button"
                                 onClick={() =>
                                     setLightboxIndex((prev) =>
-                                        prev !== null && prev < reviews.length - 1 ? prev + 1 : 0
+                                        prev !== null && prev < activeReviews.length - 1 ? prev + 1 : 0
                                     )
                                 }
                                 className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/70 hover:bg-[#25a2ee] text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer border border-white/20 shadow-lg"

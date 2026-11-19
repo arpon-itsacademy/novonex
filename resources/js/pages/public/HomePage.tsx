@@ -239,6 +239,10 @@ export const HomePage: React.FC = () => {
         );
     }
 
+    const testimonialsBlock = customPage?.blocks?.find(
+        (b) => b.type === 'testimonials' || b.type === 'student_reviews_marquee'
+    );
+
     return (
         <div className="space-y-16 sm:space-y-24 pb-20 overflow-hidden font-sans">
             {/* Top Live Campaign Ribbon */}
@@ -1060,7 +1064,7 @@ export const HomePage: React.FC = () => {
             </section>
 
             {/* 6.5. STUDENT REVIEWS / TESTIMONIALS DUAL-DIRECTION SCROLL MARQUEE */}
-            <StudentReviewsMarquee />
+            <StudentReviewsMarquee settings={testimonialsBlock?.settings} />
 
             {/* 7. WHY CHOOSE NOVONEX (Platform Pillars) */}
             <section className="bg-slate-900 text-white py-16 sm:py-20 relative overflow-hidden">
