@@ -392,6 +392,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('coupons/{id}/toggle-status', [AdminCouponController::class, 'toggleStatus']);
 
         // Marketing: Dynamic Offer Builder
+        Route::get('dynamic-offers', [AdminDynamicOfferController::class, 'index']);
+        Route::post('dynamic-offers', [AdminDynamicOfferController::class, 'store']);
+        Route::get('dynamic-offers/courses-and-categories', [AdminDynamicOfferController::class, 'getCoursesAndCategories']);
+        Route::get('dynamic-offers/{id}', [AdminDynamicOfferController::class, 'show']);
+        Route::put('dynamic-offers/{id}', [AdminDynamicOfferController::class, 'update']);
+        Route::delete('dynamic-offers/{id}', [AdminDynamicOfferController::class, 'destroy']);
+        Route::post('dynamic-offers/{id}/toggle-status', [AdminDynamicOfferController::class, 'toggleStatus']);
+
+        // Aliases with admin/ prefix for dynamic offers
         Route::get('admin/dynamic-offers', [AdminDynamicOfferController::class, 'index']);
         Route::post('admin/dynamic-offers', [AdminDynamicOfferController::class, 'store']);
         Route::get('admin/dynamic-offers/courses-and-categories', [AdminDynamicOfferController::class, 'getCoursesAndCategories']);

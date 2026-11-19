@@ -320,9 +320,18 @@ export const AdminDynamicOffersPage: React.FC = () => {
             setModalOpen(false);
             fetchOffers();
         } catch (err: any) {
+            const apiMessage = err.response?.data?.message;
+            const validationErrors = err.response?.data?.errors;
+            let displayError = apiMessage || 'Failed to save dynamic offer.';
+            if (validationErrors && typeof validationErrors === 'object') {
+                const firstVal = Object.values(validationErrors)[0];
+                if (Array.isArray(firstVal) && firstVal[0]) {
+                    displayError = `${displayError} (${firstVal[0]})`;
+                }
+            }
             setFeedback({
                 type: 'error',
-                text: err.response?.data?.message || 'Failed to save dynamic offer.',
+                text: displayError,
             });
         } finally {
             setSaving(false);

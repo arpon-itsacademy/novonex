@@ -18,6 +18,8 @@ class AdminDynamicOfferController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        DynamicOffer::ensureTableExists();
+
         if (!Schema::hasTable('dynamic_offers')) {
             return response()->json([
                 'offers' => [
@@ -75,6 +77,8 @@ class AdminDynamicOfferController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        DynamicOffer::ensureTableExists();
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
@@ -90,27 +94,46 @@ class AdminDynamicOfferController extends Controller
             'tiers.*.discount_value' => ['required', 'numeric', 'min:0'],
             'min_order_amount' => ['nullable', 'numeric', 'min:0'],
             'start_date' => ['nullable', 'date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'is_active' => ['boolean'],
+            'end_date' => ['nullable', 'date'],
+            'is_active' => ['nullable', 'boolean'],
             'priority' => ['nullable', 'integer'],
         ]);
+
+        if (!empty($validated['start_date']) && !empty($validated['end_date'])) {
+            if (strtotime($validated['end_date']) < strtotime($validated['start_date'])) {
+                return response()->json([
+                    'message' => 'End date must be greater than or equal to start date.',
+                    'errors' => ['end_date' => ['End date must be greater than or equal to start date.']],
+                ], 422);
+            }
+        }
 
         $validated['created_by'] = auth()->id();
         $validated['is_active'] = $validated['is_active'] ?? true;
         $validated['priority'] = $validated['priority'] ?? 0;
 
-        $offer = DynamicOffer::create($validated);
+        try {
+            $offer = DynamicOffer::create($validated);
 
-        AuditLog::log('dynamic_offer_created', 'DynamicOffer', $offer->id, null, [
-            'title' => $offer->title,
-            'scope_type' => $offer->scope_type,
-            'tiers_count' => count($offer->tiers ?? []),
-        ]);
+            try {
+                AuditLog::log('dynamic_offer_created', 'DynamicOffer', $offer->id, null, [
+                    'title' => $offer->title,
+                    'scope_type' => $offer->scope_type,
+                    'tiers_count' => count($offer->tiers ?? []),
+                ]);
+            } catch (\Throwable $e) {
+                // Do not fail offer creation if audit logging encounters an issue
+            }
 
-        return response()->json([
-            'message' => 'Dynamic offer created successfully.',
-            'offer' => $offer,
-        ], 201);
+            return response()->json([
+                'message' => 'Dynamic offer created successfully.',
+                'offer' => $offer,
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to create offer: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -118,6 +141,8 @@ class AdminDynamicOfferController extends Controller
      */
     public function show(int $id): JsonResponse
     {
+        DynamicOffer::ensureTableExists();
+
         $offer = DynamicOffer::findOrFail($id);
 
         return response()->json([
@@ -130,6 +155,8 @@ class AdminDynamicOfferController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
+        DynamicOffer::ensureTableExists();
+
         $offer = DynamicOffer::findOrFail($id);
 
         $validated = $request->validate([
@@ -147,22 +174,41 @@ class AdminDynamicOfferController extends Controller
             'tiers.*.discount_value' => ['required', 'numeric', 'min:0'],
             'min_order_amount' => ['nullable', 'numeric', 'min:0'],
             'start_date' => ['nullable', 'date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'is_active' => ['boolean'],
+            'end_date' => ['nullable', 'date'],
+            'is_active' => ['nullable', 'boolean'],
             'priority' => ['nullable', 'integer'],
         ]);
 
-        $offer->update($validated);
+        if (!empty($validated['start_date']) && !empty($validated['end_date'])) {
+            if (strtotime($validated['end_date']) < strtotime($validated['start_date'])) {
+                return response()->json([
+                    'message' => 'End date must be greater than or equal to start date.',
+                    'errors' => ['end_date' => ['End date must be greater than or equal to start date.']],
+                ], 422);
+            }
+        }
 
-        AuditLog::log('dynamic_offer_updated', 'DynamicOffer', $offer->id, null, [
-            'title' => $offer->title,
-            'scope_type' => $offer->scope_type,
-        ]);
+        try {
+            $offer->update($validated);
 
-        return response()->json([
-            'message' => 'Dynamic offer updated successfully.',
-            'offer' => $offer->fresh(),
-        ]);
+            try {
+                AuditLog::log('dynamic_offer_updated', 'DynamicOffer', $offer->id, null, [
+                    'title' => $offer->title,
+                    'scope_type' => $offer->scope_type,
+                ]);
+            } catch (\Throwable $e) {
+                // Do not fail update if audit logging encounters an issue
+            }
+
+            return response()->json([
+                'message' => 'Dynamic offer updated successfully.',
+                'offer' => $offer->fresh(),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to update offer: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -174,7 +220,9 @@ class AdminDynamicOfferController extends Controller
         $title = $offer->title;
         $offer->delete();
 
-        AuditLog::log('dynamic_offer_deleted', 'DynamicOffer', $id, null, ['title' => $title]);
+        try {
+            AuditLog::log('dynamic_offer_deleted', 'DynamicOffer', $id, null, ['title' => $title]);
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'message' => 'Dynamic offer deleted successfully.',
@@ -190,9 +238,11 @@ class AdminDynamicOfferController extends Controller
         $offer->is_active = !$offer->is_active;
         $offer->save();
 
-        AuditLog::log('dynamic_offer_status_toggled', 'DynamicOffer', $offer->id, null, [
-            'is_active' => $offer->is_active,
-        ]);
+        try {
+            AuditLog::log('dynamic_offer_status_toggled', 'DynamicOffer', $offer->id, null, [
+                'is_active' => $offer->is_active,
+            ]);
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'message' => $offer->is_active ? 'Dynamic offer activated.' : 'Dynamic offer deactivated.',

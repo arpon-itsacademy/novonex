@@ -59,10 +59,8 @@ class DynamicOffer extends Model
             ->orderByDesc('id');
     }
 
-    public static function booted(): void
+    public static function ensureTableExists(): void
     {
-        parent::booted();
-
         if (!Schema::hasTable('dynamic_offers')) {
             try {
                 Schema::create('dynamic_offers', function (Blueprint $table) {
@@ -79,7 +77,7 @@ class DynamicOffer extends Model
                     $table->dateTime('end_date')->nullable();
                     $table->boolean('is_active')->default(true);
                     $table->integer('priority')->default(0);
-                    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+                    $table->unsignedBigInteger('created_by')->nullable();
                     $table->timestamps();
                     $table->index('is_active');
                 });
@@ -87,6 +85,12 @@ class DynamicOffer extends Model
                 // Ignore if table exists or permission issue
             }
         }
+    }
+
+    public static function booted(): void
+    {
+        parent::booted();
+        static::ensureTableExists();
     }
 
     /**
