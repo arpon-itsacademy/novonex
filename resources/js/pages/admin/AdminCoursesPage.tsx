@@ -20,7 +20,8 @@ import {
     ChevronsRight,
     Loader2,
     X,
-    Filter
+    Filter,
+    Eye
 } from 'lucide-react';
 
 interface PaginationMeta {
@@ -402,6 +403,15 @@ export const AdminCoursesPage: React.FC = () => {
                                                             <Layers className="w-3.5 h-3.5" />
                                                             <span>Builder</span>
                                                         </Link>
+                                                        <a
+                                                            href={`/learning/${course.id}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            title="Preview Course as Student"
+                                                            className="p-1.5 hover:bg-slate-100 text-slate-600 hover:text-sky-600 rounded-lg transition-colors"
+                                                        >
+                                                            <Eye className="w-4 h-4" />
+                                                        </a>
                                                         <Link
                                                             to={`/admin/courses/${course.id}/edit`}
                                                             title="Edit Course"

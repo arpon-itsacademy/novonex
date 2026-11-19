@@ -109,6 +109,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Enrollments & Learning
     Route::post('courses/{course}/enroll-free', [EnrollmentController::class, 'enrollFree']);
     Route::get('student/my-courses', [EnrollmentController::class, 'myCourses']);
+    Route::get('learning/{course}/first-lesson', [EnrollmentController::class, 'getFirstLesson']);
     Route::get('learning/{course}/lessons/{lesson}', [EnrollmentController::class, 'getLesson']);
     Route::post('learning/lessons/{lesson}/progress', [EnrollmentController::class, 'toggleProgress']);
     Route::get('learning/lessons/{lesson}/vdocipher-otp', [VdoCipherController::class, 'getOtp']);

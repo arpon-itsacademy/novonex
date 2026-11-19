@@ -120,6 +120,79 @@ class EnrollmentController extends Controller
         return response()->json($coursesData);
     }
 
+    public function getFirstLesson(Course $course): JsonResponse
+    {
+        $user = auth()->user();
+
+        $canAccess = false;
+        if ($user && $user->isAdmin()) {
+            $canAccess = true;
+        } elseif ($user && $user->isTeacher() && $course->isAssignedTeacher($user->id)) {
+            $canAccess = true;
+        } elseif ($user && $user->isEnrolledIn($course->id)) {
+            $canAccess = true;
+        }
+
+        if (!$canAccess) {
+            $previewLesson = Lesson::where('course_id', $course->id)
+                ->where('is_preview', true)
+                ->orderBy('sort_order')
+                ->first();
+
+            if ($previewLesson) {
+                return response()->json([
+                    'lesson_id' => $previewLesson->id,
+                    'course_slug' => $course->slug,
+                    'is_preview' => true,
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'You must be enrolled in this course to access the classroom.',
+                'course_slug' => $course->slug,
+            ], 403);
+        }
+
+        // 1. Check last accessed lesson
+        $lastProgress = LessonProgress::where('user_id', $user->id)
+            ->where('course_id', $course->id)
+            ->latest('last_accessed_at')
+            ->first();
+
+        if ($lastProgress && $lastProgress->lesson_id) {
+            return response()->json([
+                'lesson_id' => $lastProgress->lesson_id,
+                'course_slug' => $course->slug,
+            ]);
+        }
+
+        // 2. Otherwise get first lesson of first section
+        $firstSection = $course->sections()->orderBy('sort_order')->first();
+        if ($firstSection) {
+            $firstLesson = $firstSection->lessons()->orderBy('sort_order')->first();
+            if ($firstLesson) {
+                return response()->json([
+                    'lesson_id' => $firstLesson->id,
+                    'course_slug' => $course->slug,
+                ]);
+            }
+        }
+
+        // 3. Fallback to any first lesson in the course
+        $firstLesson = Lesson::where('course_id', $course->id)->orderBy('sort_order')->first();
+        if ($firstLesson) {
+            return response()->json([
+                'lesson_id' => $firstLesson->id,
+                'course_slug' => $course->slug,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'No lessons found in this course yet.',
+            'course_slug' => $course->slug,
+        ], 404);
+    }
+
     public function getLesson(Course $course, Lesson $lesson): JsonResponse
     {
         $user = auth()->user();

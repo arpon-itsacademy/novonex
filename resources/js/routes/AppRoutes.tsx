@@ -221,6 +221,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/exams/:examId/take" element={<StudentExamRoomPage />} />
 
             {/* Learning Room / Video Player */}
+            <Route path="/learning/:courseId" element={<LessonPlayerPage />} />
             <Route path="/learning/:courseId/lessons/:lessonId" element={<LessonPlayerPage />} />
 
             {/* Fallback to Home */}

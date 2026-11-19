@@ -54,6 +54,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
     const [course, setCourse] = useState<any>(null);
     const [sections, setSections] = useState<CourseSection[]>([]);
     const [loading, setLoading] = useState(true);
+    const [previewMenuOpen, setPreviewMenuOpen] = useState(false);
 
     // Tab state ('lessons' | 'live_classes' | 'practice_exams' | 'live_exams' | 'routine')
     const [activeTab, setActiveTab] = useState<'lessons' | 'live_classes' | 'practice_exams' | 'live_exams' | 'routine'>('lessons');
@@ -936,6 +937,16 @@ export const AdminCourseBuilderPage: React.FC = () => {
         } catch { }
     };
 
+    const firstLesson = React.useMemo(() => {
+        if (!sections || sections.length === 0) return null;
+        for (const sec of sections) {
+            if (sec.lessons && sec.lessons.length > 0) {
+                return sec.lessons[0];
+            }
+        }
+        return null;
+    }, [sections]);
+
     if (loading || !course) {
         return <div className="p-12 text-center text-slate-400">Loading curriculum builder...</div>;
     }
@@ -963,7 +974,95 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                    {/* Course Preview Dropdown / Button */}
+                    <div className="relative">
+                        <div className="inline-flex items-center shadow-xs rounded-xl overflow-hidden border border-slate-200 bg-white">
+                            <a
+                                href={firstLesson ? `/learning/${course.id}/lessons/${firstLesson.id}` : `/courses/${course.slug}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3.5 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm flex items-center gap-2 transition-colors border-r border-slate-200 group"
+                                title={firstLesson ? "Preview course in student classroom player (new tab)" : "Preview course landing page"}
+                            >
+                                <Eye className="w-4 h-4 text-sky-600 group-hover:scale-110 transition-transform" />
+                                <span>Preview as Student</span>
+                                <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                            </a>
+                            <button
+                                type="button"
+                                onClick={() => setPreviewMenuOpen(!previewMenuOpen)}
+                                className="px-2.5 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+                                title="More preview options"
+                            >
+                                <ChevronDown className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {previewMenuOpen && (
+                            <>
+                                <div
+                                    className="fixed inset-0 z-40"
+                                    onClick={() => setPreviewMenuOpen(false)}
+                                />
+                                <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in zoom-in-95">
+                                    <div className="px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                        Course Preview Mode
+                                    </div>
+                                    <a
+                                        href={firstLesson ? `/learning/${course.id}/lessons/${firstLesson.id}` : '#'}
+                                        onClick={(e) => {
+                                            if (!firstLesson) {
+                                                e.preventDefault();
+                                                alert('Please add at least one lesson first to preview the student classroom player.');
+                                            }
+                                            setPreviewMenuOpen(false);
+                                        }}
+                                        target={firstLesson ? '_blank' : undefined}
+                                        rel="noopener noreferrer"
+                                        className={`px-3.5 py-2.5 flex items-start gap-3 hover:bg-sky-50/70 transition-colors ${!firstLesson ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        <div className="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 mt-0.5">
+                                            <PlayCircle className="w-4 h-4" />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                                                <span>Student Classroom</span>
+                                                <span className="text-[10px] px-1.5 py-0.5 bg-sky-100 text-sky-700 font-bold rounded">Player</span>
+                                            </div>
+                                            <div className="text-[11px] text-slate-500 mt-0.5 leading-tight">
+                                                Watch video player, syllabus accordion, resources & discussions as a student.
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <div className="my-1 border-t border-slate-100" />
+
+                                    <a
+                                        href={`/courses/${course.slug}`}
+                                        onClick={() => setPreviewMenuOpen(false)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-3.5 py-2.5 flex items-start gap-3 hover:bg-emerald-50/70 transition-colors"
+                                    >
+                                        <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                                            <Globe className="w-4 h-4" />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                                                <span>Public Course Details</span>
+                                                <span className="text-[10px] px-1.5 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded">Public</span>
+                                            </div>
+                                            <div className="text-[11px] text-slate-500 mt-0.5 leading-tight">
+                                                View public landing page, pricing, overview syllabus and enrollment.
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
                     {activeTab === 'lessons' && (
                         <button
                             onClick={openAddSection}
@@ -1258,6 +1357,17 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
                                                 {/* Lesson Actions */}
                                                 <div className="flex items-center gap-1.5">
+                                                    {/* Preview Lesson in Student Player */}
+                                                    <a
+                                                        href={`/learning/${course.id}/lessons/${lesson.id}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                                                        title="Preview this lesson as student"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </a>
+
                                                     {/* Reorder Lesson Up / Down */}
                                                     <button
                                                         onClick={() => moveLesson(section, lIndex, 'up')}
