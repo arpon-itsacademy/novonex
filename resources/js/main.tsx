@@ -6,6 +6,8 @@ import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { SettingsProvider } from './context/SettingsContext';
+import { CartProvider } from './context/CartContext';
+import { CartDrawer } from './components/cart/CartDrawer';
 import { AppRoutes } from './routes/AppRoutes';
 import { captureReferralFromUrl } from './utils/referralTracker';
 
@@ -32,7 +34,10 @@ if (rootElement) {
                         <ThemeProvider>
                             <LanguageProvider>
                                 <AuthProvider>
-                                    <AppRoutes />
+                                    <CartProvider>
+                                        <CartDrawer />
+                                        <AppRoutes />
+                                    </CartProvider>
                                 </AuthProvider>
                             </LanguageProvider>
                         </ThemeProvider>

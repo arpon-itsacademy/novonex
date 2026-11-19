@@ -24,8 +24,10 @@ import {
     X,
     Copy,
     Check,
-    Key
+    Key,
+    ShoppingCart
 } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
 
 const DEFAULT_FEATURES = [
     'Full HD video lectures & live discussions',
@@ -39,6 +41,7 @@ export const CourseDetailsPage: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { t, language } = useLanguage();
+    const { addToCart, isInCart } = useCart();
 
     const [course, setCourse] = useState<Course | null>(null);
     const [isEnrolled, setIsEnrolled] = useState(false);
@@ -599,12 +602,26 @@ export const CourseDetailsPage: React.FC = () => {
                                         <span>{enrollingFree ? 'Enrolling...' : 'Start Learning for Free'}</span>
                                     </button>
                                 ) : (
-                                    <Link
-                                        to={`/checkout/${course.slug}${promoCoupon ? `?coupon=${promoCoupon}` : ''}`}
-                                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/35 transition-all"
-                                    >
-                                        <span>Enroll Now</span>
-                                    </Link>
+                                    <>
+                                        <Link
+                                            to={`/checkout/${course.slug}${promoCoupon ? `?coupon=${promoCoupon}` : ''}`}
+                                            className="w-full py-4 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-sky-700 hover:from-sky-600 hover:to-sky-800 text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/35 transition-all text-center"
+                                        >
+                                            <span>Enroll Now</span>
+                                        </Link>
+                                        <button
+                                            type="button"
+                                            onClick={() => addToCart(course)}
+                                            className={`w-full py-3.5 px-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 border transition-all cursor-pointer ${
+                                                isInCart(course.id)
+                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800'
+                                                    : 'bg-sky-50 text-[#25a2ee] border-sky-200 dark:bg-sky-950/40 dark:border-sky-800 hover:bg-sky-100 dark:hover:bg-sky-900/50'
+                                            }`}
+                                        >
+                                            <ShoppingCart className="w-5 h-5" />
+                                            <span>{isInCart(course.id) ? 'Course in Cart (Open Cart)' : 'Add to Cart'}</span>
+                                        </button>
+                                    </>
                                 )}
 
                                 {/* Secondary: 'How to Enroll' button */}

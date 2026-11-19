@@ -17,8 +17,10 @@ import {
     CheckCircle2, 
     Video, 
     Users,
-    Loader2 
+    Loader2,
+    ShoppingCart 
 } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
 
 interface PaginationMeta {
     current_page: number;
@@ -31,6 +33,7 @@ interface PaginationMeta {
 
 export const CoursesPage: React.FC = () => {
     const { t, language } = useLanguage();
+    const { addToCart, isInCart } = useCart();
     const [searchParams, setSearchParams] = useSearchParams();
     const [courses, setCourses] = useState<Course[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -463,18 +466,33 @@ export const CoursesPage: React.FC = () => {
                                         </div>
 
                                         {/* Action buttons */}
-                                        <div className="grid grid-cols-2 gap-2 pt-1">
-                                            <Link
-                                                to={`/courses/${course.slug}`}
-                                                className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer"
-                                            >
-                                                View Details
-                                            </Link>
+                                        <div className="flex flex-col gap-2 pt-1">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <Link
+                                                    to={`/courses/${course.slug}`}
+                                                    className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 text-center transition-all cursor-pointer"
+                                                >
+                                                    View Details
+                                                </Link>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => addToCart(course)}
+                                                    className={`py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                                                        isInCart(course.id)
+                                                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800'
+                                                            : 'bg-sky-50 dark:bg-sky-950/40 text-[#25a2ee] hover:bg-sky-100 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800'
+                                                    }`}
+                                                >
+                                                    <ShoppingCart className="w-3.5 h-3.5" />
+                                                    <span>{isInCart(course.id) ? 'In Cart' : 'Add to Cart'}</span>
+                                                </button>
+                                            </div>
                                             <Link
                                                 to={`/checkout/${course.slug}`}
-                                                className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25a2ee] via-sky-600 to-[#1f8ed1] hover:from-sky-600 hover:to-sky-800 font-bold text-xs text-white text-center transition-all shadow-md shadow-sky-500/20 cursor-pointer"
+                                                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25a2ee] via-sky-600 to-[#1f8ed1] hover:from-sky-600 hover:to-sky-800 font-bold text-xs text-white text-center transition-all shadow-md shadow-sky-500/20 cursor-pointer flex items-center justify-center gap-1"
                                             >
-                                                Enroll Now
+                                                <span>Enroll Now</span>
+                                                <ChevronRight className="w-3.5 h-3.5" />
                                             </Link>
                                         </div>
                                     </div>

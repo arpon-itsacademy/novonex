@@ -1,0 +1,275 @@
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
+import { formatBDT, getImageUrl } from '../../api/client';
+import {
+    ShoppingCart,
+    X,
+    Trash2,
+    ArrowRight,
+    BookOpen,
+    ShieldCheck,
+    Sparkles,
+    ShoppingBag
+} from 'lucide-react';
+
+export const CartDrawer: React.FC = () => {
+    const {
+        items,
+        isCartOpen,
+        closeCart,
+        removeFromCart,
+        clearCart,
+        subtotal,
+        totalOriginalPrice,
+        totalSavings,
+        cartCount
+    } = useCart();
+
+    const navigate = useNavigate();
+
+    // Prevent body scroll when drawer is open
+    useEffect(() => {
+        if (isCartOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isCartOpen]);
+
+    if (!isCartOpen) return null;
+
+    const handleCheckout = () => {
+        closeCart();
+        navigate('/checkout');
+    };
+
+    const handleViewCart = () => {
+        closeCart();
+        navigate('/cart');
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+            {/* Backdrop */}
+            <div
+                className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+                onClick={closeCart}
+            />
+
+            {/* Slide-over panel */}
+            <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+                <div className="w-screen max-w-md bg-white dark:bg-slate-900 shadow-2xl flex flex-col justify-between border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-300">
+                    {/* Header */}
+                    <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-[#25a2ee] flex items-center justify-center">
+                                <ShoppingCart className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span>Shopping Cart</span>
+                                    {cartCount > 0 && (
+                                        <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-[#25a2ee] text-white">
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </h2>
+                                <p className="text-[11px] text-slate-400">
+                                    {cartCount === 0 ? 'No courses added yet' : `${cartCount} ${cartCount === 1 ? 'course' : 'courses'} in cart`}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            {cartCount > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={clearCart}
+                                    className="text-[11px] text-rose-500 hover:text-rose-600 font-semibold px-2 py-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                                    title="Empty Cart"
+                                >
+                                    Clear
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                onClick={closeCart}
+                                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                                title="Close"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Cart Items List */}
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-5 divide-y divide-slate-100 dark:divide-slate-800">
+                        {cartCount === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-center py-12 px-4 space-y-4">
+                                <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center">
+                                    <ShoppingBag className="w-8 h-8" />
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">
+                                        Your cart is empty
+                                    </h3>
+                                    <p className="text-xs text-slate-400 max-w-xs">
+                                        Explore our courses catalog and add the courses you want to prepare with.
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        closeCart();
+                                        navigate('/courses');
+                                    }}
+                                    className="px-5 py-2.5 bg-[#25a2ee] hover:bg-[#1a8ed2] text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                                >
+                                    <BookOpen className="w-4 h-4" />
+                                    <span>Browse Courses</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-3.5 pb-2">
+                                {items.map((item) => {
+                                    const thumb = getImageUrl(item.thumbnail || item.thumbnail_url);
+                                    const hasDiscount = item.price > item.effective_price;
+
+                                    return (
+                                        <div
+                                            key={item.id}
+                                            className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 hover:border-[#25a2ee]/40 transition-colors group"
+                                        >
+                                            {/* Thumbnail */}
+                                            <Link
+                                                to={`/courses/${item.slug}`}
+                                                onClick={closeCart}
+                                                className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-slate-900 overflow-hidden shrink-0 block relative"
+                                            >
+                                                {thumb ? (
+                                                    <img
+                                                        src={thumb}
+                                                        alt={item.title}
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-white bg-slate-800">
+                                                        <BookOpen className="w-6 h-6 text-slate-500" />
+                                                    </div>
+                                                )}
+                                            </Link>
+
+                                            {/* Course Info */}
+                                            <div className="flex-1 min-w-0">
+                                                <Link
+                                                    to={`/courses/${item.slug}`}
+                                                    onClick={closeCart}
+                                                    className="block font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 hover:text-[#25a2ee] dark:hover:text-[#25a2ee] line-clamp-2 transition-colors leading-snug"
+                                                >
+                                                    {item.title}
+                                                </Link>
+
+                                                <div className="flex items-center gap-2 mt-1.5 text-[11px] text-slate-400">
+                                                    {item.lessons_count !== undefined && item.lessons_count > 0 && (
+                                                        <span>{item.lessons_count} Classes</span>
+                                                    )}
+                                                    {item.lessons_count !== undefined && item.lessons_count > 0 && <span>•</span>}
+                                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Lifetime Access</span>
+                                                </div>
+
+                                                {/* Price & Delete */}
+                                                <div className="flex items-center justify-between gap-2 mt-2 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                                                    <div className="flex items-baseline gap-1.5">
+                                                        <span className="font-black text-sm text-[#25a2ee]">
+                                                            {formatBDT(item.effective_price)}
+                                                        </span>
+                                                        {hasDiscount && (
+                                                            <span className="text-[11px] text-slate-400 line-through">
+                                                                {formatBDT(item.price)}
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeFromCart(item.id)}
+                                                        className="p-1 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                                                        title="Remove from cart"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer / Summary & Actions */}
+                    {cartCount > 0 && (
+                        <div className="p-4 sm:p-5 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-850/80 space-y-3">
+                            {/* Summary info */}
+                            <div className="space-y-1.5 text-xs">
+                                {totalSavings > 0 && (
+                                    <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                                        <span>Regular Total</span>
+                                        <span className="line-through">{formatBDT(totalOriginalPrice)}</span>
+                                    </div>
+                                )}
+
+                                {totalSavings > 0 && (
+                                    <div className="flex items-center justify-between font-semibold text-emerald-600 dark:text-emerald-400">
+                                        <span className="flex items-center gap-1">
+                                            <Sparkles className="w-3.5 h-3.5" />
+                                            <span>Your Savings</span>
+                                        </span>
+                                        <span>-{formatBDT(totalSavings)}</span>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                                    <span className="font-extrabold text-sm text-slate-800 dark:text-slate-200">Total Payable</span>
+                                    <span className="font-black text-lg text-[#25a2ee]">
+                                        {formatBDT(subtotal)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="space-y-2 pt-1">
+                                <button
+                                    type="button"
+                                    onClick={handleCheckout}
+                                    className="w-full py-3 bg-[#25a2ee] hover:bg-[#1a8ed2] text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md shadow-[#25a2ee]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                                >
+                                    <span>Proceed to Checkout</span>
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={handleViewCart}
+                                    className="w-full py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                                >
+                                    View Full Cart
+                                </button>
+                            </div>
+
+                            {/* Security Notice */}
+                            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 text-center pt-1">
+                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                <span>Instant Enrollment upon Payment Verification</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};

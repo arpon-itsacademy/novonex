@@ -28,8 +28,10 @@ import {
     Bell,
     CheckCheck,
     ExternalLink,
-    ChevronRight
+    ChevronRight,
+    ShoppingCart
 } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
 import { HeaderMenuItem } from '../../types';
 
 const DEFAULT_NAV_ITEMS: HeaderMenuItem[] = [
@@ -89,6 +91,7 @@ const DEFAULT_NAV_ITEMS: HeaderMenuItem[] = [
 
 export const Navbar: React.FC = () => {
     const { user, logout } = useAuth();
+    const { cartCount, toggleCart } = useCart();
     const { t, language } = useLanguage();
     const { settings, loading } = useSettings();
     const navigate = useNavigate();
@@ -432,6 +435,22 @@ export const Navbar: React.FC = () => {
                             <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
 
+                        {/* Cart Icon */}
+                        <button
+                            type="button"
+                            onClick={toggleCart}
+                            className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-[#25a2ee] dark:hover:text-[#25a2ee] hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                            title="Shopping Cart"
+                            aria-label="Shopping Cart"
+                        >
+                            <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+                            {cartCount > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-[#25a2ee] text-white text-[10px] font-black min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-xs animate-in zoom-in duration-150">
+                                    {cartCount > 9 ? '9+' : cartCount}
+                                </span>
+                            )}
+                        </button>
+
                         {/* Theme switcher */}
                         {headerSettings?.show_theme_toggle !== false && (
                             <div className="hidden sm:block">
@@ -648,6 +667,26 @@ export const Navbar: React.FC = () => {
                                 </div>
                             );
                         })}
+
+                        {/* Mobile Cart Button */}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setMobileMenuOpen(false);
+                                toggleCart();
+                            }}
+                            className="w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-[#25a2ee] transition-colors cursor-pointer"
+                        >
+                            <span className="flex items-center gap-2">
+                                <ShoppingCart className="w-4 h-4 text-[#25a2ee]" />
+                                <span>Cart</span>
+                            </span>
+                            {cartCount > 0 && (
+                                <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-[#25a2ee] text-white">
+                                    {cartCount}
+                                </span>
+                            )}
+                        </button>
 
                         <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
                             {user ? (

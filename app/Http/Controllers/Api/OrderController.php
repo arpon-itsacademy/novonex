@@ -25,7 +25,9 @@ class OrderController extends Controller
     public function checkout(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'course_id' => ['required', 'exists:courses,id'],
+            'course_id' => ['nullable', 'exists:courses,id'],
+            'course_ids' => ['nullable', 'array'],
+            'course_ids.*' => ['exists:courses,id'],
             'include_nexpilot' => ['nullable', 'boolean'],
             'payment_method' => ['required', 'string'],
             'transaction_ref' => ['nullable', 'string', 'max:100'],
@@ -36,20 +38,49 @@ class OrderController extends Controller
         ]);
 
         $user = auth()->user();
-        $course = Course::with('nexpilot')->findOrFail($validated['course_id']);
 
-        if ($course->status !== Course::STATUS_PUBLISHED) {
-            abort(404, 'Course is not available for purchase.');
+        $courseIds = [];
+        if (!empty($validated['course_ids'])) {
+            $courseIds = array_values(array_unique(array_filter($validated['course_ids'])));
+        } elseif (!empty($validated['course_id'])) {
+            $courseIds = [$validated['course_id']];
         }
 
-        if ($user->isEnrolledIn($course->id)) {
+        if (empty($courseIds)) {
             return response()->json([
-                'message' => 'You are already enrolled in this course.',
+                'message' => 'Please select at least one course for checkout.',
             ], 422);
         }
 
+        $courses = Course::with('nexpilot')->whereIn('id', $courseIds)->get();
+        if ($courses->isEmpty()) {
+            abort(404, 'Selected courses are not available for purchase.');
+        }
+
+        foreach ($courses as $c) {
+            if ($c->status !== Course::STATUS_PUBLISHED) {
+                return response()->json([
+                    'message' => "Course '{$c->title}' is not available for purchase.",
+                ], 422);
+            }
+        }
+
+        $alreadyEnrolled = [];
+        foreach ($courses as $c) {
+            if ($user->isEnrolledIn($c->id)) {
+                $alreadyEnrolled[] = $c->title;
+            }
+        }
+
+        if (!empty($alreadyEnrolled)) {
+            return response()->json([
+                'message' => 'You are already enrolled in: ' . implode(', ', $alreadyEnrolled),
+            ], 422);
+        }
+
+        $primaryCourse = $courses->first();
         $includeNexPilot = (bool) ($validated['include_nexpilot'] ?? false);
-        $nexpilot = $course->nexpilot;
+        $nexpilot = $primaryCourse->nexpilot;
         $nexpilotPrice = 0.0;
         $nexpilotId = null;
         if ($includeNexPilot && $nexpilot && $nexpilot->is_active) {
@@ -57,8 +88,12 @@ class OrderController extends Controller
             $nexpilotId = $nexpilot->id;
         }
 
-        $price = (float) $course->price;
-        $courseFinalAmount = (float) $course->effective_price;
+        $price = 0.0;
+        $courseFinalAmount = 0.0;
+        foreach ($courses as $c) {
+            $price += (float) $c->price;
+            $courseFinalAmount += (float) $c->effective_price;
+        }
         $discountAmount = max(0, $price - $courseFinalAmount);
 
         // Check and apply affiliate discount
@@ -71,7 +106,7 @@ class OrderController extends Controller
 
             // Self-referral protection: cannot refer oneself
             if ($affiliateProfile && $affiliateProfile->user_id !== $user->id) {
-                $courseSetting = CourseAffiliateSetting::where('course_id', $course->id)->first();
+                $courseSetting = CourseAffiliateSetting::where('course_id', $primaryCourse->id)->first();
                 $genSetting = AffiliateSetting::current();
 
                 $discountType = $courseSetting && $courseSetting->is_active
@@ -108,7 +143,7 @@ class OrderController extends Controller
                 ], 422);
             }
 
-            $validation = $coupon->validateForCheckout($user, $course, $courseFinalAmount);
+            $validation = $coupon->validateForCheckout($user, $primaryCourse, $courseFinalAmount);
             if (!$validation['valid']) {
                 return response()->json([
                     'message' => $validation['message'],
@@ -144,13 +179,13 @@ class OrderController extends Controller
             }
         }
 
-        $order = DB::transaction(function () use ($user, $course, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice, $isFree) {
+        $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice, $isFree) {
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => $user->id,
                 'affiliate_id' => $affiliateProfile ? $affiliateProfile->id : null,
                 'affiliate_code' => $affiliateProfile ? $affiliateProfile->affiliate_code : null,
-                'course_id' => $course->id,
+                'course_id' => $primaryCourse->id,
                 'original_price' => $price,
                 'discount_amount' => $discountAmount,
                 'affiliate_discount' => $affiliateDiscount,
@@ -178,11 +213,14 @@ class OrderController extends Controller
                 $coupon->increment('times_used');
             }
 
-            OrderItem::create([
-                'order_id' => $order->id,
-                'course_id' => $course->id,
-                'price' => $finalAmount,
-            ]);
+            // Create OrderItem for each course
+            foreach ($courses as $c) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'course_id' => $c->id,
+                    'price' => (float) $c->effective_price,
+                ]);
+            }
 
             Payment::create([
                 'order_id' => $order->id,
@@ -195,28 +233,30 @@ class OrderController extends Controller
             ]);
 
             if ($isFree) {
-                Enrollment::updateOrCreate(
-                    [
-                        'user_id' => $user->id,
-                        'course_id' => $course->id,
-                    ],
-                    [
-                        'order_id' => $order->id,
-                        'status' => Enrollment::STATUS_ACTIVE,
-                        'has_nexpilot' => (bool) ($nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId)),
-                        'nexpilot_id' => $nexpilotId,
-                        'enrolled_at' => now(),
-                    ]
-                );
+                foreach ($courses as $c) {
+                    Enrollment::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'course_id' => $c->id,
+                        ],
+                        [
+                            'order_id' => $order->id,
+                            'status' => Enrollment::STATUS_ACTIVE,
+                            'has_nexpilot' => (bool) ($nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId && $c->id === $primaryCourse->id)),
+                            'nexpilot_id' => ($c->id === $primaryCourse->id ? $nexpilotId : null),
+                            'enrolled_at' => now(),
+                        ]
+                    );
+                }
             }
 
             return $order;
         });
 
         return response()->json([
-            'message' => $isFree ? 'Enrolled in course with 100% discount successfully!' : 'Order placed successfully. Enrollment will be activated upon payment verification.',
+            'message' => $isFree ? 'Enrolled in course(s) successfully!' : 'Order placed successfully. Enrollment will be activated upon payment verification.',
             'is_free' => $isFree,
-            'order' => $order->load(['course', 'latestPayment']),
+            'order' => $order->load(['course', 'items.course', 'latestPayment']),
         ], 201);
     }
 
@@ -277,20 +317,39 @@ class OrderController extends Controller
                 ]);
             }
 
-            // Create or update enrollment
-            Enrollment::updateOrCreate(
-                [
-                    'user_id' => $order->user_id,
-                    'course_id' => $order->course_id,
-                ],
-                [
-                    'order_id' => $order->id,
-                    'status' => Enrollment::STATUS_ACTIVE,
-                    'has_nexpilot' => (bool) $order->has_nexpilot,
-                    'nexpilot_id' => $order->nexpilot_id,
-                    'enrolled_at' => now(),
-                ]
-            );
+            // Create or update enrollment for each course in the order
+            $orderItems = $order->items()->get();
+            if ($orderItems->isNotEmpty()) {
+                foreach ($orderItems as $item) {
+                    Enrollment::updateOrCreate(
+                        [
+                            'user_id' => $order->user_id,
+                            'course_id' => $item->course_id,
+                        ],
+                        [
+                            'order_id' => $order->id,
+                            'status' => Enrollment::STATUS_ACTIVE,
+                            'has_nexpilot' => (bool) ($order->has_nexpilot && $item->course_id === $order->course_id),
+                            'nexpilot_id' => ($item->course_id === $order->course_id ? $order->nexpilot_id : null),
+                            'enrolled_at' => now(),
+                        ]
+                    );
+                }
+            } else {
+                Enrollment::updateOrCreate(
+                    [
+                        'user_id' => $order->user_id,
+                        'course_id' => $order->course_id,
+                    ],
+                    [
+                        'order_id' => $order->id,
+                        'status' => Enrollment::STATUS_ACTIVE,
+                        'has_nexpilot' => (bool) $order->has_nexpilot,
+                        'nexpilot_id' => $order->nexpilot_id,
+                        'enrolled_at' => now(),
+                    ]
+                );
+            }
 
             // Audit log
             AuditLog::log('payment_confirmed', 'Order', $order->id, null, [

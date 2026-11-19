@@ -20,8 +20,10 @@ import {
     TicketPercent,
     X,
     Loader2,
-    Zap
+    Zap,
+    ShoppingCart
 } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
 import { getStoredReferralCode, setStoredReferralCode, clearStoredReferralCode } from '../../utils/referralTracker';
 
 const DEFAULT_MANUAL_SETTINGS: ManualPaymentSettings = {
@@ -58,6 +60,8 @@ export const CheckoutPage: React.FC = () => {
     const { user } = useAuth();
     const { language } = useLanguage();
     const { settings } = useSettings();
+    const { items: cartItems, clearCart, subtotal: cartSubtotal, totalOriginalPrice: cartOriginalPrice } = useCart();
+    const isCartMode = !slug;
 
     const [course, setCourse] = useState<Course | null>(null);
     const [loading, setLoading] = useState(true);
@@ -151,31 +155,45 @@ export const CheckoutPage: React.FC = () => {
 
     useEffect(() => {
         if (!user) {
-            navigate(`/login?redirect=/checkout/${slug}`);
+            navigate(slug ? `/login?redirect=/checkout/${slug}` : '/login?redirect=/checkout');
             return;
         }
 
-        const fetchCourse = async () => {
-            try {
-                const { data } = await apiClient.get(`/courses/${slug}`);
-                if (data.is_enrolled) {
-                    navigate('/student/my-courses');
-                    return;
+        if (slug) {
+            const fetchCourse = async () => {
+                try {
+                    const { data } = await apiClient.get(`/courses/${slug}`);
+                    if (data.is_enrolled) {
+                        navigate('/student/my-courses');
+                        return;
+                    }
+                    setCourse(data.course);
+                    const couponFromUrl = searchParams.get('coupon');
+                    if (couponFromUrl && data.course?.id) {
+                        setCouponInput(couponFromUrl.toUpperCase());
+                        validateCouponCode(couponFromUrl.toUpperCase(), data.course.id);
+                    }
+                } catch {
+                    navigate('/courses');
+                } finally {
+                    setLoading(false);
                 }
-                setCourse(data.course);
-                const couponFromUrl = searchParams.get('coupon');
-                if (couponFromUrl && data.course?.id) {
-                    setCouponInput(couponFromUrl.toUpperCase());
-                    validateCouponCode(couponFromUrl.toUpperCase(), data.course.id);
-                }
-            } catch {
-                navigate('/courses');
-            } finally {
-                setLoading(false);
+            };
+            fetchCourse();
+        } else {
+            // Cart checkout mode
+            if (cartItems.length === 0) {
+                navigate('/cart');
+                return;
             }
-        };
-        fetchCourse();
-    }, [slug, user]);
+            setLoading(false);
+            const couponFromUrl = searchParams.get('coupon');
+            if (couponFromUrl && cartItems[0]?.id) {
+                setCouponInput(couponFromUrl.toUpperCase());
+                validateCouponCode(couponFromUrl.toUpperCase(), cartItems[0].id);
+            }
+        }
+    }, [slug, user, cartItems.length]);
 
     const activeGateway = availableGateways.find(gw => gw.id === paymentMethod) || availableGateways[0];
     const currentNumber = activeGateway?.config?.account_number || '01700000000';
@@ -184,11 +202,19 @@ export const CheckoutPage: React.FC = () => {
     const nexpilot = course?.nexpilot;
     const hasActivePilot = Boolean(nexpilot && (nexpilot.is_active === true || nexpilot.is_active === 1 || nexpilot.is_active === '1'));
     const pilotPrice = hasActivePilot && includeNexPilot ? Number(nexpilot.price || 0) : 0;
-    const courseBasePrice = course
-        ? (course.sale_price !== null && course.sale_price !== undefined && Number(course.sale_price) < Number(course.price)
-            ? Number(course.sale_price)
-            : Number(course.effective_price ?? course.price ?? 0))
-        : 0;
+
+    const courseBasePrice = isCartMode
+        ? cartSubtotal
+        : (course
+            ? (course.sale_price !== null && course.sale_price !== undefined && Number(course.sale_price) < Number(course.price)
+                ? Number(course.sale_price)
+                : Number(course.effective_price ?? course.price ?? 0))
+            : 0);
+
+    const originalRegularPrice = isCartMode
+        ? cartOriginalPrice
+        : (course ? Number(course.price || 0) : 0);
+
     const referralDiscount = appliedReferral ? Number(appliedReferral.discount_amount || 0) : 0;
     const couponDiscount = appliedCoupon ? Number(appliedCoupon.calculated_discount || 0) : 0;
     const totalPayable = Math.max(0, courseBasePrice + pilotPrice - referralDiscount - couponDiscount);
@@ -252,14 +278,15 @@ export const CheckoutPage: React.FC = () => {
     };
 
     useEffect(() => {
-        if (course) {
+        const targetCourseId = course?.id || (isCartMode && cartItems[0]?.id);
+        if (targetCourseId) {
             const stored = getStoredReferralCode();
             if (stored && !appliedReferral) {
                 setReferralInput(stored);
-                validateReferralCode(stored, course.id);
+                validateReferralCode(stored, targetCourseId);
             }
         }
-    }, [course]);
+    }, [course, isCartMode, cartItems]);
 
     const handleRemoveReferral = () => {
         setAppliedReferral(null);
@@ -296,14 +323,14 @@ export const CheckoutPage: React.FC = () => {
 
     const handleSubmitOrder = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!course) return;
+        if (!course && !isCartMode) return;
+        if (isCartMode && cartItems.length === 0) return;
 
         setError(null);
         setSubmitting(true);
 
         try {
-            const { data } = await apiClient.post('/orders/checkout', {
-                course_id: course.id,
+            const payload: any = {
                 payment_method: totalPayable <= 0 ? 'free' : paymentMethod,
                 transaction_ref: totalPayable <= 0 ? undefined : transactionRef,
                 sender_phone: totalPayable <= 0 ? undefined : senderPhone,
@@ -311,7 +338,21 @@ export const CheckoutPage: React.FC = () => {
                 include_nexpilot: hasActivePilot && includeNexPilot,
                 affiliate_code: appliedReferral?.code || (referralInput.trim() ? referralInput.trim() : undefined),
                 coupon_code: appliedCoupon?.code || (couponInput.trim() ? couponInput.trim() : undefined),
-            });
+            };
+
+            if (isCartMode) {
+                payload.course_ids = cartItems.map((i) => i.id);
+                payload.course_id = cartItems[0]?.id;
+            } else if (course) {
+                payload.course_id = course.id;
+                payload.course_ids = [course.id];
+            }
+
+            const { data } = await apiClient.post('/orders/checkout', payload);
+
+            if (isCartMode) {
+                clearCart();
+            }
 
             if (data.is_free) {
                 navigate(`/order-status/${data.order.order_number}?status=success`, {
@@ -331,19 +372,33 @@ export const CheckoutPage: React.FC = () => {
 
     const handleShurjopayCheckout = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
-        if (!course) return;
+        if (!course && !isCartMode) return;
+        if (isCartMode && cartItems.length === 0) return;
 
         setError(null);
         setSubmitting(true);
 
         try {
-            const { data } = await apiClient.post('/orders/shurjopay/checkout', {
-                course_id: course.id,
+            const payload: any = {
                 notes,
                 include_nexpilot: hasActivePilot && includeNexPilot,
                 affiliate_code: appliedReferral?.code || (referralInput.trim() ? referralInput.trim() : undefined),
                 coupon_code: appliedCoupon?.code || (couponInput.trim() ? couponInput.trim() : undefined),
-            });
+            };
+
+            if (isCartMode) {
+                payload.course_ids = cartItems.map((i) => i.id);
+                payload.course_id = cartItems[0]?.id;
+            } else if (course) {
+                payload.course_id = course.id;
+                payload.course_ids = [course.id];
+            }
+
+            const { data } = await apiClient.post('/orders/shurjopay/checkout', payload);
+
+            if (isCartMode) {
+                clearCart();
+            }
 
             if (data.is_free) {
                 navigate(data.redirect_url || `/order-status/${data.order_number}?status=success`, {
@@ -365,7 +420,7 @@ export const CheckoutPage: React.FC = () => {
         }
     };
 
-    if (loading || !course) {
+    if (loading || (!course && !isCartMode) || (isCartMode && cartItems.length === 0)) {
         return (
             <div className="max-w-4xl mx-auto px-4 py-20 text-center text-slate-400">
                 Loading checkout information...
@@ -721,22 +776,55 @@ export const CheckoutPage: React.FC = () => {
                             Order Summary
                         </h3>
 
-                        {/* Course Card Preview */}
-                        <div className="flex gap-4">
-                            <div className="w-20 h-16 rounded-xl bg-slate-900 overflow-hidden shrink-0">
-                                {course.thumbnail ? (
-                                    <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-white">
-                                        <BookOpen className="w-6 h-6 text-sky-400" />
-                                    </div>
-                                )}
+                        {/* Course Card Preview (Single Course or Cart Items) */}
+                        {isCartMode ? (
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    <span>Enrolling in {cartItems.length} {cartItems.length === 1 ? 'Course' : 'Courses'}</span>
+                                    <Link to="/cart" className="text-sky-600 hover:underline">Edit Cart</Link>
+                                </div>
+                                <div className="max-h-56 overflow-y-auto space-y-2.5 pr-1 divide-y divide-slate-100">
+                                    {cartItems.map((item) => (
+                                        <div key={item.id} className="pt-2 first:pt-0 flex items-center justify-between gap-3">
+                                            <div className="flex items-center gap-2.5 min-w-0">
+                                                <div className="w-12 h-10 rounded-lg bg-slate-900 overflow-hidden shrink-0">
+                                                    {item.thumbnail || item.thumbnail_url ? (
+                                                        <img src={item.thumbnail || item.thumbnail_url || ''} alt={item.title} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-white">
+                                                            <BookOpen className="w-4 h-4 text-sky-400" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <h4 className="text-xs font-bold text-slate-900 truncate">{item.title}</h4>
+                                                    <p className="text-[11px] text-slate-500">{item.lessons_count || 0} Lessons</p>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs font-black text-slate-900 shrink-0">
+                                                {formatBDT(item.effective_price)}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            <div>
-                                <h4 className="text-sm font-bold text-slate-900 line-clamp-2">{course.title}</h4>
-                                <p className="text-xs text-slate-500 mt-1">{course.lessons_count || 0} Lessons</p>
+                        ) : course ? (
+                            <div className="flex gap-4">
+                                <div className="w-20 h-16 rounded-xl bg-slate-900 overflow-hidden shrink-0">
+                                    {course.thumbnail ? (
+                                        <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-white">
+                                            <BookOpen className="w-6 h-6 text-sky-400" />
+                                        </div>
+                                    )}
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-bold text-slate-900 line-clamp-2">{course.title}</h4>
+                                    <p className="text-xs text-slate-500 mt-1">{course.lessons_count || 0} Lessons</p>
+                                </div>
                             </div>
-                        </div>
+                        ) : null}
 
                         {/* NexPilot Add-on Option if course has NexPilot */}
                         {hasActivePilot && (
@@ -828,7 +916,7 @@ export const CheckoutPage: React.FC = () => {
                                         <button
                                             type="button"
                                             disabled={checkingReferral || !referralInput.trim()}
-                                            onClick={() => validateReferralCode(referralInput, course.id)}
+                                            onClick={() => validateReferralCode(referralInput, course?.id || cartItems[0]?.id || 0)}
                                             className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50 shrink-0 flex items-center gap-1"
                                         >
                                             {checkingReferral && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
@@ -890,7 +978,7 @@ export const CheckoutPage: React.FC = () => {
                                         <button
                                             type="button"
                                             disabled={checkingCoupon || !couponInput.trim()}
-                                            onClick={() => validateCouponCode(couponInput, course.id)}
+                                            onClick={() => validateCouponCode(couponInput, course?.id || cartItems[0]?.id || 0)}
                                             className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50 shrink-0 flex items-center gap-1 cursor-pointer shadow-xs"
                                         >
                                             {checkingCoupon && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
@@ -909,14 +997,14 @@ export const CheckoutPage: React.FC = () => {
                         {/* Pricing Breakdown */}
                         <div className="space-y-3 pt-4 border-t border-slate-100 text-sm">
                             <div className="flex justify-between text-slate-600">
-                                <span>Regular Course Fee</span>
-                                <span className="font-semibold">{formatBDT(course.price)}</span>
+                                <span>Regular Course Fee{isCartMode ? ` (${cartItems.length} items)` : ''}</span>
+                                <span className="font-semibold">{formatBDT(originalRegularPrice)}</span>
                             </div>
 
-                            {course.sale_price && course.sale_price < course.price && (
+                            {originalRegularPrice > courseBasePrice && (
                                 <div className="flex justify-between text-emerald-600 font-medium">
-                                    <span>Special Discount ({course.discount_percent || Math.round(((course.price - Number(course.sale_price)) / course.price) * 100)}%)</span>
-                                    <span>- {formatBDT(course.price - course.sale_price)}</span>
+                                    <span>Special Discount Savings</span>
+                                    <span>- {formatBDT(originalRegularPrice - courseBasePrice)}</span>
                                 </div>
                             )}
 
@@ -940,7 +1028,7 @@ export const CheckoutPage: React.FC = () => {
                                 </div>
                             )}
 
-                            {hasActivePilot && includeNexPilot && (
+                            {hasActivePilot && includeNexPilot && nexpilot && (
                                 <div className="flex justify-between text-sky-600 font-medium">
                                     <span className="flex items-center gap-1.5">
                                         <Sparkles className="w-3.5 h-3.5 text-amber-500" />

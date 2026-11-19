@@ -11,6 +11,7 @@ import { CourseDetailsPage } from '../pages/public/CourseDetailsPage';
 import { LoginPage } from '../pages/public/LoginPage';
 import { RegisterPage } from '../pages/public/RegisterPage';
 import { ForgotPasswordPage } from '../pages/public/ForgotPasswordPage';
+import { CartPage } from '../pages/public/CartPage';
 import { CheckoutPage } from '../pages/public/CheckoutPage';
 import { OrderStatusPage } from '../pages/public/OrderStatusPage';
 import { TeacherProfilePage } from '../pages/public/TeacherProfilePage';
@@ -98,6 +99,8 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/checkout/:slug" element={<CheckoutPage />} />
                 <Route path="/order-status/:orderNumber" element={<OrderStatusPage />} />
                 <Route path="/teachers/:id" element={<TeacherProfilePage />} />
