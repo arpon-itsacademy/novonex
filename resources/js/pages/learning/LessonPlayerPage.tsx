@@ -23,7 +23,9 @@ import {
     Loader2,
     AlertCircle,
     ShieldCheck,
-    Eye
+    Eye,
+    Star,
+    Edit3
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { PlyrVideoPlayer } from '../../components/shared/PlyrVideoPlayer';
@@ -48,6 +50,17 @@ export const LessonPlayerPage: React.FC = () => {
     const [togglingProgress, setTogglingProgress] = useState(false);
     const [submittingComment, setSubmittingComment] = useState(false);
     const [canManageBuilder, setCanManageBuilder] = useState(false);
+
+    // Class Rating & Reviews State
+    const [reviewStats, setReviewStats] = useState<{ total_reviews: number; average_rating: number; distribution?: Record<number, number> } | null>(null);
+    const [myReview, setMyReview] = useState<{ id?: number; rating: number; review: string | null; updated_at?: string } | null>(null);
+    const [studentReviews, setStudentReviews] = useState<any[]>([]);
+    const [ratingValue, setRatingValue] = useState<number>(5);
+    const [ratingHover, setRatingHover] = useState<number>(0);
+    const [reviewText, setReviewText] = useState<string>('');
+    const [isEditingReview, setIsEditingReview] = useState<boolean>(false);
+    const [submittingReview, setSubmittingReview] = useState<boolean>(false);
+    const [reviewSuccessMessage, setReviewSuccessMessage] = useState<string | null>(null);
 
     // VdoCipher DRM playback state
     const [vdoOtpData, setVdoOtpData] = useState<{ otp: string; playbackInfo: string; embedUrl?: string } | null>(null);
@@ -134,6 +147,7 @@ export const LessonPlayerPage: React.FC = () => {
 
         fetchLessonData();
         fetchComments();
+        fetchLessonReviews();
     }, [courseId, lessonId]);
 
     const fetchLessonData = async () => {
@@ -158,6 +172,54 @@ export const LessonPlayerPage: React.FC = () => {
             const { data } = await apiClient.get(`/learning/lessons/${lessonId}/comments`);
             setComments(data || []);
         } catch {}
+    };
+
+    const fetchLessonReviews = async () => {
+        if (!lessonId) return;
+        try {
+            const { data } = await apiClient.get(`/learning/lessons/${lessonId}/reviews`);
+            setReviewStats(data.stats || null);
+            setMyReview(data.my_review || null);
+            setStudentReviews(data.reviews || []);
+            if (data.my_review) {
+                setRatingValue(data.my_review.rating || 5);
+                setReviewText(data.my_review.review || '');
+            } else {
+                setRatingValue(5);
+                setReviewText('');
+                setIsEditingReview(false);
+            }
+        } catch (err) {
+            console.error('Failed to load lesson reviews', err);
+        }
+    };
+
+    const handleSubmitReview = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!lesson) return;
+        setSubmittingReview(true);
+        setReviewSuccessMessage(null);
+        try {
+            const { data } = await apiClient.post(`/learning/lessons/${lesson.id}/reviews`, {
+                rating: ratingValue,
+                review: reviewText.trim() || null,
+            });
+            setMyReview(data.review);
+            if (data.stats) {
+                setReviewStats(prev => ({
+                    total_reviews: data.stats.total_reviews,
+                    average_rating: data.stats.average_rating,
+                    distribution: prev?.distribution,
+                }));
+            }
+            setIsEditingReview(false);
+            setReviewSuccessMessage(data.message || 'Review submitted successfully!');
+            fetchLessonReviews();
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Failed to submit class review.');
+        } finally {
+            setSubmittingReview(false);
+        }
     };
 
     const handleToggleComplete = async () => {
@@ -487,6 +549,219 @@ export const LessonPlayerPage: React.FC = () => {
                                 </div>
                             </div>
                         )}
+
+                        {/* Class Rating & Review Section */}
+                        <div className="bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-800 space-y-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-2 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/20">
+                                            <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                                <span>Class Rating & Feedback</span>
+                                                {reviewStats && reviewStats.total_reviews > 0 && (
+                                                    <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                                                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                                        {reviewStats.average_rating} ({reviewStats.total_reviews})
+                                                    </span>
+                                                )}
+                                            </h3>
+                                            <p className="text-xs text-slate-400">
+                                                Rate this lesson and share your valuable feedback to help your instructor improve.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {myReview && !isEditingReview && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditingReview(true)}
+                                        className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer"
+                                    >
+                                        <Edit3 className="w-3.5 h-3.5 text-sky-400" />
+                                        <span>Edit My Review</span>
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Success Notification */}
+                            {reviewSuccessMessage && (
+                                <div className="p-3 bg-emerald-500/15 border border-emerald-500/40 rounded-xl text-xs font-semibold text-emerald-300 flex items-center gap-2">
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                    <span>{reviewSuccessMessage}</span>
+                                </div>
+                            )}
+
+                            {/* If Student Already Reviewed and Not in Editing Mode */}
+                            {myReview && !isEditingReview ? (
+                                <div className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-bold text-slate-300 flex items-center gap-2">
+                                            <span>Your Rating:</span>
+                                            <span className="flex items-center gap-0.5">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <Star
+                                                        key={star}
+                                                        className={`w-4 h-4 ${
+                                                            star <= myReview.rating
+                                                                ? 'fill-amber-400 text-amber-400'
+                                                                : 'text-slate-600'
+                                                        }`}
+                                                    />
+                                                ))}
+                                            </span>
+                                            <span className="text-[11px] font-bold text-amber-400">
+                                                ({myReview.rating === 5 ? 'Excellent!' : myReview.rating === 4 ? 'Very Good' : myReview.rating === 3 ? 'Good' : myReview.rating === 2 ? 'Fair' : 'Poor'})
+                                            </span>
+                                        </span>
+                                        {myReview.updated_at && (
+                                            <span className="text-[10px] text-slate-500">
+                                                Submitted on {new Date(myReview.updated_at).toLocaleDateString()}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {myReview.review && (
+                                        <p className="text-xs text-slate-300 italic bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+                                            "{myReview.review}"
+                                        </p>
+                                    )}
+                                </div>
+                            ) : (
+                                /* Rating Form */
+                                <form onSubmit={handleSubmitReview} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-300 block">
+                                            {myReview ? 'Update Your Rating:' : 'How would you rate this class?'}
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-1.5 p-2 bg-slate-800/80 rounded-2xl border border-slate-700/80 inline-flex">
+                                                {[1, 2, 3, 4, 5].map((star) => {
+                                                    const isFilled = star <= (ratingHover || ratingValue);
+                                                    return (
+                                                        <button
+                                                            key={star}
+                                                            type="button"
+                                                            onClick={() => setRatingValue(star)}
+                                                            onMouseEnter={() => setRatingHover(star)}
+                                                            onMouseLeave={() => setRatingHover(0)}
+                                                            className="p-1 rounded-lg hover:scale-125 transition-transform cursor-pointer focus:outline-none"
+                                                            title={`${star} Star`}
+                                                        >
+                                                            <Star
+                                                                className={`w-6 h-6 transition-colors ${
+                                                                    isFilled
+                                                                        ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]'
+                                                                        : 'text-slate-600 hover:text-slate-400'
+                                                                }`}
+                                                            />
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            <span className="text-xs font-extrabold text-amber-400 pl-2">
+                                                {(ratingHover || ratingValue) === 5 ? '5/5 Excellent!'
+                                                    : (ratingHover || ratingValue) === 4 ? '4/5 Very Good'
+                                                    : (ratingHover || ratingValue) === 3 ? '3/5 Good'
+                                                    : (ratingHover || ratingValue) === 2 ? '2/5 Fair'
+                                                    : '1/5 Poor'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-slate-300 block">
+                                            Write your feedback (Optional):
+                                        </label>
+                                        <textarea
+                                            rows={2}
+                                            value={reviewText}
+                                            onChange={(e) => setReviewText(e.target.value)}
+                                            placeholder="What did you like about this class? Any suggestions or difficulties you faced?"
+                                            className="w-full p-3.5 bg-slate-800/60 border border-slate-700/80 rounded-2xl text-xs sm:text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center gap-2 justify-end">
+                                        {myReview && isEditingReview && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setIsEditingReview(false);
+                                                    setRatingValue(myReview.rating);
+                                                    setReviewText(myReview.review || '');
+                                                }}
+                                                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                        <button
+                                            type="submit"
+                                            disabled={submittingReview}
+                                            className="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                                        >
+                                            {submittingReview ? (
+                                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                            ) : (
+                                                <Star className="w-3.5 h-3.5 fill-white" />
+                                            )}
+                                            <span>{myReview ? 'Update Review' : 'Submit Review'}</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+
+                            {/* Recent Student Feedback for this class */}
+                            {studentReviews.length > 0 && (
+                                <div className="space-y-3 pt-4 border-t border-slate-800/80">
+                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                        Class Reviews from Students ({studentReviews.length})
+                                    </h4>
+                                    <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                                        {studentReviews.map((rev) => (
+                                            <div
+                                                key={rev.id}
+                                                className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/40 text-xs space-y-1.5"
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-6 h-6 rounded-lg bg-sky-600/30 text-sky-300 font-bold flex items-center justify-center text-[10px]">
+                                                            {rev.user?.name ? rev.user.name.charAt(0) : 'S'}
+                                                        </div>
+                                                        <span className="font-semibold text-white">
+                                                            {rev.user?.name || 'Student'}
+                                                        </span>
+                                                        <div className="flex items-center gap-0.5 ml-1">
+                                                            {[1, 2, 3, 4, 5].map((s) => (
+                                                                <Star
+                                                                    key={s}
+                                                                    className={`w-3 h-3 ${
+                                                                        s <= rev.rating
+                                                                            ? 'fill-amber-400 text-amber-400'
+                                                                            : 'text-slate-600'
+                                                                    }`}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-[10px] text-slate-500">
+                                                        {new Date(rev.created_at).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                                {rev.review && (
+                                                    <p className="text-slate-300 pl-8 text-xs leading-relaxed">
+                                                        {rev.review}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Threaded Discussion Section */}
                         <div className="space-y-6 pt-6 border-t border-slate-800">

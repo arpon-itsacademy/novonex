@@ -67,4 +67,9 @@ class Lesson extends Model
     {
         return $this->hasMany(LessonProgress::class);
     }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(LessonReview::class);
+    }
 }

@@ -221,6 +221,11 @@ class Course extends Model
         return $this->hasMany(CourseRoutine::class)->orderBy('start_time', 'asc');
     }
 
+    public function lessonReviews(): HasMany
+    {
+        return $this->hasMany(LessonReview::class);
+    }
+
     public function scopePublished($query)
     {
         return $query->where('status', self::STATUS_PUBLISHED);

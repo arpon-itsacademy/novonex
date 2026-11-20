@@ -59,6 +59,7 @@ import { AdminDynamicOffersPage } from '../pages/admin/AdminDynamicOffersPage';
 import { AdminTrashPage } from '../pages/admin/AdminTrashPage';
 import { NotifyStudentPage } from '../pages/shared/NotifyStudentPage';
 import { ComplainBoxPage } from '../pages/shared/ComplainBoxPage';
+import { ClassReviewsPage } from '../pages/admin/ClassReviewsPage';
 import { CustomPageView } from '../pages/public/CustomPageView';
 
 // Teacher pages
@@ -191,6 +192,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="points/rules" element={<AdminPointsPage />} />
                 <Route path="points/usages" element={<AdminPointUsagesPage />} />
                 <Route path="complain-box" element={<ComplainBoxPage role="admin" />} />
+                <Route path="class-reviews" element={<ClassReviewsPage />} />
             </Route>
 
             {/* Teacher Dashboard */}
@@ -200,6 +202,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="courses/:id/builder" element={<AdminCourseBuilderPage />} />
                 <Route path="questions" element={<TeacherQuestionsPage />} />
                 <Route path="complain-box" element={<ComplainBoxPage role="teacher" />} />
+                <Route path="class-reviews" element={<ClassReviewsPage />} />
                 {/* Exam Management */}
                 <Route path="exams" element={<ExamListPage />} />
                 <Route path="exams/create" element={<ExamFormPage />} />

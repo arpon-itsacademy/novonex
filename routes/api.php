@@ -46,6 +46,7 @@ use App\Http\Controllers\Api\AdminPointController;
 use App\Http\Controllers\Api\RewardTopicController;
 use App\Http\Controllers\Api\EarnPointController;
 use App\Http\Controllers\Api\CourseComplaintController;
+use App\Http\Controllers\Api\LessonReviewController;
 use App\Models\Course;
 use App\Models\LessonComment;
 use Illuminate\Http\Request;
@@ -130,6 +131,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('learning/lessons/{lesson}/comments', [LessonCommentController::class, 'store']);
     Route::post('learning/comments/{comment}/reply', [LessonCommentController::class, 'reply']);
 
+    // Class Rating & Reviews
+    Route::get('learning/lessons/{lesson}/reviews', [LessonReviewController::class, 'getLessonReviews']);
+    Route::post('learning/lessons/{lesson}/reviews', [LessonReviewController::class, 'submitLessonReview']);
+
     // Orders & Checkout
     Route::post('orders/checkout', [OrderController::class, 'checkout']);
     Route::post('orders/shurjopay/checkout', [ShurjopayController::class, 'initiate']);
@@ -185,6 +190,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('courses', [CourseComplaintController::class, 'getCoursesWithComplaints']);
         Route::get('courses/{courseId}', [CourseComplaintController::class, 'getCourseComplaints']);
         Route::put('{complaintId}/status', [CourseComplaintController::class, 'updateStatus']);
+    });
+
+    // Class Reviews & Performance Analytics (Admin & Teacher)
+    Route::prefix('class-reviews')->middleware('role:teacher,admin')->group(function () {
+        Route::get('courses', [LessonReviewController::class, 'getCoursesForReviews']);
+        Route::get('courses/{course}', [LessonReviewController::class, 'getCourseClassReviews']);
+        Route::delete('{id}', [LessonReviewController::class, 'deleteReview']);
     });
 
     // Student Affiliate Program

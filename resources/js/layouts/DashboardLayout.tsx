@@ -41,7 +41,8 @@ import {
     KeyRound,
     Award,
     Gem,
-    MessageSquareWarning
+    MessageSquareWarning,
+    Star
 } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
@@ -266,6 +267,12 @@ export const DashboardLayout: React.FC = () => {
                     permission: 'courses.view'
                 },
                 { 
+                    title: 'Class Reviews', 
+                    path: '/admin/class-reviews', 
+                    icon: Star,
+                    permission: 'courses.view'
+                },
+                { 
                     title: t.sidebar.payments, 
                     path: '/admin/payments', 
                     icon: CreditCard,
@@ -354,6 +361,7 @@ export const DashboardLayout: React.FC = () => {
                 },
                 { title: t.sidebar.studentQuestions, path: '/teacher/questions', icon: MessageSquare },
                 { title: 'Complain Box', path: '/teacher/complain-box', icon: MessageSquareWarning },
+                { title: 'Class Reviews', path: '/teacher/class-reviews', icon: Star },
             ];
         }
         // Student
