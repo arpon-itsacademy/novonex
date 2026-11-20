@@ -699,7 +699,7 @@ export const HomePage: React.FC = () => {
                                             <span>•</span>
                                             <span className="flex items-center gap-1">
                                                 <Users className="w-3.5 h-3.5 text-sky-500" />
-                                                <span>{course.enrollments_count || 0} Students</span>
+                                                <span>{(course.fake_enrollment_count || 0) + (course.enrollments_count || 0)} Students</span>
                                             </span>
                                         </div>
 

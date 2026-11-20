@@ -392,7 +392,12 @@ export const AdminCoursesPage: React.FC = () => {
                                         <td className="py-4 px-4">
                                             <div className="text-slate-600 space-y-0.5">
                                                 <div className="font-semibold text-slate-800">{course.lessons_count || 0} Lessons</div>
-                                                <div className="text-slate-400 text-[11px]">{course.enrollments_count || 0} Students</div>
+                                                <div className="text-slate-400 text-[11px]">
+                                                    {(course.fake_enrollment_count || 0) + (course.enrollments_count || 0)} Students
+                                                    {Boolean(course.fake_enrollment_count) && (
+                                                        <span className="text-[10px] text-slate-400"> ({course.enrollments_count || 0} real)</span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
 

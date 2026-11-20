@@ -32,41 +32,56 @@ class AdminCourseController extends Controller
             });
         }
 
-        // Sorting: best_selling, alphabetical_asc, alphabetical_desc, price_low, price_high, oldest, latest
+        // Sorting: best_selling (highest real sales & verified enrollments), alphabetical_asc, alphabetical_desc, price_low, price_high, oldest, latest
         $sort = $request->get('sort', 'latest');
         switch ($sort) {
             case 'best_selling':
             case 'most_sold':
             case 'sales':
             case 'popular':
-                $query->orderByRaw('((SELECT COUNT(*) FROM enrollments WHERE enrollments.course_id = courses.id) + COALESCE(courses.fake_enrollment_count, 0)) DESC')
-                      ->orderBy('id', 'desc');
+                $query->orderByRaw('
+                    (
+                        COALESCE((SELECT COUNT(DISTINCT orders.id) FROM orders WHERE orders.course_id = courses.id AND orders.payment_status = "paid"), 0)
+                        +
+                        COALESCE((SELECT COUNT(DISTINCT order_items.id) FROM order_items JOIN orders AS o2 ON order_items.order_id = o2.id WHERE order_items.course_id = courses.id AND o2.course_id != courses.id AND o2.payment_status = "paid"), 0)
+                        +
+                        COALESCE((SELECT COUNT(DISTINCT enrollments.id) FROM enrollments WHERE enrollments.course_id = courses.id AND (enrollments.status = "active" OR enrollments.status IS NULL) AND (enrollments.order_id IS NULL OR enrollments.order_id NOT IN (SELECT id FROM orders WHERE payment_status = "paid"))), 0)
+                    ) DESC
+                ')
+                ->orderByRaw('
+                    (
+                        COALESCE((SELECT COUNT(*) FROM enrollments WHERE enrollments.course_id = courses.id), 0)
+                        +
+                        COALESCE(courses.fake_enrollment_count, 0)
+                    ) DESC
+                ')
+                ->orderBy('courses.id', 'desc');
                 break;
             case 'alphabetical':
             case 'alphabetical_asc':
             case 'title_asc':
             case 'a_z':
-                $query->orderBy('title', 'asc');
+                $query->orderBy('courses.title', 'asc');
                 break;
             case 'alphabetical_desc':
             case 'title_desc':
             case 'z_a':
-                $query->orderBy('title', 'desc');
+                $query->orderBy('courses.title', 'desc');
                 break;
             case 'price_low':
             case 'price_asc':
-                $query->orderByRaw('COALESCE(sale_price, price) ASC');
+                $query->orderByRaw('COALESCE(courses.sale_price, courses.price) ASC');
                 break;
             case 'price_high':
             case 'price_desc':
-                $query->orderByRaw('COALESCE(sale_price, price) DESC');
+                $query->orderByRaw('COALESCE(courses.sale_price, courses.price) DESC');
                 break;
             case 'oldest':
-                $query->oldest();
+                $query->orderBy('courses.id', 'asc');
                 break;
             case 'latest':
             default:
-                $query->latest();
+                $query->orderBy('courses.id', 'desc');
                 break;
         }
 

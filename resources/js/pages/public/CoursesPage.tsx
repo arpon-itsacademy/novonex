@@ -42,7 +42,8 @@ export const CoursesPage: React.FC = () => {
 
     const activeCategory = searchParams.get('category') || '';
     const activeSearch = searchParams.get('search') || '';
-    const activeSort = searchParams.get('sort') || 'best_selling';
+    const [defaultSort, setDefaultSort] = useState<string>('best_selling');
+    const activeSort = searchParams.get('sort') || defaultSort;
     const [searchInput, setSearchInput] = useState(activeSearch);
 
     useEffect(() => {
@@ -91,6 +92,9 @@ export const CoursesPage: React.FC = () => {
                         if (selectedSlugs.length > 0) {
                             validCats = validCats.filter(c => selectedSlugs.includes(c.slug));
                         }
+                    }
+                    if (tabBlock?.settings?.sortBy) {
+                        setDefaultSort(tabBlock.settings.sortBy);
                     }
                 }
 
@@ -471,7 +475,7 @@ export const CoursesPage: React.FC = () => {
                                             <span>•</span>
                                             <span className="flex items-center gap-1">
                                                 <Users className="w-3.5 h-3.5 text-amber-500" />
-                                                <span>{course.enrollments_count || 0} Students</span>
+                                                <span>{(course.fake_enrollment_count || 0) + (course.enrollments_count || 0)} Students</span>
                                             </span>
                                         </div>
 
