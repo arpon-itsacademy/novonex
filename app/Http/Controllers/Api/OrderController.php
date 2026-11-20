@@ -560,4 +560,24 @@ class OrderController extends Controller
             'order' => $order->fresh(['user', 'course', 'latestPayment']),
         ]);
     }
+
+    /**
+     * Get order receipt details by order number.
+     */
+    public function getOrderByNumber(Request $request, string $orderNumber): JsonResponse
+    {
+        $order = Order::where('order_number', $orderNumber)
+            ->with(['course:id,title,slug,thumbnail,price', 'items.course:id,title,slug,thumbnail,price', 'latestPayment'])
+            ->first();
+
+        if (! $order) {
+            return response()->json([
+                'message' => 'Order not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'order' => $order,
+        ]);
+    }
 }

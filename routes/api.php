@@ -97,6 +97,9 @@ Route::post('coupons/validate', [CouponValidationController::class, 'validateCou
 Route::get('dynamic-offers/active', [DynamicOfferController::class, 'getActiveOffers']);
 Route::post('dynamic-offers/evaluate', [DynamicOfferController::class, 'evaluate']);
 
+// Order Status & Receipt Lookup (Public / Student Friendly)
+Route::get('orders/status/{orderNumber}', [OrderController::class, 'getOrderByNumber']);
+
 /*
 |--------------------------------------------------------------------------
 | Protected Routes (Authenticated via Sanctum)

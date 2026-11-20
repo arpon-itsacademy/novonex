@@ -405,15 +405,17 @@ export const CheckoutPage: React.FC = () => {
                 clearCart();
             }
 
+            const targetOrderNumber = data.order?.order_number || data.order_number || 'processing';
+
             if (data.is_free) {
-                navigate(`/order-status/${data.order.order_number}?status=success`, {
+                navigate(`/order-status/${targetOrderNumber}?status=success`, {
                     replace: true,
                     state: { order: data.order, message: data.message }
                 });
                 return;
             }
 
-            navigate(`/order-status/${data.order.order_number}`, { state: { order: data.order } });
+            navigate(`/order-status/${targetOrderNumber}`, { state: { order: data.order } });
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to process order.');
         } finally {
