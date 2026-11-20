@@ -597,25 +597,10 @@ export const LessonPlayerPage: React.FC = () => {
 
                             {/* If Student Already Reviewed and Not in Editing Mode */}
                             {myReview && !isEditingReview ? (
-                                <div className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold text-slate-300 flex items-center gap-2">
-                                            <span>Your Rating:</span>
-                                            <span className="flex items-center gap-0.5">
-                                                {[1, 2, 3, 4, 5].map((star) => (
-                                                    <Star
-                                                        key={star}
-                                                        className={`w-4 h-4 ${
-                                                            star <= myReview.rating
-                                                                ? 'fill-amber-400 text-amber-400'
-                                                                : 'text-slate-600'
-                                                        }`}
-                                                    />
-                                                ))}
-                                            </span>
-                                            <span className="text-[11px] font-bold text-amber-400">
-                                                ({myReview.rating === 5 ? 'Excellent!' : myReview.rating === 4 ? 'Very Good' : myReview.rating === 3 ? 'Good' : myReview.rating === 2 ? 'Fair' : 'Poor'})
-                                            </span>
+                                <div className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-3 text-center">
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pb-2 border-b border-slate-700/50">
+                                        <span className="text-xs font-bold text-slate-400">
+                                            Your Submitted Class Rating
                                         </span>
                                         {myReview.updated_at && (
                                             <span className="text-[10px] text-slate-500">
@@ -623,8 +608,28 @@ export const LessonPlayerPage: React.FC = () => {
                                             </span>
                                         )}
                                     </div>
+
+                                    {/* Centered Stars Display */}
+                                    <div className="flex flex-col items-center justify-center gap-1.5 py-1">
+                                        <div className="flex items-center justify-center gap-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star
+                                                    key={star}
+                                                    className={`w-6 h-6 ${
+                                                        star <= myReview.rating
+                                                            ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]'
+                                                            : 'text-slate-600'
+                                                    }`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <span className="text-sm font-black text-amber-400">
+                                            {myReview.rating === 5 ? '5/5 • Excellent!' : myReview.rating === 4 ? '4/5 • Very Good' : myReview.rating === 3 ? '3/5 • Good' : myReview.rating === 2 ? '2/5 • Fair' : '1/5 • Poor'}
+                                        </span>
+                                    </div>
+
                                     {myReview.review && (
-                                        <p className="text-xs text-slate-300 italic bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+                                        <p className="text-xs text-slate-300 italic bg-slate-900/40 p-3 rounded-xl border border-slate-800 text-center max-w-lg mx-auto">
                                             "{myReview.review}"
                                         </p>
                                     )}
@@ -632,43 +637,42 @@ export const LessonPlayerPage: React.FC = () => {
                             ) : (
                                 /* Rating Form */
                                 <form onSubmit={handleSubmitReview} className="space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-slate-300 block">
-                                            {myReview ? 'Update Your Rating:' : 'How would you rate this class?'}
+                                    {/* Centered Stars Selection */}
+                                    <div className="flex flex-col items-center justify-center text-center space-y-2 py-2">
+                                        <label className="text-xs sm:text-sm font-bold text-slate-300 block text-center">
+                                            {myReview ? 'Update Your Rating for this Class:' : 'How would you rate this class?'}
                                         </label>
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex items-center gap-1.5 p-2 bg-slate-800/80 rounded-2xl border border-slate-700/80 inline-flex">
-                                                {[1, 2, 3, 4, 5].map((star) => {
-                                                    const isFilled = star <= (ratingHover || ratingValue);
-                                                    return (
-                                                        <button
-                                                            key={star}
-                                                            type="button"
-                                                            onClick={() => setRatingValue(star)}
-                                                            onMouseEnter={() => setRatingHover(star)}
-                                                            onMouseLeave={() => setRatingHover(0)}
-                                                            className="p-1 rounded-lg hover:scale-125 transition-transform cursor-pointer focus:outline-none"
-                                                            title={`${star} Star`}
-                                                        >
-                                                            <Star
-                                                                className={`w-6 h-6 transition-colors ${
-                                                                    isFilled
-                                                                        ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]'
-                                                                        : 'text-slate-600 hover:text-slate-400'
-                                                                }`}
-                                                            />
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                            <span className="text-xs font-extrabold text-amber-400 pl-2">
-                                                {(ratingHover || ratingValue) === 5 ? '5/5 Excellent!'
-                                                    : (ratingHover || ratingValue) === 4 ? '4/5 Very Good'
-                                                    : (ratingHover || ratingValue) === 3 ? '3/5 Good'
-                                                    : (ratingHover || ratingValue) === 2 ? '2/5 Fair'
-                                                    : '1/5 Poor'}
-                                            </span>
+                                        <div className="flex items-center justify-center gap-2 p-2.5 bg-slate-800/80 rounded-2xl border border-slate-700/80 shadow-inner">
+                                            {[1, 2, 3, 4, 5].map((star) => {
+                                                const isFilled = star <= (ratingHover || ratingValue);
+                                                return (
+                                                    <button
+                                                        key={star}
+                                                        type="button"
+                                                        onClick={() => setRatingValue(star)}
+                                                        onMouseEnter={() => setRatingHover(star)}
+                                                        onMouseLeave={() => setRatingHover(0)}
+                                                        className="p-1 sm:p-1.5 rounded-xl hover:scale-125 transition-transform cursor-pointer focus:outline-none"
+                                                        title={`${star} Star`}
+                                                    >
+                                                        <Star
+                                                            className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
+                                                                isFilled
+                                                                    ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]'
+                                                                    : 'text-slate-600 hover:text-slate-400'
+                                                            }`}
+                                                        />
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
+                                        <span className="text-xs sm:text-sm font-black text-amber-400 block tracking-wide">
+                                            {(ratingHover || ratingValue) === 5 ? '5/5 • Excellent!'
+                                                : (ratingHover || ratingValue) === 4 ? '4/5 • Very Good'
+                                                : (ratingHover || ratingValue) === 3 ? '3/5 • Good'
+                                                : (ratingHover || ratingValue) === 2 ? '2/5 • Fair'
+                                                : '1/5 • Poor'}
+                                        </span>
                                     </div>
 
                                     <div className="space-y-1.5">

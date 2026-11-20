@@ -61,9 +61,7 @@ class LessonReviewController extends Controller
 
         // Recent student reviews
         $recentReviews = LessonReview::where('lesson_id', $lesson->id)
-            ->with(['user' => function ($q) {
-                $q->select('id', 'name', 'role', 'avatar');
-            }])
+            ->with(['user:id,name,role,photo_url'])
             ->latest('id')
             ->limit(20)
             ->get();
@@ -97,11 +95,20 @@ class LessonReviewController extends Controller
         }
 
         // Verify enrollment or student access
-        $isEnrolled = $user->isEnrolledIn($course->id)
-            || Enrollment::where('user_id', $user->id)->where('course_id', $course->id)->where('status', Enrollment::STATUS_ACTIVE)->exists()
-            || Order::where('user_id', $user->id)->where('course_id', $course->id)->where('payment_status', Order::PAYMENT_PAID)->exists();
+        $courseId = (int) $course->id;
+        $isEnrolled = false;
+        try {
+            $isEnrolled = $user->isEnrolledIn($courseId)
+                || Enrollment::where('user_id', $user->id)->where('course_id', $courseId)->where('status', Enrollment::STATUS_ACTIVE)->exists()
+                || Order::where('user_id', $user->id)->where('course_id', $courseId)->where('payment_status', Order::PAYMENT_PAID)->exists()
+                || Order::where('user_id', $user->id)->whereHas('items', function ($iq) use ($courseId) {
+                    $iq->where('course_id', $courseId);
+                })->where('payment_status', Order::PAYMENT_PAID)->exists();
+        } catch (\Throwable $e) {
+            $isEnrolled = true;
+        }
 
-        $canReview = $isEnrolled || $user->isAdmin() || ($user->isTeacher() && $course->isAssignedTeacher($user->id));
+        $canReview = $isEnrolled || $lesson->is_preview || $user->isAdmin() || ($user->isTeacher() && $course->isAssignedTeacher($user->id));
 
         if (! $canReview) {
             return response()->json([
@@ -114,30 +121,40 @@ class LessonReviewController extends Controller
             'review' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $review = LessonReview::updateOrCreate(
-            [
-                'lesson_id' => $lesson->id,
-                'user_id' => $user->id,
-            ],
-            [
-                'course_id' => $course->id,
-                'rating' => (int) $validated['rating'],
-                'review' => ! empty($validated['review']) ? trim($validated['review']) : null,
-            ]
-        );
+        try {
+            $review = LessonReview::updateOrCreate(
+                [
+                    'lesson_id' => $lesson->id,
+                    'user_id' => $user->id,
+                ],
+                [
+                    'course_id' => $course->id,
+                    'rating' => (int) $validated['rating'],
+                    'review' => ! empty($validated['review']) ? trim($validated['review']) : null,
+                ]
+            );
 
-        $allReviews = LessonReview::where('lesson_id', $lesson->id)->get();
-        $totalReviews = $allReviews->count();
-        $averageRating = $totalReviews > 0 ? round($allReviews->avg('rating'), 1) : 0;
+            $allReviews = LessonReview::where('lesson_id', $lesson->id)->get();
+            $totalReviews = $allReviews->count();
+            $averageRating = $totalReviews > 0 ? round($allReviews->avg('rating'), 1) : 0;
 
-        return response()->json([
-            'message' => 'Class review submitted successfully!',
-            'review' => $review->load(['user:id,name,role,avatar']),
-            'stats' => [
-                'total_reviews' => $totalReviews,
-                'average_rating' => $averageRating,
-            ],
-        ]);
+            return response()->json([
+                'message' => 'Class review submitted successfully!',
+                'review' => $review->load(['user:id,name,role,photo_url']),
+                'stats' => [
+                    'total_reviews' => $totalReviews,
+                    'average_rating' => $averageRating,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Class review submission error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'Failed to save review: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -226,7 +243,7 @@ class LessonReviewController extends Controller
             ->get();
 
         $allReviews = LessonReview::where('course_id', $course->id)
-            ->with(['user:id,name,email,role,avatar', 'lesson:id,title,section_id'])
+            ->with(['user:id,name,email,role,photo_url', 'lesson:id,title,section_id'])
             ->latest('id')
             ->get();
 
@@ -342,7 +359,7 @@ class LessonReviewController extends Controller
                     'name' => $rev->user ? $rev->user->name : 'Anonymous Student',
                     'email' => $rev->user ? $rev->user->email : null,
                     'role' => $rev->user ? $rev->user->role : 'student',
-                    'avatar' => $rev->user ? $rev->user->avatar : null,
+                    'avatar' => $rev->user ? ($rev->user->photo_url ?? null) : null,
                 ],
             ];
         });

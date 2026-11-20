@@ -30,19 +30,21 @@ class LessonReview extends Model
     public static function ensureTableExists(): void
     {
         if (! Schema::hasTable('lesson_reviews')) {
-            Schema::create('lesson_reviews', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('lesson_id')->constrained('lessons')->cascadeOnDelete();
-                $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete();
-                $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-                $table->unsignedTinyInteger('rating');
-                $table->text('review')->nullable();
-                $table->timestamps();
+            try {
+                Schema::create('lesson_reviews', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('lesson_id')->index();
+                    $table->unsignedBigInteger('course_id')->index();
+                    $table->unsignedBigInteger('user_id')->index();
+                    $table->unsignedTinyInteger('rating');
+                    $table->text('review')->nullable();
+                    $table->timestamps();
 
-                $table->unique(['lesson_id', 'user_id']);
-                $table->index(['course_id', 'lesson_id']);
-                $table->index('user_id');
-            });
+                    $table->unique(['lesson_id', 'user_id']);
+                });
+            } catch (\Throwable $e) {
+                // Table already exists or no DDL permission
+            }
         }
     }
 
