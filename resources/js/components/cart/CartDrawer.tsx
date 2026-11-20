@@ -270,7 +270,7 @@ export const CartDrawer: React.FC = () => {
                                                         <span>{item.lessons_count} Classes</span>
                                                     )}
                                                     {item.lessons_count !== undefined && item.lessons_count > 0 && <span>•</span>}
-                                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Lifetime Access</span>
+                                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Limited Access</span>
                                                 </div>
 
                                                 {/* Price & Delete */}

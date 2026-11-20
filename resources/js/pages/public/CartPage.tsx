@@ -521,7 +521,7 @@ export const CartPage: React.FC = () => {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                                        <span>Full lifetime access to course contents</span>
+                                        <span>Limited access to course contents</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <ShieldCheck className="w-4 h-4 text-[#25a2ee] shrink-0" />
