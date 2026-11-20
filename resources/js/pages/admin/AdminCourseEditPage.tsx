@@ -26,7 +26,8 @@ import {
     Clock,
     Sparkles,
     PlayCircle,
-    MessageCircle
+    MessageCircle,
+    Search
 } from 'lucide-react';
 
 const DEFAULT_FEATURES = [
@@ -67,6 +68,8 @@ export const AdminCourseEditPage: React.FC = () => {
 
     const [allCategories, setAllCategories] = useState<Category[]>([]);
     const [allTeachers, setAllTeachers] = useState<User[]>([]);
+    const [teacherSearch, setTeacherSearch] = useState('');
+    const [searchingTeachers, setSearchingTeachers] = useState(false);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -128,6 +131,20 @@ export const AdminCourseEditPage: React.FC = () => {
             setAllCategories(catsRes.data || []);
             setAllTeachers(teachersRes.data || []);
         } catch { }
+    };
+
+    const handleTeacherSearch = async (val: string) => {
+        setTeacherSearch(val);
+        try {
+            setSearchingTeachers(true);
+            const { data } = await apiClient.get('/admin/teachers-list', {
+                params: val.trim() ? { search: val.trim() } : {},
+            });
+            setAllTeachers(data || []);
+        } catch {
+        } finally {
+            setSearchingTeachers(false);
+        }
     };
 
     const fetchCourse = async () => {
@@ -805,6 +822,21 @@ export const AdminCourseEditPage: React.FC = () => {
                             >
                                 + Create New Instructor
                             </Link>
+                        </div>
+
+                        {/* Search teacher or student to assign */}
+                        <div className="relative">
+                            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <input
+                                type="text"
+                                placeholder="Search by name, phone, or email to assign any teacher or student..."
+                                value={teacherSearch}
+                                onChange={(e) => handleTeacherSearch(e.target.value)}
+                                className="w-full pl-8 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-hidden focus:border-sky-500"
+                            />
+                            {searchingTeachers && (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin absolute right-3 top-1/2 -translate-y-1/2 text-sky-500" />
+                            )}
                         </div>
                         {allTeachers.length === 0 ? (
                             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500">

@@ -16,8 +16,18 @@ class TeacherPublicController extends Controller
      */
     public function getFeaturedTeachers(): JsonResponse
     {
-        $teachers = User::where('role', User::ROLE_TEACHER)
-            ->where('status', User::STATUS_ACTIVE)
+        Course::ensureCourseInstructorsTableExists();
+
+        $teachers = User::where(function ($q) {
+                $q->where('role', User::ROLE_TEACHER)
+                  ->orWhereHas('instructedCourses')
+                  ->orWhereIn('id', Course::whereNotNull('instructor_id')->pluck('instructor_id'));
+            })
+            ->where(function ($q) {
+                $q->where('status', User::STATUS_ACTIVE)
+                  ->orWhereNull('status')
+                  ->orWhere('status', '');
+            })
             ->with(['teacherProfile'])
             ->withCount(['instructedCourses' => function ($q) {
                 $q->where('status', Course::STATUS_PUBLISHED);
@@ -49,10 +59,21 @@ class TeacherPublicController extends Controller
      */
     public function getTeacherProfile(int $id): JsonResponse
     {
+        Course::ensureCourseInstructorsTableExists();
+
         $teacher = User::where('id', $id)
-            ->where('role', User::ROLE_TEACHER)
             ->with(['teacherProfile'])
             ->firstOrFail();
+
+        // Ensure teacher profile exists
+        if (! $teacher->teacherProfile) {
+            TeacherProfile::firstOrCreate(['user_id' => $teacher->id], [
+                'designation' => 'Instructor',
+                'institution' => 'NovoNex Faculty',
+                'is_featured' => true,
+            ]);
+            $teacher->load('teacherProfile');
+        }
 
         // Get all courses taught by this teacher (both via pivot and instructor_id)
         $courses = Course::where('status', Course::STATUS_PUBLISHED)

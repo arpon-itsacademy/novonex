@@ -23,6 +23,11 @@ class RoleMiddleware
             return $next($request);
         }
 
+        // If teacher is accepted, allow users with role teacher OR who instruct any course
+        if (in_array('teacher', $roles, true) && method_exists($user, 'isTeacher') && $user->isTeacher()) {
+            return $next($request);
+        }
+
         if ($roles !== [] && ! in_array($userRole, $roles, true)) {
             abort(403, 'You do not have permission to access this resource.');
         }

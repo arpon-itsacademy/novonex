@@ -136,7 +136,18 @@ class User extends Authenticatable
 
     public function isTeacher(): bool
     {
-        return $this->role === self::ROLE_TEACHER;
+        if ($this->role === self::ROLE_TEACHER) {
+            return true;
+        }
+
+        try {
+            Course::ensureCourseInstructorsTableExists();
+            return Course::where('instructor_id', $this->id)
+                ->orWhereHas('instructors', fn($q) => $q->where('users.id', $this->id))
+                ->exists();
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     public function isStudent(): bool

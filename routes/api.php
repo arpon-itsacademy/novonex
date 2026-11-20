@@ -300,6 +300,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Teacher Specific Routes
     Route::prefix('teacher')->middleware('role:teacher,admin')->group(function () {
         Route::get('my-courses', function (Request $request) {
+            \App\Models\Course::ensureCourseInstructorsTableExists();
             $user = $request->user();
 
             // 1. Courses taught / assigned to this teacher

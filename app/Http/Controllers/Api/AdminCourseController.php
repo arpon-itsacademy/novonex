@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Course;
+use App\Models\TeacherProfile;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -191,6 +192,24 @@ class AdminCourseController extends Controller
                 $primaryId = $validated['instructor_ids'][0];
                 $course->update(['instructor_id' => $primaryId]);
 
+                // Automatically ensure assigned users have teacher role and TeacherProfile
+                foreach ($validated['instructor_ids'] as $instId) {
+                    $instUser = User::find($instId);
+                    if ($instUser) {
+                        if ($instUser->role === User::ROLE_STUDENT) {
+                            $instUser->update(['role' => User::ROLE_TEACHER]);
+                        }
+                        TeacherProfile::firstOrCreate(
+                            ['user_id' => $instUser->id],
+                            [
+                                'designation' => 'Instructor',
+                                'institution' => 'NovoNex Faculty',
+                                'is_featured' => true,
+                            ]
+                        );
+                    }
+                }
+
                 try {
                     $syncData = [];
                     foreach ($validated['instructor_ids'] as $idx => $userId) {
@@ -349,6 +368,24 @@ class AdminCourseController extends Controller
                 $primaryId = ! empty($validated['instructor_ids']) ? $validated['instructor_ids'][0] : null;
                 $course->update(['instructor_id' => $primaryId]);
 
+                // Automatically ensure assigned users have teacher role and TeacherProfile
+                foreach ($validated['instructor_ids'] as $instId) {
+                    $instUser = User::find($instId);
+                    if ($instUser) {
+                        if ($instUser->role === User::ROLE_STUDENT) {
+                            $instUser->update(['role' => User::ROLE_TEACHER]);
+                        }
+                        TeacherProfile::firstOrCreate(
+                            ['user_id' => $instUser->id],
+                            [
+                                'designation' => 'Instructor',
+                                'institution' => 'NovoNex Faculty',
+                                'is_featured' => true,
+                            ]
+                        );
+                    }
+                }
+
                 try {
                     $syncData = [];
                     foreach ($validated['instructor_ids'] as $idx => $userId) {
@@ -445,22 +482,38 @@ class AdminCourseController extends Controller
         ]);
     }
 
-    public function teachersList(): JsonResponse
+    public function teachersList(Request $request): JsonResponse
     {
         Course::ensureCourseInstructorsTableExists();
 
-        $teachers = User::where(function ($q) {
-                $q->where('role', User::ROLE_TEACHER)
-                  ->orWhere('role', User::ROLE_ADMIN)
-                  ->orWhereHas('customRole');
-            })
+        $query = User::query()
             ->where(function ($q) {
                 $q->where('status', User::STATUS_ACTIVE)
                   ->orWhereNull('status')
                   ->orWhere('status', '');
-            })
+            });
+
+        if ($request->filled('search')) {
+            $search = trim($request->input('search'));
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        } else {
+            $query->where(function ($q) {
+                $q->where('role', User::ROLE_TEACHER)
+                  ->orWhere('role', User::ROLE_ADMIN)
+                  ->orWhereHas('customRole')
+                  ->orWhereHas('instructedCourses')
+                  ->orWhereIn('id', Course::whereNotNull('instructor_id')->pluck('instructor_id'));
+            });
+        }
+
+        $teachers = $query
             ->select('id', 'name', 'phone', 'email', 'role')
             ->orderBy('name', 'asc')
+            ->limit(100)
             ->get();
 
         return response()->json($teachers);

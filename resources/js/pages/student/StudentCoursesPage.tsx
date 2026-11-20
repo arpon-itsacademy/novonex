@@ -17,7 +17,9 @@ import {
     Copy,
     KeyRound,
     ExternalLink,
-    MessageSquareWarning
+    MessageSquareWarning,
+    Layers,
+    GraduationCap
 } from 'lucide-react';
 import { Modal } from '../../components/ui/Modal';
 
@@ -275,6 +277,14 @@ export const StudentCoursesPage: React.FC = () => {
                                         <p className="text-xs text-slate-500 mt-1">
                                             Instructor: {course.instructors?.map((i: any) => i.name).join(', ') || 'Expert Mentor'}
                                         </p>
+                                        {item.is_instructor && (
+                                            <div className="mt-1.5 flex items-center gap-1.5">
+                                                <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-extrabold text-[10px] rounded-md border border-purple-200 dark:border-purple-800 flex items-center gap-1">
+                                                    <GraduationCap className="w-3 h-3 text-purple-600" />
+                                                    Assigned Teacher
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Progress */}
@@ -348,6 +358,17 @@ export const StudentCoursesPage: React.FC = () => {
                                     )}
 
                                     {/* Enrolled Action Buttons & Community Groups */}
+                                    {item.is_instructor && (
+                                        <div className="pt-1">
+                                            <Link
+                                                to={`/teacher/courses/${course.id}/builder`}
+                                                className="w-full py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                                            >
+                                                <Layers className="w-3.5 h-3.5 text-purple-200" />
+                                                <span>Manage in Course Builder</span>
+                                            </Link>
+                                        </div>
+                                    )}
                                     {course.enrolled_action_buttons && course.enrolled_action_buttons.length > 0 && (
                                         <div className="pt-3 border-t border-slate-100 space-y-2">
                                             {course.enrolled_action_buttons.some((b: any) => b.requires_access_key) && item.access_key && (

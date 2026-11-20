@@ -265,6 +265,20 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
+        // Auto-promote student to teacher if assigned as instructor to any course
+        if ($user->role === User::ROLE_STUDENT && $user->isTeacher()) {
+            $user->update(['role' => User::ROLE_TEACHER]);
+            \App\Models\TeacherProfile::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'designation' => 'Instructor',
+                    'institution' => 'NovoNex Faculty',
+                    'is_featured' => true,
+                ]
+            );
+            $user->refresh();
+        }
+
         return response()->json([
             'user' => [
                 'id' => $user->id,
@@ -273,6 +287,7 @@ class AuthController extends Controller
                 'registration_number' => $user->registration_number,
                 'email' => $user->email,
                 'role' => $user->role,
+                'is_teacher' => $user->isTeacher(),
                 'custom_role_id' => $user->custom_role_id,
                 'custom_role' => $user->customRole,
                 'status' => $user->status,

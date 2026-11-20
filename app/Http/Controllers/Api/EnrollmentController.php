@@ -114,6 +114,7 @@ class EnrollmentController extends Controller
                 'has_active_pilot' => $hasActivePilot,
                 'pilot_price' => $pilotPrice,
                 'pilot_title' => $pilot ? $pilot->title : null,
+                'is_instructor' => $course->isAssignedTeacher($user->id),
             ];
         });
 
