@@ -241,6 +241,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('{course}/routine/items', [RoutineController::class, 'storeRoutineItem']);
         Route::put('{course}/routine/items/{routine}', [RoutineController::class, 'updateRoutineItem']);
         Route::delete('{course}/routine/items/{routine}', [RoutineController::class, 'deleteRoutineItem']);
+
+        // Course Custom Buttons & Outline
+        Route::get('{course}/custom-buttons', [CourseBuilderController::class, 'getCustomButtons']);
+        Route::put('{course}/custom-buttons', [CourseBuilderController::class, 'updateCustomButtons']);
+        Route::post('{course}/upload-button-file', [CourseBuilderController::class, 'uploadButtonFile']);
     });
 
     // Direct VdoCipher upload credentials for Course Builder (admin & teacher)

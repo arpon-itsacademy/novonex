@@ -26,8 +26,6 @@ import {
     Clock,
     Sparkles,
     PlayCircle,
-    Key,
-    KeyRound,
     MessageCircle
 } from 'lucide-react';
 
@@ -37,21 +35,6 @@ const DEFAULT_FEATURES = [
     'Direct Q&A doubt-solving support with instructors',
     'Lifetime course access from any device',
 ];
-
-export interface CourseActionButton {
-    id: string;
-    label: string;
-    type: 'file' | 'link';
-    url: string;
-    file_name?: string;
-}
-
-export interface EnrolledActionButton {
-    id: string;
-    label: string;
-    url: string;
-    requires_access_key: boolean;
-}
 
 export const AdminCourseEditPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -69,16 +52,11 @@ export const AdminCourseEditPage: React.FC = () => {
     const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
     const [selectedTeacherIds, setSelectedTeacherIds] = useState<number[]>([]);
 
-    // New Course Badges, Features & Action Buttons
+    // New Course Badges & Features
     const [features, setFeatures] = useState<string[]>(DEFAULT_FEATURES);
     const [newFeatureText, setNewFeatureText] = useState('');
     const [fakeEnrollmentCount, setFakeEnrollmentCount] = useState<string>('0');
     const [classStartsAt, setClassStartsAt] = useState<string>('');
-    const [actionButtons, setActionButtons] = useState<CourseActionButton[]>([
-        { id: 'btn-outline', label: 'Course Outline', type: 'link', url: '' }
-    ]);
-    const [enrolledButtons, setEnrolledButtons] = useState<EnrolledActionButton[]>([]);
-    const [uploadingButtonFileId, setUploadingButtonFileId] = useState<string | null>(null);
 
     // Coupon, Countdown & How-to-Buy
     const [couponCode, setCouponCode] = useState<string>('');
@@ -132,70 +110,6 @@ export const AdminCourseEditPage: React.FC = () => {
         setFeatures(updated);
     };
 
-    /* Action Buttons handlers (Course Outline, etc.) */
-    const handleAddActionButton = () => {
-        const newBtn: CourseActionButton = {
-            id: 'btn-' + Date.now(),
-            label: 'Course Outline',
-            type: 'link',
-            url: '',
-        };
-        setActionButtons([...actionButtons, newBtn]);
-    };
-
-    const handleRemoveActionButton = (id: string) => {
-        setActionButtons(actionButtons.filter((b) => b.id !== id));
-    };
-
-    const handleUpdateButton = (id: string, updates: Partial<CourseActionButton>) => {
-        setActionButtons(actionButtons.map((b) => (b.id === id ? { ...b, ...updates } : b)));
-    };
-
-    /* Enrolled Students Action Buttons (Community, Facebook Group, etc.) */
-    const handleAddEnrolledButton = () => {
-        const newBtn: EnrolledActionButton = {
-            id: 'ebtn-' + Date.now(),
-            label: 'Join our Facebook Discussion Group',
-            url: '',
-            requires_access_key: true,
-        };
-        setEnrolledButtons([...enrolledButtons, newBtn]);
-    };
-
-    const handleRemoveEnrolledButton = (id: string) => {
-        setEnrolledButtons(enrolledButtons.filter((b) => b.id !== id));
-    };
-
-    const handleUpdateEnrolledButton = (id: string, updates: Partial<EnrolledActionButton>) => {
-        setEnrolledButtons(enrolledButtons.map((b) => (b.id === id ? { ...b, ...updates } : b)));
-    };
-
-    const handleUploadButtonFile = async (e: React.ChangeEvent<HTMLInputElement>, btnId: string) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setUploadingButtonFileId(btnId);
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const res = await apiClient.post('/admin/media', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            if (res.data && res.data.media) {
-                handleUpdateButton(btnId, {
-                    url: res.data.media.url,
-                    file_name: file.name,
-                });
-            }
-        } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to upload file.');
-        } finally {
-            setUploadingButtonFileId(null);
-            e.target.value = '';
-        }
-    };
-
     useEffect(() => {
         fetchMetadata();
         if (isEdit) {
@@ -231,18 +145,12 @@ export const AdminCourseEditPage: React.FC = () => {
             setSelectedTeacherIds(c.instructors?.map((t: any) => t.id) || []);
             setSavedCourseId(c.id);
 
-            // Load features, fake enroll count, class starts date, and custom buttons
+            // Load features, fake enroll count, class starts date
             if (c.features && Array.isArray(c.features) && c.features.length > 0) {
                 setFeatures(c.features);
             }
             setFakeEnrollmentCount(c.fake_enrollment_count ? String(c.fake_enrollment_count) : '0');
             setClassStartsAt(c.class_starts_at || '');
-            if (c.action_buttons && Array.isArray(c.action_buttons) && c.action_buttons.length > 0) {
-                setActionButtons(c.action_buttons);
-            }
-            if (c.enrolled_action_buttons && Array.isArray(c.enrolled_action_buttons) && c.enrolled_action_buttons.length > 0) {
-                setEnrolledButtons(c.enrolled_action_buttons);
-            }
             setCouponCode(c.coupon_code || '');
             setCouponDiscountText(c.coupon_discount_text || '');
             setDiscountDeadline(c.discount_deadline ? c.discount_deadline.substring(0, 16) : '');
@@ -282,8 +190,6 @@ export const AdminCourseEditPage: React.FC = () => {
                 features: features.filter((f) => f.trim().length > 0),
                 fake_enrollment_count: parseInt(fakeEnrollmentCount, 10) || 0,
                 class_starts_at: classStartsAt.trim() || null,
-                action_buttons: actionButtons.filter((b) => b.label.trim().length > 0 && b.url.trim().length > 0),
-                enrolled_action_buttons: enrolledButtons.filter((b) => b.label.trim().length > 0 && b.url.trim().length > 0),
                 coupon_code: couponCode.trim() ? couponCode.trim().toUpperCase() : null,
                 coupon_discount_text: couponDiscountText.trim() || null,
                 discount_deadline: discountDeadline.trim() || null,
@@ -709,258 +615,34 @@ export const AdminCourseEditPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Course Outline & Custom Action Buttons */}
-                    <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-sky-600" />
-                                <div>
-                                    <h3 className="text-sm font-bold text-slate-800">
-                                        Course Outline & Custom Buttons
-                                    </h3>
-                                    <p className="text-[11px] text-slate-500">
-                                        These buttons appear below the 'Enroll' button on the course details sidebar.
-                                    </p>
-                                </div>
+                    {/* Course Outline & Custom Buttons Notice Card */}
+                    <div className="p-5 rounded-2xl bg-gradient-to-r from-sky-50/70 via-indigo-50/50 to-purple-50/50 border border-indigo-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                            <div className="p-2.5 bg-indigo-100 rounded-xl text-indigo-700 shrink-0 mt-0.5">
+                                <FileText className="w-5 h-5" />
                             </div>
-                            <button
-                                type="button"
-                                onClick={handleAddActionButton}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition cursor-pointer"
-                            >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>+ Add New Button</span>
-                            </button>
-                        </div>
-
-                        <div className="space-y-3">
-                            {actionButtons.map((btn) => (
-                                <div
-                                    key={btn.id}
-                                    className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-3 shadow-2xs"
-                                >
-                                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                                        {/* Button Label */}
-                                        <div className="flex-1">
-                                            <label className="block text-[11px] font-bold text-slate-600 mb-1">
-                                                Button Name (e.g. Course Outline / How to Enroll)
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={btn.label}
-                                                onChange={(e) => handleUpdateButton(btn.id, { label: e.target.value })}
-                                                placeholder="Enter button label"
-                                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500 focus:bg-white"
-                                            />
-                                        </div>
-
-                                        {/* Type Selector: File Upload vs Link */}
-                                        <div className="w-full sm:w-48">
-                                            <label className="block text-[11px] font-bold text-slate-600 mb-1">
-                                                Type
-                                            </label>
-                                            <div className="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200 w-full">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleUpdateButton(btn.id, { type: 'file' })}
-                                                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${btn.type === 'file'
-                                                        ? 'bg-white text-sky-700 shadow-2xs'
-                                                        : 'text-slate-600 hover:text-slate-900'
-                                                        }`}
-                                                >
-                                                    File Upload
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleUpdateButton(btn.id, { type: 'link' })}
-                                                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${btn.type === 'link'
-                                                        ? 'bg-white text-sky-700 shadow-2xs'
-                                                        : 'text-slate-600 hover:text-slate-900'
-                                                        }`}
-                                                >
-                                                    Link
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Delete Button */}
-                                        <div className="sm:pt-5 flex items-center justify-end">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveActionButton(btn.id)}
-                                                className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 transition cursor-pointer"
-                                                title="Remove button"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Content based on type */}
-                                    {btn.type === 'file' ? (
-                                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1 border-t border-slate-100">
-                                            <input
-                                                type="file"
-                                                id={`file-btn-${btn.id}`}
-                                                className="hidden"
-                                                onChange={(e) => handleUploadButtonFile(e, btn.id)}
-                                            />
-                                            <label
-                                                htmlFor={`file-btn-${btn.id}`}
-                                                className="inline-flex items-center justify-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold cursor-pointer transition shrink-0"
-                                            >
-                                                <Upload className="w-3.5 h-3.5" />
-                                                <span>
-                                                    {uploadingButtonFileId === btn.id ? 'Uploading...' : 'Upload File (PDF/Doc/Image)'}
-                                                </span>
-                                            </label>
-
-                                            {btn.url ? (
-                                                <div className="flex-1 flex items-center justify-between px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-200 text-xs">
-                                                    <span className="font-medium text-emerald-800 truncate max-w-xs">
-                                                        {btn.file_name || btn.url}
-                                                    </span>
-                                                    <a
-                                                        href={btn.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-emerald-700 hover:underline font-bold inline-flex items-center gap-1 ml-2"
-                                                    >
-                                                        View <ExternalLink className="w-3 h-3" />
-                                                    </a>
-                                                </div>
-                                            ) : (
-                                                <span className="text-xs text-slate-400">No file uploaded yet</span>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div className="pt-1 border-t border-slate-100">
-                                            <input
-                                                type="url"
-                                                value={btn.url}
-                                                onChange={(e) => handleUpdateButton(btn.id, { url: e.target.value })}
-                                                placeholder="https://drive.google.com/... or enter URL"
-                                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-sky-500 focus:bg-white"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-
-                            {actionButtons.length === 0 && (
-                                <p className="text-xs text-slate-400 text-center py-3 bg-white rounded-xl border border-dashed border-slate-200">
-                                    No action buttons created yet. Click "+ Add New Button" above.
+                            <div>
+                                <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                    <span>Course Outline & Enrolled Action Buttons</span>
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700">
+                                        Moved to Builder
+                                    </span>
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-1 max-w-xl">
+                                    Course Outline files (PDF/Docs), custom landing page buttons, and private Enrolled Student Action Buttons / Community Groups are now managed inside the <strong>Course Builder</strong> under the <strong>Outline / Custom Buttons</strong> tab.
                                 </p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Enrolled Students Action Buttons & Community Groups */}
-                    <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-white to-sky-50/50 border border-indigo-200 space-y-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div className="flex items-center gap-2.5">
-                                <div className="p-2.5 bg-indigo-100 rounded-xl text-indigo-700 shrink-0">
-                                    <KeyRound className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                                        <span>Enrolled Students Action Buttons & Access Keys</span>
-                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
-                                            Private / Dashboard
-                                        </span>
-                                    </h3>
-                                    <p className="text-[11px] text-slate-500 mt-0.5">
-                                        After enrolling, students can see these buttons and their unique access key on their dashboard (e.g. Join our Facebook Discussion Group).
-                                    </p>
-                                </div>
                             </div>
-                            <button
-                                type="button"
-                                onClick={handleAddEnrolledButton}
-                                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition cursor-pointer shrink-0"
+                        </div>
+
+                        {isEdit && (
+                            <Link
+                                to={`/admin/courses/${id}/builder`}
+                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors shrink-0"
                             >
-                                <Plus className="w-4 h-4" />
-                                <span>+ Add Group Button</span>
-                            </button>
-                        </div>
-
-                        <div className="space-y-3">
-                            {enrolledButtons.map((btn) => (
-                                <div
-                                    key={btn.id}
-                                    className="p-4 bg-white rounded-xl border border-indigo-150 space-y-3 shadow-2xs"
-                                >
-                                    <div className="flex items-center justify-between gap-3">
-                                        <div className="flex-1">
-                                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                                                Button Name (e.g. Join our Facebook Discussion Group / Telegram Group)
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={btn.label}
-                                                onChange={(e) => handleUpdateEnrolledButton(btn.id, { label: e.target.value })}
-                                                placeholder="Enter button label"
-                                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:bg-white"
-                                            />
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveEnrolledButton(btn.id)}
-                                            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer shrink-0 mt-5"
-                                            title="Delete button"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-
-                                    {/* URL Input */}
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                                            Community or Group URL (Facebook / Telegram / Discord / WhatsApp)
-                                        </label>
-                                        <input
-                                            type="url"
-                                            value={btn.url}
-                                            onChange={(e) => handleUpdateEnrolledButton(btn.id, { url: e.target.value })}
-                                            placeholder="https://facebook.com/groups/your-group-name"
-                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:bg-white"
-                                        />
-                                    </div>
-
-                                    {/* Access Key Toggle */}
-                                    <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/70 p-2.5 rounded-lg">
-                                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                                            <input
-                                                type="checkbox"
-                                                checked={Boolean(btn.requires_access_key)}
-                                                onChange={(e) => handleUpdateEnrolledButton(btn.id, { requires_access_key: e.target.checked })}
-                                                className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                                            />
-                                            <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                                                <Key className="w-3.5 h-3.5 text-amber-500" />
-                                                <span>Does this button require a Student Access Key?</span>
-                                            </span>
-                                        </label>
-                                        {btn.requires_access_key ? (
-                                            <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 shrink-0">
-                                                🔑 Verification Key Active
-                                            </span>
-                                        ) : (
-                                            <span className="text-[11px] text-slate-400">
-                                                Direct access without verification key
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-
-                            {enrolledButtons.length === 0 && (
-                                <p className="text-xs text-slate-400 text-center py-4 bg-white rounded-xl border border-dashed border-indigo-200">
-                                    No private community or enrolled buttons added yet. Click "+ Add Group Button" above.
-                                </p>
-                            )}
-                        </div>
+                                <span>Go to Course Builder</span>
+                                <ExternalLink className="w-3.5 h-3.5" />
+                            </Link>
+                        )}
                     </div>
 
                     {/* Course Features Checklist */}

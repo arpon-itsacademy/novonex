@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\CourseSection;
 use App\Models\Exam;
 use App\Models\Lesson;
+use App\Models\Media;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -39,6 +40,8 @@ class CourseBuilderController extends Controller
                 'status' => $course->status,
                 'price' => $course->price,
                 'sale_price' => $course->sale_price,
+                'action_buttons' => $course->action_buttons ?? [],
+                'enrolled_action_buttons' => $course->enrolled_action_buttons ?? [],
             ],
             'sections' => $sections,
         ]);
@@ -567,6 +570,80 @@ class CourseBuilderController extends Controller
 
         return response()->json([
             'message' => 'Exam removed from course successfully.',
+        ]);
+    }
+
+    public function getCustomButtons(Course $course): JsonResponse
+    {
+        $this->authorizeCourseAccess($course);
+
+        return response()->json([
+            'action_buttons' => $course->action_buttons ?? [],
+            'enrolled_action_buttons' => $course->enrolled_action_buttons ?? [],
+        ]);
+    }
+
+    public function updateCustomButtons(Request $request, Course $course): JsonResponse
+    {
+        $this->authorizeCourseAccess($course);
+
+        $validated = $request->validate([
+            'action_buttons' => ['nullable', 'array'],
+            'enrolled_action_buttons' => ['nullable', 'array'],
+        ]);
+
+        $course->update([
+            'action_buttons' => $validated['action_buttons'] ?? [],
+            'enrolled_action_buttons' => $validated['enrolled_action_buttons'] ?? [],
+        ]);
+
+        return response()->json([
+            'message' => 'Custom buttons updated successfully.',
+            'action_buttons' => $course->action_buttons ?? [],
+            'enrolled_action_buttons' => $course->enrolled_action_buttons ?? [],
+        ]);
+    }
+
+    public function uploadButtonFile(Request $request, Course $course): JsonResponse
+    {
+        $this->authorizeCourseAccess($course);
+
+        $request->validate([
+            'file' => ['required', 'file', 'max:51200'],
+        ]);
+
+        $file = $request->file('file');
+        $originalName = $file->getClientOriginalName();
+        $path = $file->store('media', 'public');
+        $url = asset('storage/' . $path);
+
+        try {
+            $destPath = public_path('storage/' . $path);
+            $destDir = dirname($destPath);
+            if (!file_exists($destDir)) {
+                @mkdir($destDir, 0755, true);
+            }
+            @copy(storage_path('app/public/' . $path), $destPath);
+        } catch (\Throwable $e) {
+            // ignore if permissions prevent direct copy
+        }
+
+        try {
+            Media::create([
+                'user_id' => auth()->id(),
+                'file_name' => $originalName,
+                'file_path' => $path,
+                'file_type' => 'document',
+                'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
+                'file_size' => $file->getSize() ?: 0,
+            ]);
+        } catch (\Throwable $e) {
+            // ignore
+        }
+
+        return response()->json([
+            'url' => $url,
+            'file_name' => $originalName,
         ]);
     }
 }
