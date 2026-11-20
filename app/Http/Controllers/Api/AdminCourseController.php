@@ -8,6 +8,8 @@ use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class AdminCourseController extends Controller
@@ -176,12 +178,41 @@ class AdminCourseController extends Controller
             $course = Course::create($courseData);
 
             if (! empty($validated['category_ids'])) {
-                $course->categories()->sync($validated['category_ids']);
+                Course::ensureCategoryCourseTableExists();
+                try {
+                    $course->categories()->sync($validated['category_ids']);
+                } catch (\Throwable $catErr) {
+                    \Log::error('Categories sync in store failed: ' . $catErr->getMessage());
+                }
             }
 
             if (! empty($validated['instructor_ids'])) {
-                $course->instructors()->sync($validated['instructor_ids']);
-                $course->update(['instructor_id' => $validated['instructor_ids'][0]]);
+                Course::ensureCourseInstructorsTableExists();
+                $primaryId = $validated['instructor_ids'][0];
+                $course->update(['instructor_id' => $primaryId]);
+
+                try {
+                    $syncData = [];
+                    foreach ($validated['instructor_ids'] as $idx => $userId) {
+                        $syncData[$userId] = ['is_primary' => ($idx === 0)];
+                    }
+                    $course->instructors()->sync($syncData);
+                } catch (\Throwable $syncErr) {
+                    \Log::error('Instructors pivot sync in store failed: ' . $syncErr->getMessage());
+                    try {
+                        foreach ($validated['instructor_ids'] as $idx => $userId) {
+                            DB::table('course_instructors')->insert([
+                                'course_id' => $course->id,
+                                'user_id' => $userId,
+                                'is_primary' => ($idx === 0) ? 1 : 0,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                        }
+                    } catch (\Throwable $rawErr) {
+                        \Log::error('Direct DB insert in store failed: ' . $rawErr->getMessage());
+                    }
+                }
             }
 
             try {
@@ -204,6 +235,20 @@ class AdminCourseController extends Controller
 
     public function show(Course $course): JsonResponse
     {
+        Course::ensureCourseInstructorsTableExists();
+        Course::ensureCategoryCourseTableExists();
+
+        // If course has legacy instructor_id but no pivot entries, link them automatically
+        if ($course->instructor_id && $course->instructors()->count() === 0) {
+            try {
+                $course->instructors()->syncWithoutDetaching([
+                    $course->instructor_id => ['is_primary' => true]
+                ]);
+            } catch (\Throwable $e) {
+                // ignore
+            }
+        }
+
         return response()->json([
             'course' => $course->load(['instructors.teacherProfile', 'instructor.teacherProfile', 'categories:id,name', 'sections.lessons.attachments']),
         ]);
@@ -289,13 +334,43 @@ class AdminCourseController extends Controller
             $course->update($updateData);
 
             if (isset($validated['category_ids'])) {
-                $course->categories()->sync($validated['category_ids']);
+                Course::ensureCategoryCourseTableExists();
+                try {
+                    $course->categories()->sync($validated['category_ids']);
+                } catch (\Throwable $catErr) {
+                    \Log::error('Categories sync in update failed: ' . $catErr->getMessage());
+                }
             }
 
             if (isset($validated['instructor_ids'])) {
-                $course->instructors()->sync($validated['instructor_ids']);
-                if (! empty($validated['instructor_ids'])) {
-                    $course->update(['instructor_id' => $validated['instructor_ids'][0]]);
+                Course::ensureCourseInstructorsTableExists();
+
+                // Always update the single primary instructor_id on courses table first
+                $primaryId = ! empty($validated['instructor_ids']) ? $validated['instructor_ids'][0] : null;
+                $course->update(['instructor_id' => $primaryId]);
+
+                try {
+                    $syncData = [];
+                    foreach ($validated['instructor_ids'] as $idx => $userId) {
+                        $syncData[$userId] = ['is_primary' => ($idx === 0)];
+                    }
+                    $course->instructors()->sync($syncData);
+                } catch (\Throwable $syncErr) {
+                    \Log::error('Instructors pivot sync in update failed: ' . $syncErr->getMessage());
+                    try {
+                        DB::table('course_instructors')->where('course_id', $course->id)->delete();
+                        foreach ($validated['instructor_ids'] as $idx => $userId) {
+                            DB::table('course_instructors')->insert([
+                                'course_id' => $course->id,
+                                'user_id' => $userId,
+                                'is_primary' => ($idx === 0) ? 1 : 0,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                        }
+                    } catch (\Throwable $rawErr) {
+                        \Log::error('Direct DB insert in update failed: ' . $rawErr->getMessage());
+                    }
                 }
             }
 
@@ -348,10 +423,18 @@ class AdminCourseController extends Controller
         $oldValues = $course->toArray();
 
         // Detach relations safely
-        $course->instructors()->detach();
-        $course->categories()->detach();
+        Course::ensureCourseInstructorsTableExists();
+        Course::ensureCategoryCourseTableExists();
+        try {
+            $course->instructors()->detach();
+        } catch (\Throwable $e) {}
+        try {
+            $course->categories()->detach();
+        } catch (\Throwable $e) {}
         if (method_exists($course, 'bundles')) {
-            $course->bundles()->detach();
+            try {
+                $course->bundles()->detach();
+            } catch (\Throwable $e) {}
         }
         $course->forceDelete();
 
@@ -364,9 +447,20 @@ class AdminCourseController extends Controller
 
     public function teachersList(): JsonResponse
     {
-        $teachers = User::where('role', User::ROLE_TEACHER)
-            ->where('status', User::STATUS_ACTIVE)
-            ->select('id', 'name', 'phone', 'email')
+        Course::ensureCourseInstructorsTableExists();
+
+        $teachers = User::where(function ($q) {
+                $q->where('role', User::ROLE_TEACHER)
+                  ->orWhere('role', User::ROLE_ADMIN)
+                  ->orWhereHas('customRole');
+            })
+            ->where(function ($q) {
+                $q->where('status', User::STATUS_ACTIVE)
+                  ->orWhereNull('status')
+                  ->orWhere('status', '');
+            })
+            ->select('id', 'name', 'phone', 'email', 'role')
+            ->orderBy('name', 'asc')
             ->get();
 
         return response()->json($teachers);

@@ -66,6 +66,9 @@ class Course extends Model
 
     public static function booted(): void
     {
+        self::ensureCourseInstructorsTableExists();
+        self::ensureCategoryCourseTableExists();
+
         if (Schema::hasTable('courses')) {
             $columnDefinitions = [
                 'enable_manual_payment' => fn(Blueprint $table) => $table->boolean('enable_manual_payment')->default(true),
@@ -100,6 +103,52 @@ class Course extends Model
                 $course->slug = Str::slug($course->title);
             }
         });
+    }
+
+    public static function ensureCourseInstructorsTableExists(): void
+    {
+        try {
+            if (! Schema::hasTable('course_instructors')) {
+                Schema::create('course_instructors', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('course_id')->index();
+                    $table->unsignedBigInteger('user_id')->index();
+                    $table->boolean('is_primary')->default(false);
+                    $table->timestamps();
+
+                    $table->unique(['course_id', 'user_id']);
+                });
+            } else {
+                if (! Schema::hasColumn('course_instructors', 'is_primary')) {
+                    Schema::table('course_instructors', function (Blueprint $table) {
+                        $table->boolean('is_primary')->default(false)->after('user_id');
+                    });
+                }
+                if (! Schema::hasColumn('course_instructors', 'created_at')) {
+                    Schema::table('course_instructors', function (Blueprint $table) {
+                        $table->timestamps();
+                    });
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('ensureCourseInstructorsTableExists error: ' . $e->getMessage());
+        }
+    }
+
+    public static function ensureCategoryCourseTableExists(): void
+    {
+        try {
+            if (! Schema::hasTable('category_course')) {
+                Schema::create('category_course', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('category_id')->index();
+                    $table->unsignedBigInteger('course_id')->index();
+                    $table->timestamps();
+                });
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('ensureCategoryCourseTableExists error: ' . $e->getMessage());
+        }
     }
 
     public function instructors(): BelongsToMany
@@ -228,8 +277,16 @@ class Course extends Model
 
     public function isAssignedTeacher(int $userId): bool
     {
-        return $this->instructors()->where('users.id', $userId)->exists()
-            || $this->instructor_id === $userId;
+        if ($this->instructor_id === $userId) {
+            return true;
+        }
+
+        try {
+            self::ensureCourseInstructorsTableExists();
+            return $this->instructors()->where('users.id', $userId)->exists();
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     public function affiliateSetting(): \Illuminate\Database\Eloquent\Relations\HasOne

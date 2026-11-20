@@ -144,7 +144,23 @@ export const AdminCourseEditPage: React.FC = () => {
             setThumbnail(c.thumbnail || '');
             setStatus(c.status);
             setSelectedCategoryIds(c.categories?.map((cat: any) => cat.id) || []);
-            setSelectedTeacherIds(c.instructors?.map((t: any) => t.id) || []);
+
+            const initialTeacherIds: number[] = [];
+            if (Array.isArray(c.instructors) && c.instructors.length > 0) {
+                c.instructors.forEach((t: any) => {
+                    if (t?.id && !initialTeacherIds.includes(t.id)) {
+                        initialTeacherIds.push(t.id);
+                    }
+                });
+            }
+            if (c.instructor_id && !initialTeacherIds.includes(c.instructor_id)) {
+                initialTeacherIds.push(c.instructor_id);
+            }
+            if (c.instructor?.id && !initialTeacherIds.includes(c.instructor.id)) {
+                initialTeacherIds.push(c.instructor.id);
+            }
+            setSelectedTeacherIds(initialTeacherIds);
+
             setSavedCourseId(c.id);
 
             // Load features, fake enroll count, class starts date
@@ -218,7 +234,13 @@ export const AdminCourseEditPage: React.FC = () => {
                 setTimeout(() => setSuccessMessage(null), 5000);
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to save course.');
+            const resData = err.response?.data;
+            if (resData?.errors) {
+                const messages = Object.values(resData.errors).flat().join(' ');
+                setError(messages || resData.message || 'Failed to save course.');
+            } else {
+                setError(resData?.message || 'Failed to save course.');
+            }
         } finally {
             setSaving(false);
         }
@@ -772,30 +794,58 @@ export const AdminCourseEditPage: React.FC = () => {
 
                     {/* Multi-Teacher Assignment */}
                     <div className="space-y-2">
-                        <label className="block text-xs font-bold text-slate-700">
-                            Assign Instructors (Select one or more teachers) *
-                        </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-3 bg-slate-50 rounded-2xl border border-slate-200">
-                            {allTeachers.map((teacher) => {
-                                const isSelected = selectedTeacherIds.includes(teacher.id);
-                                return (
-                                    <div
-                                        key={teacher.id}
-                                        onClick={() => toggleTeacher(teacher.id)}
-                                        className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${isSelected
-                                            ? 'bg-sky-50 border-sky-400 text-sky-900 font-bold'
-                                            : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
-                                            }`}
-                                    >
-                                        <div className="text-xs truncate mr-2">
-                                            <div>{teacher.name}</div>
-                                            <div className="text-[10px] text-slate-400 font-mono">{teacher.phone}</div>
-                                        </div>
-                                        {isSelected && <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />}
-                                    </div>
-                                );
-                            })}
+                        <div className="flex items-center justify-between">
+                            <label className="block text-xs font-bold text-slate-700">
+                                Assign Instructors (Select one or more teachers)
+                            </label>
+                            <Link
+                                to="/admin/users/create"
+                                target="_blank"
+                                className="text-xs font-semibold text-sky-600 hover:text-sky-700 hover:underline"
+                            >
+                                + Create New Instructor
+                            </Link>
                         </div>
+                        {allTeachers.length === 0 ? (
+                            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500">
+                                No instructors found. Please create a teacher from the{' '}
+                                <Link to="/admin/users/create" target="_blank" className="text-sky-600 font-bold underline">
+                                    Create User
+                                </Link>{' '}
+                                page.
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                                {allTeachers.map((teacher) => {
+                                    const isSelected = selectedTeacherIds.includes(teacher.id);
+                                    return (
+                                        <div
+                                            key={teacher.id}
+                                            onClick={() => toggleTeacher(teacher.id)}
+                                            className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${isSelected
+                                                ? 'bg-sky-50 border-sky-400 text-sky-900 font-bold'
+                                                : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                                                }`}
+                                        >
+                                            <div className="text-xs truncate mr-2">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="font-bold">{teacher.name}</span>
+                                                    {teacher.role && (
+                                                        <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
+                                                            {teacher.role}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="text-[10px] text-slate-400 font-mono">
+                                                    {teacher.phone || teacher.email || `ID: ${teacher.id}`}
+                                                </div>
+                                            </div>
+                                            {isSelected && <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
 
                     {/* Categories */}
