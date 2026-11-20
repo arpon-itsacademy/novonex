@@ -54,44 +54,38 @@ export const CourseDetailsPage: React.FC = () => {
     const [copiedCoupon, setCopiedCoupon] = useState(false);
     const [showHowToBuyModal, setShowHowToBuyModal] = useState(false);
 
-    // Live countdown timer state (Matches user screenshot)
+    // Live countdown timer state
     const [timeLeft, setTimeLeft] = useState({
-        days: 18,
-        hours: 20,
-        minutes: 10,
-        seconds: 28,
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
     });
 
     useEffect(() => {
+        if (!course?.show_coupon_timer || !course?.discount_deadline) {
+            setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+            return;
+        }
+
         const updateTimer = () => {
-            if (course?.discount_deadline) {
-                const diff = new Date(course.discount_deadline).getTime() - new Date().getTime();
-                if (diff > 0) {
-                    setTimeLeft({
-                        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-                        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-                        minutes: Math.floor((diff / 1000 / 60) % 60),
-                        seconds: Math.floor((diff / 1000) % 60),
-                    });
-                    return;
-                }
+            const diff = new Date(course.discount_deadline).getTime() - new Date().getTime();
+            if (diff > 0) {
+                setTimeLeft({
+                    days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+                    minutes: Math.floor((diff / 1000 / 60) % 60),
+                    seconds: Math.floor((diff / 1000) % 60),
+                });
+            } else {
+                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
             }
-            // Rolling live countdown based on day/month target
-            const now = new Date();
-            const target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 18, 23, 59, 59);
-            const diff = Math.max(0, target.getTime() - now.getTime());
-            setTimeLeft({
-                days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-                hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-                minutes: Math.floor((diff / 1000 / 60) % 60),
-                seconds: Math.floor((diff / 1000) % 60),
-            });
         };
 
         updateTimer();
         const interval = setInterval(updateTimer, 1000);
         return () => clearInterval(interval);
-    }, [course?.discount_deadline]);
+    }, [course?.discount_deadline, course?.show_coupon_timer]);
 
     useEffect(() => {
         const fetchCourse = async () => {
@@ -174,12 +168,12 @@ export const CourseDetailsPage: React.FC = () => {
         ? Number(course.sale_price)
         : (course.effective_price ?? Number(course.price));
     const hasDiscount = course.sale_price !== null && course.sale_price !== undefined && Number(course.sale_price) < Number(course.price);
-    const promoCoupon = course.coupon_code || 'ACPPOWERPLAY500';
-    const discountAmount = hasDiscount ? Math.round(Number(course.price) - Number(course.sale_price)) : 500;
-    const discountText = course.coupon_discount_text || `Tk ${discountAmount} OFF`;
+    const promoCoupon = course.coupon_code || '';
+    const discountAmount = hasDiscount ? Math.round(Number(course.price) - Number(course.sale_price)) : 0;
+    const discountText = course.coupon_discount_text || (discountAmount > 0 ? `Tk ${discountAmount} OFF` : '');
 
     const handleApplyCoupon = () => {
-        if (navigator.clipboard) {
+        if (promoCoupon && navigator.clipboard) {
             navigator.clipboard.writeText(promoCoupon);
         }
         setCopiedCoupon(true);
@@ -521,45 +515,53 @@ export const CourseDetailsPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Coupon & Live Countdown Timer (Sky Blue & Amber Theme) */}
-                            <div className="border-[1.5px] border-dashed border-sky-300 bg-gradient-to-br from-sky-50/70 via-white to-amber-50/40 rounded-2xl p-3 sm:p-4 space-y-3">
-                                {/* Top Row: Coupon code, discount label, and Apply button */}
-                                <div className="flex items-center justify-between gap-2">
-                                    <div className="bg-white border border-sky-300 rounded-xl px-3 sm:px-4 py-1.5 font-mono font-black text-sky-600 text-xs sm:text-sm tracking-wide shadow-2xs truncate">
-                                        {promoCoupon}
-                                    </div>
-                                    <span className="text-xs sm:text-sm font-black text-amber-600 whitespace-nowrap">
-                                        {discountText}
-                                    </span>
-                                    <button
-                                        type="button"
-                                        onClick={handleApplyCoupon}
-                                        className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black shadow-xs transition cursor-pointer whitespace-nowrap"
-                                    >
-                                        {copiedCoupon ? 'Applied!' : 'Apply'}
-                                    </button>
-                                </div>
+                            {/* Coupon & Live Countdown Timer (Enabled via Admin) */}
+                            {Boolean(course.show_coupon_timer) && (Boolean(promoCoupon) || (Boolean(course.discount_deadline) && (timeLeft.days > 0 || timeLeft.hours > 0 || timeLeft.minutes > 0 || timeLeft.seconds > 0))) && (
+                                <div className="border-[1.5px] border-dashed border-sky-300 bg-gradient-to-br from-sky-50/70 via-white to-amber-50/40 rounded-2xl p-3 sm:p-4 space-y-3">
+                                    {/* Top Row: Coupon code, discount label, and Apply button */}
+                                    {Boolean(promoCoupon) && (
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="bg-white border border-sky-300 rounded-xl px-3 sm:px-4 py-1.5 font-mono font-black text-sky-600 text-xs sm:text-sm tracking-wide shadow-2xs truncate">
+                                                {promoCoupon}
+                                            </div>
+                                            {Boolean(discountText) && (
+                                                <span className="text-xs sm:text-sm font-black text-amber-600 whitespace-nowrap">
+                                                    {discountText}
+                                                </span>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={handleApplyCoupon}
+                                                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black shadow-xs transition cursor-pointer whitespace-nowrap"
+                                            >
+                                                {copiedCoupon ? 'Applied!' : 'Apply'}
+                                            </button>
+                                        </div>
+                                    )}
 
-                                {/* Bottom Row: 4 Countdown Pills */}
-                                <div className="grid grid-cols-4 gap-2 text-center">
-                                    <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
-                                        <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.days}</span>
-                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Days</span>
-                                    </div>
-                                    <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
-                                        <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.hours}</span>
-                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Hours</span>
-                                    </div>
-                                    <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
-                                        <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.minutes}</span>
-                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Mins</span>
-                                    </div>
-                                    <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
-                                        <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.seconds}</span>
-                                        <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Secs</span>
-                                    </div>
+                                    {/* Bottom Row: 4 Countdown Pills */}
+                                    {Boolean(course.discount_deadline) && (timeLeft.days > 0 || timeLeft.hours > 0 || timeLeft.minutes > 0 || timeLeft.seconds > 0) && (
+                                        <div className="grid grid-cols-4 gap-2 text-center">
+                                            <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
+                                                <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.days}</span>
+                                                <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Days</span>
+                                            </div>
+                                            <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
+                                                <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.hours}</span>
+                                                <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Hours</span>
+                                            </div>
+                                            <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
+                                                <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.minutes}</span>
+                                                <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Mins</span>
+                                            </div>
+                                            <div className="bg-white rounded-xl shadow-2xs py-2 px-1 border border-sky-100 flex flex-col items-center justify-center">
+                                                <span className="text-base sm:text-lg font-black text-sky-600 leading-tight">{timeLeft.seconds}</span>
+                                                <span className="text-[10px] sm:text-[11px] font-bold text-amber-600">Secs</span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
+                            )}
 
                             {/* Centered Price Section (Sky Blue) */}
                             <div className="text-center py-1 flex items-baseline justify-center gap-3">
@@ -711,10 +713,12 @@ export const CourseDetailsPage: React.FC = () => {
                                     <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
                                     <p className="text-xs text-slate-700 font-medium">Click the <strong className="text-sky-700">"Add to Cart"</strong> button in the sidebar to add this course to your cart, then proceed to checkout.</p>
                                 </div>
-                                <div className="flex items-start gap-3 p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
-                                    <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
-                                    <p className="text-xs text-slate-700 font-medium">Coupon code <strong className="text-sky-700 font-mono">{promoCoupon}</strong> will automatically apply your discount.</p>
-                                </div>
+                                {Boolean(course.show_coupon_timer && promoCoupon) && (
+                                    <div className="flex items-start gap-3 p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
+                                        <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
+                                        <p className="text-xs text-slate-700 font-medium">Coupon code <strong className="text-sky-700 font-mono">{promoCoupon}</strong> will automatically apply your discount.</p>
+                                    </div>
+                                )}
                                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
                                     <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
                                     <p className="text-xs text-slate-700 font-medium">Complete payment via bKash, Nagad, Rocket, or shurjoPay online gateway.</p>

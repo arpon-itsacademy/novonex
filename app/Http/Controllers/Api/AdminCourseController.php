@@ -62,6 +62,7 @@ class AdminCourseController extends Controller
             'coupon_code' => ['nullable', 'string', 'max:100'],
             'coupon_discount_text' => ['nullable', 'string', 'max:100'],
             'discount_deadline' => ['nullable', 'date'],
+            'show_coupon_timer' => ['nullable', 'boolean'],
             'how_to_buy_url' => ['nullable', 'string', 'max:500'],
         ], [
             'sale_price.lte' => 'Sale price must be less than or equal to regular price.',
@@ -92,6 +93,7 @@ class AdminCourseController extends Controller
             'coupon_code' => ! empty($validated['coupon_code']) ? strtoupper(trim($validated['coupon_code'])) : null,
             'coupon_discount_text' => $validated['coupon_discount_text'] ?? null,
             'discount_deadline' => $validated['discount_deadline'] ?? null,
+            'show_coupon_timer' => array_key_exists('show_coupon_timer', $validated) ? (bool) $validated['show_coupon_timer'] : false,
             'how_to_buy_url' => $validated['how_to_buy_url'] ?? null,
             'status' => $validated['status'],
         ]);
@@ -145,6 +147,7 @@ class AdminCourseController extends Controller
             'coupon_code' => ['nullable', 'string', 'max:100'],
             'coupon_discount_text' => ['nullable', 'string', 'max:100'],
             'discount_deadline' => ['nullable', 'date'],
+            'show_coupon_timer' => ['nullable', 'boolean'],
             'how_to_buy_url' => ['nullable', 'string', 'max:500'],
         ], [
             'sale_price.lte' => 'Sale price must be less than or equal to regular price.',
@@ -169,6 +172,7 @@ class AdminCourseController extends Controller
             'coupon_code' => ! empty($validated['coupon_code']) ? strtoupper(trim($validated['coupon_code'])) : null,
             'coupon_discount_text' => $validated['coupon_discount_text'] ?? null,
             'discount_deadline' => $validated['discount_deadline'] ?? null,
+            'show_coupon_timer' => array_key_exists('show_coupon_timer', $validated) ? (bool) $validated['show_coupon_timer'] : false,
             'how_to_buy_url' => $validated['how_to_buy_url'] ?? null,
             'status' => $validated['status'],
         ]);

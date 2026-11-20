@@ -59,6 +59,7 @@ export const AdminCourseEditPage: React.FC = () => {
     const [classStartsAt, setClassStartsAt] = useState<string>('');
 
     // Coupon, Countdown & How-to-Buy
+    const [showCouponTimer, setShowCouponTimer] = useState<boolean>(false);
     const [couponCode, setCouponCode] = useState<string>('');
     const [couponDiscountText, setCouponDiscountText] = useState<string>('');
     const [discountDeadline, setDiscountDeadline] = useState<string>('');
@@ -151,6 +152,7 @@ export const AdminCourseEditPage: React.FC = () => {
             }
             setFakeEnrollmentCount(c.fake_enrollment_count ? String(c.fake_enrollment_count) : '0');
             setClassStartsAt(c.class_starts_at || '');
+            setShowCouponTimer(Boolean(c.show_coupon_timer));
             setCouponCode(c.coupon_code || '');
             setCouponDiscountText(c.coupon_discount_text || '');
             setDiscountDeadline(c.discount_deadline ? c.discount_deadline.substring(0, 16) : '');
@@ -190,6 +192,7 @@ export const AdminCourseEditPage: React.FC = () => {
                 features: features.filter((f) => f.trim().length > 0),
                 fake_enrollment_count: parseInt(fakeEnrollmentCount, 10) || 0,
                 class_starts_at: classStartsAt.trim() || null,
+                show_coupon_timer: showCouponTimer,
                 coupon_code: couponCode.trim() ? couponCode.trim().toUpperCase() : null,
                 coupon_discount_text: couponDiscountText.trim() || null,
                 discount_deadline: discountDeadline.trim() || null,
@@ -532,87 +535,127 @@ export const AdminCourseEditPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Coupon, Countdown & How to Buy Video (Matches user reference card) */}
+                    {/* Coupon, Countdown & How to Buy Video */}
                     <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-200/80 space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="flex items-center gap-2">
                                 <Tag className="w-5 h-5 text-indigo-600" />
-                                <h3 className="text-sm font-bold text-slate-800">
-                                    Coupon Promotion & Countdown Timer
-                                </h3>
+                                <div>
+                                    <h3 className="text-sm font-bold text-slate-800">
+                                        Coupon Promotion & Countdown Timer
+                                    </h3>
+                                    <p className="text-xs text-slate-500">
+                                        Show promo coupon code and live countdown banner in public course page sidebar
+                                    </p>
+                                </div>
                             </div>
-                            <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-100/70 px-2.5 py-0.5 rounded-full">
-                                Course Sidebar Promo
-                            </span>
+                            <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
+                                <span className={`text-xs font-bold ${showCouponTimer ? 'text-indigo-600' : 'text-slate-500'}`}>
+                                    {showCouponTimer ? 'Enabled' : 'Disabled (Default)'}
+                                </span>
+                                <input
+                                    type="checkbox"
+                                    checked={showCouponTimer}
+                                    onChange={(e) => setShowCouponTimer(e.target.checked)}
+                                    className="w-4 h-4 text-indigo-600 rounded-sm border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                                />
+                            </label>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                                    <Tag className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>Coupon Code</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                    placeholder="e.g. NOVONEX500"
-                                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono font-bold uppercase focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
-                                />
-                                <p className="text-[11px] text-slate-400 mt-1">
-                                    Students can click 'Apply' in the sidebar to auto-apply this coupon at checkout.
-                                </p>
-                            </div>
 
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>Discount Text</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    value={couponDiscountText}
-                                    onChange={(e) => setCouponDiscountText(e.target.value)}
-                                    placeholder="e.g. Tk 500 Discount"
-                                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
-                                />
-                                <p className="text-[11px] text-slate-400 mt-1">
-                                    Displays next to the coupon code badge.
-                                </p>
-                            </div>
+                        {showCouponTimer ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-indigo-100">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                        <Tag className="w-3.5 h-3.5 text-indigo-600" />
+                                        <span>Coupon Code</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={couponCode}
+                                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                        placeholder="e.g. NOVONEX500"
+                                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono font-bold uppercase focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                    <p className="text-[11px] text-slate-400 mt-1">
+                                        Students can click 'Apply' in the sidebar to auto-apply this coupon at checkout.
+                                    </p>
+                                </div>
 
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                                    <Clock className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>Offer Expiry Date & Time (Countdown Timer)</span>
-                                </label>
-                                <input
-                                    type="datetime-local"
-                                    value={discountDeadline}
-                                    onChange={(e) => setDiscountDeadline(e.target.value)}
-                                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
-                                />
-                                <p className="text-[11px] text-slate-400 mt-1">
-                                    Set the deadline for the live days/hours/minutes countdown banner.
-                                </p>
-                            </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                        <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                                        <span>Discount Text</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={couponDiscountText}
+                                        onChange={(e) => setCouponDiscountText(e.target.value)}
+                                        placeholder="e.g. Tk 500 Discount"
+                                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                    <p className="text-[11px] text-slate-400 mt-1">
+                                        Displays next to the coupon code badge.
+                                    </p>
+                                </div>
 
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                                    <PlayCircle className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>'How to Enroll' Video URL</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    value={howToBuyUrl}
-                                    onChange={(e) => setHowToBuyUrl(e.target.value)}
-                                    placeholder="e.g. https://www.youtube.com/watch?v=..."
-                                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
-                                />
-                                <p className="text-[11px] text-slate-400 mt-1">
-                                    Opens in a video modal popup when clicked by students.
-                                </p>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                        <Clock className="w-3.5 h-3.5 text-indigo-600" />
+                                        <span>Offer Expiry Date & Time (Countdown Timer)</span>
+                                    </label>
+                                    <input
+                                        type="datetime-local"
+                                        value={discountDeadline}
+                                        onChange={(e) => setDiscountDeadline(e.target.value)}
+                                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                    <p className="text-[11px] text-slate-400 mt-1">
+                                        Set the deadline for the live days/hours/minutes countdown banner.
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                        <PlayCircle className="w-3.5 h-3.5 text-indigo-600" />
+                                        <span>'How to Enroll' Video URL</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={howToBuyUrl}
+                                        onChange={(e) => setHowToBuyUrl(e.target.value)}
+                                        placeholder="e.g. https://www.youtube.com/watch?v=..."
+                                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                    <p className="text-[11px] text-slate-400 mt-1">
+                                        Opens in a video modal popup when clicked by students.
+                                    </p>
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="space-y-3 pt-2 border-t border-indigo-100">
+                                <div className="py-2.5 text-xs text-slate-500 bg-white/80 border border-indigo-100 rounded-xl px-4 flex items-center justify-between">
+                                    <span>Promo coupon and countdown timer are currently disabled for this course.</span>
+                                    <span className="font-semibold text-slate-600">Hidden from Course Page</span>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                        <PlayCircle className="w-3.5 h-3.5 text-indigo-600" />
+                                        <span>'How to Enroll' Video URL</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={howToBuyUrl}
+                                        onChange={(e) => setHowToBuyUrl(e.target.value)}
+                                        placeholder="e.g. https://www.youtube.com/watch?v=..."
+                                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                    <p className="text-[11px] text-slate-400 mt-1">
+                                        Opens in a video modal popup when clicked by students.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Course Outline & Custom Buttons Notice Card */}
