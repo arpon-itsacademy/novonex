@@ -124,7 +124,13 @@ export const DashboardLayout: React.FC = () => {
 
     // Role-based protection: if student or teacher attempts to access /admin, redirect safely
     if (location.pathname.startsWith('/admin') && !isStaffOrAdmin) {
-        if (user.role === 'teacher') return <Navigate to="/teacher" replace />;
+        if (user.role === 'teacher') {
+            const builderMatch = location.pathname.match(/^\/admin\/courses\/(\d+)\/builder/);
+            if (builderMatch) {
+                return <Navigate to={`/teacher/courses/${builderMatch[1]}/builder`} replace />;
+            }
+            return <Navigate to="/teacher" replace />;
+        }
         return <Navigate to="/student" replace />;
     }
 

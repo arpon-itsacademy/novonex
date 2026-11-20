@@ -116,7 +116,7 @@ export const TeacherDashboardPage: React.FC = () => {
                             </div>
 
                             <Link
-                                to={`/admin/courses/${course.id}/builder`}
+                                to={`/teacher/courses/${course.id}/builder`}
                                 className="w-full py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                             >
                                 <Layers className="w-3.5 h-3.5" />

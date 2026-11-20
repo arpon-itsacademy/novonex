@@ -259,9 +259,9 @@ export const LessonPlayerPage: React.FC = () => {
             <header className="h-16 bg-slate-900 border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
                 <div className="flex items-center gap-3 truncate mr-4">
                     <Link
-                        to={user?.role === 'admin' ? `/admin/courses/${courseId}/builder` : (user?.role === 'teacher' ? `/teacher/courses` : "/student/my-courses")}
+                        to={user?.role === 'admin' ? `/admin/courses/${courseId}/builder` : (user?.role === 'teacher' ? `/teacher/courses/${courseId}/builder` : "/student/my-courses")}
                         className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors shrink-0"
-                        title={user?.role === 'admin' ? "Back to Course Builder" : "Back to Course List"}
+                        title={user?.role === 'admin' || user?.role === 'teacher' ? "Back to Course Builder" : "Back to Course List"}
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
@@ -279,9 +279,11 @@ export const LessonPlayerPage: React.FC = () => {
                 {(user?.role === 'admin' || user?.role === 'teacher') && (
                     <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-xl shrink-0 mx-2">
                         <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                        <span className="text-xs font-bold text-amber-300">Student Preview Mode (Admin)</span>
+                        <span className="text-xs font-bold text-amber-300">
+                            {user?.role === 'teacher' ? 'Student Preview Mode (Teacher)' : 'Student Preview Mode (Admin)'}
+                        </span>
                         <Link
-                            to={`/admin/courses/${courseId}/builder`}
+                            to={user?.role === 'teacher' ? `/teacher/courses/${courseId}/builder` : `/admin/courses/${courseId}/builder`}
                             className="ml-2 px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] uppercase rounded-lg transition-colors inline-flex items-center gap-1 shadow-xs"
                         >
                             <span>Back to Builder</span>

@@ -82,7 +82,7 @@ export const TeacherCoursesPage: React.FC = () => {
 
                                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
                                     <Link
-                                        to={`/admin/courses/${course.id}/builder`}
+                                        to={`/teacher/courses/${course.id}/builder`}
                                         className="py-2.5 px-3 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
                                     >
                                         <Layers className="w-3.5 h-3.5" />

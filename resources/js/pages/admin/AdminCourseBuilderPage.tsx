@@ -1065,7 +1065,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
                 <div className="flex items-center gap-3">
                     <Link
-                        to="/admin/courses"
+                        to={isTeacher ? "/teacher/courses" : "/admin/courses"}
                         className="p-2 text-slate-500 hover:text-slate-800 rounded-xl hover:bg-slate-100 transition-colors"
                     >
                         <ArrowLeft className="w-5 h-5" />
