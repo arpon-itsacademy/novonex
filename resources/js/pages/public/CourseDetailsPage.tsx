@@ -12,6 +12,7 @@ import {
     PlayCircle, 
     CheckCircle2, 
     Lock, 
+    Unlock,
     Sparkles, 
     ChevronDown, 
     ChevronUp,
@@ -304,34 +305,80 @@ export const CourseDetailsPage: React.FC = () => {
 
                                                 {isOpen && (
                                                     <div className="divide-y divide-slate-100 bg-white">
-                                                        {section.lessons?.map((lesson, lIndex) => (
-                                                            <div
-                                                                key={lesson.id}
-                                                                className="px-5 py-3.5 flex items-center justify-between hover:bg-slate-50/50 text-sm"
-                                                            >
-                                                                <div className="flex items-center gap-3">
-                                                                    {lesson.is_preview ? (
-                                                                        <PlayCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                                                                    ) : (
-                                                                        <Lock className="w-4 h-4 text-slate-400 shrink-0" />
-                                                                    )}
-                                                                    <span className="text-slate-700 font-medium">
-                                                                        Class {lIndex + 1}: {lesson.title}
-                                                                    </span>
-                                                                </div>
+                                                        {section.lessons?.map((lesson, lIndex) => {
+                                                            const isTeacherOrAdmin = Boolean(user && (user.role === 'admin' || (user.role === 'teacher' && course?.instructors?.some((i: any) => i.id === user.id))));
+                                                            const isPurchased = Boolean(isEnrolled || isTeacherOrAdmin);
+                                                            const canAccess = Boolean(isPurchased || lesson.is_preview);
+                                                            const lessonUrl = `/learning/${course.id}/lessons/${lesson.id}`;
 
-                                                                <div className="flex items-center gap-3">
-                                                                    {lesson.is_preview && (
-                                                                        <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
-                                                                            Free Preview
+                                                            if (canAccess) {
+                                                                return (
+                                                                    <Link
+                                                                        key={lesson.id}
+                                                                        to={lessonUrl}
+                                                                        className="px-5 py-3.5 flex items-center justify-between hover:bg-sky-50/80 transition-colors text-sm group cursor-pointer"
+                                                                    >
+                                                                        <div className="flex items-center gap-3 min-w-0">
+                                                                            {isPurchased ? (
+                                                                                <Unlock className="w-4 h-4 text-emerald-600 shrink-0 group-hover:scale-110 transition-transform" />
+                                                                            ) : (
+                                                                                <PlayCircle className="w-4 h-4 text-emerald-600 shrink-0 group-hover:scale-110 transition-transform" />
+                                                                            )}
+                                                                            <span className="text-slate-800 font-medium group-hover:text-sky-600 transition-colors truncate">
+                                                                                Class {lIndex + 1}: {lesson.title}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div className="flex items-center gap-3 shrink-0">
+                                                                            {lesson.is_preview && !isPurchased ? (
+                                                                                <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded flex items-center gap-1">
+                                                                                    <PlayCircle className="w-3 h-3" /> Free Preview
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="text-xs font-bold text-sky-600 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                                                                                    <span>Watch</span>
+                                                                                    <ArrowRight className="w-3.5 h-3.5" />
+                                                                                </span>
+                                                                            )}
+                                                                            <span className="text-xs text-slate-400">
+                                                                                {lesson.duration_minutes} mins
+                                                                            </span>
+                                                                        </div>
+                                                                    </Link>
+                                                                );
+                                                            }
+
+                                                            return (
+                                                                <div
+                                                                    key={lesson.id}
+                                                                    onClick={() => {
+                                                                        const enrollCard = document.getElementById('enroll-section-card') || document.querySelector('.enroll-action-btn');
+                                                                        if (enrollCard) {
+                                                                            enrollCard.scrollIntoView({ behavior: 'smooth' });
+                                                                        }
+                                                                    }}
+                                                                    className="px-5 py-3.5 flex items-center justify-between bg-slate-50/30 hover:bg-slate-50 text-sm cursor-not-allowed opacity-75 transition-colors"
+                                                                    title="Enroll in this course to unlock this lesson"
+                                                                >
+                                                                    <div className="flex items-center gap-3 min-w-0">
+                                                                        <Lock className="w-4 h-4 text-slate-400 shrink-0" />
+                                                                        <span className="text-slate-500 font-medium truncate">
+                                                                            Class {lIndex + 1}: {lesson.title}
                                                                         </span>
-                                                                    )}
-                                                                    <span className="text-xs text-slate-400">
-                                                                        {lesson.duration_minutes} mins
-                                                                    </span>
+                                                                    </div>
+
+                                                                    <div className="flex items-center gap-3 shrink-0">
+                                                                        <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
+                                                                            <Lock className="w-3 h-3" />
+                                                                            Locked
+                                                                        </span>
+                                                                        <span className="text-xs text-slate-400">
+                                                                            {lesson.duration_minutes} mins
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        ))}
+                                                            );
+                                                        })}
                                                     </div>
                                                 )}
                                             </div>
@@ -433,7 +480,7 @@ export const CourseDetailsPage: React.FC = () => {
 
                     {/* Right: Sticky Enrollment Card */}
                     <div className="order-1 lg:order-2 lg:col-span-4 -mt-8 sm:-mt-10 lg:-mt-48 xl:-mt-52 relative z-20">
-                        <div className="sticky top-24 bg-white rounded-2xl border border-slate-200/90 shadow-2xl overflow-hidden space-y-6 p-5 sm:p-6 ring-1 ring-black/5">
+                        <div id="enroll-section-card" className="sticky top-24 bg-white rounded-2xl border border-slate-200/90 shadow-2xl overflow-hidden space-y-6 p-5 sm:p-6 ring-1 ring-black/5">
                             {/* Course Image */}
                             <div className="aspect-video bg-slate-900 rounded-xl overflow-hidden -mx-2 -mt-2">
                                 {(course.thumbnail || (course as any).thumbnail_url) ? (

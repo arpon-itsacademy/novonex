@@ -129,14 +129,19 @@ class PublicCourseController extends Controller
         $isEnrolled = false;
         $accessKey = null;
 
-        if ($user && $user->isEnrolledIn($course->id)) {
-            $isEnrolled = true;
-            $enrollment = $user->enrollments()
-                ->where('course_id', $course->id)
-                ->where('status', \App\Models\Enrollment::STATUS_ACTIVE)
-                ->first();
-            if ($enrollment) {
-                $accessKey = $enrollment->getOrGenerateAccessKey();
+        if ($user) {
+            if ($user->isAdmin() || $user->isEnrolledIn($course->id) || ($user->isTeacher() && $course->isAssignedTeacher($user->id))) {
+                $isEnrolled = true;
+            }
+
+            if ($user->isEnrolledIn($course->id)) {
+                $enrollment = $user->enrollments()
+                    ->where('course_id', $course->id)
+                    ->where('status', \App\Models\Enrollment::STATUS_ACTIVE)
+                    ->first();
+                if ($enrollment) {
+                    $accessKey = $enrollment->getOrGenerateAccessKey();
+                }
             }
         }
 
