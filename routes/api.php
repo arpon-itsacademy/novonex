@@ -45,6 +45,7 @@ use App\Http\Controllers\Api\AdminManualEnrollmentController;
 use App\Http\Controllers\Api\AdminPointController;
 use App\Http\Controllers\Api\RewardTopicController;
 use App\Http\Controllers\Api\EarnPointController;
+use App\Http\Controllers\Api\CourseComplaintController;
 use App\Models\Course;
 use App\Models\LessonComment;
 use Illuminate\Http\Request;
@@ -173,6 +174,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('topics/{topic}/submit', [EarnPointController::class, 'submitNote']);
         Route::get('my-submissions', [EarnPointController::class, 'getMySubmissions']);
         Route::get('my-points-history', [EarnPointController::class, 'getMyPointsHistory']);
+    });
+
+    // Student Course Complaints (Complain Box)
+    Route::post('student/complaints', [CourseComplaintController::class, 'submitComplaint']);
+    Route::get('student/courses/{courseId}/complaints', [CourseComplaintController::class, 'getStudentCourseComplaints']);
+
+    // Complain Box Management (Admin & Teacher)
+    Route::prefix('complaints')->middleware('role:teacher,admin')->group(function () {
+        Route::get('courses', [CourseComplaintController::class, 'getCoursesWithComplaints']);
+        Route::get('courses/{courseId}', [CourseComplaintController::class, 'getCourseComplaints']);
+        Route::put('{complaintId}/status', [CourseComplaintController::class, 'updateStatus']);
     });
 
     // Student Affiliate Program

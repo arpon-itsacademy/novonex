@@ -253,4 +253,9 @@ class Course extends Model
     {
         return $this->hasMany(RewardNoteSubmission::class);
     }
+
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(CourseComplaint::class);
+    }
 }

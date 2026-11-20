@@ -57,6 +57,7 @@ import { AdminCouponsPage } from '../pages/admin/AdminCouponsPage';
 import { AdminDynamicOffersPage } from '../pages/admin/AdminDynamicOffersPage';
 import { AdminTrashPage } from '../pages/admin/AdminTrashPage';
 import { NotifyStudentPage } from '../pages/shared/NotifyStudentPage';
+import { ComplainBoxPage } from '../pages/shared/ComplainBoxPage';
 import { CustomPageView } from '../pages/public/CustomPageView';
 
 // Teacher pages
@@ -186,6 +187,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="media" element={<AdminMediaPage />} />
                 <Route path="trash" element={<AdminTrashPage />} />
                 <Route path="points" element={<AdminPointsPage />} />
+                <Route path="complain-box" element={<ComplainBoxPage role="admin" />} />
             </Route>
 
             {/* Teacher Dashboard */}
@@ -194,6 +196,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="courses" element={<TeacherCoursesPage />} />
                 <Route path="courses/:id/builder" element={<AdminCourseBuilderPage />} />
                 <Route path="questions" element={<TeacherQuestionsPage />} />
+                <Route path="complain-box" element={<ComplainBoxPage role="teacher" />} />
                 {/* Exam Management */}
                 <Route path="exams" element={<ExamListPage />} />
                 <Route path="exams/create" element={<ExamFormPage />} />

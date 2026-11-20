@@ -39,7 +39,8 @@ import {
     Loader2,
     Trash2,
     KeyRound,
-    Award
+    Award,
+    MessageSquareWarning
 } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
@@ -254,6 +255,12 @@ export const DashboardLayout: React.FC = () => {
                     permission: 'settings.manage'
                 },
                 { 
+                    title: 'Complain Box', 
+                    path: '/admin/complain-box', 
+                    icon: MessageSquareWarning,
+                    permission: 'courses.view'
+                },
+                { 
                     title: t.sidebar.payments, 
                     path: '/admin/payments', 
                     icon: CreditCard,
@@ -341,6 +348,7 @@ export const DashboardLayout: React.FC = () => {
                     ]
                 },
                 { title: t.sidebar.studentQuestions, path: '/teacher/questions', icon: MessageSquare },
+                { title: 'Complain Box', path: '/teacher/complain-box', icon: MessageSquareWarning },
             ];
         }
         // Student

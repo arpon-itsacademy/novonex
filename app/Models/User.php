@@ -311,6 +311,11 @@ class User extends Authenticatable
         return $this->hasMany(RewardNoteSubmission::class);
     }
 
+    public function courseComplaints(): HasMany
+    {
+        return $this->hasMany(CourseComplaint::class);
+    }
+
     public function hasPurchasedAnyCourse(): bool
     {
         return $this->enrollments()->where('status', 'active')->exists()

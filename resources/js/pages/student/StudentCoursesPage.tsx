@@ -16,7 +16,8 @@ import {
     Loader2,
     Copy,
     KeyRound,
-    ExternalLink
+    ExternalLink,
+    MessageSquareWarning
 } from 'lucide-react';
 import { Modal } from '../../components/ui/Modal';
 
@@ -39,6 +40,69 @@ export const StudentCoursesPage: React.FC = () => {
     const [unlockSuccess, setUnlockSuccess] = useState<string | null>(null);
     const [copiedNumber, setCopiedNumber] = useState(false);
     const [copiedAccessKey, setCopiedAccessKey] = useState<string | null>(null);
+
+    // Complain Box Modal State
+    const [complaintModalOpen, setComplaintModalOpen] = useState(false);
+    const [selectedCourseForComplaint, setSelectedCourseForComplaint] = useState<any | null>(null);
+    const [complaintSubject, setComplaintSubject] = useState('');
+    const [complaintMessage, setComplaintMessage] = useState('');
+    const [submittingComplaint, setSubmittingComplaint] = useState(false);
+    const [complaintSuccessMsg, setComplaintSuccessMsg] = useState<string | null>(null);
+    const [complaintErrorMsg, setComplaintErrorMsg] = useState<string | null>(null);
+    const [pastComplaints, setPastComplaints] = useState<any[]>([]);
+    const [loadingPastComplaints, setLoadingPastComplaints] = useState(false);
+    const [showPastComplaints, setShowPastComplaints] = useState(false);
+
+    const handleOpenComplaintModal = async (course: any) => {
+        setSelectedCourseForComplaint(course);
+        setComplaintSubject('');
+        setComplaintMessage('');
+        setComplaintSuccessMsg(null);
+        setComplaintErrorMsg(null);
+        setShowPastComplaints(false);
+        setComplaintModalOpen(true);
+        fetchPastComplaints(course.id);
+    };
+
+    const fetchPastComplaints = async (courseId: number) => {
+        try {
+            setLoadingPastComplaints(true);
+            const { data } = await apiClient.get(`/student/courses/${courseId}/complaints`);
+            setPastComplaints(data.complaints || []);
+        } catch {
+            // ignore
+        } finally {
+            setLoadingPastComplaints(false);
+        }
+    };
+
+    const handleSubmitComplaint = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedCourseForComplaint) return;
+        if (!complaintSubject.trim() || !complaintMessage.trim()) {
+            setComplaintErrorMsg('Please fill in both subject and description.');
+            return;
+        }
+
+        try {
+            setSubmittingComplaint(true);
+            setComplaintErrorMsg(null);
+            setComplaintSuccessMsg(null);
+            await apiClient.post('/student/complaints', {
+                course_id: selectedCourseForComplaint.id,
+                subject: complaintSubject.trim(),
+                message: complaintMessage.trim(),
+            });
+            setComplaintSuccessMsg('Your complaint has been submitted successfully! The team will review it.');
+            setComplaintSubject('');
+            setComplaintMessage('');
+            fetchPastComplaints(selectedCourseForComplaint.id);
+        } catch (err: any) {
+            setComplaintErrorMsg(err.response?.data?.message || 'Failed to submit complaint.');
+        } finally {
+            setSubmittingComplaint(false);
+        }
+    };
 
     const handleCopyAccessKey = (key: string) => {
         navigator.clipboard.writeText(key);
@@ -337,6 +401,18 @@ export const StudentCoursesPage: React.FC = () => {
                                             </div>
                                         </div>
                                     )}
+
+                                    {/* Complain Box Button - Always below learning and custom buttons */}
+                                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleOpenComplaintModal(course)}
+                                            className="w-full py-2 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/30 hover:bg-rose-100/70 dark:hover:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                                        >
+                                            <MessageSquareWarning className="w-3.5 h-3.5 text-rose-500" />
+                                            <span>Complain Box</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -484,6 +560,131 @@ export const StudentCoursesPage: React.FC = () => {
                         </form>
                     </div>
                 )}
+            </Modal>
+
+            {/* Complain Box Modal */}
+            <Modal
+                isOpen={complaintModalOpen}
+                onClose={() => setComplaintModalOpen(false)}
+                title={`Complain Box: ${selectedCourseForComplaint?.title || 'Course'}`}
+                maxWidth="md"
+            >
+                <div className="space-y-4">
+                    {/* Header Note */}
+                    <div className="p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-xl flex items-start gap-2.5">
+                        <MessageSquareWarning className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                        <p className="text-xs text-rose-800 dark:text-rose-300 leading-relaxed">
+                            Have an issue, grievance, or feedback regarding this course? Submit your complaint below. Our team and instructors will review and take necessary action.
+                        </p>
+                    </div>
+
+                    {complaintSuccessMsg && (
+                        <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 text-xs font-bold text-emerald-700 dark:text-emerald-300 rounded-xl flex items-center gap-2">
+                            <Check className="w-4 h-4 text-emerald-500" />
+                            <span>{complaintSuccessMsg}</span>
+                        </div>
+                    )}
+
+                    {complaintErrorMsg && (
+                        <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 text-xs font-bold text-rose-700 dark:text-rose-300 rounded-xl flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4 text-rose-500" />
+                            <span>{complaintErrorMsg}</span>
+                        </div>
+                    )}
+
+                    {/* Toggle past complaints button if student has past complaints */}
+                    {pastComplaints.length > 0 && (
+                        <div className="flex items-center justify-between pb-1">
+                            <button
+                                type="button"
+                                onClick={() => setShowPastComplaints(!showPastComplaints)}
+                                className="text-xs font-bold text-[#25a2ee] hover:underline cursor-pointer"
+                            >
+                                {showPastComplaints ? 'Write New Complaint' : `View My Past Complaints (${pastComplaints.length})`}
+                            </button>
+                        </div>
+                    )}
+
+                    {showPastComplaints ? (
+                        <div className="max-h-80 overflow-y-auto space-y-2.5 pr-1">
+                            {pastComplaints.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl space-y-1"
+                                >
+                                    <div className="flex items-start justify-between gap-2">
+                                        <h5 className="font-extrabold text-xs text-slate-900 dark:text-white">
+                                            {item.subject}
+                                        </h5>
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
+                                            item.status === 'resolved'
+                                                ? 'bg-emerald-100 text-emerald-800'
+                                                : item.status === 'reviewed'
+                                                ? 'bg-sky-100 text-sky-800'
+                                                : 'bg-amber-100 text-amber-800'
+                                        }`}>
+                                            {item.status}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line">
+                                        {item.message}
+                                    </p>
+                                    <span className="text-[10px] text-slate-400">
+                                        {new Date(item.created_at).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <form onSubmit={handleSubmitComplaint} className="space-y-3.5">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                    Complaint Subject <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Video playback issue in Lesson 4, or schedule conflict"
+                                    value={complaintSubject}
+                                    onChange={(e) => setComplaintSubject(e.target.value)}
+                                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-hidden focus:border-rose-500"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                    Complaint Details / Description <span className="text-rose-500">*</span>
+                                </label>
+                                <textarea
+                                    rows={4}
+                                    placeholder="Please describe your issue in detail so we can investigate and resolve it promptly..."
+                                    value={complaintMessage}
+                                    onChange={(e) => setComplaintMessage(e.target.value)}
+                                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:outline-hidden focus:border-rose-500"
+                                    required
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                <button
+                                    type="button"
+                                    onClick={() => setComplaintModalOpen(false)}
+                                    className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={submittingComplaint}
+                                    className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                                >
+                                    {submittingComplaint && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                                    <span>Submit Complaint</span>
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </div>
             </Modal>
         </div>
     );
