@@ -122,6 +122,18 @@ class Coupon extends Model
                 });
             } catch (\Throwable $e) {}
         }
+
+        if (!Schema::hasTable('coupon_users')) {
+            try {
+                Schema::create('coupon_users', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('coupon_id');
+                    $table->unsignedBigInteger('user_id');
+                    $table->timestamps();
+                    $table->index(['coupon_id', 'user_id']);
+                });
+            } catch (\Throwable $e) {}
+        }
     }
 
     public static function booted(): void
@@ -175,6 +187,11 @@ class Coupon extends Model
     public function restrictedUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'restricted_user_id');
+    }
+
+    public function restrictedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'coupon_users')->withTimestamps();
     }
 
     public function creator(): BelongsTo
@@ -263,7 +280,15 @@ class Coupon extends Model
 
         // User restriction check
         if ($this->user_restriction_type === self::USER_SPECIFIC) {
-            if (!$user || $user->id !== $this->restricted_user_id) {
+            if (!$user) {
+                return ['valid' => false, 'message' => 'Please log in to your account to use this coupon.'];
+            }
+            $allowedUserIds = $this->restrictedUsers()->pluck('users.id')->toArray();
+            if (!empty($allowedUserIds)) {
+                if (!in_array($user->id, $allowedUserIds, true)) {
+                    return ['valid' => false, 'message' => 'This coupon is restricted to specific user accounts.'];
+                }
+            } elseif ($this->restricted_user_id !== null && $user->id !== $this->restricted_user_id) {
                 return ['valid' => false, 'message' => 'This coupon is restricted to a specific user account.'];
             }
         }
@@ -349,7 +374,12 @@ class Coupon extends Model
             if (!$user) {
                 return ['valid' => false, 'message' => 'Please log in to your account to use this coupon.'];
             }
-            if ($user->id !== $this->restricted_user_id) {
+            $allowedUserIds = $this->restrictedUsers()->pluck('users.id')->toArray();
+            if (!empty($allowedUserIds)) {
+                if (!in_array($user->id, $allowedUserIds, true)) {
+                    return ['valid' => false, 'message' => 'This coupon is restricted to specific user accounts.'];
+                }
+            } elseif ($this->restricted_user_id !== null && $user->id !== $this->restricted_user_id) {
                 return ['valid' => false, 'message' => 'This coupon is restricted to a specific user account.'];
             }
         }

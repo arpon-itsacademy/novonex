@@ -65,6 +65,7 @@ interface CouponItem {
     user_restriction_type: 'all' | 'specific';
     restricted_user_id?: number | null;
     restricted_user?: UserOption | null;
+    restricted_users?: UserOption[];
     usage_limit?: number | null;
     usage_limit_per_user: number;
     times_used: number;
@@ -141,6 +142,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
         course_ids: [] as number[],
         category_ids: [] as number[],
         user_restriction_type: 'all' as 'all' | 'specific',
+        restricted_user_ids: [] as number[],
         restricted_user_id: null as number | null,
         usage_limit: '' as string | number,
         usage_limit_per_user: '' as string | number,
@@ -156,7 +158,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
     const [userSearchTerm, setUserSearchTerm] = useState('');
     const [userSearchResults, setUserSearchResults] = useState<UserOption[]>([]);
     const [searchingUsers, setSearchingUsers] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<UserOption | null>(null);
+    const [selectedUsers, setSelectedUsers] = useState<UserOption[]>([]);
 
     // Filtered courses and categories for modal
     const filteredCourses = useMemo(() => {
@@ -343,6 +345,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
             course_ids: [],
             category_ids: [],
             user_restriction_type: 'all',
+            restricted_user_ids: [],
             restricted_user_id: null,
             usage_limit: '',
             usage_limit_per_user: '',
@@ -350,7 +353,7 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
             expiry_date: '',
             is_active: true,
         });
-        setSelectedUser(null);
+        setSelectedUsers([]);
         setUserSearchTerm('');
         setUserSearchResults([]);
         setCourseSearchTerm('');
@@ -373,6 +376,12 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
             (coupon.title && coupon.title !== coupon.code)
         );
         setShowAdvanced(hasAdvancedSettings);
+
+        const usersList: UserOption[] = coupon.restricted_users && coupon.restricted_users.length > 0
+            ? coupon.restricted_users
+            : (coupon.restricted_user ? [coupon.restricted_user] : []);
+
+        setSelectedUsers(usersList);
         setFormData({
             code: coupon.code,
             title: coupon.title || '',
@@ -385,14 +394,14 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
             course_ids: coupon.courses?.map(c => c.id) || [],
             category_ids: coupon.categories?.map(c => c.id) || [],
             user_restriction_type: coupon.user_restriction_type,
-            restricted_user_id: coupon.restricted_user_id || null,
+            restricted_user_ids: usersList.map(u => u.id),
+            restricted_user_id: usersList[0]?.id || coupon.restricted_user_id || null,
             usage_limit: coupon.usage_limit || '',
             usage_limit_per_user: coupon.usage_limit_per_user || '',
             start_date: coupon.start_date ? coupon.start_date.substring(0, 16) : '',
             expiry_date: coupon.expiry_date ? coupon.expiry_date.substring(0, 16) : '',
             is_active: coupon.is_active,
         });
-        setSelectedUser(coupon.restricted_user || null);
         setUserSearchTerm('');
         setUserSearchResults([]);
         setCourseSearchTerm('');
@@ -422,8 +431,8 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
             return;
         }
 
-        if (formData.user_restriction_type === 'specific' && !formData.restricted_user_id) {
-            setFormError('Please search and select a specific student/user.');
+        if (formData.user_restriction_type === 'specific' && selectedUsers.length === 0) {
+            setFormError('Please search and select at least one student/user.');
             return;
         }
 
@@ -452,7 +461,8 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                 course_ids: formData.scope_type === 'course' ? formData.course_ids : [],
                 category_ids: formData.scope_type === 'category' ? formData.category_ids : [],
                 user_restriction_type: formData.user_restriction_type,
-                restricted_user_id: formData.user_restriction_type === 'specific' ? formData.restricted_user_id : null,
+                restricted_user_ids: formData.user_restriction_type === 'specific' ? selectedUsers.map(u => u.id) : [],
+                restricted_user_id: formData.user_restriction_type === 'specific' ? (selectedUsers[0]?.id || null) : null,
                 usage_limit: formData.usage_limit ? Number(formData.usage_limit) : null,
                 usage_limit_per_user: formData.usage_limit_per_user ? Number(formData.usage_limit_per_user) : null,
                 start_date: formData.start_date || null,
@@ -785,18 +795,43 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
 
                                             {/* Target Student */}
                                             <td className="px-6 py-4">
-                                                {coupon.user_restriction_type === 'specific' && coupon.restricted_user ? (
-                                                    <div className="space-y-0.5">
+                                                {coupon.user_restriction_type === 'specific' ? (
+                                                    <div className="space-y-1">
                                                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-900">
-                                                            <UserIcon className="w-3 h-3" /> Specific User
+                                                            <UserIcon className="w-3 h-3" />
+                                                            <span>
+                                                                {coupon.restricted_users && coupon.restricted_users.length > 1
+                                                                    ? `${coupon.restricted_users.length} Specific Users`
+                                                                    : 'Specific User'}
+                                                            </span>
                                                         </span>
-                                                        <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
-                                                            <span>{coupon.restricted_user.name}</span>
-                                                        </div>
-                                                        <div className="text-[11px] font-mono text-slate-500 flex items-center gap-1">
-                                                            <Phone className="w-3 h-3 text-slate-400" />
-                                                            <span>{coupon.restricted_user.phone}</span>
-                                                        </div>
+                                                        {coupon.restricted_users && coupon.restricted_users.length > 0 ? (
+                                                            <div className="space-y-0.5 max-w-[220px]">
+                                                                {coupon.restricted_users.slice(0, 2).map((u) => (
+                                                                    <div key={u.id} className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1">
+                                                                        <span>{u.name}</span>
+                                                                        <span className="text-[10px] text-slate-400 font-mono">({u.phone})</span>
+                                                                    </div>
+                                                                ))}
+                                                                {coupon.restricted_users.length > 2 && (
+                                                                    <div className="text-[10px] text-indigo-600 font-bold">
+                                                                        +{coupon.restricted_users.length - 2} more students
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ) : coupon.restricted_user ? (
+                                                            <div className="space-y-0.5">
+                                                                <div className="font-bold text-slate-800 dark:text-slate-200">
+                                                                    {coupon.restricted_user.name}
+                                                                </div>
+                                                                <div className="text-[11px] font-mono text-slate-500 flex items-center gap-1">
+                                                                    <Phone className="w-3 h-3 text-slate-400" />
+                                                                    <span>{coupon.restricted_user.phone}</span>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-xs text-rose-500 italic">No user assigned</span>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
@@ -1321,8 +1356,8 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    setFormData(prev => ({ ...prev, user_restriction_type: 'all', restricted_user_id: null }));
-                                                    setSelectedUser(null);
+                                                    setFormData(prev => ({ ...prev, user_restriction_type: 'all', restricted_user_ids: [], restricted_user_id: null }));
+                                                    setSelectedUsers([]);
                                                 }}
                                                 className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${formData.user_restriction_type === 'all'
                                                     ? 'border-indigo-600 bg-indigo-50 text-indigo-900 dark:bg-indigo-950 dark:text-indigo-200 ring-2 ring-indigo-500/20'
@@ -1346,8 +1381,8 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                             >
                                                 <UserIcon className="w-4 h-4 text-rose-600 shrink-0" />
                                                 <div>
-                                                    <div className="text-xs font-bold">Restricted to Specific User</div>
-                                                    <div className="text-[10px] text-slate-500">Search by student phone number</div>
+                                                    <div className="text-xs font-bold">Restricted to Specific Users</div>
+                                                    <div className="text-[10px] text-slate-500">Search & select one or multiple students</div>
                                                 </div>
                                             </button>
                                         </div>
@@ -1355,97 +1390,169 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                         {/* User Search input when restricted */}
                                         {formData.user_restriction_type === 'specific' && (
                                             <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
-                                                <div className="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-                                                    <Phone className="w-3.5 h-3.5 text-indigo-600" />
-                                                    <span>Search Student by Phone Number, Name or Email:</span>
-                                                </div>
-
-                                                {selectedUser ? (
-                                                    <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-850 rounded-xl border border-indigo-200 dark:border-indigo-800">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold flex items-center justify-center text-sm">
-                                                                {selectedUser.name.charAt(0)}
-                                                            </div>
-                                                            <div>
-                                                                <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                                                                    <span>{selectedUser.name}</span>
-                                                                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-600 border border-indigo-100">
-                                                                        {selectedUser.role}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                                                                    {selectedUser.phone}
-                                                                </div>
-                                                                <div className="text-[11px] text-slate-400">
-                                                                    {selectedUser.email}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
+                                                <div className="flex items-center justify-between">
+                                                    <div className="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                                        <Phone className="w-3.5 h-3.5 text-indigo-600" />
+                                                        <span>Search and Add Students by Phone Number, Name or Email:</span>
+                                                    </div>
+                                                    {selectedUsers.length > 0 && (
                                                         <button
                                                             type="button"
                                                             onClick={() => {
-                                                                setSelectedUser(null);
-                                                                setFormData(prev => ({ ...prev, restricted_user_id: null }));
+                                                                setSelectedUsers([]);
+                                                                setFormData(prev => ({ ...prev, restricted_user_ids: [], restricted_user_id: null }));
                                                             }}
-                                                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg cursor-pointer"
-                                                            title="Remove selected student"
+                                                            className="text-[11px] font-bold text-rose-600 hover:text-rose-700 cursor-pointer"
                                                         >
-                                                            <X className="w-4 h-4" />
+                                                            Clear All
                                                         </button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="relative">
-                                                        <div className="relative">
-                                                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                            <input
-                                                                type="text"
-                                                                value={userSearchTerm}
-                                                                onChange={(e) => setUserSearchTerm(e.target.value)}
-                                                                placeholder="Type student phone number (e.g. 017...) or name..."
-                                                                className="w-full pl-9 pr-9 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                                                            />
-                                                            {searchingUsers && (
-                                                                <Loader2 className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-indigo-600" />
-                                                            )}
-                                                        </div>
+                                                    )}
+                                                </div>
 
-                                                        {/* Search Results Dropdown */}
-                                                        {userSearchResults.length > 0 && (
-                                                            <div className="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl max-h-48 overflow-y-auto z-20 divide-y divide-slate-100 dark:divide-slate-700">
-                                                                {userSearchResults.map(u => (
+                                                {/* Live Search Input with Dropdown */}
+                                                <div className="relative">
+                                                    <div className="relative">
+                                                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                        <input
+                                                            type="text"
+                                                            value={userSearchTerm}
+                                                            onChange={(e) => setUserSearchTerm(e.target.value)}
+                                                            placeholder="Type student phone number (e.g. 017...), name or email to search..."
+                                                            className="w-full pl-9 pr-9 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                                                        />
+                                                        {searchingUsers && (
+                                                            <Loader2 className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-indigo-600" />
+                                                        )}
+                                                    </div>
+
+                                                    {/* Search Results Dropdown */}
+                                                    {userSearchResults.length > 0 && (
+                                                        <div className="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl max-h-56 overflow-y-auto z-30 divide-y divide-slate-100 dark:divide-slate-700">
+                                                            {userSearchResults.map(u => {
+                                                                const isAlreadySelected = selectedUsers.some(su => su.id === u.id);
+                                                                return (
                                                                     <button
                                                                         key={u.id}
                                                                         type="button"
                                                                         onClick={() => {
-                                                                            setSelectedUser(u);
-                                                                            setFormData(prev => ({ ...prev, restricted_user_id: u.id }));
-                                                                            setUserSearchTerm('');
-                                                                            setUserSearchResults([]);
+                                                                            if (isAlreadySelected) {
+                                                                                const next = selectedUsers.filter(su => su.id !== u.id);
+                                                                                setSelectedUsers(next);
+                                                                                setFormData(prev => ({
+                                                                                    ...prev,
+                                                                                    restricted_user_ids: next.map(x => x.id),
+                                                                                    restricted_user_id: next[0]?.id || null,
+                                                                                }));
+                                                                            } else {
+                                                                                const next = [...selectedUsers, u];
+                                                                                setSelectedUsers(next);
+                                                                                setFormData(prev => ({
+                                                                                    ...prev,
+                                                                                    restricted_user_ids: next.map(x => x.id),
+                                                                                    restricted_user_id: next[0]?.id || null,
+                                                                                }));
+                                                                                setUserSearchTerm('');
+                                                                                setUserSearchResults([]);
+                                                                            }
                                                                         }}
-                                                                        className="w-full text-left p-2.5 hover:bg-indigo-50 dark:hover:bg-slate-700/60 flex items-center justify-between transition-colors cursor-pointer"
+                                                                        className={`w-full text-left p-2.5 flex items-center justify-between transition-colors cursor-pointer ${
+                                                                            isAlreadySelected
+                                                                                ? 'bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200'
+                                                                                : 'hover:bg-indigo-50/50 dark:hover:bg-slate-700/60'
+                                                                        }`}
                                                                     >
-                                                                        <div>
-                                                                            <div className="text-xs font-bold text-slate-800 dark:text-white">
+                                                                        <div className="flex items-center gap-2.5">
+                                                                            <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold flex items-center justify-center text-xs">
+                                                                                {u.name.charAt(0)}
+                                                                            </div>
+                                                                            <div>
+                                                                                <div className="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                                                                                    <span>{u.name}</span>
+                                                                                    <span className="text-[10px] px-1 py-0.2 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                                                                        {u.role}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                                                                                    {u.phone}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-[10px] text-slate-400 hidden sm:inline">{u.email}</span>
+                                                                            {isAlreadySelected ? (
+                                                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">
+                                                                                    <Check className="w-3 h-3" /> Added
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 flex items-center gap-1">
+                                                                                    <Plus className="w-3 h-3" /> Add
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+
+                                                    {userSearchTerm.length >= 2 && !searchingUsers && userSearchResults.length === 0 && (
+                                                        <div className="text-xs text-slate-400 mt-1 italic">
+                                                            No student found with "{userSearchTerm}".
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Selected Users Chips/List */}
+                                                <div className="space-y-2 pt-1">
+                                                    <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                        <span>Selected Students ({selectedUsers.length}):</span>
+                                                    </div>
+
+                                                    {selectedUsers.length === 0 ? (
+                                                        <div className="p-3 text-center text-xs text-slate-400 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-white/50 dark:bg-slate-850/50">
+                                                            No students selected yet. Search above to add one or multiple students.
+                                                        </div>
+                                                    ) : (
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                                                            {selectedUsers.map(u => (
+                                                                <div
+                                                                    key={u.id}
+                                                                    className="flex items-center justify-between p-2.5 bg-white dark:bg-slate-850 rounded-xl border border-indigo-200 dark:border-indigo-900 shadow-2xs"
+                                                                >
+                                                                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                                                        <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold flex items-center justify-center text-xs shrink-0">
+                                                                            {u.name.charAt(0)}
+                                                                        </div>
+                                                                        <div className="min-w-0 flex-1">
+                                                                            <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
                                                                                 {u.name}
                                                                             </div>
-                                                                            <div className="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                                                                            <div className="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400 truncate">
                                                                                 {u.phone}
                                                                             </div>
                                                                         </div>
-                                                                        <span className="text-[10px] text-slate-400">{u.email}</span>
+                                                                    </div>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            const next = selectedUsers.filter(x => x.id !== u.id);
+                                                                            setSelectedUsers(next);
+                                                                            setFormData(prev => ({
+                                                                                ...prev,
+                                                                                restricted_user_ids: next.map(x => x.id),
+                                                                                restricted_user_id: next[0]?.id || null,
+                                                                            }));
+                                                                        }}
+                                                                        className="p-1 text-slate-400 hover:text-rose-600 rounded-lg cursor-pointer shrink-0 ml-1.5"
+                                                                        title="Remove this student"
+                                                                    >
+                                                                        <X className="w-3.5 h-3.5" />
                                                                     </button>
-                                                                ))}
-                                                            </div>
-                                                        )}
-
-                                                        {userSearchTerm.length >= 2 && !searchingUsers && userSearchResults.length === 0 && (
-                                                            <div className="text-xs text-slate-400 mt-1 italic">
-                                                                No student found with "{userSearchTerm}".
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         )}
                                     </div>

@@ -27,6 +27,7 @@ class AdminCouponController extends Controller
             'courses:id,title,price',
             'categories:id,name',
             'restrictedUser:id,name,phone,email',
+            'restrictedUsers:id,name,phone,email,role',
             'creator:id,name',
         ])->withCount('usages');
 
@@ -128,9 +129,11 @@ class AdminCouponController extends Controller
             'category_ids' => ['nullable', 'array'],
             'category_ids.*' => ['exists:categories,id'],
             'user_restriction_type' => ['required', 'in:all,specific'],
+            'restricted_user_ids' => ['nullable', 'array'],
+            'restricted_user_ids.*' => ['exists:users,id'],
             'restricted_user_id' => [
                 'nullable',
-                Rule::requiredIf(fn() => $request->user_restriction_type === Coupon::USER_SPECIFIC),
+                Rule::requiredIf(fn() => $request->user_restriction_type === Coupon::USER_SPECIFIC && empty($request->restricted_user_ids)),
                 'exists:users,id',
             ],
             'usage_limit' => ['nullable', 'integer', 'min:1'],
@@ -150,9 +153,14 @@ class AdminCouponController extends Controller
         }
 
         $code = strtoupper(trim($validated['code']));
+        $userIds = $validated['restricted_user_ids'] ?? [];
+        if (empty($userIds) && !empty($validated['restricted_user_id'])) {
+            $userIds = [(int) $validated['restricted_user_id']];
+        }
+        $primaryUserId = $userIds[0] ?? null;
 
         try {
-            $coupon = DB::transaction(function () use ($validated, $code, $request) {
+            $coupon = DB::transaction(function () use ($validated, $code, $request, $userIds, $primaryUserId) {
                 $coupon = Coupon::create([
                     'code' => $code,
                     'title' => !empty($validated['title']) ? $validated['title'] : $code,
@@ -163,7 +171,7 @@ class AdminCouponController extends Controller
                     'min_order_amount' => $validated['min_order_amount'] ?? null,
                     'scope_type' => $validated['scope_type'] ?? 'all',
                     'user_restriction_type' => $validated['user_restriction_type'] ?? 'all',
-                    'restricted_user_id' => ($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC ? $validated['restricted_user_id'] : null,
+                    'restricted_user_id' => ($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC ? $primaryUserId : null,
                     'usage_limit' => $validated['usage_limit'] ?? null,
                     'usage_limit_per_user' => !empty($validated['usage_limit_per_user']) ? $validated['usage_limit_per_user'] : 1,
                     'times_used' => 0,
@@ -183,12 +191,17 @@ class AdminCouponController extends Controller
                     $coupon->categories()->sync($validated['category_ids']);
                 }
 
+                // Sync restricted users if user restriction is specific
+                if (($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC && !empty($userIds)) {
+                    $coupon->restrictedUsers()->sync($userIds);
+                }
+
                 return $coupon;
             });
 
             return response()->json([
                 'message' => 'Coupon created successfully!',
-                'coupon' => $coupon->load(['courses:id,title', 'categories:id,name', 'restrictedUser:id,name,phone,email']),
+                'coupon' => $coupon->load(['courses:id,title', 'categories:id,name', 'restrictedUser:id,name,phone,email', 'restrictedUsers:id,name,phone,email,role']),
             ], 201);
         } catch (\Throwable $e) {
             return response()->json([
@@ -208,6 +221,7 @@ class AdminCouponController extends Controller
             'courses:id,title,price',
             'categories:id,name',
             'restrictedUser:id,name,phone,email',
+            'restrictedUsers:id,name,phone,email,role',
             'creator:id,name',
             'usages' => function ($q) {
                 $q->with(['user:id,name,phone,email', 'order:id,order_number'])->latest()->limit(20);
@@ -242,9 +256,11 @@ class AdminCouponController extends Controller
             'category_ids' => ['nullable', 'array'],
             'category_ids.*' => ['exists:categories,id'],
             'user_restriction_type' => ['required', 'in:all,specific'],
+            'restricted_user_ids' => ['nullable', 'array'],
+            'restricted_user_ids.*' => ['exists:users,id'],
             'restricted_user_id' => [
                 'nullable',
-                Rule::requiredIf(fn() => $request->user_restriction_type === Coupon::USER_SPECIFIC),
+                Rule::requiredIf(fn() => $request->user_restriction_type === Coupon::USER_SPECIFIC && empty($request->restricted_user_ids)),
                 'exists:users,id',
             ],
             'usage_limit' => ['nullable', 'integer', 'min:1'],
@@ -264,9 +280,14 @@ class AdminCouponController extends Controller
         }
 
         $code = strtoupper(trim($validated['code']));
+        $userIds = $validated['restricted_user_ids'] ?? [];
+        if (empty($userIds) && !empty($validated['restricted_user_id'])) {
+            $userIds = [(int) $validated['restricted_user_id']];
+        }
+        $primaryUserId = $userIds[0] ?? null;
 
         try {
-            DB::transaction(function () use ($coupon, $validated, $code) {
+            DB::transaction(function () use ($coupon, $validated, $code, $userIds, $primaryUserId) {
                 $coupon->update([
                     'code' => $code,
                     'title' => !empty($validated['title']) ? $validated['title'] : ($coupon->title ?: $code),
@@ -277,7 +298,7 @@ class AdminCouponController extends Controller
                     'min_order_amount' => $validated['min_order_amount'] ?? null,
                     'scope_type' => $validated['scope_type'] ?? 'all',
                     'user_restriction_type' => $validated['user_restriction_type'] ?? 'all',
-                    'restricted_user_id' => ($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC ? $validated['restricted_user_id'] : null,
+                    'restricted_user_id' => ($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC ? $primaryUserId : null,
                     'usage_limit' => $validated['usage_limit'] ?? null,
                     'usage_limit_per_user' => !empty($validated['usage_limit_per_user']) ? $validated['usage_limit_per_user'] : 1,
                     'start_date' => $validated['start_date'] ?? null,
@@ -298,11 +319,18 @@ class AdminCouponController extends Controller
                 } else {
                     $coupon->categories()->detach();
                 }
+
+                // Sync restricted users
+                if (($validated['user_restriction_type'] ?? 'all') === Coupon::USER_SPECIFIC) {
+                    $coupon->restrictedUsers()->sync($userIds);
+                } else {
+                    $coupon->restrictedUsers()->detach();
+                }
             });
 
             return response()->json([
                 'message' => 'Coupon updated successfully!',
-                'coupon' => $coupon->fresh(['courses:id,title', 'categories:id,name', 'restrictedUser:id,name,phone,email']),
+                'coupon' => $coupon->fresh(['courses:id,title', 'categories:id,name', 'restrictedUser:id,name,phone,email', 'restrictedUsers:id,name,phone,email,role']),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -340,6 +368,7 @@ class AdminCouponController extends Controller
         $coupon = Coupon::withTrashed()->findOrFail($id);
         $coupon->courses()->detach();
         $coupon->categories()->detach();
+        $coupon->restrictedUsers()->detach();
         $coupon->forceDelete();
 
         return response()->json([
