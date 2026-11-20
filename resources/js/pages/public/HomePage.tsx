@@ -742,7 +742,12 @@ export const HomePage: React.FC = () => {
                                             </div>
 
                                             <div className="text-right shrink-0">
-                                                {course.price === 0 ? (
+                                                {course.is_enrolled ? (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold text-xs rounded-full border border-emerald-200 dark:border-emerald-800">
+                                                        <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                                        <span>Enrolled</span>
+                                                    </span>
+                                                ) : course.price === 0 ? (
                                                     <span className="text-lg font-black text-emerald-600">Free</span>
                                                 ) : (
                                                     <div className="flex items-baseline gap-1.5">
@@ -771,18 +776,28 @@ export const HomePage: React.FC = () => {
                                             >
                                                 View Details
                                             </Link>
-                                            <button
-                                                type="button"
-                                                onClick={() => addToCart(course)}
-                                                className={`py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
-                                                    isInCart(course.id)
-                                                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
-                                                        : 'bg-[#25a2ee] hover:bg-[#1f8ed1] text-white shadow-sky-500/20'
-                                                }`}
-                                            >
-                                                <ShoppingCart className="w-3.5 h-3.5" />
-                                                <span>{isInCart(course.id) ? 'In Cart' : 'Add to Cart'}</span>
-                                            </button>
+                                            {course.is_enrolled ? (
+                                                <Link
+                                                    to={`/learning/${course.id}`}
+                                                    className="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20"
+                                                >
+                                                    <PlayCircle className="w-3.5 h-3.5" />
+                                                    <span>Start Class</span>
+                                                </Link>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => addToCart(course)}
+                                                    className={`py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                                                        isInCart(course.id)
+                                                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
+                                                            : 'bg-[#25a2ee] hover:bg-[#1f8ed1] text-white shadow-sky-500/20'
+                                                    }`}
+                                                >
+                                                    <ShoppingCart className="w-3.5 h-3.5" />
+                                                    <span>{isInCart(course.id) ? 'In Cart' : 'Add to Cart'}</span>
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

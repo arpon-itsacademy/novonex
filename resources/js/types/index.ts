@@ -76,6 +76,7 @@ export interface Course {
     features?: string[] | null;
     fake_enrollment_count?: number;
     class_starts_at?: string | null;
+    is_enrolled?: boolean;
     action_buttons?: {
         id: string;
         label: string;

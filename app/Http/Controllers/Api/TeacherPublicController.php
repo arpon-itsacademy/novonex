@@ -96,6 +96,27 @@ class TeacherPublicController extends Controller
                 ->get();
         }
 
+        $user = auth('sanctum')->user();
+        $enrolledIds = [];
+        if ($user) {
+            $enrolledIds = \App\Models\Enrollment::where('user_id', $user->id)
+                ->where('status', \App\Models\Enrollment::STATUS_ACTIVE)
+                ->pluck('course_id')
+                ->toArray();
+
+            $taughtIds = Course::where(function ($q) use ($user) {
+                $q->where('instructor_id', $user->id)
+                  ->orWhereHas('instructors', fn ($iq) => $iq->where('users.id', $user->id));
+            })->pluck('id')->toArray();
+
+            $enrolledIds = array_unique(array_merge($enrolledIds, $taughtIds));
+        }
+
+        $courses->transform(function ($c) use ($enrolledIds, $user) {
+            $c->is_enrolled = in_array($c->id, $enrolledIds) || ($user && $user->isAdmin());
+            return $c;
+        });
+
         $profile = $teacher->teacherProfile;
 
         return response()->json([

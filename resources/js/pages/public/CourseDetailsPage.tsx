@@ -563,7 +563,7 @@ export const CourseDetailsPage: React.FC = () => {
                             </div>
 
                             {/* Coupon & Live Countdown Timer (Enabled via Admin) */}
-                            {Boolean(course.show_coupon_timer) && (Boolean(promoCoupon) || (Boolean(course.discount_deadline) && (timeLeft.days > 0 || timeLeft.hours > 0 || timeLeft.minutes > 0 || timeLeft.seconds > 0))) && (
+                            {!isEnrolled && Boolean(course.show_coupon_timer) && (Boolean(promoCoupon) || (Boolean(course.discount_deadline) && (timeLeft.days > 0 || timeLeft.hours > 0 || timeLeft.minutes > 0 || timeLeft.seconds > 0))) && (
                                 <div className="border-[1.5px] border-dashed border-sky-300 bg-gradient-to-br from-sky-50/70 via-white to-amber-50/40 rounded-2xl p-3 sm:p-4 space-y-3">
                                     {/* Top Row: Coupon code, discount label, and Apply button */}
                                     {Boolean(promoCoupon) && (
@@ -610,23 +610,32 @@ export const CourseDetailsPage: React.FC = () => {
                                 </div>
                             )}
 
-                            {/* Centered Price Section (Sky Blue) */}
-                            <div className="text-center py-1 flex items-baseline justify-center gap-3">
-                                {course.price === 0 ? (
-                                    <span className="text-3xl sm:text-4xl font-black text-emerald-600">Free</span>
-                                ) : (
-                                    <>
-                                        <span className="text-3xl sm:text-4xl font-black text-sky-600 tracking-tight">
-                                            {formatBDT(effectivePrice)}
-                                        </span>
-                                        {hasDiscount && (
-                                            <span className="text-xl sm:text-2xl font-bold text-slate-400 line-through">
-                                                {formatBDT(course.price)}
+                            {/* Centered Price Section (Sky Blue) or Enrolled Badge */}
+                            {isEnrolled ? (
+                                <div className="text-center py-2">
+                                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-extrabold text-sm rounded-full border border-emerald-200 dark:border-emerald-800 shadow-2xs">
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                        <span>Enrolled (You own this course)</span>
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="text-center py-1 flex items-baseline justify-center gap-3">
+                                    {course.price === 0 ? (
+                                        <span className="text-3xl sm:text-4xl font-black text-emerald-600">Free</span>
+                                    ) : (
+                                        <>
+                                            <span className="text-3xl sm:text-4xl font-black text-sky-600 tracking-tight">
+                                                {formatBDT(effectivePrice)}
                                             </span>
-                                        )}
-                                    </>
-                                )}
-                            </div>
+                                            {hasDiscount && (
+                                                <span className="text-xl sm:text-2xl font-bold text-slate-400 line-through">
+                                                    {formatBDT(course.price)}
+                                                </span>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Action CTA (Sky Blue & Amber Theme) */}
                             <div className="space-y-2.5">
@@ -663,14 +672,16 @@ export const CourseDetailsPage: React.FC = () => {
                                 )}
 
                                 {/* Secondary: 'How to Enroll' button */}
-                                <button
-                                    type="button"
-                                    onClick={() => setShowHowToBuyModal(true)}
-                                    className="w-full py-3.5 px-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-sky-600 font-bold text-base flex items-center justify-center gap-2.5 shadow-2xs transition group cursor-pointer"
-                                >
-                                    <PlayCircle className="w-5 h-5 text-slate-400 group-hover:text-sky-600 transition" />
-                                    <span>How to Enroll</span>
-                                </button>
+                                {!isEnrolled && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowHowToBuyModal(true)}
+                                        className="w-full py-3.5 px-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-sky-600 font-bold text-base flex items-center justify-center gap-2.5 shadow-2xs transition group cursor-pointer"
+                                    >
+                                        <PlayCircle className="w-5 h-5 text-slate-400 group-hover:text-sky-600 transition" />
+                                        <span>How to Enroll</span>
+                                    </button>
+                                )}
 
                                 {/* Custom Action Buttons (Outline, etc.) */}
                                 {course.action_buttons && course.action_buttons.length > 0 && (

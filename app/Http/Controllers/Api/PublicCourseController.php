@@ -102,6 +102,27 @@ class PublicCourseController extends Controller
 
         $courses = $query->paginate($request->integer('per_page', 12));
 
+        $user = auth('sanctum')->user();
+        $enrolledCourseIds = [];
+        if ($user) {
+            $enrolledCourseIds = \App\Models\Enrollment::where('user_id', $user->id)
+                ->where('status', \App\Models\Enrollment::STATUS_ACTIVE)
+                ->pluck('course_id')
+                ->toArray();
+
+            $taughtCourseIds = Course::where(function ($q) use ($user) {
+                $q->where('instructor_id', $user->id)
+                  ->orWhereHas('instructors', fn ($iq) => $iq->where('users.id', $user->id));
+            })->pluck('id')->toArray();
+
+            $enrolledCourseIds = array_unique(array_merge($enrolledCourseIds, $taughtCourseIds));
+        }
+
+        $courses->getCollection()->transform(function ($c) use ($enrolledCourseIds, $user) {
+            $c->is_enrolled = in_array($c->id, $enrolledCourseIds) || ($user && $user->isAdmin());
+            return $c;
+        });
+
         return response()->json($courses);
     }
 
@@ -143,6 +164,10 @@ class PublicCourseController extends Controller
                     $accessKey = $enrollment->getOrGenerateAccessKey();
                 }
             }
+        }
+
+        if ($isEnrolled) {
+            $course->is_enrolled = true;
         }
 
         return response()->json([
