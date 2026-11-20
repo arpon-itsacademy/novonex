@@ -171,6 +171,7 @@ class AuthController extends Controller
                 'custom_role_id' => $user->custom_role_id,
                 'custom_role' => $user->customRole,
                 'status' => $user->status,
+                'points' => (int) ($user->points ?? 0),
             ],
         ]);
     }
@@ -255,6 +256,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'role' => $user->role,
                 'status' => $user->status,
+                'points' => (int) ($user->points ?? 0),
             ],
         ], 201);
     }
@@ -274,6 +276,7 @@ class AuthController extends Controller
                 'custom_role_id' => $user->custom_role_id,
                 'custom_role' => $user->customRole,
                 'status' => $user->status,
+                'points' => (int) ($user->points ?? 0),
                 'enrolled_courses_count' => $user->enrolledCourses()->count(),
                 'unread_notifications_count' => $user->unreadNotifications()->count(),
             ],

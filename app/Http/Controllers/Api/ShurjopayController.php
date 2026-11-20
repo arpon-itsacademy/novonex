@@ -368,6 +368,13 @@ class ShurjopayController extends Controller
                         Log::error('Free enrollment notification failed: ' . $e->getMessage());
                     }
 
+                    // Award purchase points
+                    try {
+                        app(\App\Services\PointService::class)->awardCoursePurchasePoints($order);
+                    } catch (\Throwable $e) {
+                        Log::error('Awarding purchase points failed: ' . $e->getMessage());
+                    }
+
                     try {
                         app(CoursePurchaseSmsService::class)->sendPurchaseSms($order);
                     } catch (\Throwable $e) {
@@ -660,6 +667,13 @@ class ShurjopayController extends Controller
                         $order->user->notify(new PaymentConfirmedNotification($order));
                     } catch (\Throwable $e) {
                         Log::error('Notification failed: ' . $e->getMessage());
+                    }
+
+                    // Award purchase points
+                    try {
+                        app(\App\Services\PointService::class)->awardCoursePurchasePoints($order);
+                    } catch (\Throwable $e) {
+                        Log::error('Awarding purchase points failed: ' . $e->getMessage());
                     }
 
                     // Auto SMS push

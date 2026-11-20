@@ -75,8 +75,31 @@ export const AdminCourseBuilderPage: React.FC = () => {
     const [accessError, setAccessError] = useState<string | null>(null);
     const [previewMenuOpen, setPreviewMenuOpen] = useState(false);
 
-    // Tab state ('lessons' | 'live_classes' | 'practice_exams' | 'live_exams' | 'routine' | 'outline_buttons')
-    const [activeTab, setActiveTab] = useState<'lessons' | 'live_classes' | 'practice_exams' | 'live_exams' | 'routine' | 'outline_buttons'>('lessons');
+    // Tab state ('lessons' | 'live_classes' | 'practice_exams' | 'live_exams' | 'routine' | 'outline_buttons' | 'reward_setup')
+    const [activeTab, setActiveTab] = useState<'lessons' | 'live_classes' | 'practice_exams' | 'live_exams' | 'routine' | 'outline_buttons' | 'reward_setup'>('lessons');
+
+    // Reward Setup state
+    const [rewardTopics, setRewardTopics] = useState<any[]>([]);
+    const [loadingRewardTopics, setLoadingRewardTopics] = useState(false);
+    const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+    const [editingTopic, setEditingTopic] = useState<any | null>(null);
+    const [topicTitle, setTopicTitle] = useState('');
+    const [topicDescription, setTopicDescription] = useState('');
+    const [topicPointsReward, setTopicPointsReward] = useState('50');
+    const [topicIsActive, setTopicIsActive] = useState(true);
+    const [savingTopic, setSavingTopic] = useState(false);
+
+    // Submissions Review Modal state
+    const [isSubmissionsModalOpen, setIsSubmissionsModalOpen] = useState(false);
+    const [selectedTopicForSubmissions, setSelectedTopicForSubmissions] = useState<any | null>(null);
+    const [submissionsList, setSubmissionsList] = useState<any[]>([]);
+    const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+    const [submissionStatusFilter, setSubmissionStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+    const [reviewingSubmissionId, setReviewingSubmissionId] = useState<number | null>(null);
+    const [previewFileModalUrl, setPreviewFileModalUrl] = useState<string | null>(null);
+    const [rejectModalOpen, setRejectModalOpen] = useState(false);
+    const [selectedSubmissionToReject, setSelectedSubmissionToReject] = useState<any | null>(null);
+    const [rejectFeedbackText, setRejectFeedbackText] = useState('');
 
     // Outline & Enrolled Action Buttons state
     const [actionButtons, setActionButtons] = useState<CourseActionButton[]>([]);
@@ -181,7 +204,155 @@ export const AdminCourseBuilderPage: React.FC = () => {
         fetchCourseExams();
         fetchLiveClasses();
         fetchCourseRoutine();
+        fetchRewardTopics();
     }, [id]);
+
+    const fetchRewardTopics = async () => {
+        if (!id) return;
+        try {
+            setLoadingRewardTopics(true);
+            const { data } = await apiClient.get(`/builder/${id}/reward-topics`);
+            setRewardTopics(data.topics || []);
+        } catch (err) {
+            console.error('Failed to load reward topics', err);
+        } finally {
+            setLoadingRewardTopics(false);
+        }
+    };
+
+    const openAddRewardTopicModal = () => {
+        setEditingTopic(null);
+        setTopicTitle('');
+        setTopicDescription('');
+        setTopicPointsReward('50');
+        setTopicIsActive(true);
+        setIsTopicModalOpen(true);
+    };
+
+    const openEditRewardTopicModal = (topic: any) => {
+        setEditingTopic(topic);
+        setTopicTitle(topic.title);
+        setTopicDescription(topic.description || '');
+        setTopicPointsReward(String(topic.points_reward));
+        setTopicIsActive(Boolean(topic.is_active));
+        setIsTopicModalOpen(true);
+    };
+
+    const handleSaveTopic = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!topicTitle.trim()) {
+            alert('Topic title is required.');
+            return;
+        }
+        const pts = parseInt(topicPointsReward, 10);
+        if (isNaN(pts) || pts <= 0) {
+            alert('Points reward must be a positive number.');
+            return;
+        }
+
+        try {
+            setSavingTopic(true);
+            const payload = {
+                title: topicTitle.trim(),
+                description: topicDescription.trim() || null,
+                points_reward: pts,
+                is_active: topicIsActive,
+            };
+
+            if (editingTopic) {
+                await apiClient.put(`/builder/reward-topics/${editingTopic.id}`, payload);
+            } else {
+                await apiClient.post(`/builder/${id}/reward-topics`, payload);
+            }
+
+            setIsTopicModalOpen(false);
+            fetchRewardTopics();
+            alert('Saved successfully!');
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Failed to save topic.');
+        } finally {
+            setSavingTopic(false);
+        }
+    };
+
+    const handleDeleteTopic = async (topicId: number) => {
+        if (!confirm('Are you sure you want to delete this reward topic and all associated submissions?')) {
+            return;
+        }
+        try {
+            await apiClient.delete(`/builder/reward-topics/${topicId}`);
+            fetchRewardTopics();
+            alert('Topic deleted successfully!');
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Failed to delete topic.');
+        }
+    };
+
+    const handleOpenResponses = async (topic: any) => {
+        setSelectedTopicForSubmissions(topic);
+        setIsSubmissionsModalOpen(true);
+        setSubmissionStatusFilter('all');
+        try {
+            setLoadingSubmissions(true);
+            const { data } = await apiClient.get(`/builder/reward-topics/${topic.id}/submissions`);
+            setSubmissionsList(data.submissions || []);
+        } catch (err) {
+            console.error('Failed to load submissions', err);
+        } finally {
+            setLoadingSubmissions(false);
+        }
+    };
+
+    const handleApproveSubmission = async (sub: any) => {
+        if (!confirm(`Approve this submission and award ${selectedTopicForSubmissions?.points_reward || 50} points to ${sub.user?.name || 'the student'}?`)) {
+            return;
+        }
+        try {
+            setReviewingSubmissionId(sub.id);
+            await apiClient.post(`/builder/reward-submissions/${sub.id}/review`, {
+                action: 'approve'
+            });
+            if (selectedTopicForSubmissions) {
+                const { data } = await apiClient.get(`/builder/reward-topics/${selectedTopicForSubmissions.id}/submissions`);
+                setSubmissionsList(data.submissions || []);
+            }
+            fetchRewardTopics();
+            alert('Submission approved successfully! Points awarded to the student.');
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Failed to approve submission.');
+        } finally {
+            setReviewingSubmissionId(null);
+        }
+    };
+
+    const openRejectSubmissionModal = (sub: any) => {
+        setSelectedSubmissionToReject(sub);
+        setRejectFeedbackText('');
+        setRejectModalOpen(true);
+    };
+
+    const handleConfirmRejectSubmission = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedSubmissionToReject) return;
+        try {
+            setReviewingSubmissionId(selectedSubmissionToReject.id);
+            await apiClient.post(`/builder/reward-submissions/${selectedSubmissionToReject.id}/review`, {
+                action: 'reject',
+                feedback: rejectFeedbackText.trim() || null,
+            });
+            setRejectModalOpen(false);
+            if (selectedTopicForSubmissions) {
+                const { data } = await apiClient.get(`/builder/reward-topics/${selectedTopicForSubmissions.id}/submissions`);
+                setSubmissionsList(data.submissions || []);
+            }
+            fetchRewardTopics();
+            alert('Submission marked as rejected.');
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Failed to reject submission.');
+        } finally {
+            setReviewingSubmissionId(null);
+        }
+    };
 
     const fetchCourseRoutine = async () => {
         try {
@@ -1433,6 +1604,18 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             </button>
                         </div>
                     )}
+
+                    {activeTab === 'reward_setup' && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            <button
+                                onClick={openAddRewardTopicModal}
+                                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>+ New Reward Topic</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -1519,6 +1702,20 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     <span>Outline / Custom Buttons</span>
                     <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-700">
                         {actionButtons.length + enrolledButtons.length}
+                    </span>
+                </button>
+
+                <button
+                    onClick={() => setActiveTab('reward_setup')}
+                    className={`pb-3 px-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${activeTab === 'reward_setup'
+                        ? 'border-amber-600 text-amber-600'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                        }`}
+                >
+                    <Award className="w-4 h-4" />
+                    <span>Reward Setup</span>
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">
+                        {rewardTopics.length}
                     </span>
                 </button>
             </div>
@@ -3064,6 +3261,479 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 </>
                             )}
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Reward Setup Tab Content */}
+            {activeTab === 'reward_setup' && (
+                <div className="space-y-6">
+                    {/* Header Card */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div>
+                            <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <Award className="w-5 h-5 text-amber-500" />
+                                <span>Course Reward Topics & Note Submissions</span>
+                            </h3>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                                Set up topics where students can submit their lecture notes or study summaries to earn reward points.
+                            </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={openAddRewardTopicModal}
+                                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>+ Add Topic</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Topics List */}
+                    {loadingRewardTopics ? (
+                        <div className="bg-white p-12 rounded-2xl border border-slate-200/80 text-center space-y-3">
+                            <Loader2 className="w-8 h-8 text-amber-500 animate-spin mx-auto" />
+                            <p className="text-xs font-bold text-slate-500">Loading reward topics...</p>
+                        </div>
+                    ) : rewardTopics.length === 0 ? (
+                        <div className="bg-white p-12 rounded-2xl border border-slate-200/80 text-center space-y-4">
+                            <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mx-auto">
+                                <Award className="w-8 h-8" />
+                            </div>
+                            <div className="max-w-md mx-auto space-y-1">
+                                <h4 className="font-extrabold text-sm text-slate-800">No Reward Topics Created Yet</h4>
+                                <p className="text-xs text-slate-500">
+                                    Create topics for this course so students can upload their handwritten or digital notes and earn reward points upon your approval.
+                                </p>
+                            </div>
+                            <button
+                                onClick={openAddRewardTopicModal}
+                                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs inline-flex items-center gap-1.5 transition-all"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>Create First Topic</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {rewardTopics.map((topic) => {
+                                const pendingCount = topic.pending_submissions_count || 0;
+                                const totalSubmissions = topic.submissions_count || 0;
+
+                                return (
+                                    <div
+                                        key={topic.id}
+                                        className="bg-white p-5 rounded-2xl border border-slate-200/80 hover:border-amber-300 shadow-xs transition-all space-y-4 flex flex-col justify-between"
+                                    >
+                                        <div className="space-y-2">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <h4 className="font-extrabold text-sm text-slate-900 line-clamp-2">
+                                                    {topic.title}
+                                                </h4>
+                                                <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 shrink-0 flex items-center gap-1">
+                                                    <Sparkles className="w-3 h-3 text-amber-600" />
+                                                    <span>+{topic.points_reward} Pts</span>
+                                                </span>
+                                            </div>
+
+                                            {topic.description ? (
+                                                <p className="text-xs text-slate-600 line-clamp-3">
+                                                    {topic.description}
+                                                </p>
+                                            ) : (
+                                                <p className="text-xs text-slate-400 italic">
+                                                    No special instructions provided.
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                                            {/* Responses button */}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleOpenResponses(topic)}
+                                                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${pendingCount > 0
+                                                    ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-xs'
+                                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                                                    }`}
+                                            >
+                                                <MessageSquare className="w-3.5 h-3.5" />
+                                                <span>Responses ({totalSubmissions})</span>
+                                                {pendingCount > 0 && (
+                                                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-white text-amber-700">
+                                                        {pendingCount} new
+                                                    </span>
+                                                )}
+                                            </button>
+
+                                            {/* Action buttons */}
+                                            <div className="flex items-center gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openEditRewardTopicModal(topic)}
+                                                    className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
+                                                    title="Edit Topic"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteTopic(topic.id)}
+                                                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                                    title="Delete Topic"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Add / Edit Reward Topic Modal */}
+            <Modal
+                isOpen={isTopicModalOpen}
+                onClose={() => setIsTopicModalOpen(false)}
+                title={editingTopic ? 'Edit Reward Topic' : 'Add New Reward Topic'}
+                maxWidth="md"
+            >
+                <form onSubmit={handleSaveTopic} className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Topic Title <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="e.g. Chapter 3 Calculus & Integration Notes"
+                            value={topicTitle}
+                            onChange={(e) => setTopicTitle(e.target.value)}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-hidden focus:border-amber-500"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Topic Description & Submission Guidelines:
+                        </label>
+                        <textarea
+                            rows={3}
+                            placeholder="Describe what students should upload (e.g. Upload clear photos of your handwriting or PDF formula sheet)."
+                            value={topicDescription}
+                            onChange={(e) => setTopicDescription(e.target.value)}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:outline-hidden focus:border-amber-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Points Reward (Upon Approval) <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <Sparkles className="w-4 h-4 text-amber-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <input
+                                type="number"
+                                min="1"
+                                max="10000"
+                                value={topicPointsReward}
+                                onChange={(e) => setTopicPointsReward(e.target.value)}
+                                className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-extrabold text-slate-800 focus:outline-hidden focus:border-amber-500"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-1">
+                        <input
+                            type="checkbox"
+                            id="topicActiveToggle"
+                            checked={topicIsActive}
+                            onChange={(e) => setTopicIsActive(e.target.checked)}
+                            className="rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                        />
+                        <label htmlFor="topicActiveToggle" className="text-xs font-bold text-slate-700 cursor-pointer">
+                            Active (Visible to students on Earn Points page)
+                        </label>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                        <button
+                            type="button"
+                            onClick={() => setIsTopicModalOpen(false)}
+                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={savingTopic}
+                            className="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+                        >
+                            {savingTopic && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                            <span>Save Topic</span>
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Submissions Review Modal */}
+            <Modal
+                isOpen={isSubmissionsModalOpen}
+                onClose={() => setIsSubmissionsModalOpen(false)}
+                title={`Submissions: ${selectedTopicForSubmissions?.title || 'Topic Responses'}`}
+                maxWidth="3xl"
+            >
+                <div className="space-y-4">
+                    {/* Filter tabs */}
+                    <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                        {(['all', 'pending', 'approved', 'rejected'] as const).map((st) => (
+                            <button
+                                key={st}
+                                onClick={() => setSubmissionStatusFilter(st)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${submissionStatusFilter === st
+                                    ? 'bg-amber-500 text-white shadow-2xs'
+                                    : 'text-slate-600 hover:bg-slate-100'
+                                    }`}
+                            >
+                                {st}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Submissions List */}
+                    {loadingSubmissions ? (
+                        <div className="py-12 text-center space-y-2">
+                            <Loader2 className="w-7 h-7 text-amber-500 animate-spin mx-auto" />
+                            <p className="text-xs font-bold text-slate-500">Loading submissions...</p>
+                        </div>
+                    ) : (
+                        <div className="max-h-[60vh] overflow-y-auto space-y-3 pr-1">
+                            {submissionsList
+                                .filter((s) => submissionStatusFilter === 'all' || s.status === submissionStatusFilter)
+                                .length === 0 ? (
+                                <div className="py-12 text-center text-slate-400 text-xs">
+                                    No submissions found in this category.
+                                </div>
+                            ) : (
+                                submissionsList
+                                    .filter((s) => submissionStatusFilter === 'all' || s.status === submissionStatusFilter)
+                                    .map((sub) => {
+                                        const isPending = sub.status === 'pending';
+                                        const isApproved = sub.status === 'approved';
+                                        const isRejected = sub.status === 'rejected';
+                                        const files = Array.isArray(sub.file_paths) ? sub.file_paths : [];
+
+                                        return (
+                                            <div
+                                                key={sub.id}
+                                                className="p-4 bg-slate-50/80 hover:bg-slate-50 border border-slate-200/80 rounded-2xl space-y-3 transition"
+                                            >
+                                                {/* Student Header */}
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div>
+                                                        <p className="font-extrabold text-xs text-slate-900">
+                                                            {sub.user?.name || `Student #${sub.user_id}`}
+                                                        </p>
+                                                        <p className="text-[11px] text-slate-500">
+                                                            {sub.user?.phone || sub.user?.email} {sub.user?.registration_number ? `(${sub.user.registration_number})` : ''} • {new Date(sub.created_at).toLocaleDateString()}
+                                                        </p>
+                                                    </div>
+
+                                                    <div>
+                                                        {isApproved && (
+                                                            <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                                                                <Check className="w-3.5 h-3.5" />
+                                                                <span>Approved (+{sub.points_awarded} Pts)</span>
+                                                            </span>
+                                                        )}
+                                                        {isPending && (
+                                                            <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800">
+                                                                Pending Review
+                                                            </span>
+                                                        )}
+                                                        {isRejected && (
+                                                            <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-rose-100 text-rose-800">
+                                                                Rejected
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Note content */}
+                                                <div className="space-y-1">
+                                                    <h5 className="font-bold text-xs text-slate-800">
+                                                        {sub.title}
+                                                    </h5>
+                                                    {sub.description && (
+                                                        <p className="text-xs text-slate-600 whitespace-pre-line">
+                                                            {sub.description}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                {/* Uploaded Files */}
+                                                {files.length > 0 && (
+                                                    <div className="space-y-1.5 pt-1">
+                                                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                                                            Attached Files ({files.length}):
+                                                        </span>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {files.map((f: any, idx: number) => {
+                                                                const fileUrl = typeof f === 'string' ? f : f?.url;
+                                                                const fileName = f?.file_name || `Attachment ${idx + 1}`;
+                                                                const isImage = fileUrl && (fileUrl.match(/\.(jpeg|jpg|gif|png|webp)($|\?)/i) || f?.file_type?.match(/(jpeg|jpg|png|webp)/i));
+
+                                                                return (
+                                                                    <div key={idx} className="flex items-center gap-1.5">
+                                                                        {isImage ? (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => setPreviewFileModalUrl(fileUrl)}
+                                                                                className="group relative w-16 h-16 rounded-xl overflow-hidden border border-slate-200 shrink-0 cursor-pointer"
+                                                                            >
+                                                                                <img
+                                                                                    src={fileUrl}
+                                                                                    alt={fileName}
+                                                                                    className="w-full h-full object-cover group-hover:scale-105 transition"
+                                                                                />
+                                                                                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                                                                                    <Eye className="w-4 h-4 text-white" />
+                                                                                </div>
+                                                                            </button>
+                                                                        ) : (
+                                                                            <a
+                                                                                href={fileUrl}
+                                                                                target="_blank"
+                                                                                rel="noreferrer"
+                                                                                className="px-3 py-1.5 bg-white border border-slate-200 hover:border-[#25a2ee] rounded-xl text-xs font-bold text-slate-700 hover:text-[#25a2ee] flex items-center gap-1.5 transition"
+                                                                            >
+                                                                                <Paperclip className="w-3.5 h-3.5" />
+                                                                                <span className="max-w-[140px] truncate">{fileName}</span>
+                                                                                <ExternalLink className="w-3 h-3 text-slate-400" />
+                                                                            </a>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Rejection feedback display */}
+                                                {sub.feedback && (
+                                                    <div className="p-2.5 bg-rose-50 border border-rose-100 rounded-xl text-xs text-rose-800">
+                                                        <span className="font-bold">Feedback / Reason: </span>
+                                                        <span>{sub.feedback}</span>
+                                                    </div>
+                                                )}
+
+                                                {/* Action buttons */}
+                                                {isPending && (
+                                                    <div className="pt-2 border-t border-slate-200/60 flex items-center justify-end gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => openRejectSubmissionModal(sub)}
+                                                            disabled={reviewingSubmissionId === sub.id}
+                                                            className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-rose-50 hover:border-rose-300 text-rose-600 text-xs font-bold rounded-xl transition"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleApproveSubmission(sub)}
+                                                            disabled={reviewingSubmissionId === sub.id}
+                                                            className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition"
+                                                        >
+                                                            {reviewingSubmissionId === sub.id ? (
+                                                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                            ) : (
+                                                                <Check className="w-3.5 h-3.5" />
+                                                            )}
+                                                            <span>Approve & Award Points</span>
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })
+                            )}
+                        </div>
+                    )}
+
+                    <div className="flex justify-end pt-2 border-t border-slate-100">
+                        <button
+                            type="button"
+                            onClick={() => setIsSubmissionsModalOpen(false)}
+                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Reject Feedback Reason Modal */}
+            <Modal
+                isOpen={rejectModalOpen}
+                onClose={() => setRejectModalOpen(false)}
+                title="Reject Note Submission"
+                maxWidth="sm"
+            >
+                <form onSubmit={handleConfirmRejectSubmission} className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Reason / Feedback for Student:
+                        </label>
+                        <textarea
+                            rows={3}
+                            placeholder="e.g. Note photos are blurry or formula sheet is incomplete."
+                            value={rejectFeedbackText}
+                            onChange={(e) => setRejectFeedbackText(e.target.value)}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:outline-hidden focus:border-rose-500"
+                        />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                        <button
+                            type="button"
+                            onClick={() => setRejectModalOpen(false)}
+                            className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs"
+                        >
+                            Confirm Reject
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Image Preview Lightbox Modal */}
+            {previewFileModalUrl && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+                    onClick={() => setPreviewFileModalUrl(null)}
+                >
+                    <div className="relative max-w-4xl max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                        <button
+                            onClick={() => setPreviewFileModalUrl(null)}
+                            className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/90 text-white rounded-full transition"
+                        >
+                            ✕
+                        </button>
+                        <img
+                            src={previewFileModalUrl}
+                            alt="Preview"
+                            className="w-full h-full max-h-[85vh] object-contain rounded-xl"
+                        />
                     </div>
                 </div>
             )}

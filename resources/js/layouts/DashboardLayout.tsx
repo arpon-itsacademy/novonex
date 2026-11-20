@@ -38,7 +38,8 @@ import {
     Megaphone,
     Loader2,
     Trash2,
-    KeyRound
+    KeyRound,
+    Award
 } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
@@ -245,6 +246,12 @@ export const DashboardLayout: React.FC = () => {
                         { title: 'Course Commissions', path: '/admin/affiliate/courses', permission: 'marketing.affiliates' },
                         { title: 'Affiliates & Payouts', path: '/admin/affiliate/members', permission: 'marketing.affiliates' },
                     ]
+                },
+                { 
+                    title: 'Points', 
+                    path: '/admin/points', 
+                    icon: Award,
+                    permission: 'settings.manage'
                 },
                 { 
                     title: t.sidebar.payments, 

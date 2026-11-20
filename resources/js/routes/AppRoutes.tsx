@@ -15,9 +15,11 @@ import { CartPage } from '../pages/public/CartPage';
 import { CheckoutPage } from '../pages/public/CheckoutPage';
 import { OrderStatusPage } from '../pages/public/OrderStatusPage';
 import { TeacherProfilePage } from '../pages/public/TeacherProfilePage';
+import { EarnPointsPage } from '../pages/public/EarnPointsPage';
 
 // Admin pages
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage';
+import { AdminPointsPage } from '../pages/admin/AdminPointsPage';
 import { AdminCoursesPage } from '../pages/admin/AdminCoursesPage';
 import { AdminCourseEditPage } from '../pages/admin/AdminCourseEditPage';
 import { AdminCourseBuilderPage } from '../pages/admin/AdminCourseBuilderPage';
@@ -98,6 +100,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/courses" element={<CoursesPage />} />
                 <Route path="/courses/:slug" element={<CourseDetailsPage />} />
+                <Route path="/earn-points" element={<EarnPointsPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/register" element={<RegisterPage />} />
@@ -182,6 +185,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="settings/vdocipher" element={<AdminVdoCipherSettingsPage />} />
                 <Route path="media" element={<AdminMediaPage />} />
                 <Route path="trash" element={<AdminTrashPage />} />
+                <Route path="points" element={<AdminPointsPage />} />
             </Route>
 
             {/* Teacher Dashboard */}

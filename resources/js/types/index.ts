@@ -33,6 +33,7 @@ export interface User {
     custom_role_id?: number | null;
     custom_role?: Role | null;
     status: UserStatus;
+    points?: number;
     enrolled_courses_count?: number;
     unread_notifications_count?: number;
     enrolled_courses?: Course[];

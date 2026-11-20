@@ -42,6 +42,9 @@ use App\Http\Controllers\Api\ShurjopayController;
 use App\Http\Controllers\Api\VdoCipherController;
 use App\Http\Controllers\Api\AdminRoleController;
 use App\Http\Controllers\Api\AdminManualEnrollmentController;
+use App\Http\Controllers\Api\AdminPointController;
+use App\Http\Controllers\Api\RewardTopicController;
+use App\Http\Controllers\Api\EarnPointController;
 use App\Models\Course;
 use App\Models\LessonComment;
 use Illuminate\Http\Request;
@@ -71,6 +74,13 @@ Route::get('teachers/featured', [TeacherPublicController::class, 'getFeaturedTea
 Route::get('teachers/{id}', [TeacherPublicController::class, 'getTeacherProfile']);
 Route::get('instructors/{id}', [TeacherPublicController::class, 'getTeacherProfile']);
 Route::get('testimonials/marquee', [PublicCourseController::class, 'marqueeReviews']);
+
+// Public Earn Points
+Route::prefix('earn-points')->group(function () {
+    Route::get('courses', [EarnPointController::class, 'getCourses']);
+    Route::get('courses/{course}/topics', [EarnPointController::class, 'getCourseTopics']);
+    Route::get('topics/{topic}/approved-notes', [EarnPointController::class, 'getApprovedNotes']);
+});
 
 // shurjoPay Public Redirect Callback & Cancel
 Route::match(['get', 'post'], 'payment/shurjopay/callback', [ShurjopayController::class, 'callback']);
@@ -157,6 +167,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Student Unified Routine (Live Classes & Live Exams)
     Route::get('student/routine', [RoutineController::class, 'studentRoutine']);
+
+    // Student Earn Points & Rewards
+    Route::prefix('student/earn-points')->group(function () {
+        Route::post('topics/{topic}/submit', [EarnPointController::class, 'submitNote']);
+        Route::get('my-submissions', [EarnPointController::class, 'getMySubmissions']);
+        Route::get('my-points-history', [EarnPointController::class, 'getMyPointsHistory']);
+    });
 
     // Student Affiliate Program
     Route::prefix('student/affiliate')->group(function () {
@@ -246,6 +263,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('{course}/custom-buttons', [CourseBuilderController::class, 'getCustomButtons']);
         Route::put('{course}/custom-buttons', [CourseBuilderController::class, 'updateCustomButtons']);
         Route::post('{course}/upload-button-file', [CourseBuilderController::class, 'uploadButtonFile']);
+
+        // Course Reward Topics & Submissions (Builder)
+        Route::get('{course}/reward-topics', [RewardTopicController::class, 'getCourseTopics']);
+        Route::post('{course}/reward-topics', [RewardTopicController::class, 'storeTopic']);
+        Route::put('reward-topics/{topic}', [RewardTopicController::class, 'updateTopic']);
+        Route::delete('reward-topics/{topic}', [RewardTopicController::class, 'deleteTopic']);
+        Route::get('reward-topics/{topic}/submissions', [RewardTopicController::class, 'getTopicSubmissions']);
+        Route::post('reward-submissions/{submission}/review', [RewardTopicController::class, 'reviewSubmission']);
     });
 
     // Direct VdoCipher upload credentials for Course Builder (admin & teacher)
@@ -564,6 +589,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('commissions', [AffiliateAdminController::class, 'getCommissions']);
             Route::get('payouts', [AffiliateAdminController::class, 'getPayouts']);
             Route::put('payouts/{payout}', [AffiliateAdminController::class, 'updatePayoutStatus']);
+        });
+
+        // Points Management & Rules
+        Route::prefix('points')->group(function () {
+            Route::get('settings', [AdminPointController::class, 'getSettings']);
+            Route::put('settings', [AdminPointController::class, 'updateSettings']);
+            Route::get('transactions', [AdminPointController::class, 'getTransactions']);
+            Route::post('adjust', [AdminPointController::class, 'adjustPoints']);
         });
     });
 });

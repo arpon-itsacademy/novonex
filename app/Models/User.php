@@ -33,6 +33,7 @@ class User extends Authenticatable
         'role',
         'custom_role_id',
         'status',
+        'points',
         'photo_url',
     ];
 
@@ -67,6 +68,11 @@ class User extends Authenticatable
                 if (! Schema::hasColumn('users', 'photo_url')) {
                     Schema::table('users', function (Blueprint $table) {
                         $table->string('photo_url', 1000)->nullable()->after('email');
+                    });
+                }
+                if (! Schema::hasColumn('users', 'points')) {
+                    Schema::table('users', function (Blueprint $table) {
+                        $table->integer('points')->default(0)->after('status');
                     });
                 }
             } catch (\Throwable $e) {
@@ -293,6 +299,16 @@ class User extends Authenticatable
     public function examSubmissions(): HasMany
     {
         return $this->hasMany(ExamSubmission::class);
+    }
+
+    public function pointTransactions(): HasMany
+    {
+        return $this->hasMany(PointTransaction::class);
+    }
+
+    public function rewardNoteSubmissions(): HasMany
+    {
+        return $this->hasMany(RewardNoteSubmission::class);
     }
 
     public function hasPurchasedAnyCourse(): bool

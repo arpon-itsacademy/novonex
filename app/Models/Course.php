@@ -243,4 +243,14 @@ class Course extends Model
             ->withPivot('sort_order')
             ->withTimestamps();
     }
+
+    public function rewardTopics(): HasMany
+    {
+        return $this->hasMany(RewardTopic::class);
+    }
+
+    public function rewardNoteSubmissions(): HasMany
+    {
+        return $this->hasMany(RewardNoteSubmission::class);
+    }
 }

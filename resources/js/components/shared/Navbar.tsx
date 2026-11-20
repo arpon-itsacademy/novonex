@@ -58,6 +58,14 @@ const DEFAULT_NAV_ITEMS: HeaderMenuItem[] = [
         ],
     },
     {
+        id: 'earn-points',
+        label: 'Earn Points',
+        label_en: 'Earn Points',
+        url: '/earn-points',
+        is_external: false,
+        highlight: true,
+    },
+    {
         id: '3',
         label: 'Success Story',
         label_en: 'Success Story',
@@ -145,9 +153,31 @@ export const Navbar: React.FC = () => {
         language
     );
 
-    const menuItems: HeaderMenuItem[] = (headerSettings?.menu_items && headerSettings.menu_items.length > 0)
+    const rawMenuItems: HeaderMenuItem[] = (headerSettings?.menu_items && headerSettings.menu_items.length > 0)
         ? headerSettings.menu_items
         : DEFAULT_NAV_ITEMS;
+
+    const menuItems = React.useMemo(() => {
+        const hasEarn = rawMenuItems.some(item => item.url === '/earn-points');
+        if (!hasEarn) {
+            const earnItem: HeaderMenuItem = {
+                id: 'earn-points',
+                label: 'Earn Points',
+                label_en: 'Earn Points',
+                url: '/earn-points',
+                is_external: false,
+                highlight: true,
+            };
+            const courseIdx = rawMenuItems.findIndex(item => item.url === '/courses' || item.label?.toLowerCase().includes('course'));
+            if (courseIdx >= 0) {
+                const copy = [...rawMenuItems];
+                copy.splice(courseIdx + 1, 0, earnItem);
+                return copy;
+            }
+            return [...rawMenuItems, earnItem];
+        }
+        return rawMenuItems;
+    }, [rawMenuItems]);
 
     useEffect(() => {
         setLogoError(false);
@@ -460,6 +490,16 @@ export const Navbar: React.FC = () => {
                         {/* Auth Buttons (Phitron Signature Style) */}
                         {user ? (
                             <div className="flex items-center gap-2">
+                                {/* User Points Badge */}
+                                <Link
+                                    to="/earn-points"
+                                    className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-extrabold text-xs transition-all shadow-2xs group"
+                                    title="My Reward Points & Earn Points"
+                                >
+                                    <Sparkles className="w-3.5 h-3.5 text-amber-500 group-hover:scale-110 transition-transform" />
+                                    <span>{user.points ?? 0} Pts</span>
+                                </Link>
+
                                 {/* Notification Bell */}
                                 <div className="relative">
                                     <button
@@ -713,7 +753,23 @@ export const Navbar: React.FC = () => {
                             )}
                         </button>
 
-                        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                        <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                            {user && (
+                                <Link
+                                    to="/earn-points"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center justify-between px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-3 text-xs font-bold text-amber-600 dark:text-amber-400"
+                                >
+                                    <span className="flex items-center gap-1.5">
+                                        <Sparkles className="w-4 h-4 text-amber-500" />
+                                        <span>My Reward Points</span>
+                                    </span>
+                                    <span className="px-2 py-0.5 bg-amber-500 text-white rounded-md text-[11px] font-extrabold">
+                                        {user.points ?? 0} Pts
+                                    </span>
+                                </Link>
+                            )}
+
                             {user ? (
                                 <div className="flex items-center gap-2 w-full">
                                     <Link

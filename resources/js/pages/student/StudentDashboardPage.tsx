@@ -16,7 +16,8 @@ import {
     MapPin,
     Mail,
     Phone,
-    Hash
+    Hash,
+    Sparkles
 } from 'lucide-react';
 
 interface RecentActivityItem {
@@ -245,6 +246,30 @@ export const StudentDashboardPage: React.FC = () => {
                             <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
                                 Account Summary
                             </h2>
+                        </div>
+
+                        {/* Reward Points Card */}
+                        <div className="mt-3 p-3.5 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 rounded-2xl flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                                    <Sparkles className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                        Reward Points
+                                    </span>
+                                    <p className="text-lg font-black text-slate-900 leading-tight">
+                                        {user?.points ?? 0} <span className="text-[11px] font-semibold text-slate-400">Pts</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <Link
+                                to="/earn-points"
+                                className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-extrabold rounded-xl shadow-2xs transition flex items-center gap-1 shrink-0"
+                            >
+                                <span>Earn Points</span>
+                                <ArrowRight className="w-3 h-3" />
+                            </Link>
                         </div>
 
                         {/* Progress Bars */}

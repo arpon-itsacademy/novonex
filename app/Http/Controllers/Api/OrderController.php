@@ -473,6 +473,13 @@ class OrderController extends Controller
             // Notify student
             $order->user->notify(new PaymentConfirmedNotification($order));
 
+            // Award purchase reward points
+            try {
+                app(\App\Services\PointService::class)->awardCoursePurchasePoints($order);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Awarding purchase points failed: ' . $e->getMessage());
+            }
+
             // Dispatch Course Purchase Auto SMS Push
             try {
                 app(\App\Services\CoursePurchaseSmsService::class)->sendPurchaseSms($order);
