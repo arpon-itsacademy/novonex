@@ -37,6 +37,7 @@ export const AdminCoursesPage: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const [sortBy, setSortBy] = useState('latest');
     const [statusFilter, setStatusFilter] = useState(() => {
         const p = new URLSearchParams(window.location.search);
         return p.get('status') || '';
@@ -54,14 +55,15 @@ export const AdminCoursesPage: React.FC = () => {
 
     useEffect(() => {
         setCurrentPage(1);
-        fetchCourses(1, perPage, search, statusFilter);
-    }, [search, statusFilter]);
+        fetchCourses(1, perPage, search, statusFilter, sortBy);
+    }, [search, statusFilter, sortBy]);
 
     const fetchCourses = async (
         page = currentPage,
         pageSize = perPage,
         searchTerm = search,
-        status = statusFilter
+        status = statusFilter,
+        sort = sortBy
     ) => {
         setLoading(true);
         try {
@@ -70,6 +72,7 @@ export const AdminCoursesPage: React.FC = () => {
             params.append('per_page', String(pageSize));
             if (searchTerm.trim()) params.append('search', searchTerm.trim());
             if (status) params.append('status', status);
+            if (sort) params.append('sort', sort);
 
             const { data } = await apiClient.get(`/admin/courses?${params.toString()}`);
             setCourses(data.data || []);
@@ -220,8 +223,22 @@ export const AdminCoursesPage: React.FC = () => {
                     </div>
                 </form>
 
-                {/* Status Filter & Trash Toggle */}
-                <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                {/* Status Filter & Sort Order */}
+                <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                    <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 cursor-pointer"
+                        title="Sort courses"
+                    >
+                        <option value="latest">Newest First</option>
+                        <option value="best_selling">Best Selling (Most Enrolled)</option>
+                        <option value="alphabetical_asc">Alphabetical (A - Z)</option>
+                        <option value="alphabetical_desc">Alphabetical (Z - A)</option>
+                        <option value="price_low">Price: Low to High</option>
+                        <option value="price_high">Price: High to Low</option>
+                    </select>
+
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}

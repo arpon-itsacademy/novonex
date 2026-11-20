@@ -42,6 +42,7 @@ export const CoursesPage: React.FC = () => {
 
     const activeCategory = searchParams.get('category') || '';
     const activeSearch = searchParams.get('search') || '';
+    const activeSort = searchParams.get('sort') || 'best_selling';
     const [searchInput, setSearchInput] = useState(activeSearch);
 
     useEffect(() => {
@@ -106,14 +107,15 @@ export const CoursesPage: React.FC = () => {
         const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
         const validPage = isNaN(pageFromUrl) || pageFromUrl < 1 ? 1 : pageFromUrl;
         setCurrentPage(validPage);
-        fetchCourses(validPage, perPage, activeCategory, activeSearch);
-    }, [activeCategory, activeSearch, searchParams.get('page')]);
+        fetchCourses(validPage, perPage, activeCategory, activeSearch, activeSort);
+    }, [activeCategory, activeSearch, activeSort, searchParams.get('page')]);
 
     const fetchCourses = async (
         page = currentPage,
         pageSize = perPage,
         cat = activeCategory,
-        q = activeSearch
+        q = activeSearch,
+        sort = activeSort
     ) => {
         setLoading(true);
         try {
@@ -122,6 +124,7 @@ export const CoursesPage: React.FC = () => {
             params.append('per_page', String(pageSize));
             if (cat) params.append('category', cat);
             if (q) params.append('search', q);
+            if (sort) params.append('sort', sort);
 
             const { data } = await apiClient.get(`/courses?${params.toString()}`);
             setCourses(data.data || []);
@@ -188,6 +191,13 @@ export const CoursesPage: React.FC = () => {
         } else {
             newParams.set('category', categorySlug);
         }
+        newParams.delete('page');
+        setSearchParams(newParams);
+    };
+
+    const handleSortChange = (newSort: string) => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('sort', newSort);
         newParams.delete('page');
         setSearchParams(newParams);
     };
@@ -281,23 +291,43 @@ export const CoursesPage: React.FC = () => {
                 </form>
             </div>
 
-            {/* Category Filter Tabs */}
+            {/* Category Filter Tabs & Sorting */}
             <div className="space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                         <Layers className="w-3.5 h-3.5 text-[#25a2ee]" />
                         <span>Filter by Category</span>
                     </span>
-                    {activeCategory && (
-                        <button
-                            type="button"
-                            onClick={() => handleSelectCategory('all')}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-rose-500 hover:text-rose-600 cursor-pointer"
-                        >
-                            <X className="w-3.5 h-3.5" />
-                            <span>Reset Filter</span>
-                        </button>
-                    )}
+
+                    <div className="flex items-center gap-3 self-end sm:self-auto">
+                        {/* Sort Selector */}
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">Sort:</span>
+                            <select
+                                value={activeSort}
+                                onChange={(e) => handleSortChange(e.target.value)}
+                                className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee] cursor-pointer shadow-2xs"
+                            >
+                                <option value="best_selling">Best Selling (Most Sales)</option>
+                                <option value="alphabetical_asc">Alphabetical (A - Z)</option>
+                                <option value="alphabetical_desc">Alphabetical (Z - A)</option>
+                                <option value="latest">Newest First</option>
+                                <option value="price_low">Price: Low to High</option>
+                                <option value="price_high">Price: High to Low</option>
+                            </select>
+                        </div>
+
+                        {activeCategory && (
+                            <button
+                                type="button"
+                                onClick={() => handleSelectCategory('all')}
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-rose-500 hover:text-rose-600 cursor-pointer"
+                            >
+                                <X className="w-3.5 h-3.5" />
+                                <span>Reset Filter</span>
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Horizontally Scrollable Category Pill Tabs */}

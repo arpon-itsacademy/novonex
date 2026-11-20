@@ -530,6 +530,7 @@ export const AdminPageBuilderPage: React.FC = () => {
                         viewAllText: 'All Courses',
                         viewAllLink: '/courses',
                         limit: 12,
+                        sortBy: 'best_selling',
                         showAllTab: true,
                         allTabLabel: 'All Courses',
                         dynamicCategories: false,
@@ -3038,6 +3039,28 @@ export const AdminPageBuilderPage: React.FC = () => {
                                                                 onChange={(e) => handleUpdateSelectedSettings('limit', parseInt(e.target.value) || 12)}
                                                                 className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white font-bold"
                                                             />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-slate-400 font-bold mb-1 flex items-center justify-between">
+                                                                <span>Course Sort Order</span>
+                                                                <span className="text-[10px] text-sky-400 font-normal">Arrangement</span>
+                                                            </label>
+                                                            <select
+                                                                value={selectedBlock.settings.sortBy || 'best_selling'}
+                                                                onChange={(e) => handleUpdateSelectedSettings('sortBy', e.target.value)}
+                                                                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white font-bold cursor-pointer focus:ring-2 focus:ring-sky-500"
+                                                            >
+                                                                <option value="best_selling">Best Selling / Highest Sales (Most Enrolled)</option>
+                                                                <option value="alphabetical_asc">Alphabetical (A - Z)</option>
+                                                                <option value="alphabetical_desc">Alphabetical (Z - A)</option>
+                                                                <option value="latest">Newest First (Latest Added)</option>
+                                                                <option value="oldest">Oldest First</option>
+                                                                <option value="price_low">Price (Low to High)</option>
+                                                                <option value="price_high">Price (High to Low)</option>
+                                                            </select>
+                                                            <p className="text-[10px] text-slate-500 mt-1">
+                                                                Choose whether courses are arranged by highest sales or alphabetically.
+                                                            </p>
                                                         </div>
 
                                                         {/* Category Selection in Builder */}

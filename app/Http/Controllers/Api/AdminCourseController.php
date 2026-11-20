@@ -32,7 +32,45 @@ class AdminCourseController extends Controller
             });
         }
 
-        $courses = $query->latest()->paginate($request->integer('per_page', 15));
+        // Sorting: best_selling, alphabetical_asc, alphabetical_desc, price_low, price_high, oldest, latest
+        $sort = $request->get('sort', 'latest');
+        switch ($sort) {
+            case 'best_selling':
+            case 'most_sold':
+            case 'sales':
+            case 'popular':
+                $query->orderByRaw('((SELECT COUNT(*) FROM enrollments WHERE enrollments.course_id = courses.id) + COALESCE(courses.fake_enrollment_count, 0)) DESC')
+                      ->orderBy('id', 'desc');
+                break;
+            case 'alphabetical':
+            case 'alphabetical_asc':
+            case 'title_asc':
+            case 'a_z':
+                $query->orderBy('title', 'asc');
+                break;
+            case 'alphabetical_desc':
+            case 'title_desc':
+            case 'z_a':
+                $query->orderBy('title', 'desc');
+                break;
+            case 'price_low':
+            case 'price_asc':
+                $query->orderByRaw('COALESCE(sale_price, price) ASC');
+                break;
+            case 'price_high':
+            case 'price_desc':
+                $query->orderByRaw('COALESCE(sale_price, price) DESC');
+                break;
+            case 'oldest':
+                $query->oldest();
+                break;
+            case 'latest':
+            default:
+                $query->latest();
+                break;
+        }
+
+        $courses = $query->paginate($request->integer('per_page', 15));
 
         return response()->json($courses);
     }

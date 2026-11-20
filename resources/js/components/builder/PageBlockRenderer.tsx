@@ -309,6 +309,8 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
 
     const activeTab = configuredTabs.find(t => t.id === activeTabId) || configuredTabs[0];
 
+    const sortBy = s.sortBy || 'best_selling';
+
     useEffect(() => {
         // Fetch categories for pill counts or dynamic category display if enabled
         const fetchInitial = async () => {
@@ -317,7 +319,7 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
                     ? `&category=${encodeURIComponent(activeTab.categorySlug)}`
                     : '';
                 const [coursesRes, catsRes] = await Promise.all([
-                    apiClient.get(`/courses?per_page=${s.limit || 12}${initialCategory}`),
+                    apiClient.get(`/courses?per_page=${s.limit || 12}&sort=${sortBy}${initialCategory}`),
                     apiClient.get('/categories'),
                 ]);
                 setCourses(coursesRes.data.data || []);
@@ -337,7 +339,7 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
             }
         };
         fetchInitial();
-    }, [s.limit, s.selectedCategorySlugs]);
+    }, [s.limit, s.selectedCategorySlugs, sortBy]);
 
     // When tab changes, if it is a category tab, fetch courses for that category
     const handleTabClick = async (tab: CourseTabItem) => {
@@ -347,8 +349,8 @@ const CourseTabsBlock: React.FC<{ block: PageBlock; isBuilder?: boolean }> = ({ 
             try {
                 const slug = tab.categorySlug || 'all';
                 const url = slug === 'all'
-                    ? `/courses?per_page=${s.limit || 12}`
-                    : `/courses?per_page=${s.limit || 12}&category=${encodeURIComponent(slug)}`;
+                    ? `/courses?per_page=${s.limit || 12}&sort=${sortBy}`
+                    : `/courses?per_page=${s.limit || 12}&sort=${sortBy}&category=${encodeURIComponent(slug)}`;
                 const res = await apiClient.get(url);
                 setCourses(res.data.data || []);
             } catch {
