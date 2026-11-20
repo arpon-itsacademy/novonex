@@ -160,10 +160,28 @@ class LessonAttachmentController extends Controller
             abort(403, 'You must be enrolled in the course to download this study material.');
         }
 
-        if (! Storage::exists($attachment->file_path)) {
-            abort(404, 'File not found in storage.');
+        // 1. Check in public path (e.g. materials/...)
+        $publicFile = public_path($attachment->file_path);
+        if (file_exists($publicFile) && is_file($publicFile)) {
+            return response()->download($publicFile, $attachment->file_name);
         }
 
-        return Storage::download($attachment->file_path, $attachment->file_name);
+        // 2. Check in public disk
+        if (Storage::disk('public')->exists($attachment->file_path)) {
+            return Storage::disk('public')->download($attachment->file_path, $attachment->file_name);
+        }
+
+        // 3. Check in default storage disk
+        if (Storage::exists($attachment->file_path)) {
+            return Storage::download($attachment->file_path, $attachment->file_name);
+        }
+
+        // 4. Check in private storage path
+        $privateFile = storage_path('app/' . $attachment->file_path);
+        if (file_exists($privateFile) && is_file($privateFile)) {
+            return response()->download($privateFile, $attachment->file_name);
+        }
+
+        abort(404, 'File not found in storage.');
     }
 }
