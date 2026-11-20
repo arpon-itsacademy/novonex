@@ -25,4 +25,5 @@ Thumbs.db
 /deploy_upload
 .ftp-deploy-sync-state.json
 *.zip
+!public/materials/*.zip
 *.sql
