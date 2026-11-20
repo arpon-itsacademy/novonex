@@ -31,8 +31,9 @@ export const TeacherCoursesPage: React.FC = () => {
         }
     };
 
-    const teachingCourses = courses.filter((c) => c.is_assigned_teacher !== false);
-    const enrolledCourses = courses.filter((c) => c.is_assigned_teacher === false);
+    const isTeachingCourse = (c: any) => Boolean(c.is_assigned_teacher === true || (c.role_in_course === 'instructor' && c.can_manage_builder));
+    const teachingCourses = courses.filter((c) => isTeachingCourse(c));
+    const enrolledCourses = courses.filter((c) => !isTeachingCourse(c));
 
     const displayedCourses = 
         activeTab === 'teaching'
@@ -135,7 +136,10 @@ export const TeacherCoursesPage: React.FC = () => {
                     </div>
                 ) : (
                     displayedCourses.map((course) => {
-                        const isTeaching = course.is_assigned_teacher !== false;
+                        const isTeaching = isTeachingCourse(course);
+                        const learningTarget = course.last_lesson_id
+                            ? `/learning/${course.id}/lessons/${course.last_lesson_id}`
+                            : `/learning/${course.id}`;
 
                         return (
                             <div
@@ -143,64 +147,103 @@ export const TeacherCoursesPage: React.FC = () => {
                                 className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow"
                             >
                                 {/* Thumbnail */}
-                                <a
-                                    href={`/courses/${course.slug}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="aspect-video bg-slate-900 relative block group/thumb cursor-pointer overflow-hidden"
-                                    title="View public course details"
-                                >
-                                    {course.thumbnail ? (
-                                        <img
-                                            src={course.thumbnail}
-                                            alt={course.title}
-                                            className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-white">
-                                            <BookOpen className="w-8 h-8 text-sky-400 opacity-60" />
-                                        </div>
-                                    )}
+                                {isTeaching ? (
+                                    <a
+                                        href={`/courses/${course.slug}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="aspect-video bg-slate-900 relative block group/thumb cursor-pointer overflow-hidden"
+                                        title="View public course details"
+                                    >
+                                        {course.thumbnail ? (
+                                            <img
+                                                src={course.thumbnail}
+                                                alt={course.title}
+                                                className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-white">
+                                                <BookOpen className="w-8 h-8 text-sky-400 opacity-60" />
+                                            </div>
+                                        )}
 
-                                    {/* Role Badges Top Left & Right */}
-                                    <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                                        {isTeaching ? (
+                                        <div className="absolute top-3 left-3 flex items-center gap-1.5">
                                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-600/90 text-white backdrop-blur-xs flex items-center gap-1 shadow-xs">
                                                 <Layers className="w-3 h-3" />
                                                 <span>Instructor</span>
                                             </span>
+                                        </div>
+
+                                        <span
+                                            className={`absolute top-3 right-3 px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                                                course.status === 'published'
+                                                    ? 'bg-emerald-500 text-white'
+                                                    : 'bg-slate-700 text-slate-200'
+                                            }`}
+                                        >
+                                            {course.status}
+                                        </span>
+                                    </a>
+                                ) : (
+                                    <Link
+                                        to={learningTarget}
+                                        className="aspect-video bg-slate-900 relative block group/thumb cursor-pointer overflow-hidden"
+                                        title="Start Class in Classroom"
+                                    >
+                                        {course.thumbnail ? (
+                                            <img
+                                                src={course.thumbnail}
+                                                alt={course.title}
+                                                className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300"
+                                            />
                                         ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-white">
+                                                <BookOpen className="w-8 h-8 text-emerald-400 opacity-60" />
+                                            </div>
+                                        )}
+
+                                        <div className="absolute top-3 left-3 flex items-center gap-1.5">
                                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-600/90 text-white backdrop-blur-xs flex items-center gap-1 shadow-xs">
                                                 <GraduationCap className="w-3 h-3" />
                                                 <span>Enrolled Student</span>
                                             </span>
-                                        )}
-                                    </div>
+                                        </div>
 
-                                    <span
-                                        className={`absolute top-3 right-3 px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                                            course.status === 'published'
-                                                ? 'bg-emerald-500 text-white'
-                                                : 'bg-slate-700 text-slate-200'
-                                        }`}
-                                    >
-                                        {course.status}
-                                    </span>
-                                </a>
+                                        <span
+                                            className={`absolute top-3 right-3 px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                                                course.status === 'published'
+                                                    ? 'bg-emerald-500 text-white'
+                                                    : 'bg-slate-700 text-slate-200'
+                                            }`}
+                                        >
+                                            {course.status}
+                                        </span>
+                                    </Link>
+                                )}
 
                                 {/* Content Details */}
                                 <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
                                     <div className="space-y-2">
                                         <h3 className="font-bold text-slate-900 text-base line-clamp-2">
-                                            <a
-                                                href={`/courses/${course.slug}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="hover:text-sky-600 transition-colors"
-                                                title="View public course details"
-                                            >
-                                                {course.title}
-                                            </a>
+                                            {isTeaching ? (
+                                                <a
+                                                    href={`/courses/${course.slug}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="hover:text-sky-600 transition-colors"
+                                                    title="View public course details"
+                                                >
+                                                    {course.title}
+                                                </a>
+                                            ) : (
+                                                <Link
+                                                    to={learningTarget}
+                                                    className="hover:text-emerald-600 transition-colors"
+                                                    title="Start Class in Classroom"
+                                                >
+                                                    {course.title}
+                                                </Link>
+                                            )}
                                         </h3>
 
                                         {isTeaching ? (
@@ -258,15 +301,11 @@ export const TeacherCoursesPage: React.FC = () => {
                                     ) : (
                                         <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100">
                                             <Link
-                                                to={
-                                                    course.last_lesson_id
-                                                        ? `/learning/${course.id}/lessons/${course.last_lesson_id}`
-                                                        : `/learning/${course.id}`
-                                                }
+                                                to={learningTarget}
                                                 className="col-span-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
                                             >
                                                 <PlayCircle className="w-4 h-4" />
-                                                <span>Continue Learning</span>
+                                                <span>Start Class</span>
                                             </Link>
                                             <a
                                                 href={`/courses/${course.slug}`}

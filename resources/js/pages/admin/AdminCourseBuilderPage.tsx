@@ -1180,12 +1180,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
     if (accessError) {
         return (
             <div className="max-w-xl mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200 shadow-sm text-center space-y-4">
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                    <AlertCircle className="w-7 h-7" />
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <GraduationCap className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-black text-slate-900">Course Builder Restricted</h3>
+                <h3 className="text-xl font-black text-slate-900">Enrolled Learner Access</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                    {accessError} You are not an assigned instructor for this course. If you enrolled in this course as a learner, you can access the classes from the student classroom player.
+                    {accessError} If you enrolled in this course as a learner, curriculum editing is restricted, but you can attend classes and watch lessons directly in the classroom.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
                     <Link
@@ -1196,10 +1196,10 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     </Link>
                     <Link
                         to={`/learning/${id}`}
-                        className="w-full sm:w-auto px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl transition-colors shadow-xs flex items-center justify-center gap-1.5"
+                        className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors shadow-xs flex items-center justify-center gap-1.5"
                     >
                         <PlayCircle className="w-4 h-4" />
-                        <span>Open Student Classroom</span>
+                        <span>Start Class in Classroom</span>
                     </Link>
                 </div>
             </div>
@@ -1409,20 +1409,6 @@ export const AdminCourseBuilderPage: React.FC = () => {
                     {activeTab === 'outline_buttons' && (
                         <div className="flex flex-wrap items-center gap-2">
                             <button
-                                onClick={handleAddActionButton}
-                                className="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
-                            >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>+ Add Outline Button</span>
-                            </button>
-                            <button
-                                onClick={handleAddEnrolledButton}
-                                className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
-                            >
-                                <KeyRound className="w-3.5 h-3.5" />
-                                <span>+ Add Group Button</span>
-                            </button>
-                            <button
                                 onClick={handleSaveCustomButtons}
                                 disabled={savingCustomButtons}
                                 className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
@@ -1435,7 +1421,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 ) : (
                                     <>
                                         <Save className="w-3.5 h-3.5" />
-                                        <span>Save All Buttons</span>
+                                        <span>Save</span>
                                     </>
                                 )}
                             </button>
@@ -2761,7 +2747,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
                                 ) : (
                                     <>
                                         <Save className="w-3.5 h-3.5" />
-                                        <span>Save Changes</span>
+                                        <span>Save</span>
                                     </>
                                 )}
                             </button>
@@ -3063,12 +3049,12 @@ export const AdminCourseBuilderPage: React.FC = () => {
                             {savingCustomButtons ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span>Saving Changes...</span>
+                                    <span>Saving...</span>
                                 </>
                             ) : (
                                 <>
                                     <Save className="w-4 h-4" />
-                                    <span>Save All Buttons</span>
+                                    <span>Save</span>
                                 </>
                             )}
                         </button>

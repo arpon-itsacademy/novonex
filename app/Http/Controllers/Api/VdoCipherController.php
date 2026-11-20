@@ -311,6 +311,8 @@ class VdoCipherController extends Controller
             $isAuthorized = true;
         } elseif ($lesson->is_preview) {
             $isAuthorized = true;
+        } elseif ($user->isEnrolledIn($lesson->course_id)) {
+            $isAuthorized = true;
         } else {
             $isEnrolled = Enrollment::where('user_id', $user->id)
                 ->where('course_id', $lesson->course_id)

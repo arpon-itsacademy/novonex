@@ -135,6 +135,9 @@ class EnrollmentController extends Controller
             }
         }
 
+        $canManageBuilder = $user && ($user->isAdmin() || ($user->isTeacher() && $course->isAssignedTeacher($user->id)));
+        $isEnrolled = $user ? $user->isEnrolledIn($course->id) : false;
+
         if (!$canAccess) {
             $previewLesson = Lesson::where('course_id', $course->id)
                 ->where('is_preview', true)
@@ -146,12 +149,16 @@ class EnrollmentController extends Controller
                     'lesson_id' => $previewLesson->id,
                     'course_slug' => $course->slug,
                     'is_preview' => true,
+                    'can_manage_builder' => $canManageBuilder,
+                    'is_enrolled' => $isEnrolled,
                 ]);
             }
 
             return response()->json([
                 'message' => 'You must be enrolled in this course to access the classroom.',
                 'course_slug' => $course->slug,
+                'can_manage_builder' => $canManageBuilder,
+                'is_enrolled' => $isEnrolled,
             ], 403);
         }
 
@@ -165,6 +172,8 @@ class EnrollmentController extends Controller
             return response()->json([
                 'lesson_id' => $lastProgress->lesson_id,
                 'course_slug' => $course->slug,
+                'can_manage_builder' => $canManageBuilder,
+                'is_enrolled' => $isEnrolled,
             ]);
         }
 
@@ -176,6 +185,8 @@ class EnrollmentController extends Controller
                 return response()->json([
                     'lesson_id' => $firstLesson->id,
                     'course_slug' => $course->slug,
+                    'can_manage_builder' => $canManageBuilder,
+                    'is_enrolled' => $isEnrolled,
                 ]);
             }
         }
@@ -186,12 +197,16 @@ class EnrollmentController extends Controller
             return response()->json([
                 'lesson_id' => $firstLesson->id,
                 'course_slug' => $course->slug,
+                'can_manage_builder' => $canManageBuilder,
+                'is_enrolled' => $isEnrolled,
             ]);
         }
 
         return response()->json([
             'message' => 'No lessons found in this course yet.',
             'course_slug' => $course->slug,
+            'can_manage_builder' => $canManageBuilder,
+            'is_enrolled' => $isEnrolled,
         ], 404);
     }
 
@@ -241,11 +256,15 @@ class EnrollmentController extends Controller
             ->pluck('lesson_id')
             ->toArray();
 
+        $canManageBuilder = $user && ($user->isAdmin() || ($user->isTeacher() && $course->isAssignedTeacher($user->id)));
+
         return response()->json([
             'lesson' => $lesson->load(['attachments', 'section']),
             'sections' => $sections,
             'completed_lesson_ids' => $completedLessonIds,
             'is_completed' => in_array($lesson->id, $completedLessonIds, true),
+            'can_manage_builder' => $canManageBuilder,
+            'is_enrolled' => $user ? $user->isEnrolledIn($course->id) : false,
         ]);
     }
 

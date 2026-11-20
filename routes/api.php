@@ -275,15 +275,17 @@ Route::middleware('auth:sanctum')->group(function () {
             ->with(['instructors:id,name', 'instructor:id,name'])
             ->withCount(['lessons', 'enrollments'])
             ->latest()
-            ->get()
-            ->map(function ($course) {
-                $course->is_assigned_teacher = true;
-                $course->role_in_course = 'instructor';
-                $course->can_manage_builder = true;
-                return $course;
-            });
+            ->get();
 
             $teachingIds = $teachingCourses->pluck('id')->toArray();
+
+            $formattedTeachingCourses = $teachingCourses->map(function ($course) {
+                $arr = $course->toArray();
+                $arr['is_assigned_teacher'] = true;
+                $arr['role_in_course'] = 'instructor';
+                $arr['can_manage_builder'] = true;
+                return $arr;
+            });
 
             // 2. Courses where teacher is enrolled as a student (excluding courses they instruct)
             $enrollments = $user->enrollments()
@@ -317,20 +319,21 @@ Route::middleware('auth:sanctum')->group(function () {
 
                 $firstLesson = $course->lessons()->orderBy('sort_order')->first();
 
-                $course->is_assigned_teacher = false;
-                $course->role_in_course = 'student';
-                $course->can_manage_builder = false;
-                $course->enrolled_at = $enrollment->enrolled_at;
-                $course->access_key = $enrollment->access_key;
-                $course->total_lessons = $totalLessons;
-                $course->completed_lessons = $completedCount;
-                $course->progress_percentage = $percentage;
-                $course->last_lesson_id = $lastAccessed ? $lastAccessed->lesson_id : optional($firstLesson)->id;
+                $arr = $course->toArray();
+                $arr['is_assigned_teacher'] = false;
+                $arr['role_in_course'] = 'student';
+                $arr['can_manage_builder'] = false;
+                $arr['enrolled_at'] = $enrollment->enrolled_at ? $enrollment->enrolled_at->toIso8601String() : null;
+                $arr['access_key'] = $enrollment->access_key;
+                $arr['total_lessons'] = $totalLessons;
+                $arr['completed_lessons'] = $completedCount;
+                $arr['progress_percentage'] = $percentage;
+                $arr['last_lesson_id'] = $lastAccessed ? $lastAccessed->lesson_id : optional($firstLesson)->id;
 
-                return $course;
+                return $arr;
             })->filter()->values();
 
-            $allCourses = $teachingCourses->concat($enrolledCourses)->values();
+            $allCourses = $formattedTeachingCourses->concat($enrolledCourses)->values();
 
             return response()->json($allCourses);
         });

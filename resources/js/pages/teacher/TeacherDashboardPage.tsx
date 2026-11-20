@@ -36,8 +36,9 @@ export const TeacherDashboardPage: React.FC = () => {
         return <div className="p-12 text-center text-slate-400">Loading teacher dashboard...</div>;
     }
 
-    const teachingCourses = courses.filter((c) => c.is_assigned_teacher !== false);
-    const enrolledCourses = courses.filter((c) => c.is_assigned_teacher === false);
+    const isTeachingCourse = (c: any) => Boolean(c.is_assigned_teacher === true || (c.role_in_course === 'instructor' && c.can_manage_builder));
+    const teachingCourses = courses.filter((c) => isTeachingCourse(c));
+    const enrolledCourses = courses.filter((c) => !isTeachingCourse(c));
 
     const totalStudents = teachingCourses.reduce((acc, c) => acc + (c.enrollments_count || 0), 0);
     const totalLessons = teachingCourses.reduce((acc, c) => acc + (c.lessons_count || 0), 0);
@@ -183,7 +184,7 @@ export const TeacherDashboardPage: React.FC = () => {
                                     className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                                 >
                                     <PlayCircle className="w-3.5 h-3.5" />
-                                    <span>Continue Learning</span>
+                                    <span>Start Class</span>
                                 </Link>
                             </div>
                         ))}
