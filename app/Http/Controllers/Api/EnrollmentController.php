@@ -125,9 +125,7 @@ class EnrollmentController extends Controller
         $user = auth()->user();
 
         $canAccess = false;
-        if ($user && $user->isAdmin()) {
-            $canAccess = true;
-        } elseif ($user && $user->isTeacher() && $course->isAssignedTeacher($user->id)) {
+        if ($user && ($user->isAdmin() || $user->isTeacher())) {
             $canAccess = true;
         } elseif ($user && $user->isEnrolledIn($course->id)) {
             $canAccess = true;
@@ -199,13 +197,11 @@ class EnrollmentController extends Controller
 
         // Authorization check
         $canAccess = false;
-        if ($user->isAdmin()) {
-            $canAccess = true;
-        } elseif ($user->isTeacher() && $course->isAssignedTeacher($user->id)) {
+        if ($user && ($user->isAdmin() || $user->isTeacher())) {
             $canAccess = true;
         } elseif ($lesson->is_preview) {
             $canAccess = true;
-        } elseif ($user->isEnrolledIn($course->id)) {
+        } elseif ($user && $user->isEnrolledIn($course->id)) {
             $canAccess = true;
         }
 

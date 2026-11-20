@@ -144,9 +144,7 @@ class LessonAttachmentController extends Controller
         // Verify authorization
         $canAccess = false;
         if ($user) {
-            if ($user->isAdmin()) {
-                $canAccess = true;
-            } elseif ($user->isTeacher() && $course->isAssignedTeacher($user->id)) {
+            if ($user->isAdmin() || $user->isTeacher()) {
                 $canAccess = true;
             } elseif ($user->isEnrolledIn($course->id)) {
                 $canAccess = true;
