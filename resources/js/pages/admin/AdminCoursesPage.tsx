@@ -173,27 +173,52 @@ export const AdminCoursesPage: React.FC = () => {
 
             {/* Filter & Search Bar */}
             <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4">
-                {/* Search Input */}
-                <div className="relative w-full sm:max-w-md">
-                    <input
-                        type="text"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search courses by name or description..."
-                        className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee] focus:border-transparent transition"
-                    />
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                    {search && (
+                {/* Search Input with Search button */}
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(1);
+                        fetchCourses(1, perPage, search, statusFilter);
+                    }}
+                    className="relative w-full sm:max-w-md"
+                >
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Search courses by name or description..."
+                            className="w-full pl-10 pr-24 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee] focus:border-transparent transition"
+                        />
                         <button
-                            type="button"
-                            onClick={() => setSearch('')}
-                            className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
-                            title="Clear search"
+                            type="submit"
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#25a2ee] cursor-pointer"
+                            title="Search"
                         >
-                            <X className="w-4 h-4" />
+                            <Search className="w-4 h-4" />
                         </button>
-                    )}
-                </div>
+                        {search && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSearch('');
+                                    setCurrentPage(1);
+                                    fetchCourses(1, perPage, '', statusFilter);
+                                }}
+                                className="absolute right-20 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                                title="Clear search"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
+                        <button
+                            type="submit"
+                            className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1 bg-[#25a2ee] hover:bg-[#1f8ed1] text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                        >
+                            Search
+                        </button>
+                    </div>
+                </form>
 
                 {/* Status Filter & Trash Toggle */}
                 <div className="flex items-center gap-2.5 w-full sm:w-auto">

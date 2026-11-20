@@ -42,6 +42,11 @@ export const CoursesPage: React.FC = () => {
 
     const activeCategory = searchParams.get('category') || '';
     const activeSearch = searchParams.get('search') || '';
+    const [searchInput, setSearchInput] = useState(activeSearch);
+
+    useEffect(() => {
+        setSearchInput(activeSearch);
+    }, [activeSearch]);
 
     const [currentPage, setCurrentPage] = useState<number>(() => {
         const p = parseInt(searchParams.get('page') || '1', 10);
@@ -157,14 +162,21 @@ export const CoursesPage: React.FC = () => {
 
     const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const q = formData.get('q') as string;
         const newParams = new URLSearchParams(searchParams);
-        if (q && q.trim()) {
-            newParams.set('search', q.trim());
+        const q = searchInput.trim();
+        if (q) {
+            newParams.set('search', q);
         } else {
             newParams.delete('search');
         }
+        newParams.delete('page');
+        setSearchParams(newParams);
+    };
+
+    const handleClearSearch = () => {
+        setSearchInput('');
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('search');
         newParams.delete('page');
         setSearchParams(newParams);
     };
@@ -230,16 +242,42 @@ export const CoursesPage: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Search Bar */}
+                {/* Search Bar with dedicated Search button */}
                 <form onSubmit={handleSearchSubmit} className="relative max-w-md w-full">
-                    <input
-                        type="text"
-                        name="q"
-                        defaultValue={activeSearch}
-                        placeholder={t.courses?.searchPlaceholder || 'Search courses by name or subject...'}
-                        className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee] text-sm shadow-2xs placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                    />
-                    <Search className="w-5 h-5 text-slate-400 dark:text-slate-500 absolute left-3.5 top-3.5" />
+                    <div className="relative w-full">
+                        <input
+                            type="text"
+                            name="q"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                            placeholder={t.courses?.searchPlaceholder || 'Search courses by name or subject...'}
+                            className="w-full pl-11 pr-24 py-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-hidden focus:ring-2 focus:ring-[#25a2ee] text-sm shadow-2xs placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        />
+                        <button
+                            type="submit"
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-[#25a2ee] cursor-pointer"
+                            title="Search courses"
+                        >
+                            <Search className="w-5 h-5" />
+                        </button>
+                        {searchInput && (
+                            <button
+                                type="button"
+                                onClick={handleClearSearch}
+                                className="absolute right-24 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                                title="Clear search"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
+                        <button
+                            type="submit"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-[#25a2ee] hover:bg-[#1f8ed1] text-white font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                        >
+                            <Search className="w-3.5 h-3.5" />
+                            <span>Search</span>
+                        </button>
+                    </div>
                 </form>
             </div>
 

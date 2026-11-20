@@ -210,11 +210,10 @@ export const Navbar: React.FC = () => {
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (searchQuery.trim()) {
-            navigate(`/courses?search=${encodeURIComponent(searchQuery.trim())}`);
-            setSearchModalOpen(false);
-            setSearchQuery('');
-        }
+        const q = searchQuery.trim();
+        navigate(q ? `/courses?search=${encodeURIComponent(q)}` : '/courses');
+        setSearchModalOpen(false);
+        setSearchQuery('');
     };
 
     const isHome = location.pathname === '/';
@@ -585,6 +584,32 @@ export const Navbar: React.FC = () => {
                 {/* Mobile Drawer (Phitron Clean Full-Width Style) */}
                 {mobileMenuOpen && (
                     <div className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                        {/* Mobile Drawer Search Bar */}
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                const q = searchQuery.trim();
+                                navigate(q ? `/courses?search=${encodeURIComponent(q)}` : '/courses');
+                                setMobileMenuOpen(false);
+                                setSearchQuery('');
+                            }}
+                            className="relative mb-2"
+                        >
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search courses..."
+                                className="w-full pl-10 pr-20 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-[#25a2ee]"
+                            />
+                            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <button
+                                type="submit"
+                                className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1 bg-[#25a2ee] hover:bg-[#1f8ed1] text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                            >
+                                Search
+                            </button>
+                        </form>
                         {menuItems.map((item) => {
                             const itemLabel = getLocalizedText(item.label, item.label_en, language) || item.label;
                             const hasChildren = Boolean(item.children && item.children.length > 0);
@@ -754,7 +779,13 @@ export const Navbar: React.FC = () => {
 
                         <form onSubmit={handleSearchSubmit} className="mt-4 space-y-3">
                             <div className="relative">
-                                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <button
+                                    type="submit"
+                                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-sky-600 cursor-pointer"
+                                    title="Search"
+                                >
+                                    <Search className="w-4 h-4" />
+                                </button>
                                 <input
                                     type="text"
                                     autoFocus
@@ -767,9 +798,10 @@ export const Navbar: React.FC = () => {
 
                             <button
                                 type="submit"
-                                className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-2xl text-xs sm:text-sm shadow-md transition-all cursor-pointer"
+                                className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-2xl text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                             >
-                                Search
+                                <Search className="w-4 h-4" />
+                                <span>Search</span>
                             </button>
                         </form>
                     </div>

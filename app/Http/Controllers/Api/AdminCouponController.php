@@ -398,7 +398,7 @@ class AdminCouponController extends Controller
     public function searchUsers(Request $request): JsonResponse
     {
         $q = trim($request->get('q', ''));
-        if (strlen($q) < 2) {
+        if (strlen($q) < 1) {
             return response()->json(['users' => []]);
         }
 

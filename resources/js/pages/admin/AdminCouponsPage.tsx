@@ -330,6 +330,24 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
         return () => clearTimeout(timer);
     }, [userSearchTerm]);
 
+    const executeUserSearch = async (term: string) => {
+        if (!term || term.trim().length < 1) {
+            setUserSearchResults([]);
+            return;
+        }
+        try {
+            setSearchingUsers(true);
+            const res = await apiClient.get('/admin/coupons/search-users', {
+                params: { q: term.trim() }
+            });
+            setUserSearchResults(res.data.users || []);
+        } catch (err) {
+            console.error('User search failed', err);
+        } finally {
+            setSearchingUsers(false);
+        }
+    };
+
     const handleOpenCreateModal = () => {
         setEditingCoupon(null);
         setShowAdvanced(false);
@@ -563,14 +581,26 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
             {/* Filter and Search Bar */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
                 <form onSubmit={handleSearchSubmit} className="relative w-full md:w-80">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search by code or title..."
-                        className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                        className="w-full pl-9 pr-20 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500 dark:text-white"
                     />
+                    <button
+                        type="submit"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 cursor-pointer"
+                        title="Search"
+                    >
+                        <Search className="w-4 h-4" />
+                    </button>
+                    <button
+                        type="submit"
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                    >
+                        Search
+                    </button>
                 </form>
 
                 <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
@@ -1409,20 +1439,35 @@ export const AdminCouponsPage: React.FC<AdminCouponsPageProps> = ({ autoOpenCrea
                                                     )}
                                                 </div>
 
-                                                {/* Live Search Input with Dropdown */}
+                                                {/* Live Search Input with Dropdown & Search Button */}
                                                 <div className="relative">
-                                                    <div className="relative">
+                                                    <div className="relative flex items-center">
                                                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                                         <input
                                                             type="text"
                                                             value={userSearchTerm}
                                                             onChange={(e) => setUserSearchTerm(e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    e.preventDefault();
+                                                                    executeUserSearch(userSearchTerm);
+                                                                }
+                                                            }}
                                                             placeholder="Type student phone number (e.g. 017...), name or email to search..."
-                                                            className="w-full pl-9 pr-9 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                                                            className="w-full pl-9 pr-20 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
                                                         />
-                                                        {searchingUsers && (
-                                                            <Loader2 className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-indigo-600" />
-                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => executeUserSearch(userSearchTerm)}
+                                                            className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+                                                        >
+                                                            {searchingUsers ? (
+                                                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                            ) : (
+                                                                <Search className="w-3.5 h-3.5" />
+                                                            )}
+                                                            <span>Search</span>
+                                                        </button>
                                                     </div>
 
                                                     {/* Search Results Dropdown */}
