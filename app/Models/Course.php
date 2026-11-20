@@ -67,41 +67,31 @@ class Course extends Model
     public static function booted(): void
     {
         if (Schema::hasTable('courses')) {
-            try {
-                Schema::table('courses', function (Blueprint $table) {
-                    if (!Schema::hasColumn('courses', 'enable_manual_payment')) {
-                        $table->boolean('enable_manual_payment')->default(true)->after('is_featured');
+            $columnDefinitions = [
+                'enable_manual_payment' => fn(Blueprint $table) => $table->boolean('enable_manual_payment')->default(true),
+                'enable_shurjopay' => fn(Blueprint $table) => $table->boolean('enable_shurjopay')->default(true),
+                'features' => fn(Blueprint $table) => $table->json('features')->nullable(),
+                'fake_enrollment_count' => fn(Blueprint $table) => $table->integer('fake_enrollment_count')->default(0),
+                'class_starts_at' => fn(Blueprint $table) => $table->string('class_starts_at', 100)->nullable(),
+                'action_buttons' => fn(Blueprint $table) => $table->json('action_buttons')->nullable(),
+                'enrolled_action_buttons' => fn(Blueprint $table) => $table->json('enrolled_action_buttons')->nullable(),
+                'coupon_code' => fn(Blueprint $table) => $table->string('coupon_code', 100)->nullable(),
+                'coupon_discount_text' => fn(Blueprint $table) => $table->string('coupon_discount_text', 100)->nullable(),
+                'discount_deadline' => fn(Blueprint $table) => $table->timestamp('discount_deadline')->nullable(),
+                'show_coupon_timer' => fn(Blueprint $table) => $table->boolean('show_coupon_timer')->default(false),
+                'how_to_buy_url' => fn(Blueprint $table) => $table->string('how_to_buy_url', 500)->nullable(),
+            ];
+
+            foreach ($columnDefinitions as $col => $definition) {
+                try {
+                    if (!Schema::hasColumn('courses', $col)) {
+                        Schema::table('courses', function (Blueprint $table) use ($definition) {
+                            $definition($table);
+                        });
                     }
-                    if (!Schema::hasColumn('courses', 'enable_shurjopay')) {
-                        $table->boolean('enable_shurjopay')->default(true)->after('enable_manual_payment');
-                    }
-                    if (!Schema::hasColumn('courses', 'features')) {
-                        $table->json('features')->nullable()->after('description');
-                    }
-                    if (!Schema::hasColumn('courses', 'fake_enrollment_count')) {
-                        $table->integer('fake_enrollment_count')->default(0)->after('price');
-                    }
-                    if (!Schema::hasColumn('courses', 'class_starts_at')) {
-                        $table->string('class_starts_at', 100)->nullable()->after('fake_enrollment_count');
-                    }
-                    if (!Schema::hasColumn('courses', 'action_buttons')) {
-                        $table->json('action_buttons')->nullable()->after('class_starts_at');
-                    }
-                    if (!Schema::hasColumn('courses', 'coupon_code')) {
-                        $table->string('coupon_code', 100)->nullable()->after('action_buttons');
-                    }
-                    if (!Schema::hasColumn('courses', 'coupon_discount_text')) {
-                        $table->string('coupon_discount_text', 100)->nullable()->after('coupon_code');
-                    }
-                    if (!Schema::hasColumn('courses', 'discount_deadline')) {
-                        $table->timestamp('discount_deadline')->nullable()->after('coupon_discount_text');
-                    }
-                    if (!Schema::hasColumn('courses', 'how_to_buy_url')) {
-                        $table->string('how_to_buy_url', 500)->nullable()->after('discount_deadline');
-                    }
-                });
-            } catch (\Throwable $e) {
-                // columns already exist
+                } catch (\Throwable $e) {
+                    // Column already exists or restricted
+                }
             }
         }
 

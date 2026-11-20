@@ -473,7 +473,8 @@ export const AdminPageBuilderPage: React.FC = () => {
                     sessionStorage.removeItem('novonex_home_custom_page');
                 } catch {}
             }
-            showToast('Design saved successfully!');
+            showToast('Saved successfully!');
+            alert('Saved successfully!');
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to save design.');
         } finally {

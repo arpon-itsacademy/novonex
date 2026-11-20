@@ -280,6 +280,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
 
             setRoutineModalOpen(false);
             fetchCourseRoutine();
+            alert('Saved successfully!');
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to save routine schedule.');
         } finally {
@@ -374,6 +375,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             setLiveClassModalOpen(false);
             fetchLiveClasses();
             fetchCourseRoutine();
+            alert('Saved successfully!');
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to save live class.');
         } finally {
@@ -507,7 +509,8 @@ export const AdminCourseBuilderPage: React.FC = () => {
             const { data } = await apiClient.put(`/builder/${id}/custom-buttons`, payload);
             if (data.action_buttons) setActionButtons(data.action_buttons);
             if (data.enrolled_action_buttons) setEnrolledButtons(data.enrolled_action_buttons);
-            setCustomButtonsSuccess('Outline and Action Buttons saved successfully!');
+            setCustomButtonsSuccess('Saved successfully!');
+            alert('Saved successfully!');
             setTimeout(() => setCustomButtonsSuccess(null), 4000);
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to save custom buttons.');
@@ -655,6 +658,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             setExamModalOpen(false);
             fetchCourseExams();
             fetchCourseRoutine();
+            alert('Saved successfully!');
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to save exam.');
         } finally {
@@ -742,6 +746,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             }
             setSectionModalOpen(false);
             fetchCurriculum();
+            alert('Saved successfully!');
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to save section.');
         }
@@ -1049,6 +1054,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
             }
             setLessonModalOpen(false);
             fetchCurriculum();
+            alert('Saved successfully!');
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to save lesson.');
         }

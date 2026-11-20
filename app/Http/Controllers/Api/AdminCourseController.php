@@ -129,43 +129,77 @@ class AdminCourseController extends Controller
             $counter++;
         }
 
-        $course = Course::create([
-            'title' => $validated['title'],
-            'slug' => $slug,
-            'short_description' => $validated['short_description'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'price' => (float) $validated['price'],
-            'sale_price' => isset($validated['sale_price']) && $validated['sale_price'] !== '' ? (float) $validated['sale_price'] : null,
-            'thumbnail' => $validated['thumbnail'] ?? null,
-            'is_featured' => (bool) ($validated['is_featured'] ?? false),
-            'features' => $validated['features'] ?? null,
-            'fake_enrollment_count' => isset($validated['fake_enrollment_count']) ? (int) $validated['fake_enrollment_count'] : 0,
-            'class_starts_at' => $validated['class_starts_at'] ?? null,
-            'action_buttons' => $validated['action_buttons'] ?? null,
-            'enrolled_action_buttons' => $validated['enrolled_action_buttons'] ?? null,
-            'coupon_code' => ! empty($validated['coupon_code']) ? strtoupper(trim($validated['coupon_code'])) : null,
-            'coupon_discount_text' => $validated['coupon_discount_text'] ?? null,
-            'discount_deadline' => $validated['discount_deadline'] ?? null,
-            'show_coupon_timer' => array_key_exists('show_coupon_timer', $validated) ? (bool) $validated['show_coupon_timer'] : false,
-            'how_to_buy_url' => $validated['how_to_buy_url'] ?? null,
-            'status' => $validated['status'],
-        ]);
+        try {
+            $courseData = [
+                'title' => $validated['title'],
+                'slug' => $slug,
+                'short_description' => $validated['short_description'] ?? null,
+                'description' => $validated['description'] ?? null,
+                'price' => (float) $validated['price'],
+                'sale_price' => isset($validated['sale_price']) && $validated['sale_price'] !== '' ? (float) $validated['sale_price'] : null,
+                'thumbnail' => $validated['thumbnail'] ?? null,
+                'is_featured' => (bool) ($validated['is_featured'] ?? false),
+                'status' => $validated['status'],
+            ];
 
-        if (! empty($validated['category_ids'])) {
-            $course->categories()->sync($validated['category_ids']);
+            if (Schema::hasColumn('courses', 'features')) {
+                $courseData['features'] = $validated['features'] ?? null;
+            }
+            if (Schema::hasColumn('courses', 'fake_enrollment_count')) {
+                $courseData['fake_enrollment_count'] = isset($validated['fake_enrollment_count']) ? (int) $validated['fake_enrollment_count'] : 0;
+            }
+            if (Schema::hasColumn('courses', 'class_starts_at')) {
+                $courseData['class_starts_at'] = $validated['class_starts_at'] ?? null;
+            }
+            if (Schema::hasColumn('courses', 'action_buttons')) {
+                $courseData['action_buttons'] = $validated['action_buttons'] ?? null;
+            }
+            if (Schema::hasColumn('courses', 'enrolled_action_buttons')) {
+                $courseData['enrolled_action_buttons'] = $validated['enrolled_action_buttons'] ?? null;
+            }
+            if (Schema::hasColumn('courses', 'coupon_code')) {
+                $courseData['coupon_code'] = ! empty($validated['coupon_code']) ? strtoupper(trim($validated['coupon_code'])) : null;
+            }
+            if (Schema::hasColumn('courses', 'coupon_discount_text')) {
+                $courseData['coupon_discount_text'] = $validated['coupon_discount_text'] ?? null;
+            }
+            if (Schema::hasColumn('courses', 'discount_deadline')) {
+                $courseData['discount_deadline'] = ! empty($validated['discount_deadline']) ? $validated['discount_deadline'] : null;
+            }
+            if (Schema::hasColumn('courses', 'show_coupon_timer')) {
+                $courseData['show_coupon_timer'] = array_key_exists('show_coupon_timer', $validated) ? (bool) $validated['show_coupon_timer'] : false;
+            }
+            if (Schema::hasColumn('courses', 'how_to_buy_url')) {
+                $courseData['how_to_buy_url'] = $validated['how_to_buy_url'] ?? null;
+            }
+
+            $course = Course::create($courseData);
+
+            if (! empty($validated['category_ids'])) {
+                $course->categories()->sync($validated['category_ids']);
+            }
+
+            if (! empty($validated['instructor_ids'])) {
+                $course->instructors()->sync($validated['instructor_ids']);
+                $course->update(['instructor_id' => $validated['instructor_ids'][0]]);
+            }
+
+            try {
+                AuditLog::log('course_created', 'Course', $course->id, null, $course->toArray());
+            } catch (\Throwable $e) {
+                \Log::warning('AuditLog log failed: ' . $e->getMessage());
+            }
+
+            return response()->json([
+                'message' => 'Course created successfully.',
+                'course' => $course->load(['instructors', 'categories']),
+            ], 201);
+        } catch (\Throwable $e) {
+            \Log::error('Course create failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to create course: ' . $e->getMessage(),
+            ], 500);
         }
-
-        if (! empty($validated['instructor_ids'])) {
-            $course->instructors()->sync($validated['instructor_ids']);
-            $course->update(['instructor_id' => $validated['instructor_ids'][0]]);
-        }
-
-        AuditLog::log('course_created', 'Course', $course->id, null, $course->toArray());
-
-        return response()->json([
-            'message' => 'Course created successfully.',
-            'course' => $course->load(['instructors', 'categories']),
-        ], 201);
     }
 
     public function show(Course $course): JsonResponse
@@ -208,45 +242,79 @@ class AdminCourseController extends Controller
 
         $oldValues = $course->toArray();
 
-        $course->update([
-            'title' => $validated['title'],
-            'slug' => ! empty($validated['slug']) ? Str::slug($validated['slug']) : $course->slug,
-            'short_description' => $validated['short_description'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'price' => (float) $validated['price'],
-            'sale_price' => isset($validated['sale_price']) && $validated['sale_price'] !== '' ? (float) $validated['sale_price'] : null,
-            'thumbnail' => $validated['thumbnail'] ?? $course->thumbnail,
-            'is_featured' => (bool) ($validated['is_featured'] ?? false),
-            'features' => $validated['features'] ?? null,
-            'fake_enrollment_count' => isset($validated['fake_enrollment_count']) ? (int) $validated['fake_enrollment_count'] : 0,
-            'class_starts_at' => $validated['class_starts_at'] ?? null,
-            'action_buttons' => array_key_exists('action_buttons', $validated) ? $validated['action_buttons'] : $course->action_buttons,
-            'enrolled_action_buttons' => array_key_exists('enrolled_action_buttons', $validated) ? $validated['enrolled_action_buttons'] : $course->enrolled_action_buttons,
-            'coupon_code' => ! empty($validated['coupon_code']) ? strtoupper(trim($validated['coupon_code'])) : null,
-            'coupon_discount_text' => $validated['coupon_discount_text'] ?? null,
-            'discount_deadline' => $validated['discount_deadline'] ?? null,
-            'show_coupon_timer' => array_key_exists('show_coupon_timer', $validated) ? (bool) $validated['show_coupon_timer'] : false,
-            'how_to_buy_url' => $validated['how_to_buy_url'] ?? null,
-            'status' => $validated['status'],
-        ]);
+        try {
+            $updateData = [
+                'title' => $validated['title'],
+                'slug' => ! empty($validated['slug']) ? Str::slug($validated['slug']) : $course->slug,
+                'short_description' => $validated['short_description'] ?? null,
+                'description' => $validated['description'] ?? null,
+                'price' => (float) $validated['price'],
+                'sale_price' => isset($validated['sale_price']) && $validated['sale_price'] !== '' ? (float) $validated['sale_price'] : null,
+                'thumbnail' => $validated['thumbnail'] ?? $course->thumbnail,
+                'is_featured' => (bool) ($validated['is_featured'] ?? false),
+                'status' => $validated['status'],
+            ];
 
-        if (isset($validated['category_ids'])) {
-            $course->categories()->sync($validated['category_ids']);
-        }
-
-        if (isset($validated['instructor_ids'])) {
-            $course->instructors()->sync($validated['instructor_ids']);
-            if (! empty($validated['instructor_ids'])) {
-                $course->update(['instructor_id' => $validated['instructor_ids'][0]]);
+            if (Schema::hasColumn('courses', 'features')) {
+                $updateData['features'] = $validated['features'] ?? null;
             }
+            if (Schema::hasColumn('courses', 'fake_enrollment_count')) {
+                $updateData['fake_enrollment_count'] = isset($validated['fake_enrollment_count']) ? (int) $validated['fake_enrollment_count'] : 0;
+            }
+            if (Schema::hasColumn('courses', 'class_starts_at')) {
+                $updateData['class_starts_at'] = $validated['class_starts_at'] ?? null;
+            }
+            if (Schema::hasColumn('courses', 'action_buttons')) {
+                $updateData['action_buttons'] = array_key_exists('action_buttons', $validated) ? $validated['action_buttons'] : $course->action_buttons;
+            }
+            if (Schema::hasColumn('courses', 'enrolled_action_buttons')) {
+                $updateData['enrolled_action_buttons'] = array_key_exists('enrolled_action_buttons', $validated) ? $validated['enrolled_action_buttons'] : $course->enrolled_action_buttons;
+            }
+            if (Schema::hasColumn('courses', 'coupon_code')) {
+                $updateData['coupon_code'] = ! empty($validated['coupon_code']) ? strtoupper(trim($validated['coupon_code'])) : null;
+            }
+            if (Schema::hasColumn('courses', 'coupon_discount_text')) {
+                $updateData['coupon_discount_text'] = $validated['coupon_discount_text'] ?? null;
+            }
+            if (Schema::hasColumn('courses', 'discount_deadline')) {
+                $updateData['discount_deadline'] = ! empty($validated['discount_deadline']) ? $validated['discount_deadline'] : null;
+            }
+            if (Schema::hasColumn('courses', 'show_coupon_timer')) {
+                $updateData['show_coupon_timer'] = array_key_exists('show_coupon_timer', $validated) ? (bool) $validated['show_coupon_timer'] : false;
+            }
+            if (Schema::hasColumn('courses', 'how_to_buy_url')) {
+                $updateData['how_to_buy_url'] = $validated['how_to_buy_url'] ?? null;
+            }
+
+            $course->update($updateData);
+
+            if (isset($validated['category_ids'])) {
+                $course->categories()->sync($validated['category_ids']);
+            }
+
+            if (isset($validated['instructor_ids'])) {
+                $course->instructors()->sync($validated['instructor_ids']);
+                if (! empty($validated['instructor_ids'])) {
+                    $course->update(['instructor_id' => $validated['instructor_ids'][0]]);
+                }
+            }
+
+            try {
+                AuditLog::log('course_updated', 'Course', $course->id, $oldValues, $course->toArray());
+            } catch (\Throwable $e) {
+                \Log::warning('AuditLog log failed: ' . $e->getMessage());
+            }
+
+            return response()->json([
+                'message' => 'Course updated successfully.',
+                'course' => $course->fresh(['instructors', 'categories']),
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Course update failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to save course: ' . $e->getMessage(),
+            ], 500);
         }
-
-        AuditLog::log('course_updated', 'Course', $course->id, $oldValues, $course->toArray());
-
-        return response()->json([
-            'message' => 'Course updated successfully.',
-            'course' => $course->fresh(['instructors', 'categories']),
-        ]);
     }
 
     public function destroy(Course $course): JsonResponse

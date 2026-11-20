@@ -70,6 +70,7 @@ export const AdminCourseEditPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [savedCourseId, setSavedCourseId] = useState<number | null>(null);
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [uploadingThumb, setUploadingThumb] = useState(false);
@@ -177,6 +178,7 @@ export const AdminCourseEditPage: React.FC = () => {
         }
 
         setSaving(true);
+        setSuccessMessage(null);
         try {
             const payload = {
                 title,
@@ -208,11 +210,12 @@ export const AdminCourseEditPage: React.FC = () => {
                 setSavedCourseId(targetId);
             }
 
-            alert('Course saved successfully!');
+            setSuccessMessage('Saved successfully!');
+            alert('Saved successfully!');
             if (!isEdit && targetId) {
                 navigate(`/admin/courses/${targetId}/builder`);
             } else {
-                navigate('/admin/courses');
+                setTimeout(() => setSuccessMessage(null), 5000);
             }
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to save course.');
@@ -273,6 +276,13 @@ export const AdminCourseEditPage: React.FC = () => {
                     <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
                         <AlertCircle className="w-4 h-4 shrink-0" />
                         <span>{error}</span>
+                    </div>
+                )}
+
+                {successMessage && (
+                    <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 shadow-2xs">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>{successMessage}</span>
                     </div>
                 )}
 
