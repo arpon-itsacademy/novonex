@@ -40,6 +40,7 @@ import {
     Trash2,
     KeyRound,
     Award,
+    Gem,
     MessageSquareWarning
 } from 'lucide-react';
 
@@ -251,8 +252,12 @@ export const DashboardLayout: React.FC = () => {
                 { 
                     title: 'Points', 
                     path: '/admin/points', 
-                    icon: Award,
-                    permission: 'settings.manage'
+                    icon: Gem,
+                    permission: 'settings.manage',
+                    children: [
+                        { title: 'Points Rules', path: '/admin/points/rules', permission: 'settings.manage' },
+                        { title: 'User Usages', path: '/admin/points/usages', permission: 'settings.manage' },
+                    ]
                 },
                 { 
                     title: 'Complain Box', 

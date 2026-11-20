@@ -35,6 +35,8 @@ class Order extends Model
         'coupon_id',
         'coupon_code',
         'coupon_discount',
+        'points_redeemed',
+        'points_discount',
         'dynamic_offer_id',
         'dynamic_offer_title',
         'dynamic_offer_discount',
@@ -53,6 +55,8 @@ class Order extends Model
         'discount_amount' => 'float',
         'affiliate_discount' => 'float',
         'coupon_discount' => 'float',
+        'points_redeemed' => 'integer',
+        'points_discount' => 'float',
         'dynamic_offer_discount' => 'float',
         'final_amount' => 'float',
         'has_nexpilot' => 'boolean',
@@ -66,6 +70,12 @@ class Order extends Model
         if (Schema::hasTable('orders')) {
             try {
                 Schema::table('orders', function (Blueprint $table) {
+                    if (!Schema::hasColumn('orders', 'points_redeemed')) {
+                        $table->integer('points_redeemed')->default(0)->after('coupon_discount');
+                    }
+                    if (!Schema::hasColumn('orders', 'points_discount')) {
+                        $table->decimal('points_discount', 10, 2)->default(0.00)->after('points_redeemed');
+                    }
                     if (!Schema::hasColumn('orders', 'dynamic_offer_id')) {
                         $table->unsignedBigInteger('dynamic_offer_id')->nullable()->after('coupon_discount');
                     }

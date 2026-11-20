@@ -15,7 +15,8 @@ import {
     Flame,
     Ticket,
     Loader2,
-    CheckCircle2
+    CheckCircle2,
+    Gem
 } from 'lucide-react';
 
 export const CartDrawer: React.FC = () => {
@@ -36,6 +37,9 @@ export const CartDrawer: React.FC = () => {
         couponError,
         applyCoupon,
         removeCoupon,
+        appliedPoints,
+        pointsDiscount,
+        removePoints,
         totalPayable,
         cartCount
     } = useCart();
@@ -409,6 +413,25 @@ export const CartDrawer: React.FC = () => {
                                             <span>Coupon ({appliedCoupon.code})</span>
                                         </span>
                                         <span>-{formatBDT(couponDiscount)}</span>
+                                    </div>
+                                )}
+
+                                {pointsDiscount > 0 && appliedPoints > 0 && (
+                                    <div className="flex items-center justify-between font-semibold text-amber-600 dark:text-amber-400">
+                                        <span className="flex items-center gap-1">
+                                            <Gem className="w-3.5 h-3.5 text-amber-500" />
+                                            <span>Reward Points ({appliedPoints.toLocaleString()})</span>
+                                        </span>
+                                        <div className="flex items-center gap-1.5">
+                                            <span>-{formatBDT(pointsDiscount)}</span>
+                                            <button
+                                                type="button"
+                                                onClick={removePoints}
+                                                className="text-[10px] text-rose-500 hover:text-rose-600 underline font-normal"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
 

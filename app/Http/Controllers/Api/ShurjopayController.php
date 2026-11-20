@@ -120,6 +120,7 @@ class ShurjopayController extends Controller
             'affiliate_code' => ['nullable', 'string', 'max:50'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
             'dynamic_offer_id' => ['nullable', 'integer'],
+            'points_to_redeem' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $user = auth()->user();
@@ -268,13 +269,30 @@ class ShurjopayController extends Controller
             Log::warning('Dynamic offer evaluation skipped in shurjoPay checkout: ' . $e->getMessage());
         }
 
+        // Check and apply points redemption discount
+        $pointsRedeemed = 0;
+        $pointsDiscount = 0.0;
+        if (!empty($validated['points_to_redeem']) && (int) $validated['points_to_redeem'] > 0) {
+            try {
+                $pointService = app(\App\Services\PointService::class);
+                $pointsEval = $pointService->calculatePointsDiscount($user, $courseFinalAmount, (int) $validated['points_to_redeem']);
+                if ($pointsEval['valid']) {
+                    $pointsRedeemed = (int) $pointsEval['points_redeemed'];
+                    $pointsDiscount = (float) $pointsEval['discount_amount'];
+                    $courseFinalAmount = max(0, $courseFinalAmount - $pointsDiscount);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Points redemption calculation failed in shurjoPay checkout: ' . $e->getMessage());
+            }
+        }
+
         $finalAmount = (float) floor(max(0, $courseFinalAmount + $nexpilotPrice));
 
         // If amount is 0 (100% coupon, 100% discount, or free course), do NOT call shurjoPay.
         // Immediately mark order as PAID and activate enrollment.
         if ($finalAmount <= 0) {
             try {
-                $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $includeNexPilot, $nexpilotId, $nexpilotPrice) {
+                $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $pointsRedeemed, $pointsDiscount, $includeNexPilot, $nexpilotId, $nexpilotPrice) {
                     $orderData = [
                         'order_number' => Order::generateOrderNumber(),
                         'user_id' => $user->id,
@@ -287,6 +305,8 @@ class ShurjopayController extends Controller
                         'coupon_id' => $coupon ? $coupon->id : null,
                         'coupon_code' => $coupon ? $coupon->code : null,
                         'coupon_discount' => $couponDiscount,
+                        'points_redeemed' => $pointsRedeemed,
+                        'points_discount' => $pointsDiscount,
                         'final_amount' => 0,
                         'has_nexpilot' => $nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId),
                         'nexpilot_id' => $nexpilotId,
@@ -294,7 +314,7 @@ class ShurjopayController extends Controller
                         'payment_status' => Order::PAYMENT_PAID,
                         'order_status' => Order::ORDER_COMPLETED,
                         'payment_method' => 'free',
-                        'notes' => $validated['notes'] ?? '100% Discount / Free Enrollment with Coupon Code',
+                        'notes' => $validated['notes'] ?? '100% Discount / Free Enrollment with Points or Coupon',
                     ];
 
                     if (\Illuminate\Support\Facades\Schema::hasColumn('orders', 'dynamic_offer_id')) {
@@ -308,6 +328,14 @@ class ShurjopayController extends Controller
                     }
 
                     $order = Order::create($orderData);
+
+                    if ($pointsRedeemed > 0) {
+                        try {
+                            app(\App\Services\PointService::class)->redeemPointsForOrder($order, $user, $pointsRedeemed, $pointsDiscount);
+                        } catch (\Throwable $e) {
+                            Log::error('Redeeming points in free shurjoPay checkout failed: ' . $e->getMessage());
+                        }
+                    }
 
                     if ($coupon) {
                         CouponUsage::create([
@@ -402,7 +430,7 @@ class ShurjopayController extends Controller
 
         // Create order and pending payment
         try {
-            $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice) {
+            $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $pointsRedeemed, $pointsDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice) {
                 $orderData = [
                     'order_number' => Order::generateOrderNumber(),
                     'user_id' => $user->id,
@@ -415,6 +443,8 @@ class ShurjopayController extends Controller
                     'coupon_id' => $coupon ? $coupon->id : null,
                     'coupon_code' => $coupon ? $coupon->code : null,
                     'coupon_discount' => $couponDiscount,
+                    'points_redeemed' => $pointsRedeemed,
+                    'points_discount' => $pointsDiscount,
                     'final_amount' => $finalAmount,
                     'has_nexpilot' => $nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId),
                     'nexpilot_id' => $nexpilotId,
@@ -436,6 +466,14 @@ class ShurjopayController extends Controller
                 }
 
                 $order = Order::create($orderData);
+
+                if ($pointsRedeemed > 0) {
+                    try {
+                        app(\App\Services\PointService::class)->redeemPointsForOrder($order, $user, $pointsRedeemed, $pointsDiscount);
+                    } catch (\Throwable $e) {
+                        Log::error('Redeeming points in shurjoPay checkout failed: ' . $e->getMessage());
+                    }
+                }
 
                 if ($coupon) {
                     CouponUsage::create([

@@ -36,6 +36,7 @@ class OrderController extends Controller
             'affiliate_code' => ['nullable', 'string', 'max:50'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
             'dynamic_offer_id' => ['nullable', 'integer'],
+            'points_to_redeem' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $user = auth()->user();
@@ -189,6 +190,23 @@ class OrderController extends Controller
             \Illuminate\Support\Facades\Log::warning('Dynamic offer evaluation skipped during checkout: ' . $e->getMessage());
         }
 
+        // Check and apply points redemption discount
+        $pointsRedeemed = 0;
+        $pointsDiscount = 0.0;
+        if (!empty($validated['points_to_redeem']) && (int) $validated['points_to_redeem'] > 0) {
+            try {
+                $pointService = app(\App\Services\PointService::class);
+                $pointsEval = $pointService->calculatePointsDiscount($user, $courseFinalAmount, (int) $validated['points_to_redeem']);
+                if ($pointsEval['valid']) {
+                    $pointsRedeemed = (int) $pointsEval['points_redeemed'];
+                    $pointsDiscount = (float) $pointsEval['discount_amount'];
+                    $courseFinalAmount = max(0, $courseFinalAmount - $pointsDiscount);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Points redemption calculation failed: ' . $e->getMessage());
+            }
+        }
+
         $finalAmount = (float) floor(max(0, $courseFinalAmount + $nexpilotPrice));
         $isFree = ($finalAmount <= 0);
 
@@ -214,7 +232,7 @@ class OrderController extends Controller
         }
 
         try {
-            $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice, $isFree) {
+            $order = DB::transaction(function () use ($user, $courses, $primaryCourse, $validated, $price, $discountAmount, $affiliateDiscount, $affiliateProfile, $coupon, $couponDiscount, $dynamicOffer, $dynamicOfferDiscount, $pointsRedeemed, $pointsDiscount, $finalAmount, $includeNexPilot, $nexpilotId, $nexpilotPrice, $isFree) {
                 $orderData = [
                     'order_number' => Order::generateOrderNumber(),
                     'user_id' => $user->id,
@@ -227,6 +245,8 @@ class OrderController extends Controller
                     'coupon_id' => $coupon ? $coupon->id : null,
                     'coupon_code' => $coupon ? $coupon->code : null,
                     'coupon_discount' => $couponDiscount,
+                    'points_redeemed' => $pointsRedeemed,
+                    'points_discount' => $pointsDiscount,
                     'final_amount' => $finalAmount,
                     'has_nexpilot' => $nexpilotPrice > 0 || ($includeNexPilot && $nexpilotId),
                     'nexpilot_id' => $nexpilotId,
@@ -258,6 +278,15 @@ class OrderController extends Controller
                         'discount_amount' => $couponDiscount,
                     ]);
                     $coupon->increment('times_used');
+                }
+
+                // Redeem points if applied
+                if ($pointsRedeemed > 0) {
+                    try {
+                        app(\App\Services\PointService::class)->redeemPointsForOrder($order, $user, $pointsRedeemed, $pointsDiscount);
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::error('Redeeming points for order failed: ' . $e->getMessage());
+                    }
                 }
 
                 // Create OrderItem for each course
@@ -514,6 +543,13 @@ class OrderController extends Controller
                     'verified_at' => now(),
                     'notes' => $validated['reason'] ?? null,
                 ]);
+            }
+
+            // Refund any redeemed points if order is rejected
+            try {
+                app(\App\Services\PointService::class)->refundOrderRedeemedPoints($order);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Refunding redeemed points on order rejection failed: ' . $e->getMessage());
             }
 
             AuditLog::log('payment_rejected', 'Order', $order->id, null, ['reason' => $validated['reason'] ?? null]);

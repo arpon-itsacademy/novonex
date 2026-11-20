@@ -20,6 +20,7 @@ import { EarnPointsPage } from '../pages/public/EarnPointsPage';
 // Admin pages
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage';
 import { AdminPointsPage } from '../pages/admin/AdminPointsPage';
+import { AdminPointUsagesPage } from '../pages/admin/AdminPointUsagesPage';
 import { AdminCoursesPage } from '../pages/admin/AdminCoursesPage';
 import { AdminCourseEditPage } from '../pages/admin/AdminCourseEditPage';
 import { AdminCourseBuilderPage } from '../pages/admin/AdminCourseBuilderPage';
@@ -186,7 +187,9 @@ export const AppRoutes: React.FC = () => {
                 <Route path="settings/vdocipher" element={<AdminVdoCipherSettingsPage />} />
                 <Route path="media" element={<AdminMediaPage />} />
                 <Route path="trash" element={<AdminTrashPage />} />
-                <Route path="points" element={<AdminPointsPage />} />
+                <Route path="points" element={<Navigate to="/admin/points/rules" replace />} />
+                <Route path="points/rules" element={<AdminPointsPage />} />
+                <Route path="points/usages" element={<AdminPointUsagesPage />} />
                 <Route path="complain-box" element={<ComplainBoxPage role="admin" />} />
             </Route>
 

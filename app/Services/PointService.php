@@ -181,4 +181,142 @@ class PointService
             ]);
         });
     }
+
+    /**
+     * Calculate discount for points redemption.
+     */
+    public function calculatePointsDiscount(User $user, float $currentAmount, ?int $pointsRequested): array
+    {
+        $settings = PointSetting::getSettings();
+
+        if (! $settings->is_active || ! $settings->redemption_enabled) {
+            return [
+                'valid' => false,
+                'points_redeemed' => 0,
+                'discount_amount' => 0.0,
+                'message' => 'Point redemption is currently disabled.',
+            ];
+        }
+
+        $pointsRequested = max(0, (int) $pointsRequested);
+        if ($pointsRequested <= 0) {
+            return [
+                'valid' => false,
+                'points_redeemed' => 0,
+                'discount_amount' => 0.0,
+                'message' => 'Please specify points to redeem.',
+            ];
+        }
+
+        $userBalance = (int) ($user->points ?? 0);
+        if ($userBalance < $pointsRequested) {
+            return [
+                'valid' => false,
+                'points_redeemed' => 0,
+                'discount_amount' => 0.0,
+                'message' => "Insufficient points balance (You have {$userBalance} points).",
+            ];
+        }
+
+        $pointsUnit = max(1, (int) ($settings->redemption_points ?? 10));
+        $amountUnit = max(0.01, (float) ($settings->redemption_amount ?? 1.00));
+
+        // Max discount allowed by percentage
+        $maxPercent = max(1, min(100, (int) ($settings->max_redemption_percentage ?? 50)));
+        $maxDiscountAllowed = round(($currentAmount * $maxPercent) / 100, 2);
+
+        $rawDiscount = round(($pointsRequested / $pointsUnit) * $amountUnit, 2);
+        $discountAmount = min($currentAmount, min($maxDiscountAllowed, $rawDiscount));
+
+        if ($discountAmount <= 0) {
+            return [
+                'valid' => false,
+                'points_redeemed' => 0,
+                'discount_amount' => 0.0,
+                'message' => 'Points could not be applied to this amount.',
+            ];
+        }
+
+        // Recalculate actual points needed
+        $actualPointsNeeded = min($pointsRequested, (int) ceil(($discountAmount / $amountUnit) * $pointsUnit));
+
+        return [
+            'valid' => true,
+            'points_redeemed' => $actualPointsNeeded,
+            'discount_amount' => $discountAmount,
+            'message' => "Points applied: saved {$discountAmount} BDT discount.",
+        ];
+    }
+
+    /**
+     * Redeem points for an order and record transaction.
+     */
+    public function redeemPointsForOrder(Order $order, User $user, int $pointsRedeemed, float $discountAmount): ?PointTransaction
+    {
+        if ($pointsRedeemed <= 0 || $discountAmount <= 0) {
+            return null;
+        }
+
+        PointTransaction::ensureTableExists();
+
+        return DB::transaction(function () use ($order, $user, $pointsRedeemed, $discountAmount) {
+            $u = User::lockForUpdate()->find($user->id);
+            if (! $u) {
+                return null;
+            }
+
+            $u->points = max(0, ($u->points ?? 0) - $pointsRedeemed);
+            $u->save();
+
+            return PointTransaction::create([
+                'user_id' => $u->id,
+                'amount' => -$pointsRedeemed,
+                'type' => PointTransaction::TYPE_REDEEM_DISCOUNT,
+                'reference_id' => $order->id,
+                'reference_type' => Order::class,
+                'description' => "Redeemed {$pointsRedeemed} reward points for {$discountAmount} BDT discount on order #{$order->order_number}",
+            ]);
+        });
+    }
+
+    /**
+     * Refund redeemed points when an order is cancelled.
+     */
+    public function refundOrderRedeemedPoints(Order $order): ?PointTransaction
+    {
+        $pointsRedeemed = (int) ($order->points_redeemed ?? 0);
+        if ($pointsRedeemed <= 0) {
+            return null;
+        }
+
+        PointTransaction::ensureTableExists();
+
+        $alreadyRefunded = PointTransaction::where('type', PointTransaction::TYPE_MANUAL_ADJUSTMENT)
+            ->where('reference_id', $order->id)
+            ->where('reference_type', Order::class)
+            ->exists();
+
+        if ($alreadyRefunded) {
+            return null;
+        }
+
+        return DB::transaction(function () use ($order, $pointsRedeemed) {
+            $u = User::lockForUpdate()->find($order->user_id);
+            if (! $u) {
+                return null;
+            }
+
+            $u->points = ($u->points ?? 0) + $pointsRedeemed;
+            $u->save();
+
+            return PointTransaction::create([
+                'user_id' => $u->id,
+                'amount' => $pointsRedeemed,
+                'type' => PointTransaction::TYPE_MANUAL_ADJUSTMENT,
+                'reference_id' => $order->id,
+                'reference_type' => Order::class,
+                'description' => "Refunded {$pointsRedeemed} points from cancelled order #{$order->order_number}",
+            ]);
+        });
+    }
 }

@@ -158,7 +158,13 @@ export const Navbar: React.FC = () => {
         ? headerSettings.menu_items
         : DEFAULT_NAV_ITEMS;
 
+    const isPointsActive = (settings as any)?.point_settings?.is_active !== false;
+
     const menuItems = React.useMemo(() => {
+        if (!isPointsActive) {
+            return rawMenuItems.filter(item => item.url !== '/earn-points');
+        }
+
         const hasEarn = rawMenuItems.some(item => item.url === '/earn-points');
         if (!hasEarn) {
             const earnItem: HeaderMenuItem = {
@@ -178,7 +184,7 @@ export const Navbar: React.FC = () => {
             return [...rawMenuItems, earnItem];
         }
         return rawMenuItems;
-    }, [rawMenuItems]);
+    }, [rawMenuItems, isPointsActive]);
 
     useEffect(() => {
         setLogoError(false);
@@ -491,15 +497,17 @@ export const Navbar: React.FC = () => {
                         {/* Auth Buttons (Phitron Signature Style) */}
                         {user ? (
                             <div className="flex items-center gap-2">
-                                {/* User Points Badge */}
-                                <Link
-                                    to="/earn-points"
-                                    className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-extrabold text-xs transition-all shadow-2xs group"
-                                    title="My Reward Points & Earn Points"
-                                >
-                                    <Gem className="w-3.5 h-3.5 text-amber-500 group-hover:scale-110 transition-transform" />
-                                    <span>{user.points ?? 0}</span>
-                                </Link>
+                                {/* User Points Badge (Only when active) */}
+                                {isPointsActive && (
+                                    <Link
+                                        to="/earn-points"
+                                        className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-extrabold text-xs transition-all shadow-2xs group"
+                                        title="My Reward Points & Earn Points"
+                                    >
+                                        <Gem className="w-3.5 h-3.5 text-amber-500 group-hover:scale-110 transition-transform" />
+                                        <span>{user.points ?? 0}</span>
+                                    </Link>
+                                )}
 
                                 {/* Notification Bell */}
                                 <div className="relative">
@@ -755,7 +763,7 @@ export const Navbar: React.FC = () => {
                         </button>
 
                         <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
-                            {user && (
+                            {isPointsActive && user && (
                                 <Link
                                     to="/earn-points"
                                     onClick={() => setMobileMenuOpen(false)}

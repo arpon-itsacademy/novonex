@@ -45,8 +45,12 @@ class AdminPointController extends Controller
         $validated = $request->validate([
             'purchase_points_enabled' => ['required', 'boolean'],
             'purchase_points_type' => ['required', 'string', 'in:fixed,per_amount'],
-            'points_per_course' => ['required', 'integer', 'min:0', 'max:10000'],
-            'points_per_100_currency' => ['required', 'integer', 'min:0', 'max:10000'],
+            'points_per_course' => ['required', 'integer', 'min:0', 'max:100000'],
+            'points_per_100_currency' => ['required', 'integer', 'min:0', 'max:100000'],
+            'redemption_enabled' => ['sometimes', 'boolean'],
+            'redemption_points' => ['sometimes', 'integer', 'min:1', 'max:100000'],
+            'redemption_amount' => ['sometimes', 'numeric', 'min:0.01', 'max:10000'],
+            'max_redemption_percentage' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'is_active' => ['required', 'boolean'],
         ]);
 
@@ -112,6 +116,95 @@ class AdminPointController extends Controller
             'message' => 'Points adjusted successfully.',
             'transaction' => $transaction,
             'user_points' => $user?->points ?? 0,
+        ]);
+    }
+
+    public function getUserUsages(Request $request): JsonResponse
+    {
+        PointTransaction::ensureTableExists();
+
+        $query = User::query()
+            ->where(function ($q) {
+                $q->where('points', '>', 0)
+                  ->orWhereHas('pointTransactions');
+            })
+            ->withCount('pointTransactions')
+            ->withSum(['pointTransactions as total_gained' => function ($q) {
+                $q->where('amount', '>', 0);
+            }], 'amount')
+            ->withSum(['pointTransactions as total_burned' => function ($q) {
+                $q->where('amount', '<', 0);
+            }], 'amount');
+
+        if ($request->filled('search')) {
+            $search = trim($request->input('search'));
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('registration_number', 'like', "%{$search}%");
+            });
+        }
+
+        $sort = $request->input('sort', 'points');
+        if ($sort === 'total_gained') {
+            $query->orderByDesc('total_gained');
+        } elseif ($sort === 'total_burned') {
+            $query->orderBy('total_burned'); // negative values, so lowest is most burned
+        } elseif ($sort === 'recent') {
+            $query->latest('id');
+        } else {
+            $query->orderByDesc('points');
+        }
+
+        $perPage = min(100, max(10, (int) $request->input('per_page', 20)));
+        $users = $query->paginate($perPage);
+
+        $users->getCollection()->transform(function ($u) {
+            $u->total_gained = (int) ($u->total_gained ?? 0);
+            $u->total_burned = abs((int) ($u->total_burned ?? 0));
+            return $u;
+        });
+
+        return response()->json($users);
+    }
+
+    public function getUserUsageDetails(int $id, Request $request): JsonResponse
+    {
+        PointTransaction::ensureTableExists();
+
+        $user = User::findOrFail($id);
+
+        $totalGained = (int) PointTransaction::where('user_id', $user->id)->where('amount', '>', 0)->sum('amount');
+        $totalBurned = abs((int) PointTransaction::where('user_id', $user->id)->where('amount', '<', 0)->sum('amount'));
+
+        $txQuery = PointTransaction::where('user_id', $user->id)->latest('id');
+
+        if ($request->input('filter') === 'gained') {
+            $txQuery->where('amount', '>', 0);
+        } elseif ($request->input('filter') === 'burned') {
+            $txQuery->where('amount', '<', 0);
+        }
+
+        $transactions = $txQuery->paginate($request->integer('per_page', 25));
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'phone' => $user->phone,
+                'email' => $user->email,
+                'registration_number' => $user->registration_number,
+                'photo_url' => $user->photo_url,
+                'points' => (int) ($user->points ?? 0),
+            ],
+            'summary' => [
+                'current_balance' => (int) ($user->points ?? 0),
+                'total_gained' => $totalGained,
+                'total_burned' => $totalBurned,
+                'transactions_count' => PointTransaction::where('user_id', $user->id)->count(),
+            ],
+            'transactions' => $transactions,
         ]);
     }
 }

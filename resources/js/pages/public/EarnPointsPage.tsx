@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { useSettings } from '../../context/SettingsContext';
 import {
     Award,
     Sparkles,
@@ -87,6 +88,8 @@ interface MySubmissionItem {
 
 export const EarnPointsPage: React.FC = () => {
     const { user } = useAuth();
+    const { settings } = useSettings();
+    const isPointsActive = (settings as any)?.point_settings?.is_active !== false;
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState<'courses' | 'my_submissions'>('courses');
@@ -277,6 +280,31 @@ export const EarnPointsPage: React.FC = () => {
             (c.slug && c.slug.toLowerCase().includes(term))
         );
     }, [courses, searchCourseTerm]);
+
+    if (!isPointsActive) {
+        return (
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-16 px-4">
+                <div className="max-w-md mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center space-y-4 shadow-sm">
+                    <div className="w-16 h-16 rounded-3xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto">
+                        <Gem className="w-8 h-8" />
+                    </div>
+                    <h2 className="text-xl font-black text-slate-900 dark:text-white">
+                        Reward Points System Inactive
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                        The reward points program is temporarily disabled by the administrator. Please check back later.
+                    </p>
+                    <Link
+                        to="/courses"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#25a2ee] hover:bg-[#1f8ed1] text-white font-bold text-xs rounded-xl shadow-xs transition"
+                    >
+                        <span>Browse Courses</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 sm:py-12">

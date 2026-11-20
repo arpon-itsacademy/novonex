@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
+import { useSettings } from '../../context/SettingsContext';
 import { formatBDT, getImageUrl } from '../../api/client';
 import {
     ShoppingCart,
@@ -16,7 +18,8 @@ import {
     Flame,
     Ticket,
     X,
-    Loader2
+    Loader2,
+    Gem
 } from 'lucide-react';
 
 export const CartPage: React.FC = () => {
@@ -35,9 +38,22 @@ export const CartPage: React.FC = () => {
         couponError,
         applyCoupon,
         removeCoupon,
+        appliedPoints,
+        pointsDiscount,
+        applyPoints,
+        removePoints,
         totalPayable,
         cartCount
     } = useCart();
+
+    const { user } = useAuth();
+    const { settings } = useSettings();
+    const isPointsActive = (settings as any)?.point_settings?.is_active !== false && (settings as any)?.point_settings?.redemption_enabled !== false;
+    const redemptionPointsRate = (settings as any)?.point_settings?.redemption_points || 10;
+    const redemptionAmountRate = (settings as any)?.point_settings?.redemption_amount || 1.0;
+    const maxRedeemPercent = (settings as any)?.point_settings?.max_redemption_percentage || 50;
+
+    const userPoints = user?.points || 0;
 
     const navigate = useNavigate();
     const [couponCodeInput, setCouponCodeInput] = useState('');
@@ -351,6 +367,76 @@ export const CartPage: React.FC = () => {
                                     )}
                                 </div>
 
+                                {/* Points Redemption Section */}
+                                {isPointsActive && (
+                                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                                        <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+                                            <span className="flex items-center gap-1.5">
+                                                <Gem className="w-4 h-4 text-amber-500" />
+                                                <span>Redeem Reward Points</span>
+                                            </span>
+                                        </div>
+
+                                        {!user ? (
+                                            <div className="p-2.5 bg-amber-500/10 border border-amber-300/50 rounded-xl flex items-center justify-between gap-2 text-xs">
+                                                <span className="text-amber-800 dark:text-amber-300 text-[11px]">
+                                                    Log in to apply points for discount
+                                                </span>
+                                                <Link
+                                                    to="/login"
+                                                    className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] rounded-lg shadow-2xs shrink-0"
+                                                >
+                                                    Login
+                                                </Link>
+                                            </div>
+                                        ) : userPoints <= 0 ? (
+                                            <div className="p-2.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] text-slate-400">
+                                                You have 0 💎 points available.
+                                            </div>
+                                        ) : (
+                                            <div className="p-3 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/80 rounded-xl space-y-2">
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <div>
+                                                        <span className="text-xs font-black text-slate-900 dark:text-white block">
+                                                            Available: {userPoints} 💎
+                                                        </span>
+                                                        <span className="text-[10px] text-amber-700 dark:text-amber-400 block">
+                                                            {redemptionPointsRate} 💎 = Tk {redemptionAmountRate} OFF
+                                                        </span>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (appliedPoints > 0) {
+                                                                removePoints();
+                                                            } else {
+                                                                applyPoints(userPoints, redemptionPointsRate, redemptionAmountRate, maxRedeemPercent);
+                                                            }
+                                                        }}
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer shadow-2xs ${
+                                                            appliedPoints > 0
+                                                                ? 'bg-rose-500 hover:bg-rose-600 text-white'
+                                                                : 'bg-amber-500 hover:bg-amber-600 text-white'
+                                                        }`}
+                                                    >
+                                                        {appliedPoints > 0 ? 'Remove' : 'Apply Points'}
+                                                    </button>
+                                                </div>
+                                                {appliedPoints > 0 && (
+                                                    <div className="flex items-center justify-between text-xs font-bold pt-1.5 border-t border-amber-200/60 dark:border-amber-800/60">
+                                                        <span className="text-slate-600 dark:text-slate-300">
+                                                            Applied: {appliedPoints} 💎
+                                                        </span>
+                                                        <span className="text-emerald-600 dark:text-emerald-400 font-black">
+                                                            - {formatBDT(pointsDiscount)} OFF
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 <div className="space-y-3 text-sm">
                                     <div className="flex justify-between text-slate-600 dark:text-slate-400">
                                         <span>Total Items:</span>
@@ -386,6 +472,16 @@ export const CartPage: React.FC = () => {
                                                 <span>Coupon ({appliedCoupon.code}):</span>
                                             </span>
                                             <span>- {formatBDT(couponDiscount)}</span>
+                                        </div>
+                                    )}
+
+                                    {pointsDiscount > 0 && (
+                                        <div className="flex justify-between text-amber-600 dark:text-amber-400 font-semibold">
+                                            <span className="flex items-center gap-1">
+                                                <Gem className="w-3.5 h-3.5 text-amber-500" />
+                                                <span>Points Discount ({appliedPoints} 💎):</span>
+                                            </span>
+                                            <span>- {formatBDT(pointsDiscount)}</span>
                                         </div>
                                     )}
 

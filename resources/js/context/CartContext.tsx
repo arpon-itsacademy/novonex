@@ -64,6 +64,10 @@ interface CartContextType {
     couponError: string | null;
     applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
     removeCoupon: () => void;
+    appliedPoints: number;
+    pointsDiscount: number;
+    applyPoints: (pointsCount: number, ratePoints: number, rateAmount: number, maxPercent: number) => { success: boolean; message: string };
+    removePoints: () => void;
     totalPayable: number;
     isEvaluatingOffer: boolean;
     refreshDynamicOffer: () => Promise<void>;
@@ -77,6 +81,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = 'novonex_cart_items';
 const COUPON_STORAGE_KEY = 'novonex_cart_coupon';
+const POINTS_STORAGE_KEY = 'novonex_cart_points';
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [items, setItems] = useState<CartItem[]>(() => {
@@ -114,6 +119,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
     const [couponError, setCouponError] = useState<string | null>(null);
+
+    // Points redemption state
+    const [appliedPoints, setAppliedPoints] = useState<number>(() => {
+        try {
+            const saved = localStorage.getItem(POINTS_STORAGE_KEY);
+            return saved ? parseInt(saved, 10) || 0 : 0;
+        } catch {
+            return 0;
+        }
+    });
+    const [pointsDiscount, setPointsDiscount] = useState<number>(0);
 
     useEffect(() => {
         try {
@@ -295,8 +311,36 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAppliedOffer(null);
         setDynamicOfferDiscount(0);
         removeCoupon();
+        removePoints();
         try {
             localStorage.removeItem(CART_STORAGE_KEY);
+        } catch {}
+    };
+
+    const applyPoints = (pointsCount: number, ratePoints: number, rateAmount: number, maxPercent: number) => {
+        if (pointsCount <= 0) {
+            removePoints();
+            return { success: false, message: 'Please select a valid points amount.' };
+        }
+        const baseAmount = Math.max(0, subtotal - dynamicOfferDiscount - couponDiscount);
+        const maxAllowedDiscount = Math.floor((baseAmount * (maxPercent || 50)) / 100);
+        const rPoints = Math.max(1, ratePoints || 10);
+        const rAmount = Math.max(0.01, rateAmount || 1.0);
+        const calculatedDiscount = Math.floor(Math.min(baseAmount, Math.min(maxAllowedDiscount, (pointsCount / rPoints) * rAmount)));
+
+        setAppliedPoints(pointsCount);
+        setPointsDiscount(calculatedDiscount);
+        try {
+            localStorage.setItem(POINTS_STORAGE_KEY, pointsCount.toString());
+        } catch {}
+        return { success: true, message: `Applied ${pointsCount} points (-Tk ${calculatedDiscount} discount)!` };
+    };
+
+    const removePoints = () => {
+        setAppliedPoints(0);
+        setPointsDiscount(0);
+        try {
+            localStorage.removeItem(POINTS_STORAGE_KEY);
         } catch {}
     };
 
@@ -308,7 +352,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const subtotal = Math.floor(items.reduce((acc, item) => acc + (Number(item.effective_price) || 0), 0));
     const totalOriginalPrice = Math.floor(items.reduce((acc, item) => acc + (Number(item.price) || Number(item.effective_price) || 0), 0));
-    const totalPayable = Math.floor(Math.max(0, subtotal - dynamicOfferDiscount - couponDiscount));
+    const totalPayable = Math.floor(Math.max(0, subtotal - dynamicOfferDiscount - couponDiscount - pointsDiscount));
     const totalSavings = Math.floor(Math.max(0, totalOriginalPrice - totalPayable));
 
     const openCart = () => setIsCartOpen(true);
@@ -335,6 +379,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 couponError,
                 applyCoupon,
                 removeCoupon,
+                appliedPoints,
+                pointsDiscount,
+                applyPoints,
+                removePoints,
                 totalPayable,
                 isEvaluatingOffer,
                 refreshDynamicOffer,

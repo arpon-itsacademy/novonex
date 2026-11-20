@@ -21,7 +21,8 @@ import {
     X,
     Loader2,
     Zap,
-    ShoppingCart
+    ShoppingCart,
+    Gem
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { PagePreloader } from '../../components/shared/PagePreloader';
@@ -219,7 +220,27 @@ export const CheckoutPage: React.FC = () => {
     const referralDiscount = appliedReferral ? Math.floor(Number(appliedReferral.discount_amount || 0)) : 0;
     const couponDiscount = appliedCoupon ? Math.floor(Number(appliedCoupon.calculated_discount || 0)) : 0;
     const dynamicDiscount = isCartMode ? Math.floor(dynamicOfferDiscount || 0) : 0;
-    const totalPayable = Math.floor(Math.max(0, courseBasePrice + pilotPrice - referralDiscount - couponDiscount - dynamicDiscount));
+
+    // Points redemption
+    const isPointsActive = (settings as any)?.point_settings?.is_active !== false && (settings as any)?.point_settings?.redemption_enabled !== false;
+    const redemptionPointsRate = (settings as any)?.point_settings?.redemption_points || 10;
+    const redemptionAmountRate = (settings as any)?.point_settings?.redemption_amount || 1.0;
+    const maxRedeemPercent = (settings as any)?.point_settings?.max_redemption_percentage || 50;
+
+    const [usePoints, setUsePoints] = useState(false);
+    const [pointsRedeemedCount, setPointsRedeemedCount] = useState<number>(0);
+
+    const userPoints = user?.points || 0;
+    const baseBeforePoints = Math.max(0, courseBasePrice + pilotPrice - referralDiscount - couponDiscount - dynamicDiscount);
+    const maxPointsDiscountAllowed = Math.floor((baseBeforePoints * maxRedeemPercent) / 100);
+    const maxPointsUsable = Math.max(0, Math.min(userPoints, Math.ceil((maxPointsDiscountAllowed / redemptionAmountRate) * redemptionPointsRate)));
+
+    const activePointsToRedeem = usePoints ? Math.min(userPoints, pointsRedeemedCount > 0 ? pointsRedeemedCount : maxPointsUsable) : 0;
+    const pointsDiscount = usePoints && activePointsToRedeem > 0
+        ? Math.floor(Math.min(baseBeforePoints, Math.min(maxPointsDiscountAllowed, (activePointsToRedeem / redemptionPointsRate) * redemptionAmountRate)))
+        : 0;
+
+    const totalPayable = Math.floor(Math.max(0, baseBeforePoints - pointsDiscount));
 
     // Auto sync coupon from cart if present
     useEffect(() => {
@@ -367,6 +388,7 @@ export const CheckoutPage: React.FC = () => {
                 affiliate_code: appliedReferral?.code || (referralInput.trim() ? referralInput.trim() : undefined),
                 coupon_code: appliedCoupon?.code || (couponInput.trim() ? couponInput.trim() : undefined),
                 dynamic_offer_id: appliedOffer?.offer_id || undefined,
+                points_to_redeem: usePoints && activePointsToRedeem > 0 ? activePointsToRedeem : undefined,
             };
 
             if (isCartMode) {
@@ -414,6 +436,7 @@ export const CheckoutPage: React.FC = () => {
                 affiliate_code: appliedReferral?.code || (referralInput.trim() ? referralInput.trim() : undefined),
                 coupon_code: appliedCoupon?.code || (couponInput.trim() ? couponInput.trim() : undefined),
                 dynamic_offer_id: appliedOffer?.offer_id || undefined,
+                points_to_redeem: usePoints && activePointsToRedeem > 0 ? activePointsToRedeem : undefined,
             };
 
             if (isCartMode) {
@@ -1041,6 +1064,84 @@ export const CheckoutPage: React.FC = () => {
                             )}
                         </div>
 
+                        {/* Points Redemption Box */}
+                        {isPointsActive && (
+                            <div className="pt-2 border-t border-slate-100">
+                                {!user ? (
+                                    <div className="p-3 bg-amber-500/10 border border-amber-300/60 rounded-2xl flex items-center justify-between gap-3 text-xs">
+                                        <div className="flex items-center gap-2 text-amber-800">
+                                            <Gem className="w-4 h-4 text-amber-500 shrink-0" />
+                                            <span>Have reward points? Log in to apply discounts.</span>
+                                        </div>
+                                        <Link
+                                            to="/login"
+                                            className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-2xs shrink-0"
+                                        >
+                                            Login
+                                        </Link>
+                                    </div>
+                                ) : userPoints <= 0 ? (
+                                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center gap-2 text-xs text-slate-500">
+                                        <Gem className="w-4 h-4 text-slate-400 shrink-0" />
+                                        <span>You have 0 💎 Reward Points. Earn points by uploading study notes!</span>
+                                    </div>
+                                ) : (
+                                    <div className="p-3.5 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-white border border-amber-300 rounded-2xl space-y-2.5">
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-1.5 bg-amber-500 text-white rounded-xl shadow-2xs">
+                                                    <Gem className="w-4 h-4" />
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-black text-slate-900 block">
+                                                        Apply Reward Points
+                                                    </span>
+                                                    <span className="text-[11px] text-amber-700 font-bold block">
+                                                        Balance: {userPoints} 💎 ({redemptionPointsRate} 💎 = Tk {redemptionAmountRate} OFF)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    if (!usePoints) {
+                                                        setUsePoints(true);
+                                                        setPointsRedeemedCount(maxPointsUsable);
+                                                    } else {
+                                                        setUsePoints(false);
+                                                        setPointsRedeemedCount(0);
+                                                    }
+                                                }}
+                                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer shadow-2xs ${
+                                                    usePoints
+                                                        ? 'bg-rose-500 hover:bg-rose-600 text-white'
+                                                        : 'bg-amber-500 hover:bg-amber-600 text-white'
+                                                }`}
+                                            >
+                                                {usePoints ? 'Remove Points' : 'Apply Points'}
+                                            </button>
+                                        </div>
+
+                                        {usePoints && (
+                                            <div className="pt-2 border-t border-amber-200/80 space-y-2">
+                                                <div className="flex items-center justify-between text-xs">
+                                                    <span className="font-bold text-slate-700">
+                                                        Redeeming {activePointsToRedeem} 💎 points
+                                                    </span>
+                                                    <span className="font-black text-emerald-600 text-sm">
+                                                        - {formatBDT(pointsDiscount)} OFF
+                                                    </span>
+                                                </div>
+                                                <p className="text-[10px] text-slate-400">
+                                                    Max discount limit: up to {maxRedeemPercent}% of course price.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {/* Pricing Breakdown */}
                         <div className="space-y-3 pt-4 border-t border-slate-100 text-sm">
                             <div className="flex justify-between text-slate-600">
@@ -1072,6 +1173,16 @@ export const CheckoutPage: React.FC = () => {
                                         <span>Coupon Discount ({appliedCoupon?.code})</span>
                                     </span>
                                     <span className="font-semibold">- {formatBDT(couponDiscount)}</span>
+                                </div>
+                            )}
+
+                            {pointsDiscount > 0 && (
+                                <div className="flex justify-between text-amber-600 font-medium">
+                                    <span className="flex items-center gap-1.5">
+                                        <Gem className="w-3.5 h-3.5 text-amber-500" />
+                                        <span>Points Discount ({activePointsToRedeem} 💎)</span>
+                                    </span>
+                                    <span className="font-semibold">- {formatBDT(pointsDiscount)}</span>
                                 </div>
                             )}
 

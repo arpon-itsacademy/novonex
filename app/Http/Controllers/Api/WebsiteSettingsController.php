@@ -13,7 +13,30 @@ class WebsiteSettingsController extends Controller
     public function getSettings(): JsonResponse
     {
         $settings = WebsiteSetting::current();
-        return response()->json($settings->toArray());
+        $data = $settings->toArray();
+
+        try {
+            $pointSettings = \App\Models\PointSetting::getSettings();
+            $data['point_settings'] = [
+                'is_active' => (bool) $pointSettings->is_active,
+                'purchase_points_enabled' => (bool) $pointSettings->purchase_points_enabled,
+                'redemption_enabled' => (bool) $pointSettings->redemption_enabled,
+                'redemption_points' => (int) ($pointSettings->redemption_points ?? 10),
+                'redemption_amount' => (float) ($pointSettings->redemption_amount ?? 1.00),
+                'max_redemption_percentage' => (int) ($pointSettings->max_redemption_percentage ?? 50),
+            ];
+        } catch (\Throwable $e) {
+            $data['point_settings'] = [
+                'is_active' => true,
+                'purchase_points_enabled' => true,
+                'redemption_enabled' => true,
+                'redemption_points' => 10,
+                'redemption_amount' => 1.00,
+                'max_redemption_percentage' => 50,
+            ];
+        }
+
+        return response()->json($data);
     }
 
     public function updateSettings(Request $request): JsonResponse

@@ -352,6 +352,14 @@ export interface WebsiteSetting {
     manual_payment_settings?: ManualPaymentSettings;
     shurjopay_settings?: ShurjopaySettings;
     vdocipher_settings?: VdocipherSettings;
+    point_settings?: {
+        is_active: boolean;
+        purchase_points_enabled?: boolean;
+        redemption_enabled?: boolean;
+        redemption_points?: number;
+        redemption_amount?: number;
+        max_redemption_percentage?: number;
+    };
 }
 
 export interface SmsSetting {

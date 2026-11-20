@@ -609,6 +609,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('settings', [AdminPointController::class, 'getSettings']);
             Route::put('settings', [AdminPointController::class, 'updateSettings']);
             Route::get('transactions', [AdminPointController::class, 'getTransactions']);
+            Route::get('user-usages', [AdminPointController::class, 'getUserUsages']);
+            Route::get('users/{id}/usages', [AdminPointController::class, 'getUserUsageDetails']);
             Route::post('adjust', [AdminPointController::class, 'adjustPoints']);
         });
     });
