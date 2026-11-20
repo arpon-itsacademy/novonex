@@ -129,13 +129,23 @@ export const EarnPointsPage: React.FC = () => {
         }
     }, [user, activeTab]);
 
-    const fetchCourses = async () => {
+    const fetchCourses = async (searchParam = '') => {
         try {
             setLoadingCourses(true);
-            const { data } = await apiClient.get('/earn-points/courses');
-            const list: CourseOption[] = data.featured_courses?.length > 0 ? data.featured_courses : data.all_courses || [];
+            const params: any = {};
+            if (searchParam.trim()) {
+                params.search = searchParam.trim();
+            }
+            const { data } = await apiClient.get('/earn-points/courses', { params });
+            const list: CourseOption[] = data.courses || data.all_courses || (Array.isArray(data) ? data : []);
             setCourses(list);
             if (list.length > 0) {
+                setSelectedCourse((prev) => {
+                    if (prev && list.some((item) => item.id === prev.id)) {
+                        return prev;
+                    }
+                    return list[0];
+                });
                 selectCourse(list[0]);
             }
         } catch (err) {
@@ -250,9 +260,22 @@ export const EarnPointsPage: React.FC = () => {
         }
     };
 
-    const filteredCourses = courses.filter((c) =>
-        c.title.toLowerCase().includes(searchCourseTerm.toLowerCase())
-    );
+    const getThumbnailUrl = (thumb?: string | null) => {
+        if (!thumb) return null;
+        if (thumb.startsWith('http://') || thumb.startsWith('https://') || thumb.startsWith('/')) {
+            return thumb;
+        }
+        return `/storage/${thumb}`;
+    };
+
+    const filteredCourses = React.useMemo(() => {
+        if (!searchCourseTerm.trim()) return courses;
+        const term = searchCourseTerm.toLowerCase().trim();
+        return courses.filter((c) =>
+            (c.title && c.title.toLowerCase().includes(term)) ||
+            (c.slug && c.slug.toLowerCase().includes(term))
+        );
+    }, [courses, searchCourseTerm]);
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 sm:py-12">
@@ -355,8 +378,26 @@ export const EarnPointsPage: React.FC = () => {
                                         placeholder="Search courses..."
                                         value={searchCourseTerm}
                                         onChange={(e) => setSearchCourseTerm(e.target.value)}
-                                        className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-hidden focus:border-[#25a2ee]"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                fetchCourses(searchCourseTerm);
+                                            }
+                                        }}
+                                        className="w-full pl-8 pr-8 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-hidden focus:border-[#25a2ee]"
                                     />
+                                    {searchCourseTerm && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setSearchCourseTerm('');
+                                                fetchCourses('');
+                                            }}
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                                            title="Clear search"
+                                        >
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Course Cards */}
@@ -367,12 +408,25 @@ export const EarnPointsPage: React.FC = () => {
                                             <p className="text-xs text-slate-400">Loading courses...</p>
                                         </div>
                                     ) : filteredCourses.length === 0 ? (
-                                        <div className="py-8 text-center text-xs text-slate-400">
-                                            No courses found.
+                                        <div className="py-8 text-center text-xs text-slate-400 space-y-2">
+                                            <p>No courses found {searchCourseTerm ? `matching "${searchCourseTerm}"` : ''}.</p>
+                                            {searchCourseTerm && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSearchCourseTerm('');
+                                                        fetchCourses('');
+                                                    }}
+                                                    className="text-xs text-[#25a2ee] font-bold hover:underline cursor-pointer"
+                                                >
+                                                    View All Courses
+                                                </button>
+                                            )}
                                         </div>
                                     ) : (
                                         filteredCourses.map((c) => {
                                             const isSelected = selectedCourse?.id === c.id;
+                                            const thumbUrl = getThumbnailUrl(c.thumbnail);
 
                                             return (
                                                 <div
@@ -384,9 +438,9 @@ export const EarnPointsPage: React.FC = () => {
                                                         }`}
                                                 >
                                                     <div className="w-12 h-12 rounded-lg bg-slate-900 shrink-0 overflow-hidden relative">
-                                                        {c.thumbnail ? (
+                                                        {thumbUrl ? (
                                                             <img
-                                                                src={c.thumbnail}
+                                                                src={thumbUrl}
                                                                 alt={c.title}
                                                                 className="w-full h-full object-cover"
                                                             />

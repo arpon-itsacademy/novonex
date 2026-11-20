@@ -13,50 +13,66 @@ use Illuminate\Http\Request;
 class EarnPointController extends Controller
 {
     /**
-     * Get courses that have active reward topics available for students.
+     * Get courses for the Earn Points page.
      */
     public function getCourses(Request $request): JsonResponse
     {
         RewardTopic::ensureTableExists();
         RewardNoteSubmission::ensureTableExists();
 
-        $courses = Course::where('status', Course::STATUS_PUBLISHED)
-            ->whereHas('rewardTopics', function ($q) {
-                $q->where('is_active', true);
-            })
+        $query = Course::query();
+
+        // If there are published courses, prefer published, otherwise show all active
+        $hasPublished = Course::where('status', Course::STATUS_PUBLISHED)->exists();
+        if ($hasPublished) {
+            $query->where('status', Course::STATUS_PUBLISHED);
+        }
+
+        // Optional server-side search
+        if ($request->filled('search')) {
+            $search = trim($request->input('search'));
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        $courses = $query
             ->withCount([
                 'rewardTopics as active_topics_count' => function ($q) {
                     $q->where('is_active', true);
                 },
             ])
-            ->select(['id', 'title', 'slug', 'thumbnail', 'price', 'level', 'fake_enrollment_count'])
+            ->orderByDesc('active_topics_count')
             ->latest('id')
             ->get();
 
-        // Also return all published courses so user can select any course even if topics are just being added
-        $allCourses = Course::where('status', Course::STATUS_PUBLISHED)
-            ->withCount([
-                'rewardTopics as active_topics_count' => function ($q) {
-                    $q->where('is_active', true);
-                },
-            ])
-            ->select(['id', 'title', 'slug', 'thumbnail', 'price', 'level', 'fake_enrollment_count'])
-            ->latest('id')
-            ->get();
+        $featured = $courses->filter(function ($c) {
+            return ($c->active_topics_count ?? 0) > 0;
+        })->values();
 
         return response()->json([
-            'featured_courses' => $courses,
-            'all_courses' => $allCourses,
+            'courses' => $courses,
+            'all_courses' => $courses,
+            'featured_courses' => $featured,
         ]);
     }
 
     /**
-     * Get active topics for a specific course.
+     * Get active reward topics for a specific course (by ID or slug).
      */
-    public function getCourseTopics(Course $course): JsonResponse
+    public function getCourseTopics(Request $request, $courseId): JsonResponse
     {
         RewardTopic::ensureTableExists();
         RewardNoteSubmission::ensureTableExists();
+
+        $course = Course::where('id', $courseId)->orWhere('slug', $courseId)->first();
+        if (! $course) {
+            return response()->json([
+                'message' => 'Course not found',
+                'topics' => [],
+            ], 404);
+        }
 
         $topics = RewardTopic::where('course_id', $course->id)
             ->where('is_active', true)
@@ -83,9 +99,17 @@ class EarnPointController extends Controller
     /**
      * Get approved notes for a topic (so students can read and study good notes).
      */
-    public function getApprovedNotes(RewardTopic $topic): JsonResponse
+    public function getApprovedNotes(Request $request, $topicId): JsonResponse
     {
         RewardNoteSubmission::ensureTableExists();
+
+        $topic = RewardTopic::find($topicId);
+        if (! $topic) {
+            return response()->json([
+                'message' => 'Topic not found',
+                'approved_notes' => [],
+            ], 404);
+        }
 
         $approvedNotes = RewardNoteSubmission::where('topic_id', $topic->id)
             ->where('status', RewardNoteSubmission::STATUS_APPROVED)
@@ -102,9 +126,14 @@ class EarnPointController extends Controller
     /**
      * Student submits note (photos / PDF) for a topic.
      */
-    public function submitNote(Request $request, RewardTopic $topic): JsonResponse
+    public function submitNote(Request $request, $topicId): JsonResponse
     {
         RewardNoteSubmission::ensureTableExists();
+
+        $topic = RewardTopic::find($topicId);
+        if (! $topic) {
+            return response()->json(['message' => 'Topic not found.'], 404);
+        }
 
         $user = $request->user();
 
