@@ -3,6 +3,7 @@ import { apiClient } from '../../api/client';
 import {
     Award,
     Sparkles,
+    Gem,
     TrendingUp,
     FileText,
     Users,
@@ -243,11 +244,12 @@ export const AdminPointsPage: React.FC = () => {
                             Total Points Awarded
                         </span>
                         <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                            <Sparkles className="w-5 h-5" />
+                            <Gem className="w-5 h-5" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black text-slate-900 dark:text-white mt-2">
-                        {stats.total_points_awarded.toLocaleString()} <span className="text-xs font-semibold text-slate-400">Pts</span>
+                    <p className="text-2xl font-black text-slate-900 dark:text-white mt-2 flex items-center gap-1.5">
+                        <Gem className="w-5 h-5 text-amber-500" />
+                        <span>{stats.total_points_awarded.toLocaleString()}</span>
                     </p>
                 </div>
 
@@ -536,7 +538,7 @@ export const AdminPointsPage: React.FC = () => {
                                                     ) : (
                                                         <ArrowDownRight className="w-4 h-4" />
                                                     )}
-                                                    {isPositive ? `+${t.amount}` : t.amount} Pts
+                                                    {isPositive ? `+${t.amount}` : t.amount}
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4">

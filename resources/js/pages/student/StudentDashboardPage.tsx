@@ -17,7 +17,8 @@ import {
     Mail,
     Phone,
     Hash,
-    Sparkles
+    Sparkles,
+    Gem
 } from 'lucide-react';
 
 interface RecentActivityItem {
@@ -252,14 +253,15 @@ export const StudentDashboardPage: React.FC = () => {
                         <div className="mt-3 p-3.5 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 rounded-2xl flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2.5">
                                 <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                                    <Sparkles className="w-4 h-4" />
+                                    <Gem className="w-4 h-4" />
                                 </div>
                                 <div>
                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                                         Reward Points
                                     </span>
-                                    <p className="text-lg font-black text-slate-900 leading-tight">
-                                        {user?.points ?? 0} <span className="text-[11px] font-semibold text-slate-400">Pts</span>
+                                    <p className="text-lg font-black text-slate-900 leading-tight flex items-center gap-1.5 mt-0.5">
+                                        <Gem className="w-4 h-4 text-amber-500" />
+                                        <span>{user?.points ?? 0}</span>
                                     </p>
                                 </div>
                             </div>

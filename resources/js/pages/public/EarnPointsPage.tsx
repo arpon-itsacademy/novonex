@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
     Award,
     Sparkles,
+    Gem,
     Search,
     BookOpen,
     Upload,
@@ -301,8 +302,8 @@ export const EarnPointsPage: React.FC = () => {
                         {user ? (
                             <div className="pt-2 flex flex-wrap items-center gap-3">
                                 <div className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl flex items-center gap-2 text-sm font-extrabold text-amber-400">
-                                    <Sparkles className="w-4 h-4 text-amber-400" />
-                                    <span>My Balance: {user.points ?? 0} Pts</span>
+                                    <Gem className="w-4 h-4 text-amber-400" />
+                                    <span>My Balance: {user.points ?? 0}</span>
                                 </div>
 
                                 <button
@@ -536,8 +537,8 @@ export const EarnPointsPage: React.FC = () => {
 
                                                             <div className="shrink-0 flex items-center gap-2">
                                                                 <span className="px-3 py-1 bg-amber-500 text-white rounded-full text-xs font-black shadow-xs flex items-center gap-1">
-                                                                    <Sparkles className="w-3.5 h-3.5" />
-                                                                    <span>+{topic.points_reward} Pts</span>
+                                                                    <Gem className="w-3.5 h-3.5" />
+                                                                    <span>+{topic.points_reward}</span>
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -607,8 +608,9 @@ export const EarnPointsPage: React.FC = () => {
                                 </p>
                             </div>
 
-                            <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-400 text-xs font-black">
-                                Total Earned From Notes: +{totalEarnedFromNotes} Pts
+                            <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-400 text-xs font-black flex items-center gap-1.5">
+                                <Gem className="w-3.5 h-3.5 text-amber-500" />
+                                <span>Total Earned From Notes: +{totalEarnedFromNotes}</span>
                             </div>
                         </div>
 
@@ -657,7 +659,7 @@ export const EarnPointsPage: React.FC = () => {
                                                     {isApproved && (
                                                         <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">
                                                             <Check className="w-3.5 h-3.5" />
-                                                            <span>Approved (+{sub.points_awarded} Pts)</span>
+                                                            <span>Approved (+{sub.points_awarded})</span>
                                                         </span>
                                                     )}
                                                     {isPending && (
