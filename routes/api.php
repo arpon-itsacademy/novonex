@@ -259,15 +259,75 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('teacher')->middleware('role:teacher,admin')->group(function () {
         Route::get('my-courses', function (Request $request) {
             $user = $request->user();
-            $courses = Course::whereHas('instructors', function ($q) use ($user) {
-                $q->where('users.id', $user->id);
+
+            // 1. Courses taught / assigned to this teacher
+            $teachingCourses = Course::where(function ($query) use ($user) {
+                $query->whereHas('instructors', function ($q) use ($user) {
+                    $q->where('users.id', $user->id);
+                })
+                ->orWhere('instructor_id', $user->id);
             })
-            ->orWhere('instructor_id', $user->id)
+            ->with(['instructors:id,name', 'instructor:id,name'])
             ->withCount(['lessons', 'enrollments'])
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($course) {
+                $course->is_assigned_teacher = true;
+                $course->role_in_course = 'instructor';
+                $course->can_manage_builder = true;
+                return $course;
+            });
 
-            return response()->json($courses);
+            $teachingIds = $teachingCourses->pluck('id')->toArray();
+
+            // 2. Courses where teacher is enrolled as a student (excluding courses they instruct)
+            $enrollments = $user->enrollments()
+                ->where('status', \App\Models\Enrollment::STATUS_ACTIVE)
+                ->whereNotIn('course_id', $teachingIds)
+                ->with(['course' => function ($q) {
+                    $q->with(['instructors:id,name', 'instructor:id,name', 'nexpilot:id,course_id,title,price,is_active'])
+                      ->withCount(['lessons', 'enrollments']);
+                }])
+                ->latest('enrolled_at')
+                ->get();
+
+            $enrolledCourses = $enrollments->map(function ($enrollment) use ($user) {
+                $course = $enrollment->course;
+                if (!$course) {
+                    return null;
+                }
+
+                $totalLessons = (int) ($course->lessons_count ?? 0);
+                $completedCount = \App\Models\LessonProgress::where('user_id', $user->id)
+                    ->where('course_id', $course->id)
+                    ->where('is_completed', true)
+                    ->count();
+
+                $percentage = $totalLessons > 0 ? (int) round(($completedCount / $totalLessons) * 100) : 0;
+
+                $lastAccessed = \App\Models\LessonProgress::where('user_id', $user->id)
+                    ->where('course_id', $course->id)
+                    ->latest('last_accessed_at')
+                    ->first();
+
+                $firstLesson = $course->lessons()->orderBy('sort_order')->first();
+
+                $course->is_assigned_teacher = false;
+                $course->role_in_course = 'student';
+                $course->can_manage_builder = false;
+                $course->enrolled_at = $enrollment->enrolled_at;
+                $course->access_key = $enrollment->access_key;
+                $course->total_lessons = $totalLessons;
+                $course->completed_lessons = $completedCount;
+                $course->progress_percentage = $percentage;
+                $course->last_lesson_id = $lastAccessed ? $lastAccessed->lesson_id : optional($firstLesson)->id;
+
+                return $course;
+            })->filter()->values();
+
+            $allCourses = $teachingCourses->concat($enrolledCourses)->values();
+
+            return response()->json($allCourses);
         });
 
         Route::get('student-questions', function (Request $request) {

@@ -3,12 +3,14 @@ import { useParams, useLocation, Link, useSearchParams } from 'react-router-dom'
 import { CheckCircle2, Clock, BookOpen, Home, XCircle, AlertTriangle, ArrowRight } from 'lucide-react';
 import { formatBDT } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 
 export const OrderStatusPage: React.FC = () => {
     const { orderNumber } = useParams<{ orderNumber: string }>();
     const location = useLocation();
     const [searchParams] = useSearchParams();
     const { language } = useLanguage();
+    const { user } = useAuth();
     const isBn = language === 'bn';
 
     const order = location.state?.order;
@@ -117,7 +119,7 @@ export const OrderStatusPage: React.FC = () => {
             {/* Action buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
-                    to="/student/my-courses"
+                    to={user?.role === 'teacher' ? "/teacher/courses" : (user?.role === 'admin' ? "/admin/courses" : "/student/my-courses")}
                     className="w-full sm:w-auto px-6 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
                 >
                     <BookOpen className="w-4 h-4" />

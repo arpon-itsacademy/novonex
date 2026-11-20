@@ -583,7 +583,7 @@ export const CourseDetailsPage: React.FC = () => {
                             <div className="space-y-2.5">
                                 {isEnrolled ? (
                                     <Link
-                                        to={firstLessonId ? `/learning/${course.id}/lessons/${firstLessonId}` : '/student/my-courses'}
+                                        to={firstLessonId ? `/learning/${course.id}/lessons/${firstLessonId}` : (user?.role === 'teacher' ? '/teacher/courses' : '/student/my-courses')}
                                         className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all"
                                     >
                                         <PlayCircle className="w-5 h-5" />

@@ -303,9 +303,11 @@ class VdoCipherController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        // Authorize access: must be admin, teacher, lesson is preview, or enrolled student
+        // Authorize access: must be admin, assigned course instructor, lesson is preview, or enrolled student
         $isAuthorized = false;
-        if ($user->isAdmin() || $user->isTeacher()) {
+        if ($user->isAdmin()) {
+            $isAuthorized = true;
+        } elseif ($user->isTeacher() && $lesson->course && $lesson->course->isAssignedTeacher($user->id)) {
             $isAuthorized = true;
         } elseif ($lesson->is_preview) {
             $isAuthorized = true;

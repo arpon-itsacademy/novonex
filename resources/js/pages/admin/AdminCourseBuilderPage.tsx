@@ -55,6 +55,7 @@ export const AdminCourseBuilderPage: React.FC = () => {
     const [course, setCourse] = useState<any>(null);
     const [sections, setSections] = useState<CourseSection[]>([]);
     const [loading, setLoading] = useState(true);
+    const [accessError, setAccessError] = useState<string | null>(null);
     const [previewMenuOpen, setPreviewMenuOpen] = useState(false);
 
     // Tab state ('lessons' | 'live_classes' | 'practice_exams' | 'live_exams' | 'routine')
@@ -387,8 +388,13 @@ export const AdminCourseBuilderPage: React.FC = () => {
             const { data } = await apiClient.get(`/builder/${id}/curriculum`);
             setCourse(data.course);
             setSections(data.sections || []);
-        } catch {
-            // handle error
+            setAccessError(null);
+        } catch (err: any) {
+            if (err.response?.status === 403) {
+                setAccessError(err.response?.data?.message || 'You do not have permission to manage this course.');
+            } else {
+                setAccessError('Failed to load course builder.');
+            }
         } finally {
             setLoading(false);
         }
@@ -1054,6 +1060,35 @@ export const AdminCourseBuilderPage: React.FC = () => {
         }
         return null;
     }, [sections]);
+
+    if (accessError) {
+        return (
+            <div className="max-w-xl mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200 shadow-sm text-center space-y-4">
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                    <AlertCircle className="w-7 h-7" />
+                </div>
+                <h3 className="text-xl font-black text-slate-900">Course Builder Restricted</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                    {accessError} You are not an assigned instructor for this course. If you enrolled in this course as a learner, you can access the classes from the student classroom player.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+                    <Link
+                        to={isTeacher ? "/teacher/courses" : "/admin/courses"}
+                        className="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl transition-colors"
+                    >
+                        Back to My Courses
+                    </Link>
+                    <Link
+                        to={`/learning/${id}`}
+                        className="w-full sm:w-auto px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl transition-colors shadow-xs flex items-center justify-center gap-1.5"
+                    >
+                        <PlayCircle className="w-4 h-4" />
+                        <span>Open Student Classroom</span>
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     if (loading || !course) {
         return <div className="p-12 text-center text-slate-400">Loading curriculum builder...</div>;
