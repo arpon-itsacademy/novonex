@@ -140,15 +140,9 @@ export const PointRewardProvider: React.FC<{ children: React.ReactNode }> = ({ c
         const sY = options.fromY ?? (window.innerHeight / 2 + 30);
         setStartCoords({ x: sX, y: sY });
 
-        // 2. Locate Header Badge Destination Coordinates
-        const badgeEl = document.getElementById('navbar-points-badge') || document.getElementById('navbar-points-badge-mobile');
-        let tX = window.innerWidth - 65;
-        let tY = 28;
-        if (badgeEl) {
-            const rect = badgeEl.getBoundingClientRect();
-            tX = rect.left + rect.width / 2;
-            tY = rect.top + rect.height / 2;
-        }
+        // 2. Set Destination Coordinates to Top Center of viewport
+        const tX = window.innerWidth / 2;
+        const tY = 36;
         setTargetCoords({ x: tX, y: tY });
 
         // 3. Generate mini particles constellation
@@ -169,18 +163,13 @@ export const PointRewardProvider: React.FC<{ children: React.ReactNode }> = ({ c
         // Play Initial Celebratory Chime
         playHarmonicChime();
 
-        // Phase 2: Start Flight towards Header (at 750ms)
+        // Phase 2: Start Flight towards Top Center (at 750ms)
         const t1 = setTimeout(() => {
-            // Re-check target coordinates in case of scroll
-            const currentBadge = document.getElementById('navbar-points-badge') || document.getElementById('navbar-points-badge-mobile');
-            if (currentBadge) {
-                const r = currentBadge.getBoundingClientRect();
-                setTargetCoords({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
-            }
+            setTargetCoords({ x: window.innerWidth / 2, y: 36 });
             setPhase('flight');
         }, 750);
 
-        // Phase 3: Impact at Header Badge (at 1650ms)
+        // Phase 3: Impact at Top Center (at 1650ms)
         const t2 = setTimeout(() => {
             setPhase('impact');
             playImpactCoinSound();
@@ -274,7 +263,7 @@ export const PointRewardProvider: React.FC<{ children: React.ReactNode }> = ({ c
                                 phase === 'pop'
                                     ? 'translate(-50%, -50%) scale(1)'
                                     : phase === 'flight' || phase === 'impact'
-                                    ? `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px)) scale(0.35)`
+                                    ? `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px)) scale(0.65)`
                                     : 'translate(-50%, -50%) scale(0)',
                             opacity: phase === 'impact' ? 0 : 1,
                             transition:
@@ -333,21 +322,21 @@ export const PointRewardProvider: React.FC<{ children: React.ReactNode }> = ({ c
                         </div>
                     ))}
 
-                    {/* HEADER IMPACT BURST RIPPLE */}
+                    {/* TOP CENTER IMPACT BURST RIPPLE */}
                     {phase === 'impact' && (
                         <div
                             style={{
                                 left: `${targetCoords.x}px`,
                                 top: `${targetCoords.y}px`,
                             }}
-                            className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30"
+                            className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30 flex flex-col items-center justify-center"
                         >
                             {/* Expanding Ring Ripple */}
-                            <div className="w-16 h-16 rounded-full border-4 border-amber-400 bg-amber-400/30 animate-ping" />
+                            <div className="w-20 h-20 rounded-full border-4 border-amber-400 bg-amber-400/30 animate-ping" />
 
-                            {/* Floating Text above badge: +50 */}
-                            <div className="absolute left-1/2 -top-8 -translate-x-1/2 flex items-center gap-1 font-black text-xs sm:text-sm text-amber-500 bg-amber-50 dark:bg-slate-900 px-2 py-0.5 rounded-full border border-amber-400 shadow-md animate-bounce">
-                                <Sparkles className="w-3 h-3 text-amber-500" />
+                            {/* Floating Text at top center: +50 */}
+                            <div className="absolute flex items-center gap-1.5 font-black text-sm sm:text-base text-amber-500 bg-amber-50 dark:bg-slate-900 px-4 py-1.5 rounded-full border-2 border-amber-400 shadow-xl shadow-amber-500/30 animate-bounce">
+                                <Sparkles className="w-4 h-4 text-amber-500" />
                                 <span>+{rewardAmount} 💎</span>
                             </div>
                         </div>
