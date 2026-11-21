@@ -21,7 +21,8 @@ import {
     ChevronRight,
     FileText,
     ShoppingCart,
-    BookOpen
+    BookOpen,
+    Star
 } from 'lucide-react';
 import { Modal } from '../../components/ui/Modal';
 
@@ -202,6 +203,13 @@ export const AdminPointUsagesPage: React.FC = () => {
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                         <FileText className="w-3 h-3" />
                         <span>Note Reward</span>
+                    </span>
+                );
+            case 'lesson_review':
+                return (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                        <Star className="w-3 h-3 fill-amber-400" />
+                        <span>Class Review</span>
                     </span>
                 );
             case 'redeem_discount':

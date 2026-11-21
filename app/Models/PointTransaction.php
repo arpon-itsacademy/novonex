@@ -16,6 +16,7 @@ class PointTransaction extends Model
 
     public const TYPE_COURSE_PURCHASE = 'course_purchase';
     public const TYPE_NOTE_REWARD = 'note_reward';
+    public const TYPE_LESSON_REVIEW = 'lesson_review';
     public const TYPE_MANUAL_ADJUSTMENT = 'manual_adjustment';
     public const TYPE_REDEEM_DISCOUNT = 'redeem_discount';
 

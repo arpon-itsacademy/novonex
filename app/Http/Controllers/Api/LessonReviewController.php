@@ -122,6 +122,11 @@ class LessonReviewController extends Controller
         ]);
 
         try {
+            $existingReview = LessonReview::where('lesson_id', $lesson->id)
+                ->where('user_id', $user->id)
+                ->first();
+            $isFirstReview = ! $existingReview;
+
             $review = LessonReview::updateOrCreate(
                 [
                     'lesson_id' => $lesson->id,
@@ -134,13 +139,31 @@ class LessonReviewController extends Controller
                 ]
             );
 
+            // Award points for class review if eligible
+            $pointsAwarded = 0;
+            if ($isFirstReview || empty($review->points_awarded)) {
+                try {
+                    $pointService = app(\App\Services\PointService::class);
+                    $transaction = $pointService->awardLessonReviewPoints($review);
+                    if ($transaction) {
+                        $pointsAwarded = (int) $transaction->amount;
+                    }
+                } catch (\Throwable $pe) {
+                    \Illuminate\Support\Facades\Log::warning('Failed awarding lesson review points: ' . $pe->getMessage());
+                }
+            }
+
             $allReviews = LessonReview::where('lesson_id', $lesson->id)->get();
             $totalReviews = $allReviews->count();
             $averageRating = $totalReviews > 0 ? round($allReviews->avg('rating'), 1) : 0;
 
             return response()->json([
-                'message' => 'Class review submitted successfully!',
+                'message' => $pointsAwarded > 0
+                    ? "Class review submitted successfully! You earned +{$pointsAwarded} reward points!"
+                    : 'Class review submitted successfully!',
                 'review' => $review->load(['user:id,name,role,photo_url']),
+                'points_awarded' => $pointsAwarded,
+                'user_points' => $user->fresh()?->points ?? 0,
                 'stats' => [
                     'total_reviews' => $totalReviews,
                     'average_rating' => $averageRating,

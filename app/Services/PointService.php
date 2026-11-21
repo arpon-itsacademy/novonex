@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\LessonReview;
 use App\Models\Order;
 use App\Models\PointSetting;
 use App\Models\PointTransaction;
@@ -318,5 +319,66 @@ class PointService
                 'description' => "Refunded {$pointsRedeemed} points from cancelled order #{$order->order_number}",
             ]);
         });
+    }
+
+    /**
+     * Award points to a student upon submitting a class review.
+     */
+    public function awardLessonReviewPoints(LessonReview $review): ?PointTransaction
+    {
+        try {
+            $settings = PointSetting::getSettings();
+
+            if (! $settings->is_active || ! $settings->lesson_review_points_enabled) {
+                return null;
+            }
+
+            $pointsToAward = (int) ($settings->points_per_lesson_review ?? 10);
+            if ($pointsToAward <= 0) {
+                return null;
+            }
+
+            PointTransaction::ensureTableExists();
+
+            // Check if points have already been awarded for this lesson by this user
+            $existing = PointTransaction::where('type', PointTransaction::TYPE_LESSON_REVIEW)
+                ->where('user_id', $review->user_id)
+                ->where('reference_id', $review->lesson_id)
+                ->first();
+
+            if ($existing) {
+                return $existing;
+            }
+
+            return DB::transaction(function () use ($review, $pointsToAward) {
+                $user = User::lockForUpdate()->find($review->user_id);
+                if (! $user) {
+                    return null;
+                }
+
+                $user->points = ($user->points ?? 0) + $pointsToAward;
+                $user->save();
+
+                $review->points_awarded = $pointsToAward;
+                $review->save();
+
+                $lessonTitle = $review->lesson?->title ?? 'Class Lesson';
+                $courseTitle = $review->course?->title ?? 'Course';
+
+                $transaction = PointTransaction::create([
+                    'user_id' => $user->id,
+                    'amount' => $pointsToAward,
+                    'type' => PointTransaction::TYPE_LESSON_REVIEW,
+                    'reference_id' => $review->lesson_id,
+                    'reference_type' => LessonReview::class,
+                    'description' => "Reward points earned for rating class: {$lessonTitle} ({$courseTitle})",
+                ]);
+
+                return $transaction;
+            });
+        } catch (\Throwable $e) {
+            Log::error('PointService awardLessonReviewPoints failed: ' . $e->getMessage());
+            return null;
+        }
     }
 }

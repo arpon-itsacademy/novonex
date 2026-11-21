@@ -25,15 +25,20 @@ import {
     ShieldCheck,
     Eye,
     Star,
-    Edit3
+    Edit3,
+    Gem
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useSettings } from '../../context/SettingsContext';
+import { usePointReward } from '../../context/PointRewardContext';
 import { PlyrVideoPlayer } from '../../components/shared/PlyrVideoPlayer';
 
 export const LessonPlayerPage: React.FC = () => {
     const { courseId, lessonId } = useParams<{ courseId: string; lessonId?: string }>();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
+    const { settings } = useSettings();
+    const { triggerPointReward } = usePointReward();
     const { t, language } = useLanguage();
 
     const [lesson, setLesson] = useState<Lesson | null>(null);
@@ -53,7 +58,7 @@ export const LessonPlayerPage: React.FC = () => {
 
     // Class Rating & Reviews State
     const [reviewStats, setReviewStats] = useState<{ total_reviews: number; average_rating: number; distribution?: Record<number, number> } | null>(null);
-    const [myReview, setMyReview] = useState<{ id?: number; rating: number; review: string | null; updated_at?: string } | null>(null);
+    const [myReview, setMyReview] = useState<{ id?: number; rating: number; review: string | null; updated_at?: string; points_awarded?: number } | null>(null);
     const [studentReviews, setStudentReviews] = useState<any[]>([]);
     const [ratingValue, setRatingValue] = useState<number>(5);
     const [ratingHover, setRatingHover] = useState<number>(0);
@@ -214,6 +219,18 @@ export const LessonPlayerPage: React.FC = () => {
             }
             setIsEditingReview(false);
             setReviewSuccessMessage(data.message || 'Review submitted successfully!');
+
+            // Trigger points reward sound and flying animation if points were awarded
+            if (data.points_awarded && data.points_awarded > 0) {
+                triggerPointReward({
+                    amount: data.points_awarded,
+                    title: `+${data.points_awarded} Class Review Reward!`,
+                });
+                if (data.user_points !== undefined && user) {
+                    updateUser({ ...user, points: data.user_points });
+                }
+            }
+
             fetchLessonReviews();
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to submit class review.');
@@ -571,6 +588,12 @@ export const LessonPlayerPage: React.FC = () => {
                                             <p className="text-xs text-slate-400">
                                                 Rate this lesson and share your valuable feedback to help your instructor improve.
                                             </p>
+                                            {settings?.point_settings?.is_active !== false && settings?.point_settings?.lesson_review_points_enabled !== false && !myReview && (
+                                                <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/15 border border-amber-500/30 rounded-xl text-xs font-bold text-amber-300">
+                                                    <Gem className="w-3.5 h-3.5 text-amber-400" />
+                                                    <span>Rate this class to earn +{settings?.point_settings?.points_per_lesson_review ?? 10} Reward Points!</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -599,9 +622,17 @@ export const LessonPlayerPage: React.FC = () => {
                             {myReview && !isEditingReview ? (
                                 <div className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-3 text-center">
                                     <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pb-2 border-b border-slate-700/50">
-                                        <span className="text-xs font-bold text-slate-400">
-                                            Your Submitted Class Rating
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-bold text-slate-400">
+                                                Your Submitted Class Rating
+                                            </span>
+                                            {myReview.points_awarded && myReview.points_awarded > 0 ? (
+                                                <span className="px-2.5 py-0.5 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold rounded-lg flex items-center gap-1">
+                                                    <Gem className="w-3 h-3 text-amber-400" />
+                                                    <span>+{myReview.points_awarded} Points Earned</span>
+                                                </span>
+                                            ) : null}
+                                        </div>
                                         {myReview.updated_at && (
                                             <span className="text-[10px] text-slate-500">
                                                 Submitted on {new Date(myReview.updated_at).toLocaleDateString()}

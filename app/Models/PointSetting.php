@@ -22,6 +22,8 @@ class PointSetting extends Model
         'redemption_points',
         'redemption_amount',
         'max_redemption_percentage',
+        'lesson_review_points_enabled',
+        'points_per_lesson_review',
         'is_active',
     ];
 
@@ -33,6 +35,8 @@ class PointSetting extends Model
         'redemption_points' => 'integer',
         'redemption_amount' => 'float',
         'max_redemption_percentage' => 'integer',
+        'lesson_review_points_enabled' => 'boolean',
+        'points_per_lesson_review' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -50,6 +54,8 @@ class PointSetting extends Model
                     $table->integer('redemption_points')->default(10);
                     $table->decimal('redemption_amount', 10, 2)->default(1.00);
                     $table->integer('max_redemption_percentage')->default(50);
+                    $table->boolean('lesson_review_points_enabled')->default(true);
+                    $table->integer('points_per_lesson_review')->default(10);
                     $table->boolean('is_active')->default(true);
                     $table->timestamps();
                 });
@@ -64,6 +70,12 @@ class PointSetting extends Model
                         $table->integer('redemption_points')->default(10);
                         $table->decimal('redemption_amount', 10, 2)->default(1.00);
                         $table->integer('max_redemption_percentage')->default(50);
+                    });
+                }
+                if (! Schema::hasColumn('point_settings', 'lesson_review_points_enabled')) {
+                    Schema::table('point_settings', function (Blueprint $table) {
+                        $table->boolean('lesson_review_points_enabled')->default(true);
+                        $table->integer('points_per_lesson_review')->default(10);
                     });
                 }
             } catch (\Throwable $e) {
@@ -87,6 +99,8 @@ class PointSetting extends Model
                 'redemption_points' => 10,
                 'redemption_amount' => 1.00,
                 'max_redemption_percentage' => 50,
+                'lesson_review_points_enabled' => true,
+                'points_per_lesson_review' => 10,
                 'is_active' => true,
             ]);
         }

@@ -24,6 +24,8 @@ class WebsiteSettingsController extends Controller
                 'redemption_points' => (int) ($pointSettings->redemption_points ?? 10),
                 'redemption_amount' => (float) ($pointSettings->redemption_amount ?? 1.00),
                 'max_redemption_percentage' => (int) ($pointSettings->max_redemption_percentage ?? 50),
+                'lesson_review_points_enabled' => (bool) ($pointSettings->lesson_review_points_enabled ?? true),
+                'points_per_lesson_review' => (int) ($pointSettings->points_per_lesson_review ?? 10),
             ];
         } catch (\Throwable $e) {
             $data['point_settings'] = [
@@ -33,6 +35,8 @@ class WebsiteSettingsController extends Controller
                 'redemption_points' => 10,
                 'redemption_amount' => 1.00,
                 'max_redemption_percentage' => 50,
+                'lesson_review_points_enabled' => true,
+                'points_per_lesson_review' => 10,
             ];
         }
 

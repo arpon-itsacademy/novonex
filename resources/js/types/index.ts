@@ -359,6 +359,8 @@ export interface WebsiteSetting {
         redemption_points?: number;
         redemption_amount?: number;
         max_redemption_percentage?: number;
+        lesson_review_points_enabled?: boolean;
+        points_per_lesson_review?: number;
     };
 }
 

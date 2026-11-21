@@ -15,7 +15,8 @@ import {
     Sliders,
     Zap,
     Percent,
-    ArrowRight
+    ArrowRight,
+    Star
 } from 'lucide-react';
 
 interface PointSettings {
@@ -28,6 +29,8 @@ interface PointSettings {
     redemption_points: number;
     redemption_amount: number;
     max_redemption_percentage: number;
+    lesson_review_points_enabled: boolean;
+    points_per_lesson_review: number;
     is_active: boolean;
 }
 
@@ -41,6 +44,8 @@ export const AdminPointsPage: React.FC = () => {
         redemption_points: 10,
         redemption_amount: 1.00,
         max_redemption_percentage: 50,
+        lesson_review_points_enabled: true,
+        points_per_lesson_review: 10,
         is_active: true,
     });
     const [loading, setLoading] = useState(true);
@@ -65,6 +70,8 @@ export const AdminPointsPage: React.FC = () => {
                     redemption_points: res.data.settings.redemption_points ?? 10,
                     redemption_amount: res.data.settings.redemption_amount ?? 1.00,
                     max_redemption_percentage: res.data.settings.max_redemption_percentage ?? 50,
+                    lesson_review_points_enabled: res.data.settings.lesson_review_points_enabled !== false,
+                    points_per_lesson_review: res.data.settings.points_per_lesson_review ?? 10,
                 });
             }
         } catch (err) {
@@ -87,6 +94,8 @@ export const AdminPointsPage: React.FC = () => {
                     redemption_points: res.data.settings.redemption_points ?? 10,
                     redemption_amount: res.data.settings.redemption_amount ?? 1.00,
                     max_redemption_percentage: res.data.settings.max_redemption_percentage ?? 50,
+                    lesson_review_points_enabled: res.data.settings.lesson_review_points_enabled !== false,
+                    points_per_lesson_review: res.data.settings.points_per_lesson_review ?? 10,
                 });
             }
             setSaveSuccessMsg('Point rules and redemption settings saved successfully!');
@@ -500,6 +509,66 @@ export const AdminPointsPage: React.FC = () => {
                                 </div>
                             )}
                         </div>
+                    )}
+                </div>
+
+                {/* 4. CLASS REVIEW EARNING RULES */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-5">
+                    <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center shrink-0">
+                                <Star className="w-5 h-5 fill-amber-400" />
+                            </div>
+                            <div>
+                                <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+                                    Class Review Earning Rules
+                                </h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    Award reward points automatically when enrolled students submit a review for any class / lesson.
+                                </p>
+                            </div>
+                        </div>
+
+                        <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input
+                                type="checkbox"
+                                checked={settings.lesson_review_points_enabled}
+                                onChange={(e) => setSettings({ ...settings, lesson_review_points_enabled: e.target.checked })}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                        </label>
+                    </div>
+
+                    {settings.lesson_review_points_enabled ? (
+                        <div className="space-y-4">
+                            <div className="max-w-xs space-y-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                                    <Gem className="w-3.5 h-3.5 text-amber-500" />
+                                    <span>Points Per Class Review</span>
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100000"
+                                        value={settings.points_per_lesson_review}
+                                        onChange={(e) => setSettings({ ...settings, points_per_lesson_review: parseInt(e.target.value, 10) || 0 })}
+                                        className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-hidden focus:border-amber-500"
+                                    />
+                                    <span className="text-xs font-bold text-amber-600 dark:text-amber-400 shrink-0">
+                                        Points
+                                    </span>
+                                </div>
+                                <p className="text-[11px] text-slate-400 leading-tight">
+                                    Reward amount credited to student when they review a class for the first time.
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                            Class review rewards are currently disabled. Students can still rate and review classes, but won't receive points.
+                        </p>
                     )}
                 </div>
 

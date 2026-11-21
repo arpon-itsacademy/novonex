@@ -15,6 +15,7 @@ class LessonReview extends Model
         'user_id',
         'rating',
         'review',
+        'points_awarded',
     ];
 
     protected $casts = [
@@ -22,6 +23,7 @@ class LessonReview extends Model
         'lesson_id' => 'integer',
         'course_id' => 'integer',
         'user_id' => 'integer',
+        'points_awarded' => 'integer',
     ];
 
     /**
@@ -38,12 +40,23 @@ class LessonReview extends Model
                     $table->unsignedBigInteger('user_id')->index();
                     $table->unsignedTinyInteger('rating');
                     $table->text('review')->nullable();
+                    $table->integer('points_awarded')->default(0);
                     $table->timestamps();
 
                     $table->unique(['lesson_id', 'user_id']);
                 });
             } catch (\Throwable $e) {
                 // Table already exists or no DDL permission
+            }
+        } else {
+            try {
+                if (! Schema::hasColumn('lesson_reviews', 'points_awarded')) {
+                    Schema::table('lesson_reviews', function (Blueprint $table) {
+                        $table->integer('points_awarded')->default(0);
+                    });
+                }
+            } catch (\Throwable $e) {
+                // Ignore DDL errors
             }
         }
     }

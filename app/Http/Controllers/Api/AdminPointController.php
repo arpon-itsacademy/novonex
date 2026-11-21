@@ -51,6 +51,8 @@ class AdminPointController extends Controller
             'redemption_points' => ['sometimes', 'integer', 'min:1', 'max:100000'],
             'redemption_amount' => ['sometimes', 'numeric', 'min:0.01', 'max:10000'],
             'max_redemption_percentage' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'lesson_review_points_enabled' => ['sometimes', 'boolean'],
+            'points_per_lesson_review' => ['sometimes', 'integer', 'min:0', 'max:100000'],
             'is_active' => ['required', 'boolean'],
         ]);
 
