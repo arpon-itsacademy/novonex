@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { useSettings } from '../../context/SettingsContext';
+import { usePointReward } from '../../context/PointRewardContext';
 import {
     Award,
     Sparkles,
@@ -89,6 +90,7 @@ interface MySubmissionItem {
 export const EarnPointsPage: React.FC = () => {
     const { user } = useAuth();
     const { settings } = useSettings();
+    const { triggerPointReward } = usePointReward();
     const isPointsActive = (settings as any)?.point_settings?.is_active !== false;
     const navigate = useNavigate();
 
@@ -333,6 +335,16 @@ export const EarnPointsPage: React.FC = () => {
                                     <Gem className="w-4 h-4 text-amber-400" />
                                     <span>My Balance: {user.points ?? 0}</span>
                                 </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => triggerPointReward({ amount: 50, title: 'Reward Points Earned!' })}
+                                    className="px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 border border-amber-500/40 cursor-pointer shadow-xs"
+                                    title="Click to preview the flying point animation & sound effect"
+                                >
+                                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                                    <span>Preview Sound & Animation</span>
+                                </button>
 
                                 <button
                                     onClick={() => setActiveTab(activeTab === 'my_submissions' ? 'courses' : 'my_submissions')}

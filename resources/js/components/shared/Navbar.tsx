@@ -33,6 +33,7 @@ import {
     ShoppingCart
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { usePointReward } from '../../context/PointRewardContext';
 import { HeaderMenuItem } from '../../types';
 
 const DEFAULT_NAV_ITEMS: HeaderMenuItem[] = [
@@ -99,9 +100,10 @@ const DEFAULT_NAV_ITEMS: HeaderMenuItem[] = [
 ];
 
 export const Navbar: React.FC = () => {
-    const { user, logout } = useAuth();
+    const { user, logout, refreshUser } = useAuth();
     const { cartCount, toggleCart } = useCart();
     const { t, language } = useLanguage();
+    const { triggerPointReward } = usePointReward();
     const { settings, loading } = useSettings();
     const navigate = useNavigate();
     const location = useLocation();
@@ -205,15 +207,33 @@ export const Navbar: React.FC = () => {
         const fetchNotifs = async () => {
             try {
                 const { data } = await apiClient.get('/notifications');
-                setNotifications(data.data || []);
+                const list = data.data || [];
+                setNotifications(list);
                 const unreadRes = await apiClient.get('/notifications/unread-count');
                 setUnreadCount(unreadRes.data.unread_count || 0);
+
+                // Detect unread reward points notification
+                const unreadPointNotif = list.find((n: any) =>
+                    !n.read_at &&
+                    (n.data?.type === 'reward_points_approved' || n.data?.type === 'course_purchase_points')
+                );
+                if (unreadPointNotif) {
+                    const key = `celebrated_notif_${unreadPointNotif.id}`;
+                    if (!localStorage.getItem(key)) {
+                        localStorage.setItem(key, 'true');
+                        triggerPointReward({
+                            amount: unreadPointNotif.data?.points || 50,
+                            title: unreadPointNotif.data?.title || 'Reward Points Received!',
+                        });
+                        refreshUser();
+                    }
+                }
             } catch { }
         };
         fetchNotifs();
         const interval = setInterval(fetchNotifs, 30000);
         return () => clearInterval(interval);
-    }, [user]);
+    }, [user, triggerPointReward, refreshUser]);
 
     const markAllRead = async () => {
         try {
@@ -501,6 +521,7 @@ export const Navbar: React.FC = () => {
                                 {isPointsActive && (
                                     <Link
                                         to="/earn-points"
+                                        id="navbar-points-badge"
                                         className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-extrabold text-xs transition-all shadow-2xs group"
                                         title="My Reward Points & Earn Points"
                                     >
@@ -766,6 +787,7 @@ export const Navbar: React.FC = () => {
                             {isPointsActive && user && (
                                 <Link
                                     to="/earn-points"
+                                    id="navbar-points-badge-mobile"
                                     onClick={() => setMobileMenuOpen(false)}
                                     className="flex items-center justify-between px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-3 text-xs font-bold text-amber-600 dark:text-amber-400"
                                 >

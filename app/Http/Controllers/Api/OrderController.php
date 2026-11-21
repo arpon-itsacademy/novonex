@@ -342,11 +342,22 @@ class OrderController extends Controller
 
         if ($isFree) {
             try {
+                app(\App\Services\PointService::class)->awardCoursePurchasePoints($order);
+            } catch (\Throwable $e) {}
+
+            try {
                 app(\App\Services\CoursePurchaseSmsService::class)->sendPurchaseSms($order);
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('Purchase SMS failed on free checkout: ' . $e->getMessage());
             }
         }
+
+        \App\Models\PointTransaction::ensureTableExists();
+        $pointsAwarded = (int) \App\Models\PointTransaction::where('reference_id', $order->id)
+            ->where('reference_type', Order::class)
+            ->where('amount', '>', 0)
+            ->sum('amount');
+        $order->points_awarded = $pointsAwarded;
 
         return response()->json([
             'message' => $isFree ? 'Enrolled in course(s) successfully!' : 'Order placed successfully. Enrollment will be activated upon payment verification.',
@@ -575,6 +586,13 @@ class OrderController extends Controller
                 'message' => 'Order not found.',
             ], 404);
         }
+
+        \App\Models\PointTransaction::ensureTableExists();
+        $pointsAwarded = (int) \App\Models\PointTransaction::where('reference_id', $order->id)
+            ->where('reference_type', Order::class)
+            ->where('amount', '>', 0)
+            ->sum('amount');
+        $order->points_awarded = $pointsAwarded;
 
         return response()->json([
             'order' => $order,

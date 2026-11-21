@@ -20,12 +20,15 @@ import {
 import { apiClient, formatBDT, getImageUrl } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { usePointReward } from '../../context/PointRewardContext';
 
 export const OrderStatusPage: React.FC = () => {
     const { orderNumber } = useParams<{ orderNumber: string }>();
     const location = useLocation();
     const [searchParams] = useSearchParams();
     const { user } = useAuth();
+    const { triggerPointReward } = usePointReward();
+    const hasTriggeredRewardRef = React.useRef(false);
 
     const [order, setOrder] = useState<any>(location.state?.order || null);
     const [loading, setLoading] = useState<boolean>(!location.state?.order);
@@ -54,6 +57,20 @@ export const OrderStatusPage: React.FC = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (!order || hasTriggeredRewardRef.current) return;
+        const pts = order.points_awarded || 0;
+        if (pts > 0 && (order.payment_status === 'paid' || queryStatus === 'success')) {
+            hasTriggeredRewardRef.current = true;
+            setTimeout(() => {
+                triggerPointReward({
+                    amount: pts,
+                    title: `+${pts} Course Reward Points!`,
+                });
+            }, 600);
+        }
+    }, [order, queryStatus, triggerPointReward]);
 
     const handleCopyOrderNumber = () => {
         const text = orderNumber || order?.order_number;
